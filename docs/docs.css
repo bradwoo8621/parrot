@@ -1,0 +1,182 @@
+@CHARSET "UTF-8";
+
+html {
+    font-family: arial, tahoma, sans-serif;
+}
+
+body {
+    background-color: #fff;
+    color: #eaeaea;
+    font-weight: 400;
+    line-height: 1.5;
+    font-family: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal, monospace;
+    color: rgba(0, 0, 0, .8);
+    padding: 0;
+    margin: 0;
+    font-style: normal;
+    position: relative;
+    cursor: auto;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: normal;
+    font-family: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal, monospace;
+    color: #6db33f;
+    letter-spacing: -0.03em;
+}
+
+header {
+    background: rgba(0, 0, 0, 0.1);
+    width: 100%;
+    border-bottom: 1px dashed #b5e853;
+    padding: 20px 0;
+    margin: 0 0 40px 0;
+}
+
+header h1 {
+    font-size: 30px;
+    line-height: 1.5;
+    font-weight: bold;
+    font-family: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal, monospace;
+    letter-spacing: -1px;
+    -webkit-font-smoothing: antialiased;
+}
+
+header h2 {
+    font-size: 18px;
+    font-weight: 300;
+    color: #666;
+}
+
+a {
+    color: #080;
+    text-decoration: underline;
+    line-height: inherit;
+    background: transparent;
+}
+
+a:hover, a:visited, a:active, a:focus, a:link {
+    color: #080;
+    text-decoration: underline;
+}
+
+pre {
+    margin-bottom: 0px;
+}
+
+dl dt {
+    margin-bottom: .3125em;
+    font-weight: bold;
+    font-size: 140% text-rendering : optimizeLegibility;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 15px;
+}
+
+dl dt a, dl dt a:visited, dl dt a:active, dl dt a:link, dl dt a:focus {
+    text-decoration: none;
+}
+
+dl dt a:hover {
+    text-decoration: underline;
+}
+
+#toc {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #e0e0dc;
+    border-bottom: 1px solid #efefed;
+    margin-bottom: 1.25em;
+    padding: 1.25em;
+    background: #f8f8f7;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+}
+
+#toc ul {
+    list-style-type: none;
+}
+
+#toc ul.level0 {
+    padding-left: 0px;
+}
+
+#toc a {
+    text-decoration: none;
+}
+
+#toc a:hover {
+    text-decoration: underline;
+}
+
+#content h1 > a.anchor, h2 > a.anchor, h3 > a.anchor, h4 > a.anchor, h5 > a.anchor, h6 > a.anchor {
+    position: absolute;
+    z-index: 1001;
+    display: block;
+    text-decoration: none;
+    text-align: center;
+    font-weight: 400;
+    visibility: hidden;
+}
+
+div.example div.title {
+    text-rendering: optimizeLegibility;
+    text-align: left;
+    font-style: italic;
+    color: #6db33f;
+}
+
+div.example div.content {
+    background-color: #fffef7;
+    border-color: #e0e0dc;
+    box-shadow: 0 1px 4px #e0e0dc;
+    border-style: solid;
+    border-width: 1px;
+    margin-bottom: 1.25em;
+    border-radius: 4px;
+}
+
+.CodeMirror {
+    height: auto;
+}
+
+.CodeMirror pre {
+    font-size: 15px;
+}
+
+.cm-s-solarized.cm-s-light {
+    background-color: #f5f5f5;
+}
+
+.cm-s-solarized.cm-s-light .CodeMirror-gutters {
+    background-color: #f5f5f5;
+}
+
+div.sign {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+div.sign td.sign {
+    width: 150px;
+    text-align: center;
+    vertical-align: middle;
+    border-right: 1px solid #ddddd8;
+}
+
+div.sign td.sign.important > span.glyphicon {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, .5);;
+    color: #ff2222;
+    font-size: 36px;
+}
+
+div.sign td.sign.info > span.glyphicon {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, .5);;
+    color: yellowgreen;
+    font-size: 36px;
+}
+
+div.sign td.sign-content {
+    padding-left: 10px;
+    padding-right: 10px;
+}

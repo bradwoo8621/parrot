@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Quelea Web - User Manual</title>
+    <!-- bootstrap css -->
+    <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap-theme.css">
+    <link rel="stylesheet" href="../bower_components/CodeMirror/lib/codemirror.css">
+    <link rel="stylesheet" href="../bower_components/CodeMirror/theme/solarized.css">
+    <link rel="stylesheet" href="docs.css">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="../bower_components/html5shiv/dist/html5shiv.js"></script>
+    <script src="../bower_components/html5shiv/dist/html5shiv-printshiv.js"></script>
+    <script src="../bower_components/es5-shim/es5-shim.js"></script>
+    <script src="../bower_components/es5-shim/es5-sham.js"></script>
+    <script src="../bower_components/Respond/dest/respond.src.js"></script>
+    <![endif]-->
+</head>
+<body>
+<header>
+    <div class="container">
+        <h1>Quelea Web - User Manual</h1>
+
+        <h2>Brad Wu - Version 0.0.1, 2015/05/29</h2>
+    </div>
+</header>
+<div class="container">
+    <div id="toc" class="toc">
+        <h4>Table of Contents</h4>
+        <ul class="level0">
+            <li><a href="#preface">0. Preface</a></li>
+            <li><a href="#concepts">1. Working with Quelea Web</a>
+                <ul>
+                    <li><a href="#concepts.core">1.1 Core concepts</a></li>
+                    <li><a href="#concepts.model">1.2 Build your own model</a></li>
+                    <li><a href="#concepts.layout">1.3 Build your own layout
+                        model</a></li>
+                    <li><a href="#concepts.validator">1.4 Build your own
+                        validation model</a></li>
+                    <li><a href="#concepts.using">1.5 Using the models</a></li>
+                </ul>
+            </li>
+            <li><a href="#components">2. Components</a>
+                <ul>
+                    <li><a href="#components.text">2.1 Text</a></li>
+                    <li><a href="#components.check">2.2 CheckBox</a></li>
+                    <li><a href="#components.dropdown">2.3 Dropdown</a></li>
+                    <li><a href="#components.date">2.4 DateTimePicker</a></li>
+                    <li><a href="#components.search">2.5 SearchText</a></li>
+                    <li><a href="#components.pagination">2.6 Pagination</a></li>
+                    <li><a href="#components.table">2.7 Table</a></li>
+                    <li><a href="#components.jumbotron">2.8 Jumbotron</a></li>
+                    <li><a href="#components.confirm">2.9 Modal Confirm
+                        Dialog</a></li>
+                    <li><a href="#components.pageheader">2.10 Page Header</a></li>
+                    <li><a href="#components.pagefooter">2.11 Page Footer</a></li>
+                    <li><a href="#components.panelfooter">2.12 Panel Footer</a></li>
+                    <li><a href="#components.form">2.13 Form</a></li>
+                    <li><a href="#components.formdialog">2.14 Modal Form
+                        Dialog</a></li>
+                </ul>
+            </li>
+            <li><a href="#event">3. Event Mechanism</a>
+                <ul>
+                    <li><a href="#event.change">3.1 Change</a></li>
+                    <li><a href="#event.add">3.2 Add</a></li>
+                    <li><a href="#event.remove">3.3 Remove</a></li>
+                    <li><a href="#event.validate">3.4 Validate</a></li>
+                </ul>
+            </li>
+            <li><a href="#customize">4. Customize Component</a>
+                <ul>
+                    <li><a href="#customize.do">4.1 DO</a></li>
+                    <li><a href="#customize.donot">4.2 DO NOT</a></li>
+                </ul>
+            </li>
+            <li><a href="#next">98. Next Features</a></li>
+            <li><a href="#appendix">99. Appendix</a></li>
+        </ul>
+    </div>
+</div>
+<div class="container" id="content">
+    <h1 id="#preface">
+        <a class="anchor" name="preface"></a>0. Preface
+    </h1>
+
+    <div class="sectionbody">
+        <p>
+            Quelea Web is designed based on <a
+                href="https://facebook.github.io/react/" target="_blank">ReactJS</a>
+            and <a href="http://getbootstrap.com/" target="_blank">Bootstrap3</a>.
+            This guide will not explain how to use these two libraries, please
+            find basic concepts and guides there.
+        </p>
+
+        <p>
+            Repository: <a
+                href="https://github.com/bradwoo8621/nest/tree/master/quelea-web"
+                target="_blank">https://github.com/bradwoo8621/nest/tree/master/quelea-web</a>
+        </p>
+
+        <p>
+            Live Demo: <a
+                href="https://bradwoo8621.github.io/nest/quelea/quelea.html">Starts
+            here</a>.
+        </p>
+    </div>
+
+    <h1 id="#concepts">
+        <a class="anchor" name="concepts"></a>1. Working with Quelea Web
+    </h1>
+
+    <h3 id="#concepts.core">
+        <a class="anchor" name="concepts.core"></a>1.1 Core concepts
+    </h3>
+
+    <div class="paragraph">
+        <p>
+            The central concept in Quelea Web is
+            <code>Model</code>
+            . Construct the JSON data object to javascript
+            <code>Model</code>
+            , which makes intercepting the
+            <code>setter</code>
+            of model to be possible.<br> For render the model to UI, a
+            <code>Layout</code>
+            model is introduced into Quelea Web. Relationships of properties in
+            <code>Model</code>
+            and
+            <code>Layout</code>
+            are built based on
+            <code>id</code>
+            . At the same time, a
+            <code>Validator</code>
+            also be introduced into this framework, using same mapping
+            mechanism.
+        </p>
+    </div>
+
+    <h3 id="#concepts.model">
+        <a class="anchor" name="concepts.model"></a>1.2 Build your own model
+    </h3>
+
+    <div class="example">
+        <div class="title">Example 1. A JSON model</div>
+			<pre class="javascript">var user = {
+    id: null,
+    name: null
+};</pre>
+    </div>
+    <div class="paragraph">
+        <p>
+            Call
+            <code>ModelUtil.cloneJSON</code>
+            , clone original JSON object to avoid changing base.<br> Call
+            <code>ModelUtil.createModel</code>
+            , create a wrapper for JSON object, provides getter/setter method
+            for each properties.
+        </p>
+    </div>
+    <div class="example">
+        <div class="title">Example 2. Construct JSON model with wrapper</div>
+			<pre class="javascript">
+var userModel = ModelUtil.createModel(ModelUtil.cloneJSON(user));
+
+// after wrapping, call getter and setter
+var id = userModel.getId();
+userModel.setId(10001);
+var name = userModel.getName();
+userModel.setName("John Doe");
+
+// or call get/set method by parameters
+id = userModel.get("id");
+userModel.set("name", "John Doe");
+
+// get current editing model
+var editingModel = userModel.getCurrentModel();</pre>
+    </div>
+
+    <h3 id="#concepts.layout">
+        <a class="anchor" name="concepts.layout"></a>1.3 Build your own
+        layout model
+    </h3>
+
+    <div class="paragraph">
+        Quelea Web using Bootstrap to layout UI, so the viewport is designed
+        as 12 columns.<br> There are four parts of layout configuration:
+        <ul>
+            <li><code>label</code>: Required. Defined the label of
+                component. Normally component will not render label by itself
+                except some special components, eg. <code>Table</code>.
+            </li>
+            <li><code>comp</code>: Optional. Component options, sub
+                properties is component related.
+            </li>
+            <li><code>pos</code>: Required. There are three sub properties
+                <code>col</code>, <code>row</code> and <code>width</code>. <code>pos</code>
+                is configuration about position and size in UI.
+            </li>
+            <li><code>css</code>: Optional. Component CSS, sub properties
+                is component related.
+            </li>
+        </ul>
+    </div>
+    <div class="example">
+        <div class="title">Example 3. A JSON layout model</div>
+			<pre class="javascript">var layout = {
+    id: {
+        label: "User ID",
+        // comp attribute is optional is no sub properties
+        comp: {
+            // optional, default is ComponentConstants.Text
+            type: ComponentConstants.Text
+        },
+        pos: {
+            // optional is it is 3
+            col: 1, row: 1, width: 3
+        }
+    },
+    name: {
+        label: "User Name",
+        pos: {col: 2, row: 1}
+    }
+};</pre>
+    </div>
+    <div class="paragraph sign">
+        <table>
+            <tr>
+                <td class="sign important"><span
+                        class="glyphicon glyphicon-exclamation-sign"></span></td>
+                <td class="sign-content">Properties name must be same as
+                    model.
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="example">
+        <div class="title">Example 4. Construct JSON layout model with
+            wrapper
+        </div>
+        <pre class="javascript">var layoutModel = new FormLayout(layout);</pre>
+    </div>
+    <div class="paragraph">
+        <code>FormLayout</code>
+        constructor accepts one or more JSON objects, if the property name is
+        duplicated in parameters, the last should be the effective one.
+        Layout object figures out how the properties are rendered by browser.
+    </div>
+    <h3 id="#concepts.validator">
+        <a class="anchor" name="concepts.validator"></a>1.4 Build your own
+        validation model
+    </h3>
+
+    <div class="paragraph">As a very important part of UI,
+        validation mechanism is also provided by Quelea Web.
+    </div>
+    <div class="example">
+        <div class="title">Example 5. A JSON validation model</div>
+			<pre class="javascript">var validator = {
+    id: {
+        requried: true
+    },
+    name: {
+        required: true,
+        maxlength: 20
+    }
+};</pre>
+    </div>
+    <div class="paragraph sign">
+        <table>
+            <tr>
+                <td class="sign important"><span
+                        class="glyphicon glyphicon-exclamation-sign"></span></td>
+                <td class="sign-content">Properties name must be same as
+                    model.
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="paragraph">
+        <code>ModelValidator</code>
+        is provided as a wrapper for validation model. There are two
+        parameters in constructor, the first is JSON validation model and the
+        second is validation rules.
+    </div>
+    <div class="example">
+        <div class="title">Example 6. Construct JSON validation model
+            with wrapper
+        </div>
+			<pre class="javascript" data-lang="javascript">var validatorModel = new ModelValidator(ValidatorDefine.IndividualPartyValidator);
+// or
+var validatorModel = new ModelValidator(ValidatorDefine.IndividualPartyValidator, ValidateRules);
+
+// party of ValidationRules which was defined at class.js
+var ValidateRules = {
+    required: function (model, value) {
+        if (value == null || value.toString().isEmpty()) {
+            return "\"%1\" is Required.";
+        } else {
+            return true;
+        }
+    },
+    maxlength: function (model, value, length) {
+        if (value == null) {
+            return true;
+        } else if (value.length > length) {
+            return "Length of \"%1\" cannot be more than " + length + ".";
+        }
+    }
+};</pre>
+    </div>
+    <div class="paragraph sign">
+        <table>
+            <tr>
+                <td class="sign info"><span
+                        class="glyphicon glyphicon-ok-sign"></span></td>
+                <td class="sign-content">The secondary parameter is optional.
+                    If it is skipped, constructor uses <code>ValidateRules</code> as
+                    default.
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="paragraph">
+        <code>ModelValidator</code>
+        find validation rules by key name, such as
+        <code>required</code>
+        ,
+        <code>maxlength</code>
+        . And three parameters are passed to validation rule function, model
+        itself, value of property and the definition of the rule. In the
+        previous example,
+        <code>20</code>
+        is passed to
+        <code>maxlength</code>
+        . Because of the structure of
+        <code>ValidateRules</code>
+        is a simple JSON object, extension is very easy, just simplely add
+        new property into
+        <code>ValidateRules</code>
+        and define it in validation model.
+    </div>
+    <div class="example">
+        <div class="title">Example 7. Adding a new validation rule</div>
+			<pre class="javascript" data-lang="javascript">// in class.js
+// Note this sample is a part of Quelea Web, already implemented.
+var ValidateRules = {
+    // ... other rules
+    before: function (model, value, settings) {
+        return ValidateRules.__dateCompare(value, model, settings, ValidateRules.__beforeSpecial);
+    },
+    /**
+     * compare data
+     * @param value
+     * @param model
+     * @param settings
+     * @param checkFunc
+     * @returns {[string]|string}
+     * @private
+     */
+    __dateCompare: function (value, model, settings, checkFunc) {
+        // some logic here
+    },
+    // ... other rules
+};
+
+// in project javascript file
+var validator = {
+    // ... other definitions
+    dateOfBirth: {
+        requried: true,
+        before: {
+            rule: ["now", "dateOfDeath"],
+            format: "YYYY/MM/DD",
+            label: ["Now", "\"Date Of Death\""]
+        }
+    }
+    // ... other definitions
+};</pre>
+    </div>
+    <div class="paragraph sign">
+        <table>
+            <tr>
+                <td class="sign important"><span
+                        class="glyphicon glyphicon-exclamation-sign"></span></td>
+                <td class="sign-content">Call other methods in <code>ValidationRules</code>,
+                    treat them as static methods. Caller <code>"this"</code> is <code>ModelValidator</code>,
+                    not <code>ValidationRules</code>.
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="paragraph">The validation rules definition is
+        flexible and extensible, the only rule is providing a function.
+    </div>
+    <h3 id="#concepts.using">
+        <a class="anchor" name="concepts.using"></a>1.5 Using the models
+    </h3>
+
+    <div class="example">
+        <div class="title">Example 8. Construct models and send them to
+            React component
+        </div>
+			<pre class="javascript">var model = ModelUtil.createModel(ModelUtil.cloneJSON(user), new ModelValidator(validator));
+var layout = new FormLayout(layout);
+// the JSX syntax
+var form = &lt;NForm model={model} layout={layout}/&gt;;
+React.render(form, document.getElementById("container"));</pre>
+    </div>
+
+    <h1 id="#components">
+        <a class="anchor" name="components"></a>2. Components
+    </h1>
+
+    <div class="paragraph">
+        Component receives two properties,
+        <code>model</code>
+        and
+        <code>layout</code>
+        .
+        <ul>
+            <li>Render component style by <code>layout</code>, value from <code>model</code>.
+            </li>
+            <li>Monitor component value change, synchronize to model.</li>
+            <li>Monitor model value change, synchronize to component.</li>
+            <li>Monitor model validation operation, refresh component.</li>
+        </ul>
+    </div>
+    <h3 id="#components.text">
+        <a class="anchor" name="components.text"></a>2.1 Text
+    </h3>
+
+    <div class="example">
+        <div class="title">Example 9. Text</div>
+			<pre class="javascript">&lt;NText model={model} layout={layout}/&gt;
+
+// layout JSON
+{
+    label: "Text",
+    comp: {
+        type: ComponentConstants.Text, // optional, default is ComponentConstants.Text
+        enabled: {
+            when: function(model, value) {return false;} // optional, component is enabled if this property not exists
+            depends: "otherPropertyId"
+        }
+    },
+    pos: {},
+    css: {
+        comp: "additional-css" // optional, css class name
+    }
+}</pre>
+    </div>
+    <h3 id="#components.check">
+        <a class="anchor" name="components.check"></a>2.2 CheckBox
+    </h3>
+
+    <div class="example">
+        <div class="title">Example 10. CheckBox</div>
+			<pre class="javascript">&lt;NCheck model={model} layout={layout}/&gt;
+
+// layout JSON
+{
+    label: "Check",
+    comp: {
+        type: ComponentConstants.Check
+    },
+    pos: {},
+    css: {
+        comp: "additional-css" // optional, css class name
+    }
+}</pre>
+    </div>
+    <h3 id="#components.dropdown">
+        <a class="anchor" name="components.dropdown"></a>2.3 Dropdown
+    </h3>
+
+    <div class="content">
+        <p>
+            Dropdown component is based on <a href="https://select2.github.io/"
+                                              target="_blank">jQuery Select2</a>
+        </p>
+
+        <p>
+            Setting
+            <code>data</code>
+            is a
+            <code>CodeTable</code>
+            .
+        </p>
+    </div>
+    <div class="example">
+        <div class="title">Example 11. Dropdown</div>
+			<pre class="javascript">&lt;NSelect model={model} layout={layout}/&gt;
+
+// layout JSON
+{
+    label: "Dropdown",
+    comp: {
+        type: ComponentConstants.Select,
+
+        // following properties are same as jQuery Select2 and most of them are optional
+        allowClear: true, // optional, default true
+        minimumResultsForSearch: 1, // optional, default 1, or Infinity
+        multiple: false, // optional, default false
+        placeholder: "Please Select...", // optional, default "Please Select..."
+        width: "100%", // optional, default "100%"
+        data: null, // required.
+
+        // following properties are hierarchy dropdown
+        availableWhenNoParentValue: false, // optional, default false. No available items when no parent value when false.
+        parentPropId: "parentPropId", // required if there is hierarchy relationship. Property Id of parent model.
+        parentModel: parentModel, // optional, default is current model if not exists.
+        // If assigned, parent model must be created by ModelUtil.createModel()
+        parentFilter: "pid" // filter of items according to parent property value,
+        // can be property of self items or a function with parameters(1: parent value, 2: self options array)
+    },
+    pos: {},
+    css: {
+        comp: "additional-css" // optional, css class name
+    }
+}</pre>
+    </div>
+    <h3 id="#components.date">
+        <a class="anchor" name="components.date"></a>2.4 DateTimePicker
+    </h3>
+
+    <div class="content">
+        <p>
+            DateTimePicker component is based on <a
+                href="https://github.com/Eonasdan/bootstrap-datetimepicker"
+                target="_blank">Bootstrap DateTimePicker</a>
+        </p>
+    </div>
+    <div class="example">
+        <div class="title">Example 12. DateTimePicker</div>
+			<pre class="javascript">&lt;NDateTime model={model} layout={layout}/&gt;
+
+// layout JSON
+{
+    label: "DateTimePicker",
+    comp: {
+        type: ComponentConstants.Date,
+
+        // following properties are same as Bootstrap DateTimePicker,
+        // all of them are optional, and here are the default value.
+        format: "YYYY/MM/DD",
+        dayViewHeaderFormat: "MMMM YYYY",
+        stepping: 1,
+        minDate: false,
+        maxDate: false,
+        collapse: true,
+        defaultDate: false,
+        disabledDates: false,
+        enabledDates: false,
+        icons: {
+            time: 'glyphicon glyphicon-time',
+            date: 'glyphicon glyphicon-calendar',
+            up: 'glyphicon glyphicon-chevron-up',
+            down: 'glyphicon glyphicon-chevron-down',
+            previous: 'glyphicon glyphicon-chevron-left',
+            next: 'glyphicon glyphicon-chevron-right',
+            today: 'glyphicon glyphicon-screenshot',
+            clear: 'glyphicon glyphicon-trash'
+        },
+        useStrict: false,
+        sideBySide: true,
+        daysOfWeekDisabled: [],
+        calendarWeeks: false,
+        viewMode: 'days',
+        toolbarPlacement: 'default',
+        showTodayButton: true,
+        showClear: true,
+        showClose: true,
+
+        // value format can be different with display format
+        valueFormat: "YYYY/MM/DD" // optional
+    },
+    pos: {},
+    css: {
+        comp: "additional-css" // optional, css class name apply to input
+        div: "additional-div-css" // optional, css class name apply to div
+    }
+}</pre>
+    </div>
+
+    <h3 id="#components.search">
+        <a class="anchor" name="components.search"></a>2.5 SearchText
+    </h3>
+
+    <div class="content">
+        <p>Search Text is still on developing.</p>
+    </div>
+    <div class="example">
+        <div class="title">Example 13. SearchText</div>
+			<pre class="javascript">&lt;NSearchText model={model} layout={layout}/&gt;
+
+// layout JSON
+{
+    label: "SearchText",
+    comp: {
+        type: ComponentConstants.Search,
+
+        // button icons, all of them are optional, here are default value.
+        searchButtonIcon: "screenshot",
+        advancedSearchButtonIcon: "search"
+    },
+    pos: {},
+    css: {
+        text: "additional-css" // optional, css class name apply to code input
+        label: "additional-css" // optional, css class name apply to label input
+    }
+}</pre>
+    </div>
+
+    <h3 id="#components.pagination">
+        <a class="anchor" name="components.pagination"></a>2.6 Pagination
+    </h3>
+
+    <div class="content">
+        <p>
+            Pagination is not designed for model layout, but it is using in
+            <code>Table</code>
+            component.
+        </p>
+    </div>
+    <div class="example">
+        <div class="title">Example 14. Pagination</div>
+			<pre class="javascript">&lt;NPagination/&gt;
+
+// React definition
+propTypes: {
+    // max page buttons
+    maxPageButtons: React.PropTypes.number,
+    // page count
+    pageCount: React.PropTypes.number,
+    // current page index, start from 1
+    currentPageIndex: React.PropTypes.number,
+
+    // jump to page, will be invoked when page index changed
+    toPage: React.PropTypes.func.isRequired,
+
+    className: React.PropTypes.string,
+
+    // show status label
+    showStatus: React.PropTypes.bool
+},
+getDefaultProps: function () {
+    return {
+        maxPageButtons: 5,
+        pageCount: 1, // page count default 1
+        currentPageIndex: 1, // page number count from 1
+        showStatus: true
+    };
+}</pre>
+    </div>
+
+    <h3 id="#components.table">
+        <a class="anchor" name="components.table"></a>2.7 Table
+    </h3>
+
+    <div class="content">
+        Table supports,
+        <ul>
+            <li>Sort</li>
+            <li>Text search</li>
+            <li>Fixed left/right columns</li>
+            <li>Index column at left</li>
+            <li>Edit and remove button column at right</li>
+            <li>Add new item</li>
+            <li>Pagination</li>
+        </ul>
+        Not supports yet,
+        <ul>
+            <li>Dynamic data loading</li>
+        </ul>
+    </div>
+    <div class="example">
+        <div class="title">Example 15. Table</div>
+			<pre class="javascript">&lt;NTable model={model} layout={layout}/&gt;
+
+// layout JSON
+{
+    label: "Table",
+    comp: {
+        type: ComponentConstants.Table,
+
+        // following properties are all optional, here are default value
+        scrollY: false,
+        scrollX: false,
+        fixedRightColumns: 0,
+        fixedLeftColumns: 0,
+
+        addable: true,
+        addButtonIcon: "plus-sign",
+        addButtonText: "Add",
+        searchable: true,
+        searchPlaceholder: "Search...",
+
+        operationFixed: true,
+        editable: false,
+        rowEditButtonIcon: "pencil",
+        removable: false,
+        rowRemoveButtonIcon: "remove",
+        editDialogSaveButtonText: "Save",
+        editDialogSaveButtonIcon: "floppy-save",
+
+        indexable: false,
+        indexFixed: true,
+
+        sortable: true,
+        sortIcon: "sort",
+        sortAscIcon: "sort-by-attributes",
+        sortDescIcon: "sort-by-attributes-alt",
+
+        pageable: false,
+        countPerPage: 20,
+
+        noDataLabel: "No Data",
+        detailErrorMessage: "Detail error please open item and do validate.",
+
+        // following is properties for table item editing
+        modelTemplate : {}, // required if addable, JSON object, base of creating new item
+        editLayout: {}, // required if addable or editable, same as JSON layout object.
+
+        // following is layout of render table columns
+        columns: new TableColumnLayout([]) // required, must be TableColumnLayout object
+        // each element of array is a JSON object as below,
+        // {
+        //    title: "Account Type", // title of column
+        //    width: 150, // width of column, required if scrollX or fixed left/right
+        //    // render the cell text, data of row, a JSON object.
+        //    render: function (data) {
+        //        return Codes.AccountType.getText(data.accountTypeCode);
+        //    },
+        //    data: "accountNumber" // if no render, data means the property id of row JSON object
+        //}
+    },
+    pos: {},
+    css: {
+        heading: "additional-css" // optional, css class name apply to heading
+        headingLabel: "additional-css" // optional, css class name apply to heading label
+        sort: "additional-css" // optional, css class name apply to table header when column is sortable
+        sort: "additional-css" // optional, css class name apply to table header when column is sorted
+        panelBody: "additional-css" // optional, css class name apply to table container
+        table: "additional-css" // optional, css class name apply to table
+        div: "additional-css" // optional, css class name apply to panel div
+        body: "additional-css" // optional, css class name apply to panel body
+    }
+}</pre>
+    </div>
+
+    <h3 id="#components.jumbotron">
+        <a class="anchor" name="components.jumbotron"></a>2.8 Jumbotron
+    </h3>
+
+    <div class="content">
+        <p>Jumbotron is not designed for model layout, it can be used to
+            render a simple home page.</p>
+    </div>
+    <div class="example">
+        <div class="title">Example 16. Jumbotron</div>
+			<pre class="javascript">&lt;NJumbortron/&gt;
+
+// React definition
+propTypes: {
+    highlightText: React.PropTypes.oneOfType(
+        React.PropTypes.string,
+        React.PropTypes.arrayOf(React.PropTypes.string)).isRequired
+}</pre>
+    </div>
+
+    <h3 id="#components.confirm">
+        <a class="anchor" name="components.confirm"></a>2.9 Modal Confirm
+        Dialog
+    </h3>
+
+    <div class="content">
+        <p>
+            ModalConfirmDialog is not designed for model layout, it can be used
+            independent. Meanwhile,
+            <code>Table</code>
+            also depends on it.
+        </p>
+    </div>
+    <div class="example">
+        <div class="title">Example 17. Modal Confirm Dialog</div>
+			<pre class="javascript">&lt;NConfirm/&gt;
+
+// React definition
+propTypes: {
+    css: React.PropTypes.string,
+    zIndex: React.PropTypes.number
+}
+
+// to control the visibility of confirm dialog, using the following methods
+hide: function () {};
+/**
+ * show dialog
+ * @param title title of dialog
+ * @param options string or string array, or object as below.
+ *          {
+ *              disableButtons: true, // hide button bar
+ *              disableConfirm: true, // hide confirm button
+ *              disableClose: true, // hide close button
+ *              messsages: "" // string or string array
+ *              close: true // show close button text as "close"
+ *          }
+ * @param onConfirm callback function when confirm button clicked
+ */
+show: function (title, options, onConfirm) {};
+</pre>
+    </div>
+
+    <h3 id="#components.pageheader">
+        <a class="anchor" name="components.pageheader"></a>2.10 Page Header
+    </h3>
+
+    <div class="content">
+        <p>PageHeader is not designed for model layout, it can be used
+            independent. Normally, it used to render the banner part of page.</p>
+    </div>
+    <div class="example">
+        <div class="title">Example 18. Page Header</div>
+			<pre class="javascript">&lt;NPageHeader/&gt;
+
+// React definition
+propTypes: {
+    // brand string
+    brand: React.PropTypes.string.isRequired,
+    brandUrl: React.PropTypes.string, // optional, url jumping when brand clicked
+    brandFunc: React.PropTypes.func, // optional, callback function when brand clicked
+    // menu object
+    menus: React.PropTypes.array,
+    // search box properties
+    search: React.PropTypes.func, // required, callback function when search button clicked
+    searchPlaceholder: React.PropTypes.string // optional
+},
+getDefaultProps: function () {
+    return {
+        searchPlaceholder: "Search..."
+    };
+},
+
+// menus array sample
+var controller = {...};
+var menus = [{
+    text: "Party",
+    children: [{text: "Find Party", func: controller.findParty.bind(controller)},
+        {text: "Find Role", func: controller.findRole.bind(controller)},
+        {divider: true},
+        {
+            text: "Create Party",
+            children: [{text: "Individual", func: controller.createIndividualParty.bind(controller)},
+                {text: "Organization", func: controller.createOrganizationParty.bind(controller)}]
+        },
+        {divider: true},
+        {
+            text: "Create Customer",
+            children: [{text: "Individual", func: controller.demo.bind(controller)},
+                {text: "Organization", func: controller.demo.bind(controller)}]
+        }, {
+            text: "Create Agent",
+            children: [{text: "Individual", func: controller.demo.bind(controller)},
+                {text: "Organization", func: controller.demo.bind(controller)}]
+        },
+        {text: "Create Bank", func: controller.demo.bind(controller)},
+        {
+            text: "Create Own Roles",
+            children: [{text: "Branch", func: controller.demo.bind(controller)},
+                {text: "Department", func: controller.demo.bind(controller)},
+                {text: "Employee", func: controller.demo.bind(controller)}]
+        }]
+}];</pre>
+    </div>
+
+    <h3 id="#components.pagefooter">
+        <a class="anchor" name="components.pagefooter"></a>2.11 Page Footer
+    </h3>
+
+    <div class="content">
+        <p>PageFooter is not designed for model layout, it can be used
+            independent. Normally, it used to render the footer part of page.
+            It's a very simple component, just for demo the how to render the
+            fixed bottom footer. In this component, now contains the license
+            information and url link to Nest project, which is the parent
+            project of Quelea Web.</p>
+    </div>
+    <div class="example">
+        <div class="title">Example 19. Page Footer</div>
+			<pre class="javascript">&lt;NPageFooter/&gt;
+
+// React definition
+propTypes: {
+    name: React.PropTypes.string.isRequired
+}</pre>
+    </div>
+
+    <h3 id="#components.panelfooter">
+        <a class="anchor" name="components.panelfooter"></a>2.12 Panel Footer
+    </h3>
+
+    <div class="content">
+        <p>PanelFooter is not designed for model layout, it can be used
+            independent. Normally, it used to render the footer part of panel.</p>
+
+        <p>
+            PanelFooter provides the ability to render buttons. There are four
+            default buttons,
+            <code>Reset</code>
+            ,
+            <code>Validate</code>
+            ,
+            <code>Save</code>
+            ,
+            <code>Cancel</code>
+            . All these default buttons will be enabled when set the callback
+            function. At the same time, two set of buttons interception are
+            allowed.
+        </p>
+    </div>
+    <div class="example">
+        <div class="title">Example 20. Panel Footer</div>
+			<pre class="javascript">&lt;NPanelFooter/&gt;
+
+// React definition
+propTypes: {
+    save: React.PropTypes.func,
+    validate: React.PropTypes.func,
+    cancel: React.PropTypes.func,
+    reset: React.PropTypes.func,
+
+    left: React.PropTypes.arrayOf(React.PropTypes.shape({
+        icon: React.PropTypes.string,
+        text: React.PropTypes.string,
+        style: React.PropTypes.string,
+        onClick: React.PropTypes.func.isRequired
+    })),
+    right: React.PropTypes.arrayOf(React.PropTypes.shape({
+        icon: React.PropTypes.string,
+        text: React.PropTypes.string,
+        style: React.PropTypes.string, // references to bootstrap styles
+        onClick: React.PropTypes.func.isRequired
+    }))
+}</pre>
+    </div>
+
+    <h3 id="#components.form">
+        <a class="anchor" name="components.form"></a>2.13 Form
+    </h3>
+
+    <div class="content">
+        <p>Form is the most important component which automatically
+            render according to given model and layout, automatically execute
+            the validation.</p>
+
+        <p>
+            Form scans the layout property ids to render UI, which means with
+            same model, can be separated to more than one form, it depends on
+            the layout definition. Each property is explained as a
+            <code>NFormCell</code>
+            , form cell provides label for component.
+        </p>
+
+        <p>Form has no buttons, PanelFooter is the component which render
+            the buttons.</p>
+    </div>
+    <div class="example">
+        <div class="title">Example 21. Form</div>
+			<pre class="javascript">&lt;NForm model={model} layout={layout}/&gt;
+
+// React definition
+propTypes: {
+    // model, created by ModelUtil.createModel()
+    model: React.PropTypes.object,
+    // layout, FormLayout
+    layout: React.PropTypes.object
+}</pre>
+    </div>
+
+    <h3 id="#components.formdialog">
+        <a class="anchor" name="components.formdialog"></a>2.14 Modal Form
+        Dialog
+    </h3>
+
+    <div class="content">
+        <p>
+            ModalFormDialog quietly likes
+            <code>Form</code>
+            , but it renders model in a modal layer.
+        </p>
+
+        <p>
+            <code>Table</code>
+            depends on this component.
+        </p>
+    </div>
+    <div class="example">
+        <div class="title">Example 22. Modal Form Dialog</div>
+			<pre class="javascript">&lt;NModalForm /&gt;
+
+// React definition
+propTypes: {
+    title: React.PropTypes.string,
+    css: React.PropTypes.string,
+    zIndex: React.PropTypes.number
+}
+
+// methods to control the dialog
+hide: function () {};
+/**
+ * show dialog
+ * @param model created by ModelUtil.createModel();
+ * @param layout FormLayout
+ * @param buttons refers to PanelFooter
+ */
+show: function (model, layout, buttons) {};
+</pre>
+    </div>
+    <h1 id="#event">
+        <a class="anchor" name="event"></a>3. Event Mechanism
+    </h1>
+
+    <div class="content">
+        There are four event provided by Quelea Web, and currently only be
+        invoked when
+        <code>post</code>
+        event.
+    </div>
+
+    <h3 id="#event.change">
+        <a class="anchor" name="event.change"></a>3.1 Change
+    </h3>
+
+    <div class="content">
+        Event invokes when value of model changed. Monitor event via
+        <code>addListener</code>
+    </div>
+    <div class="example">
+        <div class="title">Example 23. Change Event</div>
+			<pre class="javascript">model.addListener("name", "post", "change", listener);
+model.removeListener("name", "post", "change", listener);</pre>
+    </div>
+
+    <h3 id="#event.add">
+        <a class="anchor" name="event.add"></a>3.2 Add
+    </h3>
+
+    <div class="content">
+        Event invokes when item of value added, only table property invokes
+        this event. Monitor event via
+        <code>addListener</code>
+    </div>
+    <div class="example">
+        <div class="title">Example 24. Add Event</div>
+			<pre class="javascript">model.addListener("table", "post", "add", listener);
+model.removeListener("table", "post", "add", listener);</pre>
+    </div>
+
+    <h3 id="#event.remove">
+        <a class="anchor" name="event.remove"></a>3.3 Remove
+    </h3>
+
+    <div class="content">
+        Event invokes when item of value removed, only table property invokes
+        this event. Monitor event via
+        <code>addListener</code>
+    </div>
+    <div class="example">
+        <div class="title">Example 24. Add Event</div>
+			<pre class="javascript">model.addListener("table", "post", "remove", listener);
+model.removeListener("table", "post", "remove", listener);</pre>
+    </div>
+
+    <h3 id="#event.validate">
+        <a class="anchor" name="event.validate"></a>3.4 Validate
+    </h3>
+
+    <div class="content">
+        Event invokes when finished property validation of model. Monitor
+        event via
+        <code>addListener</code>
+    </div>
+    <div class="example">
+        <div class="title">Example 23. Change Event</div>
+			<pre class="javascript">model.addListener("name", "post", "validate", listener);
+model.removeListener("name", "post", "validate", listener);</pre>
+    </div>
+
+    <h1 id="#customize">
+        <a class="anchor" name="customize"></a>4. Customize Component
+    </h1>
+
+    <h3 id="#customize.do">
+        <a class="anchor" name="customize.do"></a>4.1 DO
+    </h3>
+
+    <div class="content">
+        <ul class="level0">
+            <li>Base methods of component are provided in <code>base.js</code>,
+                call <code>ComponentDefine</code> to initialize the component
+                definition, each method of <code>ComponentBase</code> can be
+                override.
+            </li>
+
+            <li>Add and remove listeners in <code>componentWillUpdate</code>,
+                <code>componentDidUpdate</code>, <code>componentDidMount</code>, <code>componentWillUnmount</code>.
+                Call <code>forceUpdate</code> when want to refresh the component.
+            </li>
+
+            <li>Add constants value into <code>ComponentConstants</code>.
+                Add render method into <code>NFormCell</code> at <code>Form.jsx</code>.
+            </li>
+            <li>Extend layout configuration as you want, it's unlimited.
+                But follow the rules:
+                <ul>
+                    <li>Component options is under <code>comp</code>.
+                    </li>
+                    <li>CSS class names is under <code>css</code></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <h3 id="#customize.donot">
+        <a class="anchor" name="customize.donot"></a>4.2 DO NOT
+    </h3>
+
+    <div>
+        <ul>
+            <li>Monitor DOM element event out of component.</li>
+            <li>Confuse <code>this</code>.
+            </li>
+        </ul>
+    </div>
+
+    <h1 id="#next">
+        <a class="anchor" name="next"></a>98. Next Features
+    </h1>
+    <h4>V0.0.1</h4>
+    <ul class="level0">
+        <li>Finish the <code>NSearchText</code>.
+        </li>
+        <li>Add <code>enabled</code>, <code>visible</code>, <code>readonly</code>
+            support.
+        </li>
+        <li>Add dynamic data support of <code>NTable</code>.
+        </li>
+        <li>Add dynamic data support of <code>NSelect</code>.
+        </li>
+        <li>Add ajax mock service mechanism.</li>
+    </ul>
+
+    <h1 id="#appendix">
+        <a class="anchor" name="appendix"></a>99. Appendix
+    </h1>
+    <dl>
+        <dt>
+            <a target="_blank" href="https://facebook.github.io/react/">React</a>
+        </dt>
+        <dt>
+            <a target="_blank" href="http://getbootstrap.com">Bootstrap</a>
+        </dt>
+        <dt>
+            <a target="_blank" href="http://jquery.com/">jQuery</a>
+        </dt>
+        <dt>
+            <a target="_blank" href="http://momentjs.com/">Moment.js</a>
+        </dt>
+        <dt>
+            <a target="_blank" href="https://github.com/tnhu/jsface">jsface</a>
+        </dt>
+        <dt>
+            <a target="_blank" href="http://react-bootstrap.github.io/">React
+                Bootstrap</a>
+        </dt>
+        <dt>
+            <a target="_blank" href="https://select2.github.io/">Select2</a>
+        </dt>
+        <dt>
+            <a target="_blank"
+               href="https://github.com/Eonasdan/bootstrap-datetimepicker">Bootstrap-DateTimePicker</a>
+        </dt>
+        <dt>
+            <a target="_blank"
+               href="https://github.com/gabceb/jquery-browser-plugin">jQuery.browser</a>
+        </dt>
+        <dt>
+            <a target="_blank" href="https://github.com/afarkas/html5shiv">html5shiv</a>
+        </dt>
+        <dt>
+            <a target="_blank" href="https://github.com/es-shims/es5-shi">es5-shim</a>
+        </dt>
+        <dt>
+            <a target="_blank" href="https://github.com/scottjehl/Respond">Respond.js</a>
+        </dt>
+    </dl>
+</div>
+<!-- bootstrap -->
+<script src="../bower_components/jquery/dist/jquery.js"></script>
+<script src="../bower_components/jquery.browser/dist/jquery.browser.js"></script>
+<script src="../bower_components/bootstrap/dist/js/bootstrap.js"></script>
+<script src="../bower_components/bootstrap3-ie10-viewport-bug-workaround/ie10-viewport-bug-workaround.js"></script>
+<script src="../bower_components/CodeMirror/lib/codemirror.js"></script>
+<script src="../bower_components/CodeMirror/mode/javascript/javascript.js"></script>
+<script>
+    $('.javascript').each(function () {
+        var $this = $(this), $code = $this.text();
+        $this.empty();
+        CodeMirror(this, {
+            value: $code,
+            mode: 'javascript',
+            lineNumbers: true,
+            readOnly: true,
+            theme: "solarized light",
+            smartIndent: true,
+            indentUnit: 4,
+            indentWithTabs: true
+        });
+    });
+</script>
+</body>
+</html>

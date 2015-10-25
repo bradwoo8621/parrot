@@ -1,0 +1,32 @@
+{
+  "name": "parrot",
+  "version": "0.0.1",
+  "authors": [
+    "brad.wu <bradwoo8621@gmail.com>"
+  ],
+  "description": "Fast form render tools build on reactjs",
+  "main": "target/js/com.github.nest.parrot-0.0.1.js",
+  "keywords": [
+    "form",
+    "fast",
+    "reactjs"
+  ],
+  "license": "MIT",
+  "homepage": "https://bradwoo8621.github.io/nest",
+  "dependencies": {
+    "bootstrap": ">=3.3.5",
+    "bootstrap3-ie10-viewport-bug-workaround": ">=1.0.0",
+    "eonasdan-bootstrap-datetimepicker": ">=4.14.30",
+    "es5-shim": ">=4.1.7",
+    "fontawesome": ">=4.3.0",
+    "html5shiv": ">=3.7.2",
+    "jquery.browser": ">=0.0.7",
+    "jsface": ">=2.4.5",
+    "jquery": ">=2.1.4",
+    "react-bootstrap": ">=0.23.5",
+    "react": ">=0.13.3",
+    "Respond": ">=1.4.2",
+    "select2": ">=4.0.0"
+  },
+  "ignore": ["test/*"]
+}
