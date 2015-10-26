@@ -1,0 +1,42 @@
+.n-tree {
+	li > ul.nav {
+		display: none;
+	}
+	li.active > ul.nav {
+		display: block;
+	}
+	li > a,
+	li > a:hover,
+	li > a:visited,
+	li > a:active,
+	li > a:focus {
+		color: @font-color;
+		padding: 0;
+		background-color: transparent;
+		min-height: 30px;
+		display: inline-block;
+	}
+
+	li > ul.nav li {
+		padding-left: 15px;
+	}
+
+	.node-op-icon {
+		margin-left: 5px;
+	}
+	.node-icon {
+		margin-left: 5px;
+	}
+	.node-text {
+		padding-left: 5px;
+		padding-right: 5px;
+	}
+
+	div.n-checkbox {
+		margin-left: 5px;
+		display: inline-block;
+		span.check-container {
+			top: 2px;
+		}
+	}
+}

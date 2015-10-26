@@ -2154,6 +2154,43 @@ div.n-file .file-input div.btn.btn-file {
   outline: 0;
   outline-offset: 0;
 }
+.n-tree li > ul.nav {
+  display: none;
+}
+.n-tree li.active > ul.nav {
+  display: block;
+}
+.n-tree li > a,
+.n-tree li > a:hover,
+.n-tree li > a:visited,
+.n-tree li > a:active,
+.n-tree li > a:focus {
+  color: #666666;
+  padding: 0;
+  background-color: transparent;
+  min-height: 30px;
+  display: inline-block;
+}
+.n-tree li > ul.nav li {
+  padding-left: 15px;
+}
+.n-tree .node-op-icon {
+  margin-left: 5px;
+}
+.n-tree .node-icon {
+  margin-left: 5px;
+}
+.n-tree .node-text {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+.n-tree div.n-checkbox {
+  margin-left: 5px;
+  display: inline-block;
+}
+.n-tree div.n-checkbox span.check-container {
+  top: 2px;
+}
 div.has-error > span,
 div.has-error.horizontal-label > div.row > div:first-child > span {
   color: #f44336;

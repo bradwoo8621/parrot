@@ -60,6 +60,7 @@
 		Toggle: 'toggle',
 		Radio: "radio",
 		Table: {type: "table", label: false, popover: false},
+		Tree: {type: "tree", label: false, popover: false},
 		Date: "date",
 		Search: "search",
 		Button: {type: "button", label: false},

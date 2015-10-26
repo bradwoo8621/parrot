@@ -119,6 +119,14 @@ var NFormCell = React.createClass($pt.defineCellComponent({
 			return <NTable model={model} layout={layout} ref={layout.getId()}/>;
 		},
 		/**
+		 * render tree
+		 * @returns {XML}
+		 * @private
+		 */
+		__tree: function(model, layout) {
+			return <NTree model={model} layout={layout} ref={layout.getId()} />;
+		},
+		/**
 		 * render file
 		 * @return {XML}
 		 * @private
