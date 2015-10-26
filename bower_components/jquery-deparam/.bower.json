@@ -1,0 +1,17 @@
+{
+  "name": "jquery-deparam",
+  "version": "0.4.2",
+  "main": "jquery-deparam.js",
+  "license": "MIT",
+  "homepage": "https://github.com/AceMetrix/jquery-deparam",
+  "_release": "0.4.2",
+  "_resolution": {
+    "type": "version",
+    "tag": "0.4.2",
+    "commit": "052e936086e2d6e57ae3a7ca91dabb1eef3fcf1e"
+  },
+  "_source": "git://github.com/AceMetrix/jquery-deparam.git",
+  "_target": "~0.4.2",
+  "_originalSource": "jquery-deparam",
+  "_direct": true
+}
