@@ -1183,7 +1183,7 @@
 					PAGE_JUMPING_PROXY: NTable.PAGE_JUMPING_PROXY
 				};
 				return {
-					id: 'page-footer-constants',
+					id: 'table-constants',
 					title: 'Constants',
 					desc: <span>Available constants. Constants must be change before construct component.<br/>
 						<code>NTable.PAGE_JUMPING_PROXY</code> is a function which proxy the page jumping,
@@ -1191,7 +1191,7 @@
 					</span>,
 					index: 900,
 					code: $demo.convertJSON({
-						variable: 'NPageFooter',
+						variable: 'NTable',
 						json: {
 							statics: statics
 						}
