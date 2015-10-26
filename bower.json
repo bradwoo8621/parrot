@@ -1,18 +1,18 @@
 {
   "name": "parrot",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "authors": [
     "brad.wu <bradwoo8621@gmail.com>"
   ],
   "description": "Fast form render tools build on reactjs",
-  "main": "target/js/com.github.nest.parrot-0.0.1.js",
+  "main": "target/js/com.github.nest.parrot.js",
   "keywords": [
     "form",
     "fast",
     "reactjs"
   ],
   "license": "MIT",
-  "homepage": "https://bradwoo8621.github.io/nest",
+  "homepage": "https://bradwoo8621.github.io/parrot",
   "dependencies": {
     "bootstrap": ">=3.3.5",
     "bootstrap3-ie10-viewport-bug-workaround": ">=1.0.0",
