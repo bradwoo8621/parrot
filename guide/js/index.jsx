@@ -50,21 +50,31 @@
 			]
 		},
 		{
-			text: 'Form Component',
+			text: 'Form Component (Simple)',
 			children: [
 				{text: 'Label', func: $demo.renderer.formLabel},
 				{text: 'Text', func: $demo.renderer.formText},
 				{text: 'TextArea', func: $demo.renderer.formTextArea},
 				{text: 'Button', func: $demo.renderer.formButton},
+				{divider: true},
 				{text: 'CheckBox', func: $demo.renderer.formCheck},
-				{text: 'DateTime Picker', func: $demo.renderer.formDateTime},
-				{text: 'File', func: $demo.renderer.formFile},
 				{text: 'Radio Button', func: $demo.renderer.formRadio},
-				{text: 'Code Search', func: $demo.renderer.formCodeSearch},
-				{text: 'Select', func: $demo.renderer.formSelect},
 				{text: 'Toggle', func: $demo.renderer.formToggle},
-				{text: 'Table', func: $demo.renderer.formTable},
+				{divider: true},
 				{text: 'Nothing', func: $demo.renderer.formNothing}
+			]
+		},
+		{
+			text: 'Form Component (Complex)',
+			children: [
+				{text: 'DateTime Picker', func: $demo.renderer.formDateTime},
+				{text: 'Select', func: $demo.renderer.formSelect},
+				{text: 'Code Search', func: $demo.renderer.formCodeSearch},
+				{divider: true},
+				{text: 'Table', func: $demo.renderer.formTable},
+				{text: 'Tree', func: $demo.renderer.formTree},
+				{divider: true},
+				{text: 'File', func: $demo.renderer.formFile}
 			]
 		},
 		{
