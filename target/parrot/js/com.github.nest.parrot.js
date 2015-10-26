@@ -1,4 +1,4 @@
-/** com.github.nest.parrot.V0.0.4 2015-10-25 */
+/** com.github.nest.parrot.V0.0.4 2015-10-26 */
 (function ($) {
 	var patches = {
 		console: function () {
@@ -11620,3 +11620,29 @@ var NToggle = React.createClass($pt.defineCellComponent({
 		return $(React.findDOMNode(this.refs.txt));
 	}
 }));
+(function(context, $, $pt) {
+    var NTree = React.createClass($pt.defineCellComponent({
+        propTypes: {
+            // model
+            model: React.PropTypes.object,
+            // CellLayout
+            layout: React.PropTypes.object
+        },
+        getDefaultProps: function() {
+            return {
+                defaultOptions: {
+                    root: 'Root'
+                }
+            };
+        },
+        getInitialState: function() {
+            return {};
+        },
+        render: function() {
+            return (React.createElement("div", {className: this.getComponentCSS('n-tree')}, 
+                React.createElement("ul", {className: "nav"}
+                )
+            ));
+        }
+    }));
+} (this, jQuery, $pt));

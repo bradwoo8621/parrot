@@ -1,46 +1,48 @@
 {
-  "name": "parrot",
-  "version": "0.0.4",
-  "authors": [
-    "brad.wu <bradwoo8621@gmail.com>"
-  ],
-  "description": "Fast form render tools build on reactjs",
-  "main": "target/js/com.github.nest.parrot.js",
-  "keywords": [
-    "form",
-    "fast",
-    "reactjs"
-  ],
-  "license": "MIT",
-  "homepage": "https://bradwoo8621.github.io/parrot",
-  "dependencies": {
-    "bootstrap": ">=3.3.5",
-    "bootstrap3-ie10-viewport-bug-workaround": ">=1.0.0",
-    "bootstrap-fileinput": ">=4.2.7",
-    "bootswatch": ">=3.3.5",
-    "eonasdan-bootstrap-datetimepicker": "~4.15.35",
-    "es5-shim": ">=4.1.7",
-    "fontawesome": "~4.4.0",
-    "html5shiv": ">=3.7.2",
-    "jquery": ">=2.1.4",
-    "jquery.browser": ">=0.0.6",
-    "jquery-deparam": ">=0.3.0",
-    "jquery-mockjax": ">=2.0.1",
-    "jsface": ">=2.4.6",
-    "moment": ">=2.10.6",
-    "react": "0.13.3",
-    "react-bootstrap": ">=0.23.6",
-    "Respond": ">=1.4.2",
-    "select2": ">=4.0.0"
-  },
-  "ignore": [
-    "test/*"
-  ],
-  "devDependencies": {
-    "classnames":">=2.1.2",
-    "highlightjs": "8.8.0",
-    "jQuery-Storage-API": "~1.7.4",
-    "js-cookie": "~2.0.3",
-    "moment-taiwan": "*"
-  }
+    "name": "parrot",
+    "version": "0.0.4",
+    "authors": [
+        "brad.wu <bradwoo8621@gmail.com>"
+    ],
+    "description": "Fast form render tools build on reactjs",
+    "main": "target/parrot/js/com.github.nest.parrot.js",
+    "keywords": [
+        "form",
+        "fast",
+        "reactjs"
+    ],
+    "license": "MIT",
+    "homepage": "https://bradwoo8621.github.io/parrot",
+    "dependencies": {
+        "bootstrap": "3.3.5",
+        "bootstrap-fileinput": "4.2.7",
+        "bootswatch": "3.3.5",
+        "eonasdan-bootstrap-datetimepicker": "4.15.35",
+        "fontawesome": "4.4.0",
+        "jquery": "2.1.4",
+        "jsface": "2.4.6",
+        "moment": "2.10.6",
+        "react": "0.13.3",
+        "react-bootstrap": "0.23.6",
+        "select2": "4.0.0"
+    },
+    "devDependencies": {
+        "bootstrap3-ie10-viewport-bug-workaround": "1.0.0",
+        "classnames":"2.1.2",
+        "es5-shim": "4.1.7",
+        "highlightjs": "8.8.0",
+        "html5shiv": "3.7.2",
+        "jquery.browser": "0.0.6",
+        "jquery-deparam": "0.3.0",
+        "jquery-mockjax": "2.0.1",
+        "jQuery-Storage-API": "1.7.4",
+        "js-cookie": "2.0.3",
+        "moment-taiwan": "0.0.1",
+        "Respond": "1.4.2"
+    },
+    "ignore": [
+        "test",
+        "guide",
+        ".gitignore"
+    ]
 }

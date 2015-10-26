@@ -6,13 +6,10 @@ module.exports = function(grunt) {
 			targetPath: 'target',
 			middlePath: 'intermediate',
 			bowerPath: 'bower_components',
-			demoSourcePath: 'demo',
-			demoTargetPath: 'demo-target',
 			clean: {
 				all: ['<%= targetPath %>', '<%= middlePath %>'],
 				mid: ['<%= middlePath %>'],
-				compile: ['<%= targetPath %>/parrot/'],
-				demo: ['<%= demoTargetPath %>']
+				compile: ['<%= targetPath %>/parrot/']
 			},
 			replace: {
 				// remove the @import from bootswatch css
@@ -52,45 +49,6 @@ module.exports = function(grunt) {
 							rename: function(dest, src) {
 								return dest + src.replace('bootswatch.', 'bootswatch_');
 							}
-						}
-					]
-				},
-				demo: {
-					options: {
-						patterns: [
-							{
-								match: / type="text\/jsx"/g,
-								replacement: ''
-							},
-							{
-								match: /jsx">/g,
-								replacement: 'js">'
-							},
-							{
-								match: /\/demo\//g,
-								replacement: '/demo-target/'
-							},
-							{
-								match: /<script src="\.\.\/target\/react\/JSXTransformer\.js"><\/script>/g,
-								replacement: ''
-							//},
-							//{
-							//    match: /<script src="\.\.\/target\/jsface\/jsface\.pointcut\.js"><\/script>/g,
-							//    replacement: ''
-							}
-						]
-					},
-					files: [
-						{
-							expand: true,
-							cwd: '<%= demoSourcePath %>/',
-							src: ['**/*.html'],
-							dest: '<%= demoTargetPath %>/'
-						}, {
-							expand: true,
-							cwd: '<%= demoTargetPath %>/',
-							src: ['**/*.js'],
-							dest: '<%= demoTargetPath %>/'
 						}
 					]
 				}
@@ -148,20 +106,6 @@ module.exports = function(grunt) {
 					files: {
 						'<%= targetPath %>/parrot/js/<%= pkg.groupId %>.<%= pkg.artifactId %>.min.js': ['<%= concat.js.dest %>']
 					}
-				},
-				demo: {
-					options: {
-						sourceMap: true
-					},
-					files: [{
-						expand: true,
-						cwd: '<%= demoTargetPath %>/',
-						src: '**/*.js',
-						dest: '<%= demoTargetPath %>/',
-						rename: function(dest, src) {
-							return dest + src.replace('.js', '.min.js');
-						}
-					}]
 				}
 			},
 			jshint: {
@@ -182,11 +126,6 @@ module.exports = function(grunt) {
 						src: ['<%= middlePath %>/**/*.js']
 					}
 
-				},
-				demo: {
-					files: {
-						src: ['<%= demoTargetPath %>/**/*.js']
-					}
 				}
 			},
 			// convert jsx to js
@@ -197,15 +136,6 @@ module.exports = function(grunt) {
 						cwd: 'src/js/',
 						src: ['**/*.jsx'],
 						dest: '<%= middlePath %>/js/',
-						ext: '.js'
-					}]
-				},
-				demo: {
-					files: [{
-						expand: true,
-						cwd: '<%= demoSourcePath %>/js/',
-						src: ['**/*.jsx'],
-						dest: '<%= demoTargetPath %>/js/',
 						ext: '.js'
 					}]
 				}
@@ -491,14 +421,6 @@ module.exports = function(grunt) {
 							}
 						}
 					]
-				},
-				demo: {
-					files: [{
-						expand: true,
-						cwd: '<%= demoSourcePath %>/',
-						src: ['**/*.js'],
-						dest: '<%= demoTargetPath %>/'
-					}]
 				}
 			},
 			less: {
@@ -508,22 +430,6 @@ module.exports = function(grunt) {
 					},
 					files: {
 						'src/css/parrot.css': 'src/less/parrot.less'
-					}
-				},
-				demo: {
-					options: {
-						paths: ['assets/css']
-					},
-					files: {
-						'demo-target/css/common.css': 'demo/css/common.less',
-						'demo/css/common.css': 'demo/css/common.less'
-					}
-				}
-			},
-			browserify: {
-				demo: {
-					files: {
-						'<%= demoTargetPath %>/js/login/login-bundle.js': ['<%= demoTargetPath %>/js/login/*.js']
 					}
 				}
 			}
@@ -538,7 +444,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-less');
 	grunt.loadNpmTasks('grunt-react');
 	grunt.loadNpmTasks('grunt-replace');
-	grunt.loadNpmTasks('grunt-browserify');
 
 	// grunt.loadNpmTasks('grunt-webpack');
 
@@ -550,12 +455,4 @@ module.exports = function(grunt) {
 	grunt.registerTask('css-compile', ['bootswatch', 'css-parrot']);
 	grunt.registerTask('deploy', ['clean:all', 'bower-copy', 'js-compile', 'css-compile', 'copy:fonts', 'clean:mid']);
 	grunt.registerTask('default', ['clean:compile', 'js-compile', 'css-parrot', 'clean:mid']);
-
-	grunt.registerTask('demo',
-		['clean:demo',
-			'less:demo', 'copy:demo',
-			'react:demo', 'jshint:demo',
-			//'browserify:demo',
-			'replace:demo',
-			'uglify:demo'])
 };

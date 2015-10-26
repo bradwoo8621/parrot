@@ -1,9 +1,7 @@
 /.settings/
 /.project
 /bower_components/
-/demo-target/
-/demo/
-/gs/
+/node_modules/
 /target/react-bootstrap/
 /target/bootstrap3/
 /target/es5-shim/
