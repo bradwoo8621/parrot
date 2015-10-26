@@ -1,0 +1,28 @@
+// replace bootstrap date time picker
+.bootstrap-datetimepicker-widget {
+	a[data-action] {
+		-webkit-box-shadow: none;
+		box-shadow: none;
+		-o-box-shadow: none;
+	}
+
+	.datepicker-decades .decade {
+		float: left;
+		text-align: center;
+	}
+}
+
+div.n-datetime {
+	position: relative;
+	> div.input-group > span.input-group-addon {
+		padding-right: 0;
+		&.link {
+			cursor: @link-cursor;
+		}
+		&.disabled,
+		&.link.disabled {
+			cursor: @disabled-cursor;
+			color: @disabled-color;
+		}
+	}
+}

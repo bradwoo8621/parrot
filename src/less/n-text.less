@@ -1,0 +1,25 @@
+div.n-text {
+	position: relative;
+	> div.input-group {
+		width: 100%;
+		> span.input-group-addon {
+			padding-left: 0;
+			border: 0;
+			span:nth-child(2) {
+				margin-left: 3px;
+			}
+			&.link {
+				cursor: @link-cursor;
+			}
+			&.disabled,
+			&.link.disabled {
+				cursor: @disabled-cursor;
+				color: @disabled-color;
+			}
+		}
+		> input + span.input-group-addon {
+			padding-right: 0;
+			padding-left: 5px;
+		}
+	}
+}

@@ -1,0 +1,44 @@
+div.n-search-text {
+	> div.input-group {
+		border: 0;
+		border-radius: @border-radius;
+		.input-btn-group > .btn {
+			float: none;
+		}
+		.form-control.search-code {
+			width: 50%;
+			border: 0;
+		}
+		.form-control.search-label {
+			border: 0;
+			width: 150%;
+			margin-left: -50%;
+			&[readonly] {
+				background-color: transparent;
+			}
+			&[disabled] {
+				background-color: transparent;
+			}
+		}
+		> span.input-group-addon {
+			border: 0;
+			&.advanced-search-btn {
+				border-left: 0;
+				cursor: @link-cursor;
+				padding-right: 0;
+			}
+		}
+	}
+	&.n-disabled > div.input-group {
+		.form-control.search-label {
+			background-color: transparent;
+		}
+		> span.input-group-addon.advanced-search-btn {
+			cursor: @disabled-cursor;
+		}
+	}
+	hr.normal-line,
+	hr.focus-line {
+		left: 0;
+	}
+}

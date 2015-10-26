@@ -1,0 +1,13 @@
+div.n-textarea {
+	position: relative;
+}
+
+.generate-textarea-lines(@n, @i: 2) when (@i =< @n) {
+	textarea.l@{i}, textarea.form-control.l@{i} {
+		height: (@i * @form-control-height);
+	}
+	.generate-textarea-lines(@n, (@i + 1));
+}
+
+.generate-textarea-lines(10);
+

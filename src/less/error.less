@@ -1,0 +1,149 @@
+div.has-error {
+	> span,
+	&.horizontal-label > div.row > div:first-child > span {
+		color: @error-color;
+	}
+	textarea,
+	textarea.form-control,
+	input.form-control,
+	input[type=text],
+	input[type=password],
+	input[type=email],
+	input[type=number],
+	input[type=text].form-control,
+	input[type=password].form-control,
+	input[type=email].form-control,
+	input[type=tel].form-control {
+		color: @error-color;
+	}
+	span.select2-selection {
+		border-color: @error-color;
+		color: @error-color;
+	}
+	.select2-container--default {
+		.select2-selection--single {
+			.select2-selection__rendered {
+				color: @error-color;
+			}
+			.select2-selection__arrow b {
+				border-color: @error-color transparent transparent transparent;
+			}
+			.select2-selection__placeholder {
+				color: @error-color;
+			}
+		}
+		&.select2-container--open {
+			.select2-selection--single {
+				.select2-selection__arrow b {
+					border-color: transparent transparent @error-color transparent;
+				}
+			}
+		}
+		&.select2-container--disabled.select2-container--focus hr.focus-line {
+			transform: scaleX(1);
+			-o-transform: scaleX(1);
+			-webkit-transform: scaleX(1);
+		}
+	}
+	div.popover {
+		max-width: 500px;
+		border-color: @error-color;
+		div.arrow {
+			border-top-color: @popover-arrow-color;
+		}
+		div.popover-content {
+			color: @error-color;
+		}
+	}
+	div.n-label {
+		color: @error-color;
+	}
+	div.n-search-text {
+		> div.input-group {
+			border-color: @error-color;
+			.form-control {
+				.search-code,
+				.search-label {
+					border-color: @error-color;
+					color: @error-color;
+				}
+			}
+			span.input-group-addon.advanced-search-btn {
+				border-color: @error-color;
+				color: @error-color;
+			}
+		}
+	}
+	div.n-checkbox span.check-container.disabled,
+	div.n-checkbox span.check-container.checked.disabled,
+	div.n-checkbox span.check-container span.check,
+	div.n-checkbox span.check-container.checked span.check:before,
+	div.n-checkbox span.check-container.disabled span.check,
+	div.n-checkbox span.check-container.checked.disabled span.check,
+	div.n-checkbox span.check-container.checked.disabled span.check:before,
+	div.n-checkbox span.check-label,
+	div.n-checkbox span.check-label.disabled {
+		color: @error-color;
+	}
+	div.n-checkbox span.check-container.disabled:focus:before,
+	div.n-checkbox span.check-container.disabled:before,
+	div.n-checkbox span.check-container.checked.disabled:focus:before,
+	div.n-checkbox span.check-container.checked.disabled:before,
+	div.n-checkbox span.check-container:focus:before,
+	div.n-checkbox span.check-container:before,
+	div.n-radio span.radio-container.disabled:focus:before,
+	div.n-radio span.radio-container.disabled:before,
+	div.n-radio span.radio-container.checked.disabled:focus:before,
+	div.n-radio span.radio-container.checked.disabled:before,
+	div.n-radio span.radio-container:focus:before,
+	div.n-radio span.radio-container:before {
+		background-color: @error-color;
+	}
+	div.n-radio span.radio-container.disabled,
+	div.n-radio span.radio-container.checked.disabled,
+	div.n-radio span.radio-container span.check,
+	div.n-radio span.radio-container.checked span.check:before,
+	div.n-radio span.radio-container.disabled span.check,
+	div.n-radio span.radio-container.checked.disabled span.check,
+	div.n-radio span.radio-container.checked.disabled span.check:before,
+	div.n-radio span.radio-label,
+	div.n-radio span.radio-label.disabled {
+		color: @error-color;
+	}
+	div.n-text > div.input-group > span.input-group-addon,
+	div.n-datetime > div.input-group > span.input-group-addon,
+	div.n-text > div.input-group > span.input-group-addon.disabled,
+	div.n-text > div.input-group > span.input-group-addon.link.disabled,
+	div.n-datetime > div.input-group > span.input-group-addon.disabled,
+	div.n-datetime > div.input-group > span.input-group-addon.link.disabled {
+		color: @error-color;
+	}
+	div.n-toggle {
+		span.n-toggle-line,
+		&.n-disabled > div.toggle-container > span.n-toggle-line {
+			background-color: @toggle-line-background-disabled-color;
+		}
+		span.n-toggle-true,
+		&.n-disabled > div.toggle-container.checked > span.n-toggle-true {
+			background-color: @toggle-true-error-disabled-color;
+		}
+		span.n-toggle-true:before {
+			background-color: @toggle-true-error-disabled-color
+		}
+	}
+
+	hr.normal-line {
+		border-top: solid 1px transparent;
+		border-bottom: solid 1px transparent;
+		transform: scaleX(1);
+		-o-transform: scaleX(1);
+		-webkit-transform: scaleX(1);
+	}
+
+	hr.focus-line {
+		border-top: solid 2px @error-color;
+		transform: scaleX(1);
+		-o-transform: scaleX(1);
+		-webkit-transform: scaleX(1);
+	}
+}

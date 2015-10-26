@@ -1,0 +1,33 @@
+div.n-pagination-status {
+	> div {
+		display: table;
+		height: 34px;
+		> span {
+			vertical-align: middle;
+			display: table-cell;
+		}
+	}
+}
+
+div.n-pagination-buttons {
+	text-align: right;
+	line-height: 1;
+	@media (max-width: 767px) {
+		text-align: left;
+	}
+}
+
+div.n-pagination ul.pagination {
+	margin: 0;
+	padding-top: @container-margin-top;
+	padding-bottom: @container-margin-bottom;
+	> li > a {
+		padding: 4px 10px;
+		/*width: 50px;*/
+		/*text-align: center;*/
+	}
+}
+
+ul.pagination > li > a.active {
+	background-color: @pagination-background-active-color;
+}

@@ -1,0 +1,72 @@
+div.n-card {
+	display: none;
+	&.n-card-active {
+		display: block;
+	}
+}
+
+ul.n-cards-nav {
+	padding-bottom: @container-padding-bottom;
+	> li {
+		line-height: 1.6;
+		&.active {
+			> a,
+			> a:hover,
+			> a:focus {
+				color: @font-color-reverse;
+				background-color: @color-primary;
+			}
+		}
+		&.before > a {
+			color: @font-color-reverse;
+			background-color: @color-success;
+			> .badge {
+				color: @color-success;
+				background-color: @font-color-reverse;
+			}
+		}
+		&.after > a {
+			color: @font-color;
+			background-color: @background-color;
+		}
+		> a {
+			border-radius: 0;
+			opacity: 0.8;
+			cursor: default;
+			> .badge {
+				margin-top: -3px;
+			}
+		}
+		&:first-child > a {
+			border-bottom-left-radius: @border-radius;
+			border-top-left-radius: @border-radius;
+		}
+		&:last-child > a {
+			border-bottom-right-radius: @border-radius;
+			border-top-right-radius: @border-radius;
+		}
+	}
+	&.n-cards-free > li {
+		&.before > a {
+			color: @font-color;
+			background-color: @background-color;
+			> .badge {
+				color: @font-color-reverse;
+				background-color: @badge-background-color;
+			}
+		}
+		> a {
+			cursor: @link-cursor;
+		}
+	}
+}
+
+ul.nav.nav-direction-vertical {
+	&.nav-tabs,
+	&.nav-pills {
+		text-align: center;
+	}
+	> li > a > span:first-child {
+		display: block;
+	}
+}

@@ -1,0 +1,7 @@
+hr.normal-line.custom-normal-line {
+    border-top: solid 1px #00d95a;
+}
+
+hr.focus-line.custom-focus-line {
+    border-top: solid 2px #ff2222;
+}

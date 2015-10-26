@@ -1,0 +1,29 @@
+div.n-panel-footer {
+	padding-top: @container-margin-top;
+	padding-bottom: @container-margin-bottom;
+	div {
+		height: @form-control-height;
+		&.btn-toolbar {
+			padding: 0;
+			border-top: 0;
+			background-color: transparent;
+			&.n-panel-footer-left {
+				display: inline-block;
+				> div.n-button {
+					float: left;
+				}
+			}
+			&.n-panel-footer-right {
+				float: right;
+				display: inline-block;
+				margin-bottom: 0;
+				> div.n-button {
+					float: right;
+				}
+			}
+			> div.n-button {
+				margin-left: 5px;
+			}
+		}
+	}
+}

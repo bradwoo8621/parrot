@@ -16,17 +16,31 @@
   "dependencies": {
     "bootstrap": ">=3.3.5",
     "bootstrap3-ie10-viewport-bug-workaround": ">=1.0.0",
-    "eonasdan-bootstrap-datetimepicker": ">=4.14.30",
+    "bootstrap-fileinput": ">=4.2.7",
+    "bootswatch": ">=3.3.5",
+    "eonasdan-bootstrap-datetimepicker": "~4.15.35",
     "es5-shim": ">=4.1.7",
-    "fontawesome": ">=4.3.0",
+    "fontawesome": "~4.4.0",
     "html5shiv": ">=3.7.2",
-    "jquery.browser": ">=0.0.7",
-    "jsface": ">=2.4.5",
     "jquery": ">=2.1.4",
-    "react-bootstrap": ">=0.23.5",
-    "react": ">=0.13.3",
+    "jquery.browser": ">=0.0.6",
+    "jquery-deparam": ">=0.3.0",
+    "jquery-mockjax": ">=2.0.1",
+    "jsface": ">=2.4.6",
+    "moment": ">=2.10.6",
+    "react": "0.13.3",
+    "react-bootstrap": ">=0.23.6",
     "Respond": ">=1.4.2",
     "select2": ">=4.0.0"
   },
-  "ignore": ["test/*"]
+  "ignore": [
+    "test/*"
+  ],
+  "devDependencies": {
+    "classnames":">=2.1.2",
+    "highlightjs": "8.8.0",
+    "jQuery-Storage-API": "~1.7.4",
+    "js-cookie": "~2.0.3",
+    "moment-taiwan": "*"
+  }
 }

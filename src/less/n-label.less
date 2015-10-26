@@ -1,0 +1,55 @@
+div.n-label {
+	display: table-cell;
+	vertical-align: middle;
+	height: @form-control-height;
+	> span {
+		display: block;
+	}
+}
+
+.generate-label-size(@n, @i: 2) when (@i =< @n) {
+	span.n-label-@{i}x {
+		font-size: unit(@i, em)
+	}
+	.generate-label-size(@n, (@i + 1));
+}
+
+.generate-label-size(10);
+
+.generate-label-half-size(@n, @i: 1) when (@i =< @n) {
+	span.n-label-@{i}-5x {
+		font-size: unit(@i+0.5, em)
+	}
+	.generate-label-size(@n, (@i + 1));
+}
+
+.generate-label-half-size(9);
+
+div.n-label.n-label-primary,
+span.n-label-primary {
+	color: @color-primary;
+}
+
+div.n-label.n-label-success,
+span.n-label-success {
+	color: @color-success;
+}
+
+div.n-label.n-label-danger,
+span.n-label-danger {
+	color: @color-danger;
+}
+
+div.n-label.n-label-info,
+span.n-label-info {
+	color: @color-info;
+}
+
+div.n-label.n-label-warning,
+span.n-label-warning {
+	color: @color-warning;
+}
+
+span.n-normal-label span {
+	display: block;
+}

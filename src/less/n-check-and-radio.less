@@ -1,0 +1,384 @@
+div.n-checkbox {
+	height: @form-control-height;
+	position: relative;
+	white-space: nowrap;
+	div.check-container {
+		display: inline-block;
+	}
+	span.check-container {
+		vertical-align: middle;
+		position: relative;
+		cursor: @link-cursor;
+		top: 9px;
+		outline: 0;
+		display: inline-block;
+		&.disabled,
+		&.disabled.checked,
+		&.disabled span.check,
+		&.disabled.checked span.check,
+		&.disabled.checked span.check:before {
+			cursor: @disabled-cursor;
+			color: @disabled-color;
+			user-select: none;
+		}
+		&.disabled:focus:before,
+		&.checked.disabled:focus:before {
+			-webkit-animation: none;
+			animation: none;
+			-o-animation: none;
+		}
+		&:focus:before {
+			display: block;
+			position: absolute;
+			content: "";
+			background-color: @color-primary;
+			border-radius: 100%;
+			z-index: 1;
+			opacity: 0;
+			outline: 0;
+		}
+		&:focus:before {
+			-webkit-animation: rippleOff 500ms linear forwards;
+			animation: rippleOff 500ms linear forwards;
+			-o-animation: rippleOff 500ms linear forwards;
+		}
+		&.checked {
+			&:focus:before {
+				-webkit-animation: rippleOn 500ms linear forwards;
+				animation: rippleOn 500ms linear forwards;
+				-o-animation: rippleOn 500ms linear forwards;
+			}
+			span.check {
+				color: @color-primary;
+				&:before {
+					box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px;
+					-o-box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px;
+					-webkit-box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px;
+					-webkit-animation: checkbox-on .3s forwards;
+					animation: checkbox-on .3s forwards;
+					-o-animation: checkbox-on .3s forwards;
+					color: @color-primary;
+				}
+			}
+		}
+		span.check {
+			position: relative;
+			display: inline-block;
+			width: 20px;
+			height: 20px;
+			border: 2px solid;
+			border-radius: 2px;
+			overflow: hidden;
+			z-index: 1;
+			&:before {
+				position: absolute;
+				content: "";
+				-webkit-transform: rotate(45deg);
+				-o-transform: rotate(45deg);
+				transform: rotate(45deg);
+				display: block;
+				margin-top: -4px;
+				margin-left: 6px;
+				width: 0;
+				height: 0;
+				box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0 inset;
+				-o-box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0 inset;
+				-webkit-box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0 inset;
+				-webkit-animation: checkbox-off .3s forwards;
+				animation: checkbox-off .3s forwards;
+				-o-animation: checkbox-off .3s forwards;
+			}
+		}
+	}
+	span.check-label {
+		font-size: @font-size;
+		position: relative;
+		left: 5px;
+		top: 6px;
+		display: inline-block;
+		height: @form-control-height;
+		cursor: @link-cursor;
+		&.check-label-left {
+			left: 0;
+			margin-right: 5px;
+		}
+		&.disabled {
+			color: @disabled-color;
+			cursor: @disabled-cursor;
+		}
+	}
+}
+
+@keyframes checkbox-on {
+	0% {
+		box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 15px 2px 0 11px;
+		-o-box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 15px 2px 0 11px;
+		-webkit-box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 15px 2px 0 11px;
+	}
+	50% {
+		box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 20px 2px 0 11px;
+		-o-box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 20px 2px 0 11px;
+		-webkit-box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 20px 2px 0 11px;
+	}
+	100% {
+		box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px;
+		-o-box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px;
+		-webkit-box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px;
+	}
+}
+
+@keyframes checkbox-off {
+	0% {
+		box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px, 0 0 0 0 inset;
+		-o-box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px, 0 0 0 0 inset;
+		-webkit-box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px, 0 0 0 0 inset;
+	}
+
+	25% {
+		box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px, 0 0 0 0 inset;
+		-o-box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px, 0 0 0 0 inset;
+		-webkit-box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px, 0 0 0 0 inset;
+	}
+	50% {
+		transform: rotate(45deg);
+		margin-top: -4px;
+		margin-left: 6px;
+		width: 0;
+		height: 0;
+		box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 15px 2px 0 11px, 0 0 0 0 inset;
+		-o-box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 15px 2px 0 11px, 0 0 0 0 inset;
+		-webkit-box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 15px 2px 0 11px, 0 0 0 0 inset;
+	}
+	51% {
+		transform: rotate(0deg);
+		margin-top: -2px;
+		margin-left: -2px;
+		width: 20px;
+		height: 20px;
+		box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0px 0px 0 10px inset;
+		-o-box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0px 0px 0 10px inset;
+		-webkit-box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0px 0px 0 10px inset;
+	}
+	100% {
+		transform: rotate(0deg);
+		margin-top: -2px;
+		margin-left: -2px;
+		width: 20px;
+		height: 20px;
+		box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0px 0px 0 0px inset;
+		-o-box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0px 0px 0 0px inset;
+		-webkit-box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0px 0px 0 0px inset;
+	}
+}
+
+@keyframes rippleOn {
+	0% {
+		opacity: 0;
+		height: 20px;
+		width: 20px;
+		margin-top: 0;
+		margin-left: 0;
+	}
+	25% {
+		opacity: 0.2;
+		height: 26px;
+		width: 26px;
+		margin-top: -3px;
+		margin-left: -3px;
+	}
+	50% {
+		opacity: 0.5;
+		height: 32px;
+		width: 32px;
+		margin-top: -6px;
+		margin-left: -6px;
+	}
+	75% {
+		opacity: 0.3;
+		height: 38px;
+		width: 38px;
+		margin-top: -9px;
+		margin-left: -9px;
+	}
+	99% {
+		opacity: 0;
+		height: 44px;
+		width: 44px;
+		margin-top: -12px;
+		margin-left: -12px;
+	}
+	100% {
+		height: 0;
+		width: 0;
+		margin-top: 0;
+		margin-left: 0;
+	}
+}
+
+@keyframes rippleOff {
+	0% {
+		opacity: 0;
+		height: 20px;
+		width: 20px;
+		margin-top: 0;
+		margin-left: 0;
+	}
+	25% {
+		opacity: 0.2;
+		height: 26px;
+		width: 26px;
+		margin-top: -3px;
+		margin-left: -3px;
+	}
+	50% {
+		opacity: 0.5;
+		height: 32px;
+		width: 32px;
+		margin-top: -6px;
+		margin-left: -6px;
+	}
+	75% {
+		opacity: 0.3;
+		height: 38px;
+		width: 38px;
+		margin-top: -9px;
+		margin-left: -9px;
+	}
+	99% {
+		opacity: 0;
+		height: 44px;
+		width: 44px;
+		margin-top: -12px;
+		margin-left: -12px;
+	}
+	100% {
+		height: 0;
+		width: 0;
+		margin-top: 0;
+		margin-left: 0;
+	}
+}
+
+div.n-radio {
+	position: relative;
+	div.n-radio-option {
+		vertical-align: middle;
+		position: relative;
+		height: @form-control-height;
+		display: inline-block;
+		white-space: nowrap;
+		&:not(:first-child) {
+			padding-left: 10px;
+		}
+	}
+	&.vertical div.n-radio-option {
+		display: block;
+		padding-left: 0;
+	}
+	div.radio-container {
+		display: inline-block;
+	}
+	span.radio-container {
+		vertical-align: middle;
+		position: relative;
+		cursor: @link-cursor;
+		top: 6px;
+		outline: 0;
+		display: inline-block;
+		&.disabled,
+		&.checked.disabled,
+		&.disabled span.check,
+		&.checked.disabled span.check,
+		&.checked.disabled span.check:before {
+			cursor: @disabled-cursor;
+			color: @disabled-color;
+			user-select: none;
+		}
+		&.disabled:focus:before,
+		&.checked.disabled:focus:before {
+			-webkit-animation: none;
+			animation: none;
+			-o-animation: none;
+		}
+		&:focus:before {
+			display: block;
+			position: absolute;
+			content: "";
+			background-color: @color-primary;
+			border-radius: 100%;
+			z-index: 1;
+			opacity: 0;
+			margin: 0;
+			outline: 0;
+		}
+		//&:before {
+		//	-webkit-animation: rippleOff 500ms linear forwards;
+		//	animation: rippleOff 500ms linear forwards;
+		//	-o-animation: rippleOff 500ms linear forwards;
+		//}
+		&.checked {
+			&:before {
+				-webkit-animation: rippleOn 500ms linear forwards;
+				animation: rippleOn 500ms linear forwards;
+				-o-animation: rippleOn 500ms linear forwards;
+			}
+			span.check {
+				color: @color-primary;
+				&:before {
+					box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px;
+					-o-box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px;
+					-webkit-box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px;;
+					-webkit-animation: checkbox-on .3s forwards;
+					animation: checkbox-on .3s forwards;
+					-o-animation: checkbox-on .3s forwards;
+					color: @color-primary;
+				}
+			}
+		}
+		span.check {
+			position: relative;
+			display: inline-block;
+			width: 20px;
+			height: 20px;
+			border: 2px solid;
+			border-radius: 100%;
+			overflow: hidden;
+			z-index: 1;
+			&:before {
+				position: absolute;
+				content: "";
+				-webkit-transform: rotate(45deg);
+				-o-transform: rotate(45deg);
+				transform: rotate(45deg);
+				display: block;
+				margin-top: -4px;
+				margin-left: 6px;
+				width: 0;
+				height: 0;
+				box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0 inset;
+				-o-box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0 inset;
+				-webkit-box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0 inset;
+				-webkit-animation: checkbox-off .3s forwards;
+				animation: checkbox-off .3s forwards;
+				-o-animation: checkbox-off .3s forwards;
+			}
+		}
+	}
+	span.radio-label {
+		position: relative;
+		display: inline-block;
+		font-size: 13px;
+		left: 5px;
+		top: 5px;
+		height: @form-control-height;
+		cursor: @link-cursor;
+		&.radio-label-left {
+			left: 0;
+			margin-right: 5px;
+		}
+		&.disabled {
+			color: @disabled-color;
+			cursor: @disabled-cursor;
+		}
+	}
+}

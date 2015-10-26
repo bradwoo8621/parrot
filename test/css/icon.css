@@ -1,0 +1,13 @@
+.custom-icon {
+    box-shadow: 2px 2px 2px 2px;
+    -o-box-shadow: 2px 2px 2px 2px;
+    -webkit-box-shadow: 2px 2px 2px 2px;
+}
+
+.custom-icon-black {
+    border: solid 1px black;
+}
+
+.fa-6x {
+    font-size: 6em;
+}

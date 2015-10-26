@@ -1,0 +1,72 @@
+div.horizontal-label {
+	padding-top: 0;
+	> div.row > div:first-child {
+		height: @form-control-height;
+		> span {
+			line-height: @form-control-height;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			width: 100%;
+			display: inline-block;
+			overflow: hidden;
+		}
+	}
+}
+
+div.vertical-label {
+	line-height: 1.2;
+	> span {
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		&:first-child {
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			width: 100%;
+			display: inline-block;
+			overflow: hidden;
+		}
+	}
+}
+
+span.required {
+	color: @error-color;
+	font-size: 0.95em;
+}
+
+div.n-form-cell {
+	padding-top: @container-margin-top;
+	padding-bottom: @container-margin-bottom;
+	.n-form-cell-tooltip {
+		color: @form-cell-tooltip-color;
+		font-size: 0.95em;
+		margin-left: 3px;
+	}
+	&.n-form-cell-invisible {
+		//padding-top: 0;
+		//padding-bottom: 0;
+		display: none;
+	}
+	&.horizontal-label {
+		div.n-radio {
+			span.radio-container {
+				top: 5px;
+			}
+			span.radio-label {
+				top: 2px;
+			}
+		}
+		div.n-checkbox {
+			span.check-container {
+				top: 5px;
+			}
+			span.check-label {
+				top: 3px;
+			}
+		}
+	}
+}
+
+.pull-down,
+.n-form-cell.pull-down {
+	padding-top: 20px;
+}

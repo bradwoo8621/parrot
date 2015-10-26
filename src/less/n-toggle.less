@@ -1,0 +1,222 @@
+div.n-toggle {
+	padding-top: 5px;
+	padding-bottom: 2px;
+	> span.toggle-label {
+		display: inline-block;
+		&.toggle-label-left {
+			margin-right: 10px;
+		}
+		&.toggle-label-right {
+			margin-left: 10px;
+		}
+	}
+	> div.toggle-container {
+		display: inline-block;
+		top: -14px;
+		position: relative;
+		width: 40px;
+		&.checked {
+			span.n-toggle-true:focus:before {
+				-webkit-animation: toggleTrueRippleOn .65s linear forwards;
+				animation: toggleTrueRippleOn .65s linear forwards;
+				-o-animation: toggleTrueRippleOn .65s linear forwards;
+			}
+			> span.n-toggle-false {
+				background-color: transparent;
+				box-shadow: none;
+				-o-box-shadow: none;
+				-webkit-box-shadow: none;
+			}
+		}
+		&.unchecked {
+			> span.n-toggle-true {
+				background-color: transparent;
+				box-shadow: none;
+				-o-box-shadow: none;
+				-webkit-box-shadow: none;
+			}
+			span.n-toggle-false:focus:before {
+				-webkit-animation: toggleFalseRippleOn .65s linear forwards;
+				animation: toggleFalseRippleOn .65s linear forwards;
+				-o-animation: toggleFalseRippleOn .65s linear forwards;
+			}
+		}
+	}
+	span.n-toggle-line {
+		width: 34px;
+		height: 14px;
+		position: absolute;
+		left: 3px;
+		top: 3px;
+		border-radius: 30px;
+		background-color: rgba(0, 0, 0, 0.25);
+	}
+	span.n-toggle-true {
+		height: 20px;
+		width: 20px;
+		border-radius: 50%;
+		background-color: @color-primary;
+		position: absolute;
+		box-sizing: border-box;
+		box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);
+		-o-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);;
+		-webkit-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);;
+		cursor: @link-cursor;
+		outline: 0;
+		&:before {
+			display: block;
+			position: absolute;
+			content: "";
+			background-color: @color-primary;
+			border-radius: 100%;
+			z-index: 1;
+			opacity: 0;
+			outline: 0;
+		}
+	}
+	span.n-toggle-false {
+		height: 20px;
+		width: 20px;
+		border-radius: 50%;
+		background-color: @background-color;
+		position: absolute;
+		right: 0;
+		box-shadow: rgba(0, 0, 0, 0.12) 0 1px 6px, rgba(0, 0, 0, 0.24) 0 1px 4px;
+		-o-box-shadow: rgba(0, 0, 0, 0.12) 0 1px 6px, rgba(0, 0, 0, 0.24) 0 1px 4px;;
+		-webkit-box-shadow: rgba(0, 0, 0, 0.12) 0 1px 6px, rgba(0, 0, 0, 0.24) 0 1px 4px;;
+		box-sizing: border-box;
+		cursor: @link-cursor;
+		outline: 0;
+		&:before {
+			display: block;
+			position: absolute;
+			content: "";
+			background-color: @background-color;
+			border-radius: 100%;
+			z-index: 1;
+			opacity: 0;
+			outline: 0;
+		}
+	}
+	&.n-disabled {
+		> div.toggle-container {
+			&.checked {
+				> span.n-toggle-true {
+					background-color: @toggle-true-disabled-color;
+					box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);
+					-o-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);;
+					-webkit-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);;
+					cursor: @disabled-cursor;
+				}
+				> span.n-toggle-false {
+					cursor: default;
+				}
+			}
+			&.unchecked {
+				> span.n-toggle-false {
+					background-color: @toggle-false-disabled-color;
+					box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);
+					-o-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);;
+					-webkit-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);;
+					cursor: @disabled-cursor;
+				}
+				> span.n-toggle-true {
+					cursor: default;
+				}
+			}
+			> span.n-toggle-line {
+				background-color: rgba(0, 0, 0, 0.12);
+			}
+		}
+	}
+}
+
+@keyframes toggleTrueRippleOn {
+	0% {
+		opacity: 0;
+		height: 16px;
+		width: 16px;
+		top: 2px;
+		left: 2px;
+	}
+	25% {
+		opacity: 0.2;
+		height: 24px;
+		width: 24px;
+		top: -2px;
+		left: -2px;
+	}
+	50% {
+		opacity: 0.5;
+		height: 32px;
+		width: 32px;
+		top: -6px;
+		left: -6px;
+	}
+	75% {
+		opacity: 0.3;
+		height: 40px;
+		width: 40px;
+		top: -10px;
+		left: -10px;
+	}
+	99% {
+		opacity: 0;
+		height: 48px;
+		width: 48px;
+		top: -14px;
+		left: -14px;
+	}
+	100% {
+		opacity: 0;
+		height: 0;
+		width: 0;
+		top: 10px;
+		left: 10px;
+	}
+}
+
+@keyframes toggleFalseRippleOn {
+	0% {
+		opacity: 0;
+		height: 16px;
+		width: 16px;
+		top: 2px;
+		right: 2px;
+	}
+	25% {
+		opacity: 0.2;
+		height: 24px;
+		width: 24px;
+		top: -2px;
+		right: -2px;
+	}
+	50% {
+		opacity: 0.5;
+		height: 32px;
+		width: 32px;
+		top: -6px;
+		right: -6px;
+	}
+	75% {
+		opacity: 0.3;
+		height: 40px;
+		width: 40px;
+		top: -10px;
+		right: -10px;
+	}
+	99% {
+		opacity: 0;
+		height: 48px;
+		width: 48px;
+		top: -14px;
+		right: -14px;
+	}
+	100% {
+		opacity: 0;
+		height: 0;
+		width: 0;
+		top: 10px;
+		right: 10px;
+	}
+}
