@@ -2,7 +2,9 @@
  * Created by brad.wu on 8/16/2015.
  */
 (function () {
-    var form = NModalForm.createFormModal('Test Modal Form');
+    var form = NModalForm.createFormModal('Normal Form Modal');
+    var noFooterForm = NModalForm.createFormModal('No Footer Form Modal');
+    var customForm = NModalForm.createFormModal('Custom Form Modal');
     var model = $pt.createModel({name: null});
     var layout = $pt.createFormLayout({
         name: {
@@ -31,14 +33,14 @@
     var noFooter = $pt.createCellLayout('button', $.extend(true, {
         label: 'No Footer', comp: {
             click: function () {
-                form.show(model, layout, null, null, false);
+                noFooterForm.show(model, layout, null, null, false);
             }
         }
     }, buttonTemplate));
     var custButtons = $pt.createCellLayout('button', $.extend(true, {
         label: 'Custom Buttons', comp: {
             click: function () {
-                form.show(model, layout, {
+                customForm.show(model, layout, {
                     reset: false,
                     validate: false,
                     cancel: false,

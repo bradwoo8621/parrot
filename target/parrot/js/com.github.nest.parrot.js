@@ -1,4 +1,4 @@
-/** com.github.nest.parrot.V0.0.4 2015-10-27 */
+/** com.github.nest.parrot.V0.0.4 2015-10-28 */
 (function ($) {
 	var patches = {
 		console: function () {
@@ -6662,13 +6662,19 @@
 			document.body.style.paddingRight = 0;
 		},
 		setDraggable: function() {
-			if (!this.isDraggable() || !this.refs.modal) {
+			if (!this.isDraggable() || !this.refs.top) {
 				return;
 			}
-			var modal = $(React.findDOMNode(this.refs.modal));
-			var dialog = modal.find('.modal');
-			dialog.drags({handle: '.modal-header'});
-			modal.find('.modal-backdrop').hide();
+			var top = $(React.findDOMNode(this.refs.top));
+			var modal = top.children('.modal');
+			modal.drags({handle: '.modal-header'});
+			modal.css({
+				overflow: 'visible',
+				height: 0
+			}).children('.modal-dialog').css({
+				height: 0
+			});
+			top.find('.modal-backdrop').hide();
 		},
 		/**
 		 * did update
@@ -6714,7 +6720,7 @@
 				return null;
 			}
 			var title = this.state.title ? this.state.title : this.props.title;
-			return (React.createElement(Modal, {className: this.props.className, backdrop: "static", onHide: this.hide, ref: "modal"}, 
+			return (React.createElement(Modal, {className: this.props.className, backdrop: "static", onHide: this.hide, ref: "top"}, 
 				React.createElement(Modal.Header, {closeButton: true}, 
 					React.createElement(Modal.Title, null, title)
 				), 
