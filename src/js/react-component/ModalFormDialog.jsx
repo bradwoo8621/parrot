@@ -66,6 +66,15 @@
 			}
 			document.body.style.paddingRight = 0;
 		},
+		setDraggable: function() {
+			if (!this.isDraggable() || !this.refs.modal) {
+				return;
+			}
+			var modal = $(React.findDOMNode(this.refs.modal));
+			var dialog = modal.find('.modal');
+			dialog.drags({handle: '.modal-header'});
+			modal.find('.modal-backdrop').hide();
+		},
 		/**
 		 * did update
 		 * @param prevProps
@@ -73,12 +82,14 @@
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
 			this.setZIndex();
+			this.setDraggable();
 		},
 		/**
 		 * did mount
 		 */
 		componentDidMount: function () {
 			this.setZIndex();
+			this.setDraggable();
 		},
 		/**
 		 * render footer
@@ -108,7 +119,7 @@
 				return null;
 			}
 			var title = this.state.title ? this.state.title : this.props.title;
-			return (<Modal className={this.props.className} backdrop="static" onHide={this.hide} bsStyle="danger">
+			return (<Modal className={this.props.className} backdrop="static" onHide={this.hide} ref='modal'>
 				<Modal.Header closeButton>
 					<Modal.Title>{title}</Modal.Title>
 				</Modal.Header>
@@ -222,6 +233,9 @@
 		getSaveButton: function () {
 			return this.state.buttons ? this.state.buttons.save : null;
 		},
+		isDraggable: function() {
+			return this.state.draggable;
+		},
 		/**
 		 * validate
 		 * @returns {boolean}
@@ -266,7 +280,8 @@
 					buttons: model.buttons,
 					direction: model.direction,
 					footer: model.footer,
-					title: model.title
+					title: model.title,
+					draggable: model.draggable
 				});
 			} else {
 				this.setState({
@@ -282,4 +297,45 @@
 		}
 	});
 	context.NModalForm = NModalForm;
+
+	$.fn.drags = function(opt) {
+		opt = $.extend({handle:"",cursor:"move"}, opt);
+		var $el = null;
+		if(opt.handle === "") {
+			$el = this;
+		} else {
+			$el = this.find(opt.handle);
+		}
+
+		return $el.css('cursor', opt.cursor).on("mousedown", function(e) {
+			var $drag = null;
+			if(opt.handle === "") {
+				$drag = $(this).addClass('draggable');
+			} else {
+				$drag = $(this).addClass('active-handle').parent().addClass('draggable');
+			}
+			var z_idx = $drag.css('z-index'),
+			drg_h = $drag.outerHeight(),
+			drg_w = $drag.outerWidth(),
+			pos_y = $drag.offset().top + drg_h - e.pageY,
+			pos_x = $drag.offset().left + drg_w - e.pageX;
+
+			//          $drag.css('z-index', 1000).parents().on("mousemove", function(e) {
+			$drag.parents().on("mousemove", function(e) {
+				$('.draggable').offset({
+					top:e.pageY + pos_y - drg_h,
+					left:e.pageX + pos_x - drg_w
+				}).on("mouseup", function() {
+					$(this).removeClass('draggable').css('z-index', z_idx);
+				});
+			});
+			e.preventDefault(); // disable selection
+		}).on("mouseup", function() {
+			if(opt.handle === "") {
+				$(this).removeClass('draggable');
+			} else {
+				$(this).removeClass('active-handle').parent().removeClass('draggable');
+			}
+		});
+	};
 }(this, jQuery, $pt));

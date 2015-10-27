@@ -15,10 +15,15 @@
     var normal = $pt.createCellLayout('button', $.extend(true, {
         label: 'Normal', comp: {
             click: function () {
-                form.show(model, layout, {
-                    save: function () {
-                        alert('Save Clicked');
-                    }
+                form.show({
+                    model: model,
+                    layout: layout,
+                    buttons: {
+                        save: function () {
+                            alert('Save Clicked');
+                        }
+                    },
+                    draggable: true
                 });
             }
         }
