@@ -95,20 +95,36 @@
 				};
 				var content = dialog.children('.modal-content');
 				var contentPosition = {};
-				if (this.state.pos.bottom != null) {
-					contentPosition.bottom = dialogPosition.bottom + content.height() - $(window).height();
-				} else if (this.state.pos.top != null) {
-					contentPosition.top = this.state.pos.top - dialogPosition.top;
+				var currentContentTop = parseInt(content.css('top'));
+				if (isNaN(currentContentTop)) {
+					if (this.state.pos.bottom != null) {
+						contentPosition.bottom = dialogPosition.bottom + content.height() - $(window).height();
+					} else if (this.state.pos.top != null) {
+						contentPosition.top = this.state.pos.top - dialogPosition.top;
+					}
+				} else {
+					contentPosition.top = currentContentTop;
 				}
-				if (this.state.pos.right != null) {
-					contentPosition.right = this.state.pos.right - dialogPosition.right;
-				} else if (this.state.pos.left != null) {
-					contentPosition.left = this.state.pos.left - dialogPosition.left;
+				var currentContentLeft = parseInt(content.css('left'));
+				if (isNaN(currentContentLeft)) {
+					if (this.state.pos.right != null) {
+						contentPosition.right = this.state.pos.right - dialogPosition.right;
+					} else if (this.state.pos.left != null) {
+						contentPosition.left = this.state.pos.left - dialogPosition.left;
+					}
+				} else {
+					contentPosition.left = currentContentLeft;
 				}
 				if (Object.keys(contentPosition).length > 0) {
-					console.log(contentPosition);
 					content.css(contentPosition);
 				}
+			}
+		},
+		stopDraggable: function() {
+			if (this.refs.top) {
+				var top = $(React.findDOMNode(this.refs.top));
+				var modal = top.children('.modal');
+				modal.stopDrags({handle: '.modal-header'});
 			}
 		},
 		/**
@@ -120,12 +136,18 @@
 			this.setZIndex();
 			this.setDraggable();
 		},
+		componentWillUpdate: function() {
+			this.stopDraggable();
+		},
 		/**
 		 * did mount
 		 */
 		componentDidMount: function () {
 			this.setZIndex();
 			this.setDraggable();
+		},
+		componentDidUnmount: function() {
+			this.stopDraggable();
 		},
 		/**
 		 * render footer
@@ -413,5 +435,24 @@
 				$(this).removeClass('active-handle').parent().removeClass('draggable');
 			}
 		});
+	};
+	$.fn.stopDrags = function(opt) {
+		opt = $.extend({handle:"",cursor:"move"}, opt);
+		var $el = null;
+		if(opt.handle === "") {
+			$el = this;
+		} else {
+			$el = this.find(opt.handle);
+		}
+
+		var $drag = null;
+		if(opt.handle === "") {
+			$drag = $($el);
+		} else {
+			$drag = $($el).parent();
+		}
+		$drag.parents().off("mousemove");
+
+		return $el.off('mousedown mouseup');
 	};
 }(this, jQuery, $pt));
