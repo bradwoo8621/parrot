@@ -694,6 +694,16 @@
 					})
 				};
 			},
+			direction: function () {
+				return {
+					id: 'form-direction',
+					title: 'Label Direction',
+					desc: ['Label direction can be specified when construct form programmatically, actually pass to each Form Cell.',
+						<span><code>horizontal</code> and <code>vertical</code>(default value) are acceptable options.<br/>
+						Or change the global constants via <code>NForm.LABEL_DIRECTION = 'horizontal';</code>.</span>],
+					code: '<NForm model={model} layout={layout} direction="horizontal" />'
+				}
+			},
 			css: function () {
 				return {
 					id: 'form-class-name',
@@ -701,15 +711,6 @@
 					desc: ['Customized CSS class can be specified when construct form programmatically.'],
 					code: "<NForm model={model} layout={layout} className='your-class-name' />\n"
 				};
-			},
-			direction: function () {
-				return {
-					id: 'form-direction',
-					title: 'Label Direction',
-					desc: ['Label direction can be specified when construct form programmatically, actually pass to each Form Cell.',
-						<span><code>horizontal</code> and <code>vertical</code>(default value) are legally options</span>],
-					code: '<NForm model={model} layout={layout} direction="horizontal" />'
-				}
 			}
 		};
 		return $demo.convertToExampleList(all);

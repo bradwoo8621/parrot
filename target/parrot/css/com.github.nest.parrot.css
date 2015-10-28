@@ -1024,6 +1024,16 @@ ul.pagination > li > a.active {
 div.n-modal-form.advanced-search-dialog .n-modal-form-footer {
   display: none;
 }
+div.n-modal-form .modal-title > a,
+div.n-modal-form .modal-title > a:hover,
+div.n-modal-form .modal-title > a:active,
+div.n-modal-form .modal-title > a:focus {
+  color: #666666;
+  text-decoration: none;
+}
+div.n-modal-form .modal-title > a:hover {
+  text-decoration: underline;
+}
 .select2-container.select2-container--default .select2-selection--single {
   height: auto;
   line-height: 32px;

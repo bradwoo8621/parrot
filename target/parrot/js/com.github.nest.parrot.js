@@ -4900,6 +4900,9 @@
  */
 (function (context, $, $pt) {
 	var NForm = React.createClass({displayName: "NForm",
+		statics: {
+			LABEL_DIRECTION: 'vertical'
+		},
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
@@ -4920,8 +4923,7 @@
 					icon: 'angle-double-left',
 					text: 'Previous',
 					style: 'primary'
-				},
-				direction: 'vertical'
+				}
 			};
 		},
 		getInitialState: function () {
@@ -5034,7 +5036,7 @@
 			};
 			return React.createElement(NPanel, {model: this.getModel(), 
 			               layout: $pt.createCellLayout(sections[0].getParentCard().getId() + '-body', sectionLayout), 
-			               direction: this.props.direction});
+			               direction: this.getLabelDirection()});
 		},
 		/**
 		 * attach previous button
@@ -5363,6 +5365,9 @@
 		 */
 		getModel: function () {
 			return this.props.model;
+		},
+		getLabelDirection: function() {
+			return this.props.direction ? this.props.direction : NForm.LABEL_DIRECTION;
 		},
 		/**
 		 * get layout
@@ -6671,10 +6676,40 @@
 			modal.css({
 				overflow: 'visible',
 				height: 0
-			}).children('.modal-dialog').css({
+			});
+			var dialog = modal.children('.modal-dialog');
+			dialog.css({
 				height: 0
 			});
 			top.find('.modal-backdrop').hide();
+
+			// the initial position
+			if (this.state.pos) {
+				// dialog content position is relative to dialog.
+				// dialog has margin.
+				var dialogPosition = {
+					top: parseInt(dialog.css('margin-top')),
+					left: parseInt(dialog.css('margin-left')),
+					bottom: parseInt(dialog.css('margin-bottom')),
+					right: parseInt(dialog.css('margin-right'))
+				};
+				var content = dialog.children('.modal-content');
+				var contentPosition = {};
+				if (this.state.pos.bottom != null) {
+					contentPosition.bottom = dialogPosition.bottom + content.height() - $(window).height();
+				} else if (this.state.pos.top != null) {
+					contentPosition.top = this.state.pos.top - dialogPosition.top;
+				}
+				if (this.state.pos.right != null) {
+					contentPosition.right = this.state.pos.right - dialogPosition.right;
+				} else if (this.state.pos.left != null) {
+					contentPosition.left = this.state.pos.left - dialogPosition.left;
+				}
+				if (Object.keys(contentPosition).length > 0) {
+					console.log(contentPosition);
+					content.css(contentPosition);
+				}
+			}
 		},
 		/**
 		 * did update
@@ -6697,10 +6732,10 @@
 		 * @returns {XML}
 		 */
 		renderFooter: function () {
-			if (this.state.footer === false) {
-				return React.createElement("div", null);
+			if (this.state.footer === false || !this.state.expanded) {
+				return React.createElement("div", {ref: "footer"});
 			} else {
-				return (React.createElement(Modal.Footer, {className: "n-modal-form-footer"}, 
+				return (React.createElement(Modal.Footer, {className: "n-modal-form-footer", ref: "footer"}, 
 					React.createElement(NPanelFooter, {reset: this.getResetButton(), 
 					              validate: this.getValidationButton(), 
 					              save: this.getSaveButton(), 
@@ -6711,6 +6746,12 @@
 				));
 			}
 		},
+		renderBody: function() {
+			return (React.createElement(Modal.Body, {ref: "body", className: !this.state.expanded ? 'hide': null}, 
+				React.createElement(NForm, {model: this.getModel(), layout: this.getLayout(), direction: this.getDirection(), 
+				       ref: "form"})
+			));
+		},
 		/**
 		 * render
 		 * @returns {*}
@@ -6720,17 +6761,23 @@
 				return null;
 			}
 			var title = this.state.title ? this.state.title : this.props.title;
+			if (this.isCollapsible()) {
+				title = (React.createElement("a", {href: "javascript:void(0);", onClick: this.onTitleClicked}, title));
+			}
 			return (React.createElement(Modal, {className: this.props.className, backdrop: "static", onHide: this.hide, ref: "top"}, 
-				React.createElement(Modal.Header, {closeButton: true}, 
+				React.createElement(Modal.Header, {closeButton: this.isDialogCloseShown()}, 
 					React.createElement(Modal.Title, null, title)
 				), 
-				React.createElement(Modal.Body, {ref: "body"}, 
-					React.createElement(NForm, {model: this.getModel(), layout: this.getLayout(), direction: this.getDirection(), 
-					       ref: "form"})
-				), 
-
+				this.renderBody(), 
 				this.renderFooter()
 			));
+		},
+		/**
+		 * on title clicked
+		 */
+		onTitleClicked: function() {
+			// TODO no animotion, tried, weird.
+			this.setState({expanded: !this.state.expanded});
 		},
 		/**
 		 * on reset clicked
@@ -6834,8 +6881,33 @@
 		getSaveButton: function () {
 			return this.state.buttons ? this.state.buttons.save : null;
 		},
+		/**
+		 * is dialog close button shown
+		 * @returns boolean
+		 */
+		isDialogCloseShown: function() {
+			return this.state.buttons ? this.state.buttons.dialogCloseShown !== false : true;
+		},
+		/**
+		 * is draggable
+		 * @returns boolean
+		 */
 		isDraggable: function() {
 			return this.state.draggable;
+		},
+		/**
+		 * is collapsible
+		 * @returns boolean
+		 */
+		isCollapsible: function() {
+			return this.state.collapsible;
+		},
+		/**
+		 * is expanded
+		 * @returns boolean
+		 */
+		isExpanded: function() {
+			return this.state.expanded;
 		},
 		/**
 		 * validate
@@ -6882,7 +6954,10 @@
 					direction: model.direction,
 					footer: model.footer,
 					title: model.title,
-					draggable: model.draggable
+					draggable: model.draggable,
+					collapsible: model.collapsible,
+					expanded: model.expanded == null ? true : model.expanded,
+					pos: model.pos
 				});
 			} else {
 				this.setState({

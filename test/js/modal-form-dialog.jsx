@@ -3,7 +3,10 @@
  */
 (function () {
     var form = NModalForm.createFormModal('Normal Form Modal');
+    var floatForm = NModalForm.createFormModal('Floating Form Dialog');
+    var collapsibleForm = NModalForm.createFormModal('Collapsible Form Modal');
     var noFooterForm = NModalForm.createFormModal('No Footer Form Modal');
+    var noCloseForm = NModalForm.createFormModal('No Dialog Close Button Form Modal');
     var customForm = NModalForm.createFormModal('Custom Form Modal');
     var model = $pt.createModel({name: null});
     var layout = $pt.createFormLayout({
@@ -24,8 +27,57 @@
                         save: function () {
                             alert('Save Clicked');
                         }
-                    },
+                    }
+                });
+            }
+        }
+    }, buttonTemplate));
+    var floating = $pt.createCellLayout('button', $.extend(true, {
+        label: 'Floating', comp: {
+            click: function () {
+                floatForm.show({
+                    model: model,
+                    layout: layout,
                     draggable: true
+                });
+            }
+        }
+    }, buttonTemplate));
+    var floatingWithPos = $pt.createCellLayout('button', $.extend(true, {
+        label: 'Floating With Position', comp: {
+            click: function () {
+                floatForm.show({
+                    model: model,
+                    layout: layout,
+                    draggable: true,
+                    pos: {
+                        right: 20,
+                        left: 30,
+                        bottom: 0
+                    }
+                });
+            }
+        }
+    }, buttonTemplate));
+    var collapsible = $pt.createCellLayout('button', $.extend(true, {
+        label: 'Collapsible', comp: {
+            click: function () {
+                collapsibleForm.show({
+                    model: model,
+                    layout: layout,
+                    collapsible: true
+                });
+            }
+        }
+    }, buttonTemplate));
+    var collapsed = $pt.createCellLayout('button', $.extend(true, {
+        label: 'Collapsed', comp: {
+            click: function () {
+                collapsibleForm.show({
+                    model: model,
+                    layout: layout,
+                    collapsible: true,
+                    expanded: false
                 });
             }
         }
@@ -34,6 +86,19 @@
         label: 'No Footer', comp: {
             click: function () {
                 noFooterForm.show(model, layout, null, null, false);
+            }
+        }
+    }, buttonTemplate));
+    var noClose = $pt.createCellLayout('button', $.extend(true, {
+        label: 'No Close', comp: {
+            click: function () {
+                noCloseForm.show({
+                    model: model,
+                    layout: layout,
+                    buttons: {
+                        dialogCloseShown: false
+                    }
+                });
             }
         }
     }, buttonTemplate));
@@ -74,9 +139,16 @@
         <div className='col-md-3 col-lg-3 col-sm-3'>
             <span>Modal Form Dialog</span>
             <NFormButton layout={normal}/>
+            <NFormButton layout={floating}/>
+            <NFormButton layout={floatingWithPos}/>
+            <NFormButton layout={collapsible}/>
+            <NFormButton layout={collapsed}/>
             <NFormButton layout={noFooter}/>
+            <NFormButton layout={noClose}/>
             <NFormButton layout={custButtons}/>
         </div>
+        <div style={{height: 2000}} />
+        <NFormButton layout={floatingWithPos}/>
     </div>);
     React.render(panel, document.getElementById('main'));
 })();

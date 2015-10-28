@@ -36,6 +36,9 @@
  */
 (function (context, $, $pt) {
 	var NForm = React.createClass({
+		statics: {
+			LABEL_DIRECTION: 'vertical'
+		},
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
@@ -56,8 +59,7 @@
 					icon: 'angle-double-left',
 					text: 'Previous',
 					style: 'primary'
-				},
-				direction: 'vertical'
+				}
 			};
 		},
 		getInitialState: function () {
@@ -170,7 +172,7 @@
 			};
 			return <NPanel model={this.getModel()}
 			               layout={$pt.createCellLayout(sections[0].getParentCard().getId() + '-body', sectionLayout)}
-			               direction={this.props.direction}/>;
+			               direction={this.getLabelDirection()}/>;
 		},
 		/**
 		 * attach previous button
@@ -499,6 +501,9 @@
 		 */
 		getModel: function () {
 			return this.props.model;
+		},
+		getLabelDirection: function() {
+			return this.props.direction ? this.props.direction : NForm.LABEL_DIRECTION;
 		},
 		/**
 		 * get layout
