@@ -12050,7 +12050,7 @@
                     React.createElement("a", {
                         href: "javascript:void(0);", 
                         onClick: this.onNodeClicked.bind(this, node, nodeId)}, 
-                        React.createElement("span", {className: "node-text"}, node.text)
+                        React.createElement("span", {className: "node-text"}, this.getNodeText(node))
                     ), 
                     this.renderNodes(node, nodeId)
                 )
@@ -12229,6 +12229,14 @@
                     folder: false,
                     leaf: true
                 }, NTree.FILE_ICON);
+            }
+        },
+        getNodeText: function(node) {
+            var render = this.getComponentOption('textRender');
+            if (render) {
+                return render.call(this, node);
+            } else {
+                return node.text;
             }
         },
         /**

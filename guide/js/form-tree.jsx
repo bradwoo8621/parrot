@@ -70,6 +70,24 @@
 					index: 20
 				};
 			},
+			nodeText: function() {
+				var layoutTemplate = {comp: {root: "Informations", textRender: function(node) {
+					return node.text + ' & something';
+				}}};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'nodes',
+					template: layoutTemplate
+				});
+				return {
+					id: 'tree-style-root-nodeText',
+					title: 'Node Text',
+					desc: 'Node text can be defined.',
+					xml: <NTree model={model} layout={$pt.createCellLayout('nodes', layoutTemplate)}/>,
+					code: [modelCode, layoutCode, compCode],
+					index: 25
+				};
+			},
 			op: function () {
 				var layoutTemplate = {comp: {opIconEnabled: true}};
 				var layoutCode = $demo.convertCellLayoutCreatorToString({

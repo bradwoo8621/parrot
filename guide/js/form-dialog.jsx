@@ -33,7 +33,7 @@
 						id: 'form-dialog-show',
 						title: '#show',
 						pattern: '#show()',
-						desc: <span>Show dialog. Options as below,
+						desc: <span>Show dialog. Options as below,<br/>
 						1. <code>model</code>: Model Interface. data model.<br/>
 						2. <code>layout</code>: Form Layout. create by <code>$pt.createFormLayout()</code>.<br/>
 						3. <code>buttons</code>: JSON. properties as below,
