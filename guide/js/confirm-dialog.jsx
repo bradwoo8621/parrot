@@ -46,12 +46,12 @@
 				id: 'confirm-dialog-constants',
 				title: 'Constants',
 				desc: <span>
-						<code>NConfirm.OK_TEXT = 'OK';</code><br/>
-						<code>NConfirm.OK_ICON = 'check';</code><br/>
-						<code>NConfirm.CLOSE_TEXT = 'Close';</code><br/>
-						<code>NConfirm.CLOSE_ICON = 'ban';</code><br/>
-						<code>NConfirm.CANCEL_TEXT = 'Cancel';</code><br/>
-						<code>NConfirm.CANCEL_ICON = 'ban';</code>
+						<code>NConfirm.OK_TEXT = {NConfirm.OK_TEXT};</code><br/>
+						<code>NConfirm.OK_ICON = {NConfirm.OK_ICON};</code><br/>
+						<code>NConfirm.CLOSE_TEXT = {NConfirm.CLOSE_TEXT};</code><br/>
+						<code>NConfirm.CLOSE_ICON = {NConfirm.CLOSE_ICON};</code><br/>
+						<code>NConfirm.CANCEL_TEXT = {NConfirm.CANCEL_TEXT};</code><br/>
+						<code>NConfirm.CANCEL_ICON = {NConfirm.CANCEL_ICON};</code>
 				</span>
 			}
 		]
