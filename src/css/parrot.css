@@ -505,7 +505,7 @@ div.n-datetime {
   position: relative;
 }
 div.n-datetime > div.input-group > span.input-group-addon {
-  padding-right: 0;
+  padding: 0;
 }
 div.n-datetime > div.input-group > span.input-group-addon.link {
   cursor: pointer;
@@ -1143,7 +1143,7 @@ div.n-table-container div.n-table-body-container.panel-body {
   border-top: solid 1px #e0e0e0;
 }
 div.n-table-container div.n-table-body-container.panel-body div.n-table-panel-body {
-  overflow: auto;
+  overflow-y: hidden;
 }
 div.n-table-container div.n-table-body-container.panel-body div.n-table-panel-body .n-table-scroll-head {
   overflow: hidden;
@@ -1220,18 +1220,6 @@ div.n-table-container table.n-table tbody tr td div.n-checkbox {
 div.n-table-container table.n-table thead tr td div.n-checkbox span.check-container,
 div.n-table-container table.n-table tbody tr td div.n-checkbox span.check-container {
   top: 4px;
-}
-div.n-table-container table.n-table thead tr td div.n-checkbox span.check-container:focus:before,
-div.n-table-container table.n-table tbody tr td div.n-checkbox span.check-container:focus:before {
-  -webkit-animation: none;
-  animation: none;
-  -o-animation: none;
-}
-div.n-table-container table.n-table thead tr td div.n-checkbox span.check-container.checked:focus:before,
-div.n-table-container table.n-table tbody tr td div.n-checkbox span.check-container.checked:focus:before {
-  -webkit-animation: none;
-  animation: none;
-  -o-animation: none;
 }
 div.n-table-container table.n-table thead tr td div.n-checkbox span.check-container span.check,
 div.n-table-container table.n-table tbody tr td div.n-checkbox span.check-container span.check {
@@ -1315,6 +1303,9 @@ table.n-table tbody tr td {
 table.n-table tbody tr td:last-child {
   border-right: 0;
 }
+table.n-table tbody tr td .inline-editor {
+  padding: 0;
+}
 table.n-table tbody tr:last-child {
   border-bottom: solid 1px #e0e0e0;
 }
@@ -1328,6 +1319,12 @@ table.n-table div.n-table-op-btn-group button.n-table-op-btn {
   height: 20px;
   overflow: hidden;
   outline: 0;
+}
+div.n-table-container.inline-editor table.n-table tbody tr td {
+  height: 36px;
+}
+div.n-table-container.inline-editor table.n-table tbody tr td .inline-editor {
+  padding: 0;
 }
 @-moz-document url-prefix() {
   table.n-table thead tr {
@@ -2307,6 +2304,8 @@ div.has-error div.n-text > div.input-group > span.input-group-addon.link.disable
 div.has-error div.n-datetime > div.input-group > span.input-group-addon.disabled,
 div.has-error div.n-datetime > div.input-group > span.input-group-addon.link.disabled {
   color: #f44336;
+  background-color: transparent;
+  border: 0;
 }
 div.has-error div.n-toggle span.n-toggle-line,
 div.has-error div.n-toggle.n-disabled > div.toggle-container > span.n-toggle-line {

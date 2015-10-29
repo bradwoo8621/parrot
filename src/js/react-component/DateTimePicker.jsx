@@ -39,7 +39,8 @@
 			DAY_VIEW_HEADER_FORMAT: 'MMMM YYYY',
 			HEADER_YEAR_FORMAT: null,
 			VALUE_FORMAT: $pt.ComponentConstants.Default_Date_Format,
-			LOCALE: 'en'
+			LOCALE: 'en',
+			DATE_PICKER_VERTICAL_OFFSET: 35 // equals row height according to current testing
 		},
 		propTypes: {
 			// model
@@ -180,12 +181,34 @@
 			});
 		},
 		resetPopupContent: function (picker, target) {
+			var widget = $(target).children('div.bootstrap-datetimepicker-widget');
+			// if (widget.closest('.n-table').length != 0) {
+			// 	var tablePanelBody = widget.closest('.n-table-panel-body');
+			// 	// date time picker in table, move the popover to appointed div
+			// 	var inputOffset = widget.prev().offset();
+			// 	// console.log("Input: " + JSON.stringify(inputOffset));
+			// 	var offset = widget.offset();
+			// 	// console.log("Popup: " + JSON.stringify(offset));
+			// 	var container = $('#datepicker_popup');
+			// 	if (container.length == 0) {
+			// 		$('body').append('<div id="datepicker_popup" style="position:absolute;top:0;left:0;height:0;z-index:10000"/>');
+			// 	}
+			// 	container = $('#datepicker_popup');
+			// 	// console.log("Independent Container: " + JSON.stringify(container.offset()));
+			// 	if (inputOffset.top >= offset.top) {
+			// 		offset.top += NTable.DATE_PICKER_VERTICAL_OFFSET;
+			// 	}
+			// 	// widget.css({bottom: '', right: '', top: offset.top, left: offset.left});
+			// 	// console.log("Widget relocated: " + JSON.stringify(widget.offset()));
+			// 	// widget.detach().appendTo(container);
+			// 	// console.log(container.html());
+			// }
+
 			var headerYearFormat = this.getHeaderYearFormat();
 			//var yearsFormat = this.getComponentOption('yearsFormat');
 			if (headerYearFormat) {
 				var viewDate = picker.viewDate();
 
-				var widget = $(target).children('div.bootstrap-datetimepicker-widget');
 				var monthsView = widget.find('.datepicker-months');
 				var monthsViewHeader = monthsView.find('th');
 				monthsViewHeader.eq(1).text(viewDate.format(headerYearFormat));

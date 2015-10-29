@@ -609,6 +609,83 @@
 					code: [modelCode, layoutCode, compCode],
 					index: 90
 				};
+			},
+			inline: function () {
+				var Gender = $pt.createCodeTable([{id: 'F', text: 'Female'}, {id: 'M', text: 'Male'}]);
+				Gender.name('gender');
+				var layout = $.extend(true, {}, layoutTemplate, {
+					comp: {
+						scrollY: 200,
+			            columns: [{
+			                title: 'Name',
+			                data: 'name',
+			                inline: 'text',
+			                width: 150
+			            }, {
+			                title: 'Code',
+			                data: 'code',
+			                width: 150,
+			                inline: {
+			                    inlineType: 'cell',
+			                    comp: {
+			                        type: {type: $pt.ComponentConstants.Text, label: false}
+			                    }
+			                }
+			            }, {
+			                data: 'gender',
+			                title: 'Gender',
+			                codes: Gender,
+			                inline: 'select',
+			                width: 150
+			            }, {
+			                data: 'object_age',
+			                title: 'Age',
+			                width: 150
+			            }, {
+			                title: 'Selected',
+			                data: 'selected',
+			                inline: 'check',
+			                width: 150
+			            }, {
+			                data: 'gender',
+			                title: 'Radio',
+			                codes: Gender,
+			                inline: 'radio',
+			                width: 300
+			            }, {
+			                data: 'birth',
+			                title: 'Date of Birth',
+			                inline: 'date',
+			                width: 200
+			            }]
+					},
+			        css: {
+			            comp: 'inline-editor'
+			        }
+				});
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'value',
+					template: layout
+				});
+				return {
+					id: 'table-edit-inline',
+					title: 'Inline Editor',
+					desc: <span>Inline editor:<br/>
+					1. Pre-defined: There are 5 pre-defined inline editors. <code>text</code>, <code>select</code>, <code>radio</code>, <code>check</code> and <code>date</code>.
+					<code>data</code> property of column should be used as data id for cell, and <code>codes</code> used as data options for <code>select</code> and <code>radio</code><br/>
+					Or register more via <code>NTable.registerInlineEditor(type: string, def: JSON);</code>, <code>def</code> is cell layout format.<br/>
+					2. Cell Layout: Simply use cell layout JSON, such as <code>inline: {"{}"}</code>. Note in JSON object, <code>inlineType: 'cell'</code> is necessary,
+					or the JSON object will be treated as option 3.<br/>
+					3. Form Layout: Use form layout JSON, take care of the CSS, it's very important. Form CSS class name can be defined via additional property <code>__className</code> in JSON.<br/>
+					</span>,
+					xml: {
+						width: 12,
+						xml: <NTable model={model} layout={$pt.createCellLayout('items', layout)}/>
+					},
+					code: [modelCode, layoutCode, compCode],
+					index: 100
+				};
 			}
 		};
 
