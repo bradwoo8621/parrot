@@ -1303,9 +1303,6 @@ table.n-table tbody tr td {
 table.n-table tbody tr td:last-child {
   border-right: 0;
 }
-table.n-table tbody tr td .inline-editor {
-  padding: 0;
-}
 table.n-table tbody tr:last-child {
   border-bottom: solid 1px #e0e0e0;
 }
@@ -1325,6 +1322,18 @@ div.n-table-container.inline-editor table.n-table tbody tr td {
 }
 div.n-table-container.inline-editor table.n-table tbody tr td .inline-editor {
   padding: 0;
+}
+div.n-table-container.inline-editor table.n-table tbody tr td .n-form .n-form-cell {
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-right: 3px;
+  padding-left: 2px;
+}
+div.n-table-container.inline-editor table.n-table tbody tr td .n-form .n-form-cell:first-child {
+  padding-left: 15px;
+}
+div.n-table-container.inline-editor table.n-table tbody tr td .n-form .n-form-cell:last-child {
+  padding-right: 15px;
 }
 @-moz-document url-prefix() {
   table.n-table thead tr {
@@ -1822,10 +1831,12 @@ div.n-checkbox span.check-container.checked span.check:before {
   box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px;
   -o-box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px;
   -webkit-box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px;
+  color: #2196f3;
+}
+div.n-checkbox span.check-container.checked:focus span.check:before {
   -webkit-animation: checkbox-on 0.3s forwards;
   animation: checkbox-on 0.3s forwards;
   -o-animation: checkbox-on 0.3s forwards;
-  color: #2196f3;
 }
 div.n-checkbox span.check-container span.check {
   position: relative;
@@ -1851,6 +1862,8 @@ div.n-checkbox span.check-container span.check:before {
   box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0 inset;
   -o-box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0 inset;
   -webkit-box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0 inset;
+}
+div.n-checkbox span.check-container:focus span.check:before {
   -webkit-animation: checkbox-off 0.3s forwards;
   animation: checkbox-off 0.3s forwards;
   -o-animation: checkbox-off 0.3s forwards;
@@ -2083,10 +2096,12 @@ div.n-radio span.radio-container.checked span.check:before {
   box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px;
   -o-box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px;
   -webkit-box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px;
+  color: #2196f3;
+}
+div.n-radio span.radio-container.checked:focus span.check:before {
   -webkit-animation: checkbox-on 0.3s forwards;
   animation: checkbox-on 0.3s forwards;
   -o-animation: checkbox-on 0.3s forwards;
-  color: #2196f3;
 }
 div.n-radio span.radio-container span.check {
   position: relative;
@@ -2112,6 +2127,8 @@ div.n-radio span.radio-container span.check:before {
   box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0 inset;
   -o-box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0 inset;
   -webkit-box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0 inset;
+}
+div.n-radio span.radio-container:focus span.check:before {
   -webkit-animation: checkbox-off 0.3s forwards;
   animation: checkbox-off 0.3s forwards;
   -o-animation: checkbox-off 0.3s forwards;

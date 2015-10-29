@@ -4397,27 +4397,28 @@
 		},
 		resetPopupContent: function (picker, target) {
 			var widget = $(target).children('div.bootstrap-datetimepicker-widget');
-			// if (widget.closest('.n-table').length != 0) {
-			// 	var tablePanelBody = widget.closest('.n-table-panel-body');
-			// 	// date time picker in table, move the popover to appointed div
-			// 	var inputOffset = widget.prev().offset();
-			// 	// console.log("Input: " + JSON.stringify(inputOffset));
-			// 	var offset = widget.offset();
-			// 	// console.log("Popup: " + JSON.stringify(offset));
-			// 	var container = $('#datepicker_popup');
-			// 	if (container.length == 0) {
-			// 		$('body').append('<div id="datepicker_popup" style="position:absolute;top:0;left:0;height:0;z-index:10000"/>');
-			// 	}
-			// 	container = $('#datepicker_popup');
-			// 	// console.log("Independent Container: " + JSON.stringify(container.offset()));
-			// 	if (inputOffset.top >= offset.top) {
-			// 		offset.top += NTable.DATE_PICKER_VERTICAL_OFFSET;
-			// 	}
-			// 	// widget.css({bottom: '', right: '', top: offset.top, left: offset.left});
-			// 	// console.log("Widget relocated: " + JSON.stringify(widget.offset()));
-			// 	// widget.detach().appendTo(container);
-			// 	// console.log(container.html());
-			// }
+			if (widget.closest('.n-table').length != 0) {
+				var tableBodyContainer = $(target).closest('.n-table-body-container');
+				// date time picker in table, move the popover to body,
+				// Don't know why the popup hasn't place on body in original library, the z-index really sucks.
+				var inputOffset = widget.prev().offset();
+				var widgetOffset = widget.offset();
+				var widgetHeight = widget.outerHeight(true);
+				// console.log("Widget height: " + widgetHeight);
+				if (widgetOffset.top == null || widgetOffset.top == 'auto' || inputOffset.top > widgetOffset.top) {
+					// on top
+					widgetOffset.top = inputOffset.top - widgetHeight + NDateTime.DATE_PICKER_VERTICAL_OFFSET;
+				} else {
+					// on bottom
+					widgetOffset.top = inputOffset.top + widget.prev().height();
+				}
+				// console.log("Input Offset: " + JSON.stringify(inputOffset));
+				// console.log("Widget Offset: " + JSON.stringify(widgetOffset));
+				widget.css({top: widgetOffset.top, left: widgetOffset.left, bottom: "auto", right: "auto", height: 'auto'});
+				widget.detach().appendTo($('body'));
+				// console.log(widget.css("top") + "," + widget.css("left") + "," + widget.css("bottom") + "," + widget.css("right") + "," + widget.outerHeight(true));
+				tableBodyContainer.hide().show(0);
+			}
 
 			var headerYearFormat = this.getHeaderYearFormat();
 			//var yearsFormat = this.getComponentOption('yearsFormat');
@@ -5286,7 +5287,13 @@
 		 * @returns {XML}
 		 */
 		render: function () {
-			return (React.createElement("div", {className: this.props.className}, this.renderCards()));
+			var css = {
+				'n-form': true
+			};
+			if (this.props.className) {
+				css[this.props.className] = true;
+			}
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, this.renderCards()));
 		},
 		/**
 		 * on model changed
@@ -9713,6 +9720,7 @@
 		statics: {
 			__operationButtonWidth: 31,
 			__minOperationButtonWidth: 40,
+			ROW_HEIGHT: 32,
 			TOOLTIP_EDIT: null,
 			TOOLTIP_REMOVE: null,
 			/**
@@ -9939,7 +9947,7 @@
 			var rightFixedDiv = this.getFixedRightBodyComponent();
 			var trs = mainTable.find("tr");
 			var rowCount = trs.length;
-			var height = rowCount * 32; // 32 is defined in css, if value in css is changed, it must be changed together
+			var height = rowCount * NTable.ROW_HEIGHT; // 32 is defined in css, if value in css is changed, it must be changed together
 			if (height > this.getComponentOption("scrollY")) {
 				height = this.getComponentOption("scrollY");
 			}

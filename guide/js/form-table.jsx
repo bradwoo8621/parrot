@@ -638,9 +638,29 @@
 			                inline: 'select',
 			                width: 150
 			            }, {
-			                data: 'object_age',
+			                // data: 'object_age',
 			                title: 'Age',
-			                width: 150
+			                width: 150,
+							inline: {
+								'object_age': {
+									comp: {
+										type: {type: $pt.ComponentConstants.Text, label: false},
+										placeholder: 'Age'
+									},
+									pos: {
+										width: 6
+									}
+								},
+								'object_lunarAge': {
+									comp: {
+										type: {type: $pt.ComponentConstants.Text, label: false},
+										placeholder: 'Lunar Age'
+									},
+									pos: {
+										width: 6
+									}
+								}
+							}
 			            }, {
 			                title: 'Selected',
 			                data: 'selected',
@@ -678,6 +698,9 @@
 					2. Cell Layout: Simply use cell layout JSON, such as <code>inline: {"{}"}</code>. Note in JSON object, <code>inlineType: 'cell'</code> is necessary,
 					or the JSON object will be treated as option 3.<br/>
 					3. Form Layout: Use form layout JSON, take care of the CSS, it's very important. Form CSS class name can be defined via additional property <code>__className</code> in JSON.<br/>
+					<span className='text-danger'>Note: <br/>
+					1. NEVER try to wrap lines in cell, if need, customized your own component, DONOT use Table.<br/>
+					2. NEVER forget the set comp CSS as <code>inline-editor</code> for Table which has inline editor.</span>
 					</span>,
 					xml: {
 						width: 12,

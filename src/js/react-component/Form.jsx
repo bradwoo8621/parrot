@@ -399,7 +399,13 @@
 		 * @returns {XML}
 		 */
 		render: function () {
-			return (<div className={this.props.className}>{this.renderCards()}</div>);
+			var css = {
+				'n-form': true
+			};
+			if (this.props.className) {
+				css[this.props.className] = true;
+			}
+			return (<div className={$pt.LayoutHelper.classSet(css)}>{this.renderCards()}</div>);
 		},
 		/**
 		 * on model changed

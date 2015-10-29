@@ -8,6 +8,7 @@
 		statics: {
 			__operationButtonWidth: 31,
 			__minOperationButtonWidth: 40,
+			ROW_HEIGHT: 32,
 			TOOLTIP_EDIT: null,
 			TOOLTIP_REMOVE: null,
 			/**
@@ -234,7 +235,7 @@
 			var rightFixedDiv = this.getFixedRightBodyComponent();
 			var trs = mainTable.find("tr");
 			var rowCount = trs.length;
-			var height = rowCount * 32; // 32 is defined in css, if value in css is changed, it must be changed together
+			var height = rowCount * NTable.ROW_HEIGHT; // 32 is defined in css, if value in css is changed, it must be changed together
 			if (height > this.getComponentOption("scrollY")) {
 				height = this.getComponentOption("scrollY");
 			}

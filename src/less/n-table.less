@@ -238,10 +238,6 @@ table.n-table {
 			&:last-child {
 				border-right: 0;
 			}
-
-			.inline-editor {
-				padding: 0;
-			}
 		}
 		&:last-child {
 			border-bottom: solid 1px @border-color;
@@ -275,6 +271,18 @@ div.n-table-container.inline-editor {
 				height: @table-row-editor-height;
 				.inline-editor {
 					padding: 0;
+				}
+				.n-form .n-form-cell {
+					padding-top: 0;
+					padding-bottom: 0;
+					padding-right: 3px;
+					padding-left: 2px;
+					&:first-child {
+						padding-left: 15px;
+					}
+					&:last-child {
+						padding-right: 15px;
+					}
 				}
 			}
 		}
