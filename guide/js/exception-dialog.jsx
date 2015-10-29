@@ -37,7 +37,7 @@
 			{
 				id: 'exception-dialog-constants',
 				title: 'Constants',
-				desc: <span><code>NExceptionModal.TITLE = 'Exception Raised...';</code></span>
+				desc: <span><code>NExceptionModal.TITLE = {NExceptionModal.TITLE};</code></span>
 			}
 		]
 	};

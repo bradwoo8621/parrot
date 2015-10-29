@@ -188,10 +188,10 @@
 			},
 			constants: function () {
 				var statics = {
-					FORMAT: 'YYYY/MM/DD',
-					DAY_VIEW_HEADER_FORMAT: 'MMMM YYYY',
-					VALUE_FORMAT: $pt.ComponentConstants.Default_Date_Format,
-					LOCALE: 'en'
+					FORMAT: NDateTime.FORMAT,
+					DAY_VIEW_HEADER_FORMAT: NDateTime.DAY_VIEW_HEADER_FORMAT,
+					VALUE_FORMAT: NDateTime.VALUE_FORMAT,
+					LOCALE: NDateTime.LOCALE
 				};
 				return {
 					id: 'datetime-constants',

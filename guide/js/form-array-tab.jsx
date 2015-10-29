@@ -133,7 +133,7 @@
 						variable: 'NArrayTab',
 						json: {
 							statics: {
-								UNTITLED: 'Untitled Item'
+								UNTITLED: NArrayTab.UNTITLED
 							}
 						}
 					})

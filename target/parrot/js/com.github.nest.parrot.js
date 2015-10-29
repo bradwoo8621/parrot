@@ -1,4 +1,4 @@
-/** com.github.nest.parrot.V0.0.4 2015-10-28 */
+/** com.github.nest.parrot.V0.0.4 2015-10-29 */
 (function ($) {
 	var patches = {
 		console: function () {
@@ -4254,7 +4254,8 @@
 			DAY_VIEW_HEADER_FORMAT: 'MMMM YYYY',
 			HEADER_YEAR_FORMAT: null,
 			VALUE_FORMAT: $pt.ComponentConstants.Default_Date_Format,
-			LOCALE: 'en'
+			LOCALE: 'en',
+			DATE_PICKER_VERTICAL_OFFSET: 35 // equals row height according to current testing
 		},
 		propTypes: {
 			// model
@@ -4395,12 +4396,35 @@
 			});
 		},
 		resetPopupContent: function (picker, target) {
+			var widget = $(target).children('div.bootstrap-datetimepicker-widget');
+			if (widget.closest('.n-table').length != 0) {
+				var tableBodyContainer = $(target).closest('.n-table-body-container');
+				// date time picker in table, move the popover to body,
+				// Don't know why the popup hasn't place on body in original library, the z-index really sucks.
+				var inputOffset = widget.prev().offset();
+				var widgetOffset = widget.offset();
+				var widgetHeight = widget.outerHeight(true);
+				// console.log("Widget height: " + widgetHeight);
+				if (widgetOffset.top == null || widgetOffset.top == 'auto' || inputOffset.top > widgetOffset.top) {
+					// on top
+					widgetOffset.top = inputOffset.top - widgetHeight + NDateTime.DATE_PICKER_VERTICAL_OFFSET;
+				} else {
+					// on bottom
+					widgetOffset.top = inputOffset.top + widget.prev().height();
+				}
+				// console.log("Input Offset: " + JSON.stringify(inputOffset));
+				// console.log("Widget Offset: " + JSON.stringify(widgetOffset));
+				widget.css({top: widgetOffset.top, left: widgetOffset.left, bottom: "auto", right: "auto", height: 'auto'});
+				widget.detach().appendTo($('body'));
+				// console.log(widget.css("top") + "," + widget.css("left") + "," + widget.css("bottom") + "," + widget.css("right") + "," + widget.outerHeight(true));
+				tableBodyContainer.hide().show(0);
+			}
+
 			var headerYearFormat = this.getHeaderYearFormat();
 			//var yearsFormat = this.getComponentOption('yearsFormat');
 			if (headerYearFormat) {
 				var viewDate = picker.viewDate();
 
-				var widget = $(target).children('div.bootstrap-datetimepicker-widget');
 				var monthsView = widget.find('.datepicker-months');
 				var monthsViewHeader = monthsView.find('th');
 				monthsViewHeader.eq(1).text(viewDate.format(headerYearFormat));
@@ -5263,7 +5287,13 @@
 		 * @returns {XML}
 		 */
 		render: function () {
-			return (React.createElement("div", {className: this.props.className}, this.renderCards()));
+			var css = {
+				'n-form': true
+			};
+			if (this.props.className) {
+				css[this.props.className] = true;
+			}
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, this.renderCards()));
 		},
 		/**
 		 * on model changed
@@ -6695,20 +6725,36 @@
 				};
 				var content = dialog.children('.modal-content');
 				var contentPosition = {};
-				if (this.state.pos.bottom != null) {
-					contentPosition.bottom = dialogPosition.bottom + content.height() - $(window).height();
-				} else if (this.state.pos.top != null) {
-					contentPosition.top = this.state.pos.top - dialogPosition.top;
+				var currentContentTop = parseInt(content.css('top'));
+				if (isNaN(currentContentTop)) {
+					if (this.state.pos.bottom != null) {
+						contentPosition.bottom = dialogPosition.bottom + content.height() - $(window).height();
+					} else if (this.state.pos.top != null) {
+						contentPosition.top = this.state.pos.top - dialogPosition.top;
+					}
+				} else {
+					contentPosition.top = currentContentTop;
 				}
-				if (this.state.pos.right != null) {
-					contentPosition.right = this.state.pos.right - dialogPosition.right;
-				} else if (this.state.pos.left != null) {
-					contentPosition.left = this.state.pos.left - dialogPosition.left;
+				var currentContentLeft = parseInt(content.css('left'));
+				if (isNaN(currentContentLeft)) {
+					if (this.state.pos.right != null) {
+						contentPosition.right = this.state.pos.right - dialogPosition.right;
+					} else if (this.state.pos.left != null) {
+						contentPosition.left = this.state.pos.left - dialogPosition.left;
+					}
+				} else {
+					contentPosition.left = currentContentLeft;
 				}
 				if (Object.keys(contentPosition).length > 0) {
-					console.log(contentPosition);
 					content.css(contentPosition);
 				}
+			}
+		},
+		stopDraggable: function() {
+			if (this.refs.top) {
+				var top = $(React.findDOMNode(this.refs.top));
+				var modal = top.children('.modal');
+				modal.stopDrags({handle: '.modal-header'});
 			}
 		},
 		/**
@@ -6720,12 +6766,18 @@
 			this.setZIndex();
 			this.setDraggable();
 		},
+		componentWillUpdate: function() {
+			this.stopDraggable();
+		},
 		/**
 		 * did mount
 		 */
 		componentDidMount: function () {
 			this.setZIndex();
 			this.setDraggable();
+		},
+		componentDidUnmount: function() {
+			this.stopDraggable();
 		},
 		/**
 		 * render footer
@@ -7013,6 +7065,25 @@
 				$(this).removeClass('active-handle').parent().removeClass('draggable');
 			}
 		});
+	};
+	$.fn.stopDrags = function(opt) {
+		opt = $.extend({handle:"",cursor:"move"}, opt);
+		var $el = null;
+		if(opt.handle === "") {
+			$el = this;
+		} else {
+			$el = this.find(opt.handle);
+		}
+
+		var $drag = null;
+		if(opt.handle === "") {
+			$drag = $($el);
+		} else {
+			$drag = $($el).parent();
+		}
+		$drag.parents().off("mousemove");
+
+		return $el.off('mousedown mouseup');
 	};
 }(this, jQuery, $pt));
 
@@ -9649,6 +9720,7 @@
 		statics: {
 			__operationButtonWidth: 31,
 			__minOperationButtonWidth: 40,
+			ROW_HEIGHT: 32,
 			TOOLTIP_EDIT: null,
 			TOOLTIP_REMOVE: null,
 			/**
@@ -9674,7 +9746,54 @@
 			REMOVE_CONFIRM_MESSAGE: ["Are you sure you want to delete data?", "Deleted data cannot be recovered."],
 			BOOLEAN_TRUE_DISPLAY_TEXT: 'Y',
 			BOOLEAN_FALSE_DISPLAY_TEXT: 'N',
-			PAGE_JUMPING_PROXY: null
+			PAGE_JUMPING_PROXY: null,
+			registerInlineEditor: function(type, definition) {
+				if (NTable.__inlineEditors[type] != null) {
+					console.warn("Inline editor[" + type + "] is repalced.");
+					console.warn("From:");
+					console.warn(NTable.__inlineEditors[type]);
+					console.warn("To:");
+					console.warn(definition);
+				}
+				NTable.__inlineEditors[type] = definition;
+			},
+			getInlineEditor: function(type) {
+				var editor = NTable.__inlineEditors[type];
+				if (editor == null) {
+					editor = NTable['__' + type];
+				}
+				if (editor == null) {
+					throw $pt.createComponentException($pt.ComponentConstants.Err_Unsupported_Component,
+						"Inline component type[" + type + "] is not supported yet.");
+				}
+				return editor;
+			},
+			__inlineEditors: {},
+			__text: {
+				comp: {
+					type: {type: $pt.ComponentConstants.Text, label: false}
+				}
+			},
+			__check: {
+				comp: {
+					type: {type: $pt.ComponentConstants.Check, label: false}
+				}
+			},
+			__date: {
+				comp: {
+					type: {type: $pt.ComponentConstants.Date, label: false}
+				}
+			},
+			__select: {
+				comp: {
+					type: {type: $pt.ComponentConstants.Select, label: false}
+				}
+			},
+			__radio: {
+				comp: {
+					type: {type: $pt.ComponentConstants.Radio, label: false}
+				}
+			}
 		},
 		propTypes: {
 			// model
@@ -9828,7 +9947,7 @@
 			var rightFixedDiv = this.getFixedRightBodyComponent();
 			var trs = mainTable.find("tr");
 			var rowCount = trs.length;
-			var height = rowCount * 32; // 32 is defined in css, if value in css is changed, it must be changed together
+			var height = rowCount * NTable.ROW_HEIGHT; // 32 is defined in css, if value in css is changed, it must be changed together
 			if (height > this.getComponentOption("scrollY")) {
 				height = this.getComponentOption("scrollY");
 			}
@@ -9981,12 +10100,12 @@
 			if (this.isCollapsible()) {
 				spanCSS['n-table-heading-label-collapsible'] = true;
 			}
-			return React.createElement("div", {className: css}, 
-			React.createElement("span", {className: this.getAdditionalCSS("headingLabel", $pt.LayoutHelper.classSet(spanCSS)), 
-			      ref: this.getHeaderLabelId(), onClick: this.isCollapsible() ? this.onTitleClicked : null}, 
-				this.getLayout().getLabel()
-			)
-			);
+			return (React.createElement("div", {className: css}, 
+				React.createElement("span", {className: this.getAdditionalCSS("headingLabel", $pt.LayoutHelper.classSet(spanCSS)), 
+				      ref: this.getHeaderLabelId(), onClick: this.isCollapsible() ? this.onTitleClicked : null}, 
+					this.getLayout().getLabel()
+				)
+			));
 		},
 		/**
 		 * render header popover
@@ -10213,6 +10332,8 @@
 					className += " has-error";
 				}
 			}
+
+			var inlineModel = null;
 			return (React.createElement("tr", {className: className}, 
 				this.columns.map(function (column) {
 					if (columnIndex >= indexToRender.min && columnIndex <= indexToRender.max) {
@@ -10234,6 +10355,43 @@
 							data = rowIndex;
 						} else if (column.rowSelectable) {
 							data = _this.renderRowSelectCell(column, row);
+						} else if (column.inline) {
+							if (inlineModel == null) {
+								inlineModel = _this.createEditingModel(row);
+								inlineModel.useBaseAsCurrent();
+							}
+							// inline editor or something, can be pre-defined or just declare as be constructed as a form layout
+							if (typeof column.inline === 'string') {
+								var layout = NTable.getInlineEditor(column.inline);
+								layout.pos = {width: 12};
+								if (layout.css) {
+									layout.css.cell = 'inline-editor' + (layout.css.cell) ? (' ' + layout.css.cell) : '';
+								} else {
+									layout.css = {cell: 'inline-editor'};
+								}
+								if (column.inline === 'select' || column.inline === 'radio') {
+									// set code table
+									if (column.codes) {
+										layout = $.extend(true, {}, {comp: {data: column.codes}}, layout);
+									}
+								}
+								// pre-defined, use with data together
+								data = React.createElement(NFormCell, {model: inlineModel, layout: $pt.createCellLayout(column.data, layout), direction: "horizontal"});
+							} else if (column.inline.inlineType == 'cell') {
+								column.inline.pos = {width: 12};
+								if (column.inline.css) {
+									column.inline.css.cell = 'inline-editor' + (column.inline.css.cell) ? (' ' + column.inline.css.cell) : '';
+								} else {
+									column.inline.css = {cell: 'inline-editor'};
+								}
+								data = React.createElement(NFormCell, {model: inlineModel, layout: $pt.createCellLayout(column.data, column.inline), 
+													direction: "horizontal", 
+													className: column.inline.__className});
+							} else {
+								// any other, treat as form layout
+								// column.data is not necessary
+								data = React.createElement(NForm, {model: inlineModel, layout: $pt.createFormLayout(column.inline), direction: "horizontal"});
+							}
 						} else {
 							// data is property name
 							data = _this.getDisplayTextOfColumn(column, row);
@@ -12009,7 +12167,7 @@
                     React.createElement("a", {
                         href: "javascript:void(0);", 
                         onClick: this.onNodeClicked.bind(this, node, nodeId)}, 
-                        React.createElement("span", {className: "node-text"}, node.text)
+                        React.createElement("span", {className: "node-text"}, this.getNodeText(node))
                     ), 
                     this.renderNodes(node, nodeId)
                 )
@@ -12188,6 +12346,14 @@
                     folder: false,
                     leaf: true
                 }, NTree.FILE_ICON);
+            }
+        },
+        getNodeText: function(node) {
+            var render = this.getComponentOption('textRender');
+            if (render) {
+                return render.call(this, node);
+            } else {
+                return node.text;
             }
         },
         /**

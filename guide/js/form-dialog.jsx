@@ -33,7 +33,7 @@
 						id: 'form-dialog-show',
 						title: '#show',
 						pattern: '#show()',
-						desc: <span>Show dialog. Options as below,
+						desc: <span>Show dialog. Options as below,<br/>
 						1. <code>model</code>: Model Interface. data model.<br/>
 						2. <code>layout</code>: Form Layout. create by <code>$pt.createFormLayout()</code>.<br/>
 						3. <code>buttons</code>: JSON. properties as below,
@@ -59,12 +59,10 @@
 				id: 'confirm-dialog-constants',
 				title: 'Constants',
 				desc: <span>
-						<code>NModalForm.RESET_CONFIRM_TITLE: "Reset Data";</code><br/>
-						<code>NModalForm.RESET_CONFIRM_MESSAGE: ["Are you sure to reset data?", "All data will be lost
-							and cannot be recovered."];</code><br/>
-						<code>NModalForm.CANCEL_CONFIRM_TITLE: "Cancel Editing";</code><br/>
-						<code>NModalForm.CANCEL_CONFIRM_MESSAGE: ["Are you sure to cancel current operating?", "All data
-							will be lost and cannot be recovered."];</code>
+						<code>NModalForm.RESET_CONFIRM_TITLE: {NModalForm.RESET_CONFIRM_TITLE};</code><br/>
+						<code>NModalForm.RESET_CONFIRM_MESSAGE: {NModalForm.RESET_CONFIRM_MESSAGE};</code><br/>
+						<code>NModalForm.CANCEL_CONFIRM_TITLE: {NModalForm.CANCEL_CONFIRM_TITLE};</code><br/>
+						<code>NModalForm.CANCEL_CONFIRM_MESSAGE: {NModalForm.CANCEL_CONFIRM_MESSAGE};</code>
 				</span>
 			}
 		]
