@@ -5,9 +5,9 @@
 	var NPageFooter = React.createClass({
 		statics: {
 			TECH_BASE: 'Parrot',
-			TECH_URL: 'https://oss.ebaotech.com/nest/parrot',
-			COMPANY: 'eBaoTech',
-			COMPANY_URL: 'https://www.ebaotech.com',
+			TECH_URL: 'https://github.com/bradwoo8621/parrot',
+			COMPANY: 'NEST',
+			COMPANY_URL: 'https://github.com/bradwoo8621/nest',
 			LEFT_TEXT: 'For best viewing, we recommend using the latest Chrome version.'
 		},
 		propTypes: {
