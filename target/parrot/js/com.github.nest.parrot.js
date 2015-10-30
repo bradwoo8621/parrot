@@ -6680,7 +6680,10 @@
 		},
 		getInitialState: function () {
 			return {
-				visible: false
+				visible: false,
+				expanded: true,
+				collapsible: false,
+				draggable: true
 			};
 		},
 		/**
