@@ -1,4 +1,4 @@
-/** com.github.nest.parrot.V0.0.4 2015-10-26 */
+/** com.github.nest.parrot.V0.0.4 2015-10-29 */
 (function ($) {
 	var patches = {
 		console: function () {
@@ -3294,204 +3294,208 @@
  *      }
  * }
  */
-var NArrayPanel = React.createClass($pt.defineCellComponent({
-	statics: {
-		UNTITLED: 'Untitled Item'
-	},
-	propTypes: {
-		// model
-		model: React.PropTypes.object,
-		// CellLayout
-		layout: React.PropTypes.object,
-		direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
-	},
-	getDefaultProps: function () {
-		return {
-			defaultOptions: {
-				collapsible: true,
-				expanded: true
-			}
-		};
-	},
-	getInitialState: function () {
-		return {};
-	},
-	/**
-	 * will update
-	 * @param nextProps
-	 */
-	componentWillUpdate: function (nextProps) {
-		// remove post change listener to handle model change
-		this.removePostChangeListener(this.onModelChanged);
-		this.removePostAddListener(this.onModelChanged);
-		this.removePostRemoveListener(this.onModelChanged);
-		this.removePostValidateListener(this.onModelValidateChanged);
-	},
-	/**
-	 * did update
-	 * @param prevProps
-	 * @param prevState
-	 */
-	componentDidUpdate: function (prevProps, prevState) {
-		// add post change listener to handle model change
-		this.addPostChangeListener(this.onModelChanged);
-		this.addPostAddListener(this.onModelChanged);
-		this.addPostRemoveListener(this.onModelChanged);
-		this.addPostValidateListener(this.onModelValidateChanged);
-	},
-	/**
-	 * did mount
-	 */
-	componentDidMount: function () {
-		// add post change listener to handle model change
-		this.addPostChangeListener(this.onModelChanged);
-		this.addPostAddListener(this.onModelChanged);
-		this.addPostRemoveListener(this.onModelChanged);
-		this.addPostValidateListener(this.onModelValidateChanged);
-	},
-	/**
-	 * will unmount
-	 */
-	componentWillUnmount: function () {
-		// remove post change listener to handle model change
-		this.removePostChangeListener(this.onModelChanged);
-		this.removePostAddListener(this.onModelChanged);
-		this.removePostRemoveListener(this.onModelChanged);
-		this.removePostValidateListener(this.onModelValidateChanged);
-	},
-	/**
-	 * render item
-	 * @param item {{}}
-	 * @returns {XML}
-	 */
-	renderItem: function (item) {
-		var parentModel = this.getModel();
-		var parentValidator = parentModel.getValidator();
-		var validator = null;
-		if (parentValidator) {
-			var parentValidationConfig = parentValidator.getConfig()[this.getDataId()];
-			if (parentValidationConfig && parentValidationConfig.table) {
-				validator = $pt.createModelValidator(parentValidationConfig.table);
-			}
-		}
-		var model = validator ? $pt.createModel(item, validator) : $pt.createModel(item);
-		model.useBaseAsCurrent();
-		model.parent(parentModel);
-		// synchronized the validation result from parent model
-		// get errors about current value
-		var errors = this.getModel().getError(this.getDataId());
-		if (errors) {
-			var itemError = null;
-			for (var index = 0, count = errors.length; index < count; index++) {
-				if (typeof errors[index] !== "string") {
-					itemError = errors[index].getError(item);
-					model.mergeError(itemError);
+(function (context, $, $pt) {
+	var NArrayPanel = React.createClass($pt.defineCellComponent({
+		statics: {
+			UNTITLED: 'Untitled Item'
+		},
+		propTypes: {
+			// model
+			model: React.PropTypes.object,
+			// CellLayout
+			layout: React.PropTypes.object,
+			direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
+		},
+		getDefaultProps: function () {
+			return {
+				defaultOptions: {
+					collapsible: true,
+					expanded: true
+				}
+			};
+		},
+		getInitialState: function () {
+			return {};
+		},
+		/**
+		 * will update
+		 * @param nextProps
+		 */
+		componentWillUpdate: function (nextProps) {
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.onModelChanged);
+			this.removePostAddListener(this.onModelChanged);
+			this.removePostRemoveListener(this.onModelChanged);
+			this.removePostValidateListener(this.onModelValidateChanged);
+		},
+		/**
+		 * did update
+		 * @param prevProps
+		 * @param prevState
+		 */
+		componentDidUpdate: function (prevProps, prevState) {
+			// add post change listener to handle model change
+			this.addPostChangeListener(this.onModelChanged);
+			this.addPostAddListener(this.onModelChanged);
+			this.addPostRemoveListener(this.onModelChanged);
+			this.addPostValidateListener(this.onModelValidateChanged);
+		},
+		/**
+		 * did mount
+		 */
+		componentDidMount: function () {
+			// add post change listener to handle model change
+			this.addPostChangeListener(this.onModelChanged);
+			this.addPostAddListener(this.onModelChanged);
+			this.addPostRemoveListener(this.onModelChanged);
+			this.addPostValidateListener(this.onModelValidateChanged);
+		},
+		/**
+		 * will unmount
+		 */
+		componentWillUnmount: function () {
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.onModelChanged);
+			this.removePostAddListener(this.onModelChanged);
+			this.removePostRemoveListener(this.onModelChanged);
+			this.removePostValidateListener(this.onModelValidateChanged);
+		},
+		/**
+		 * render item
+		 * @param item {{}}
+		 * @returns {XML}
+		 */
+		renderItem: function (item) {
+			var parentModel = this.getModel();
+			var parentValidator = parentModel.getValidator();
+			var validator = null;
+			if (parentValidator) {
+				var parentValidationConfig = parentValidator.getConfig()[this.getDataId()];
+				if (parentValidationConfig && parentValidationConfig.table) {
+					validator = $pt.createModelValidator(parentValidationConfig.table);
 				}
 			}
-		}
-
-		var _this = this;
-		this.getDependencies('itemTitle').forEach(function (key) {
-			model.addListener(key, "post", "change", function () {
-				_this.forceUpdate();
-			});
-		});
-		var cellLayout = {
-			label: this.getPanelTitle(item),
-			comp: {
-				type: $pt.ComponentConstants.Panel,
-				collapsible: this.getComponentOption('collapsible'),
-				expanded: this.getComponentOption('expanded'),
-				editLayout: this.getEditLayout(item),
-				style: this.getComponentOption('style'),
-				checkInTitle: this.getCheckInTitle(item),
-				expandedLabel: this.getComponentOption('expandedLabel'),
-				collapsedLabel: this.getComponentOption('collapsedLabel')
+			var model = validator ? $pt.createModel(item, validator) : $pt.createModel(item);
+			model.useBaseAsCurrent();
+			model.parent(parentModel);
+			// synchronized the validation result from parent model
+			// get errors about current value
+			var errors = this.getModel().getError(this.getDataId());
+			if (errors) {
+				var itemError = null;
+				for (var index = 0, count = errors.length; index < count; index++) {
+					if (typeof errors[index] !== "string") {
+						itemError = errors[index].getError(item);
+						model.mergeError(itemError);
+					}
+				}
 			}
-		};
-		return (React.createElement("div", {className: "row"}, 
-			React.createElement("div", {className: "col-sm-12 col-md-12 col-lg-12"}, 
-				React.createElement(NPanel, {model: model, 
-				        layout: $pt.createCellLayout('pseudo-panel', cellLayout), 
-				        direction: this.props.direction})
-			)
-		));
-	},
-	/**
-	 * render
-	 * @returns {XML}
-	 */
-	render: function () {
-		return (React.createElement("div", {className: this.getComponentCSS('n-array-panel')}, 
-			this.getValueFromModel().map(this.renderItem)
-		));
-	},
-	/**
-	 * return [] when is null
-	 * @returns {[*]}
-	 */
-	getValueFromModel: function () {
-		var data = this.getModel().get(this.getDataId());
-		return data == null ? [] : data;
-	},
-	/**
-	 * on model changed
-	 * @param evt
-	 */
-	onModelChanged: function (evt) {
-		this.forceUpdate();
-	},
-	/**
-	 * monitor the parent model validation
-	 * @param evt
-	 */
-	onModelValidateChanged: function (evt) {
-		// TODO maybe will introduce performance issue, cannot sure now.
-		this.forceUpdate();
-	},
-	/**
-	 * get edit layout
-	 * @param item
-	 * @returns {{}}
-	 */
-	getEditLayout: function (item) {
-		var layout = this.getComponentOption('editLayout');
-		if (typeof layout === 'function') {
-			return layout.call(this, item);
-		} else {
-			return layout;
+
+			var _this = this;
+			this.getDependencies('itemTitle').forEach(function (key) {
+				model.addListener(key, "post", "change", function () {
+					_this.forceUpdate();
+				});
+			});
+			var cellLayout = {
+				label: this.getPanelTitle(item),
+				comp: {
+					type: $pt.ComponentConstants.Panel,
+					collapsible: this.getComponentOption('collapsible'),
+					expanded: this.getComponentOption('expanded'),
+					editLayout: this.getEditLayout(item),
+					style: this.getComponentOption('style'),
+					checkInTitle: this.getCheckInTitle(item),
+					expandedLabel: this.getComponentOption('expandedLabel'),
+					collapsedLabel: this.getComponentOption('collapsedLabel')
+				}
+			};
+			return (React.createElement("div", {className: "row"}, 
+				React.createElement("div", {className: "col-sm-12 col-md-12 col-lg-12"}, 
+					React.createElement(NPanel, {model: model, 
+					        layout: $pt.createCellLayout('pseudo-panel', cellLayout), 
+					        direction: this.props.direction})
+				)
+			));
+		},
+		/**
+		 * render
+		 * @returns {XML}
+		 */
+		render: function () {
+			return (React.createElement("div", {className: this.getComponentCSS('n-array-panel')}, 
+				this.getValueFromModel().map(this.renderItem)
+			));
+		},
+		/**
+		 * return [] when is null
+		 * @returns {[*]}
+		 */
+		getValueFromModel: function () {
+			var data = this.getModel().get(this.getDataId());
+			return data == null ? [] : data;
+		},
+		/**
+		 * on model changed
+		 * @param evt
+		 */
+		onModelChanged: function (evt) {
+			this.forceUpdate();
+		},
+		/**
+		 * monitor the parent model validation
+		 * @param evt
+		 */
+		onModelValidateChanged: function (evt) {
+			// TODO maybe will introduce performance issue, cannot sure now.
+			this.forceUpdate();
+		},
+		/**
+		 * get edit layout
+		 * @param item
+		 * @returns {{}}
+		 */
+		getEditLayout: function (item) {
+			var layout = this.getComponentOption('editLayout');
+			if (typeof layout === 'function') {
+				return layout.call(this, item);
+			} else {
+				return layout;
+			}
+		},
+		/**
+		 * get check in title
+		 * @param item
+		 * @returns {{}}
+		 */
+		getCheckInTitle: function (item) {
+			var checkInTitle = this.getComponentOption('checkInTitle');
+			if (typeof checkInTitle === 'function') {
+				return checkInTitle.call(this, item);
+			} else {
+				return checkInTitle;
+			}
+		},
+		/**
+		 * get panel titled
+		 * @param item {{}}
+		 * @returns {string}
+		 */
+		getPanelTitle: function (item) {
+			var title = this.getComponentOption('itemTitle');
+			if (title == null) {
+				return NArrayPanel.UNTITLED;
+			} else if (typeof title === 'string') {
+				return title;
+			} else {
+				var titleText = title.when.call(this, item);
+				return (titleText == null || titleText.isBlank()) ? NArrayPanel.UNTITLED : titleText;
+			}
 		}
-	},
-	/**
-	 * get check in title
-	 * @param item
-	 * @returns {{}}
-	 */
-	getCheckInTitle: function (item) {
-		var checkInTitle = this.getComponentOption('checkInTitle');
-		if (typeof checkInTitle === 'function') {
-			return checkInTitle.call(this, item);
-		} else {
-			return checkInTitle;
-		}
-	},
-	/**
-	 * get panel titled
-	 * @param item {{}}
-	 * @returns {string}
-	 */
-	getPanelTitle: function (item) {
-		var title = this.getComponentOption('itemTitle');
-		if (title == null) {
-			return NArrayPanel.UNTITLED;
-		} else if (typeof title === 'string') {
-			return title;
-		} else {
-			var titleText = title.when.call(this, item);
-			return (titleText == null || titleText.isBlank()) ? NArrayPanel.UNTITLED : titleText;
-		}
-	}
-}));
+	}));
+	context.NArrayPanel = NArrayPanel;
+}(this, jQuery, $pt));
+
 /**
  * Created by brad.wu on 8/20/2015.
  * TODO add & remove are not supported yet
@@ -3532,300 +3536,304 @@ var NArrayPanel = React.createClass($pt.defineCellComponent({
  *      }
  * }
  */
-var NArrayTab = React.createClass($pt.defineCellComponent({
-	statics: {
-		UNTITLED: 'Untitled Item'
-	},
-	propTypes: {
-		// model
-		model: React.PropTypes.object,
-		// CellLayout
-		layout: React.PropTypes.object,
-		direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
-	},
-	getDefaultProps: function () {
-		return {
-			defaultOptions: {
-				tabType: 'tab',
-				justified: false,
-				titleDirection: 'horizontal'
-			}
-		};
-	},
-	getInitialState: function () {
-		return {
-			tabs: null,
-			activeTabIndex: null
-		};
-	},
-	/**
-	 * will update
-	 * @param nextProps
-	 */
-	componentWillUpdate: function (nextProps) {
-		// remove post change listener to handle model change
-		this.removePostChangeListener(this.onModelChanged);
-		this.removePostAddListener(this.onModelChanged);
-		this.removePostRemoveListener(this.onModelChanged);
-		this.removePostValidateListener(this.onModelValidateChanged);
-	},
-	/**
-	 * did update
-	 * @param prevProps
-	 * @param prevState
-	 */
-	componentDidUpdate: function (prevProps, prevState) {
-		// add post change listener to handle model change
-		this.addPostChangeListener(this.onModelChanged);
-		this.addPostAddListener(this.onModelChanged);
-		this.addPostRemoveListener(this.onModelChanged);
-		this.addPostValidateListener(this.onModelValidateChanged);
-	},
-	/**
-	 * did mount
-	 */
-	componentDidMount: function () {
-		// add post change listener to handle model change
-		this.addPostChangeListener(this.onModelChanged);
-		this.addPostAddListener(this.onModelChanged);
-		this.addPostRemoveListener(this.onModelChanged);
-		this.addPostValidateListener(this.onModelValidateChanged);
-	},
-	/**
-	 * will unmount
-	 */
-	componentWillUnmount: function () {
-		// remove post change listener to handle model change
-		this.removePostChangeListener(this.onModelChanged);
-		this.removePostAddListener(this.onModelChanged);
-		this.removePostRemoveListener(this.onModelChanged);
-		this.removePostValidateListener(this.onModelValidateChanged);
-	},
-	/**
-	 * render tab content
-	 * @param tab
-	 * @param index
-	 * @returns {XML}
-	 */
-	renderTabContent: function (tab, index) {
-		var activeIndex = this.getActiveTabIndex();
-		var css = {
-			'n-array-tab-card': true,
-			show: index == activeIndex,
-			hide: index != activeIndex
-		};
+(function (context, $, $pt) {
+	var NArrayTab = React.createClass($pt.defineCellComponent({
+		statics: {
+			UNTITLED: 'Untitled Item'
+		},
+		propTypes: {
+			// model
+			model: React.PropTypes.object,
+			// CellLayout
+			layout: React.PropTypes.object,
+			direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
+		},
+		getDefaultProps: function () {
+			return {
+				defaultOptions: {
+					tabType: 'tab',
+					justified: false,
+					titleDirection: 'horizontal'
+				}
+			};
+		},
+		getInitialState: function () {
+			return {
+				tabs: null,
+				activeTabIndex: null
+			};
+		},
+		/**
+		 * will update
+		 * @param nextProps
+		 */
+		componentWillUpdate: function (nextProps) {
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.onModelChanged);
+			this.removePostAddListener(this.onModelChanged);
+			this.removePostRemoveListener(this.onModelChanged);
+			this.removePostValidateListener(this.onModelValidateChanged);
+		},
+		/**
+		 * did update
+		 * @param prevProps
+		 * @param prevState
+		 */
+		componentDidUpdate: function (prevProps, prevState) {
+			// add post change listener to handle model change
+			this.addPostChangeListener(this.onModelChanged);
+			this.addPostAddListener(this.onModelChanged);
+			this.addPostRemoveListener(this.onModelChanged);
+			this.addPostValidateListener(this.onModelValidateChanged);
+		},
+		/**
+		 * did mount
+		 */
+		componentDidMount: function () {
+			// add post change listener to handle model change
+			this.addPostChangeListener(this.onModelChanged);
+			this.addPostAddListener(this.onModelChanged);
+			this.addPostRemoveListener(this.onModelChanged);
+			this.addPostValidateListener(this.onModelValidateChanged);
+		},
+		/**
+		 * will unmount
+		 */
+		componentWillUnmount: function () {
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.onModelChanged);
+			this.removePostAddListener(this.onModelChanged);
+			this.removePostRemoveListener(this.onModelChanged);
+			this.removePostValidateListener(this.onModelValidateChanged);
+		},
+		/**
+		 * render tab content
+		 * @param tab
+		 * @param index
+		 * @returns {XML}
+		 */
+		renderTabContent: function (tab, index) {
+			var activeIndex = this.getActiveTabIndex();
+			var css = {
+				'n-array-tab-card': true,
+				show: index == activeIndex,
+				hide: index != activeIndex
+			};
 
-		var parentModel = this.getModel();
-		var parentValidator = parentModel.getValidator();
-		var validator = null;
-		if (parentValidator) {
-			var parentValidationConfig = parentValidator.getConfig()[this.getDataId()];
-			if (parentValidationConfig && parentValidationConfig.table) {
-				validator = $pt.createModelValidator(parentValidationConfig.table);
-			}
-		}
-		var model = validator ? $pt.createModel(tab.data, validator) : $pt.createModel(tab.data);
-		model.useBaseAsCurrent();
-		model.parent(parentModel);
-		// synchronized the validation result from parent model
-		// get errors about current value
-		var errors = this.getModel().getError(this.getDataId());
-		if (errors) {
-			var itemError = null;
-			for (var errorIndex = 0, errorCount = errors.length; errorIndex < errorCount; errorIndex++) {
-				if (typeof errors[errorIndex] !== "string") {
-					itemError = errors[errorIndex].getError(tab.data);
-					model.mergeError(itemError);
+			var parentModel = this.getModel();
+			var parentValidator = parentModel.getValidator();
+			var validator = null;
+			if (parentValidator) {
+				var parentValidationConfig = parentValidator.getConfig()[this.getDataId()];
+				if (parentValidationConfig && parentValidationConfig.table) {
+					validator = $pt.createModelValidator(parentValidationConfig.table);
 				}
 			}
-		}
-		// no base here. since no apply operation
-		var _this = this;
-		// add item title and item icon listener
-		this.getDependencies(['itemTitle', 'itemIcon']).forEach(function (key) {
-			model.addListener(key, "post", "change", function () {
-				_this.forceUpdate();
-			});
-		});
-		// add badge listener
-		var badge = this.getComponentOption('badge');
-		if (badge != null) {
-			if (typeof badge === 'string') {
-				model.addListener(badge, "post", "change", function () {
+			var model = validator ? $pt.createModel(tab.data, validator) : $pt.createModel(tab.data);
+			model.useBaseAsCurrent();
+			model.parent(parentModel);
+			// synchronized the validation result from parent model
+			// get errors about current value
+			var errors = this.getModel().getError(this.getDataId());
+			if (errors) {
+				var itemError = null;
+				for (var errorIndex = 0, errorCount = errors.length; errorIndex < errorCount; errorIndex++) {
+					if (typeof errors[errorIndex] !== "string") {
+						itemError = errors[errorIndex].getError(tab.data);
+						model.mergeError(itemError);
+					}
+				}
+			}
+			// no base here. since no apply operation
+			var _this = this;
+			// add item title and item icon listener
+			this.getDependencies(['itemTitle', 'itemIcon']).forEach(function (key) {
+				model.addListener(key, "post", "change", function () {
 					_this.forceUpdate();
 				});
-			} else {
-				this.getDependencies(badge).forEach(function (key) {
-					model.addListener(key, "post", "change", function () {
+			});
+			// add badge listener
+			var badge = this.getComponentOption('badge');
+			if (badge != null) {
+				if (typeof badge === 'string') {
+					model.addListener(badge, "post", "change", function () {
 						_this.forceUpdate();
 					});
+				} else {
+					this.getDependencies(badge).forEach(function (key) {
+						model.addListener(key, "post", "change", function () {
+							_this.forceUpdate();
+						});
+					});
+				}
+			}
+			return (React.createElement(NForm, {model: model, 
+			               layout: $pt.createFormLayout(tab.layout), 
+			               direction: this.props.direction, 
+			               className: $pt.LayoutHelper.classSet(css)})
+			);
+		},
+		/**
+		 * render
+		 * @returns {XML}
+		 */
+		render: function () {
+			var tabs = this.getTabs();
+			return (React.createElement("div", {className: this.getComponentCSS('n-array-tab')}, 
+				React.createElement(NTab, {type: this.getComponentOption('tabType'), 
+				      justified: this.getComponentOption('justified'), 
+				      direction: this.getComponentOption('titleDirection'), 
+				      size: this.getComponentOption('titleIconSize'), 
+				      tabClassName: this.getAdditionalCSS('tabs'), 
+				      tabs: tabs, 
+				      canActive: this.getComponentOption('canActive'), 
+				      onActive: this.onTabClicked, 
+				      ref: "tab"}
+				), 
+
+				React.createElement("div", {className: "n-array-tab-content", ref: "content"}, 
+					tabs.map(this.renderTabContent)
+				)
+			));
+		},
+		/**
+		 * get tabs
+		 * @returns {Array}
+		 */
+		getTabs: function () {
+			var _this = this;
+			var tabs = [];
+			var data = this.getValueFromModel();
+			data.forEach(function (item) {
+				tabs.push({
+					label: _this.getTabTitle(item),
+					icon: _this.getTabIcon(item),
+					layout: _this.getEditLayout(item),
+					badge: _this.getTabBadge(item),
+					data: item
+				});
+			});
+			this.state.tabs = tabs;
+			this.getActiveTabIndex();
+			return tabs;
+		},
+		/**
+		 * return [] when is null
+		 * @returns {[*]}
+		 */
+		getValueFromModel: function () {
+			var data = this.getModel().get(this.getDataId());
+			return data == null ? [] : data;
+		},
+		/**
+		 * on model changed
+		 * @param evt
+		 */
+		onModelChanged: function (evt) {
+			this.forceUpdate();
+		},
+		/**
+		 * monitor the parent model validation
+		 * @param evt
+		 */
+		onModelValidateChanged: function (evt) {
+			// TODO maybe will introduce performance issue, cannot sure now.
+			this.forceUpdate();
+		},
+		/**
+		 * get edit layout
+		 * @param item
+		 * @returns {FormLayout}
+		 */
+		getEditLayout: function (item) {
+			var layout = this.getComponentOption('editLayout');
+			if (typeof layout === 'function') {
+				return layout.call(this, item);
+			} else {
+				return layout;
+			}
+		},
+		/**
+		 * get item title
+		 * @param item
+		 * @returns {string}
+		 */
+		getTabTitle: function (item) {
+			var title = this.getComponentOption('itemTitle');
+			if (title == null) {
+				return NArrayTab.UNTITLED;
+			} else if (typeof title === 'string') {
+				return title;
+			} else {
+				var titleText = title.when.call(this, item);
+				return (titleText == null || titleText.isBlank()) ? NArrayTab.UNTITLED : titleText;
+			}
+		},
+		getTabBadge: function (item) {
+			var badge = this.getComponentOption('badge');
+			if (badge == null) {
+				return null;
+			} else if (typeof badge === 'string') {
+				var badgeValue = $pt.getValueFromJSON(item, badge);
+				var badgeRender = this.getComponentOption('badgeRender');
+				if (badgeRender) {
+					badgeValue = badgeRender.call(this, badgeValue, item, this.getModel());
+				}
+				return badgeValue;
+			} else {
+				return badge.when.call(this, item);
+			}
+		},
+		/**
+		 * get item icon
+		 * @param item
+		 * @returns {string}
+		 */
+		getTabIcon: function (item) {
+			var icon = this.getComponentOption('itemIcon');
+			if (icon == null) {
+				return null;
+			} else if (typeof icon === 'string') {
+				return icon;
+			} else {
+				return icon.when.call(this, item);
+			}
+		},
+		/**
+		 * on tab clicked
+		 * @param tabValue {string} tab value
+		 * @param index {number}
+		 */
+		onTabClicked: function (tabValue, index) {
+			this.setState({
+				activeTabIndex: index
+			});
+			var onActive = this.getComponentOption('onActive');
+			if (onActive) {
+				onActive.call(this, tabValue, index);
+			}
+		},
+		/**
+		 * get active tab index
+		 * @returns {number}
+		 */
+		getActiveTabIndex: function () {
+			if (this.state.activeTabIndex == null) {
+				// get initial active tab index, or 0 if not set
+				var _this = this;
+				this.state.activeTabIndex = 0;
+				this.state.tabs.forEach(function (tab, index) {
+					if (tab.active === true) {
+						_this.state.activeTabIndex = index;
+					}
 				});
 			}
+			return this.state.activeTabIndex;
 		}
-		return (React.createElement(NForm, {model: model, 
-		               layout: $pt.createFormLayout(tab.layout), 
-		               direction: this.props.direction, 
-		               className: $pt.LayoutHelper.classSet(css)})
-		);
-	},
-	/**
-	 * render
-	 * @returns {XML}
-	 */
-	render: function () {
-		var tabs = this.getTabs();
-		return (React.createElement("div", {className: this.getComponentCSS('n-array-tab')}, 
-			React.createElement(NTab, {type: this.getComponentOption('tabType'), 
-			      justified: this.getComponentOption('justified'), 
-			      direction: this.getComponentOption('titleDirection'), 
-			      size: this.getComponentOption('titleIconSize'), 
-			      tabClassName: this.getAdditionalCSS('tabs'), 
-			      tabs: tabs, 
-			      canActive: this.getComponentOption('canActive'), 
-			      onActive: this.onTabClicked, 
-			      ref: "tab"}
-			), 
+	}));
+	context.NArrayTab = NArrayTab;
+}(this, jQuery, $pt));
 
-			React.createElement("div", {className: "n-array-tab-content", ref: "content"}, 
-				tabs.map(this.renderTabContent)
-			)
-		));
-	},
-	/**
-	 * get tabs
-	 * @returns {Array}
-	 */
-	getTabs: function () {
-		var _this = this;
-		var tabs = [];
-		var data = this.getValueFromModel();
-		data.forEach(function (item) {
-			tabs.push({
-				label: _this.getTabTitle(item),
-				icon: _this.getTabIcon(item),
-				layout: _this.getEditLayout(item),
-				badge: _this.getTabBadge(item),
-				data: item
-			});
-		});
-		this.state.tabs = tabs;
-		this.getActiveTabIndex();
-		return tabs;
-	},
-	/**
-	 * return [] when is null
-	 * @returns {[*]}
-	 */
-	getValueFromModel: function () {
-		var data = this.getModel().get(this.getDataId());
-		return data == null ? [] : data;
-	},
-	/**
-	 * on model changed
-	 * @param evt
-	 */
-	onModelChanged: function (evt) {
-		this.forceUpdate();
-	},
-	/**
-	 * monitor the parent model validation
-	 * @param evt
-	 */
-	onModelValidateChanged: function (evt) {
-		// TODO maybe will introduce performance issue, cannot sure now.
-		this.forceUpdate();
-	},
-	/**
-	 * get edit layout
-	 * @param item
-	 * @returns {FormLayout}
-	 */
-	getEditLayout: function (item) {
-		var layout = this.getComponentOption('editLayout');
-		if (typeof layout === 'function') {
-			return layout.call(this, item);
-		} else {
-			return layout;
-		}
-	},
-	/**
-	 * get item title
-	 * @param item
-	 * @returns {string}
-	 */
-	getTabTitle: function (item) {
-		var title = this.getComponentOption('itemTitle');
-		if (title == null) {
-			return NArrayTab.UNTITLED;
-		} else if (typeof title === 'string') {
-			return title;
-		} else {
-			var titleText = title.when.call(this, item);
-			return (titleText == null || titleText.isBlank()) ? NArrayTab.UNTITLED : titleText;
-		}
-	},
-	getTabBadge: function (item) {
-		var badge = this.getComponentOption('badge');
-		if (badge == null) {
-			return null;
-		} else if (typeof badge === 'string') {
-			var badgeValue = $pt.getValueFromJSON(item, badge);
-			var badgeRender = this.getComponentOption('badgeRender');
-			if (badgeRender) {
-				badgeValue = badgeRender.call(this, badgeValue, item, this.getModel());
-			}
-			return badgeValue;
-		} else {
-			return badge.when.call(this, item);
-		}
-	},
-	/**
-	 * get item icon
-	 * @param item
-	 * @returns {string}
-	 */
-	getTabIcon: function (item) {
-		var icon = this.getComponentOption('itemIcon');
-		if (icon == null) {
-			return null;
-		} else if (typeof icon === 'string') {
-			return icon;
-		} else {
-			return icon.when.call(this, item);
-		}
-	},
-	/**
-	 * on tab clicked
-	 * @param tabValue {string} tab value
-	 * @param index {number}
-	 */
-	onTabClicked: function (tabValue, index) {
-		this.setState({
-			activeTabIndex: index
-		});
-		var onActive = this.getComponentOption('onActive');
-		if (onActive) {
-			onActive.call(this, tabValue, index);
-		}
-	},
-	/**
-	 * get active tab index
-	 * @returns {number}
-	 */
-	getActiveTabIndex: function () {
-		if (this.state.activeTabIndex == null) {
-			// get initial active tab index, or 0 if not set
-			var _this = this;
-			this.state.activeTabIndex = 0;
-			this.state.tabs.forEach(function (tab, index) {
-				if (tab.active === true) {
-					_this.state.activeTabIndex = index;
-				}
-			});
-		}
-		return this.state.activeTabIndex;
-	}
-}));
 /**
  * Created by brad.wu on 8/18/2015.
  *
@@ -3860,146 +3868,150 @@ var NArrayTab = React.createClass($pt.defineCellComponent({
  *      }
  * }
  */
-var NFormButton = React.createClass($pt.defineCellComponent({
-	propTypes: {
-		// model, whole model, not only for this cell
-		// use id to get the value of this cell from model
-		model: React.PropTypes.object,
-		// CellLayout
-		layout: React.PropTypes.object
-	},
-	getDefaultProps: function () {
-		return {
-			defaultOptions: {
-				style: 'default'
-			}
-		};
-	},
-	/**
-	 * will update
-	 * @param nextProps
-	 */
-	componentWillUpdate: function (nextProps) {
-		this.removeEnableDependencyMonitor();
-	},
-	/**
-	 * did update
-	 * @param prevProps
-	 * @param prevState
-	 */
-	componentDidUpdate: function (prevProps, prevState) {
-		this.addEnableDependencyMonitor();
-	},
-	/**
-	 * did mount
-	 */
-	componentDidMount: function () {
-		this.addEnableDependencyMonitor();
-	},
-	/**
-	 * will unmount
-	 */
-	componentWillUnmount: function () {
-		this.removeEnableDependencyMonitor();
-	},
-	/**
-	 * render icon
-	 * @returns {*}
-	 */
-	renderIcon: function () {
-		var icon = this.getIcon();
-		if (icon == null) {
-			return null;
-		} else {
-			var css = {
-				fa: true,
-				'fa-fw': true
+(function (context, $, $pt) {
+	var NFormButton = React.createClass($pt.defineCellComponent({
+		propTypes: {
+			// model, whole model, not only for this cell
+			// use id to get the value of this cell from model
+			model: React.PropTypes.object,
+			// CellLayout
+			layout: React.PropTypes.object
+		},
+		getDefaultProps: function () {
+			return {
+				defaultOptions: {
+					style: 'default'
+				}
 			};
-			css['fa-' + icon] = true;
-			return React.createElement("span", {className: $pt.LayoutHelper.classSet(css)});
-		}
-	},
-	render: function () {
-		if (!this.isVisible()) {
-			return null;
-		}
-		var compCSS = {};
-		compCSS[this.getComponentCSS('n-button')] = true;
-		compCSS['n-disabled'] = !this.isEnabled();
-		var css = {
-			btn: true,
-			disabled: !this.isEnabled()
-		};
-		css['btn-' + this.getStyle()] = true;
-		if (this.getLabelPosition() === 'left') {
-			// label in left
-			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(compCSS)}, 
-				React.createElement("a", {href: "javascript:void(0);", 
-				   className: $pt.LayoutHelper.classSet(css), 
-				   onClick: this.onClicked, 
-				   disabled: !this.isEnabled(), 
-				   ref: "a"}, 
-					this.getLayout().getLabel(), " ", this.renderIcon()
-				)
-			));
-		} else {
-			// default label in right
-			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(compCSS)}, 
-				React.createElement("a", {href: "javascript:void(0);", 
-				   className: $pt.LayoutHelper.classSet(css), 
-				   onClick: this.onClicked, 
-				   disabled: !this.isEnabled(), 
-				   ref: "a"}, 
-					this.renderIcon(), " ", this.getLayout().getLabel()
-				)
-			));
-		}
-	},
-	onClicked: function () {
-		$(React.findDOMNode(this.refs.a)).toggleClass('effect');
-		if (this.isEnabled()) {
-			var onclick = this.getComponentOption("click");
-			if (onclick) {
-				onclick.call(this, this.getModel());
+		},
+		/**
+		 * will update
+		 * @param nextProps
+		 */
+		componentWillUpdate: function (nextProps) {
+			this.removeEnableDependencyMonitor();
+		},
+		/**
+		 * did update
+		 * @param prevProps
+		 * @param prevState
+		 */
+		componentDidUpdate: function (prevProps, prevState) {
+			this.addEnableDependencyMonitor();
+		},
+		/**
+		 * did mount
+		 */
+		componentDidMount: function () {
+			this.addEnableDependencyMonitor();
+		},
+		/**
+		 * will unmount
+		 */
+		componentWillUnmount: function () {
+			this.removeEnableDependencyMonitor();
+		},
+		/**
+		 * render icon
+		 * @returns {*}
+		 */
+		renderIcon: function () {
+			var icon = this.getIcon();
+			if (icon == null) {
+				return null;
+			} else {
+				var css = {
+					fa: true,
+					'fa-fw': true
+				};
+				css['fa-' + icon] = true;
+				return React.createElement("span", {className: $pt.LayoutHelper.classSet(css)});
 			}
+		},
+		render: function () {
+			if (!this.isVisible()) {
+				return null;
+			}
+			var compCSS = {};
+			compCSS[this.getComponentCSS('n-button')] = true;
+			compCSS['n-disabled'] = !this.isEnabled();
+			var css = {
+				btn: true,
+				disabled: !this.isEnabled()
+			};
+			css['btn-' + this.getStyle()] = true;
+			if (this.getLabelPosition() === 'left') {
+				// label in left
+				return (React.createElement("div", {className: $pt.LayoutHelper.classSet(compCSS)}, 
+					React.createElement("a", {href: "javascript:void(0);", 
+					   className: $pt.LayoutHelper.classSet(css), 
+					   onClick: this.onClicked, 
+					   disabled: !this.isEnabled(), 
+					   ref: "a"}, 
+						this.getLayout().getLabel(), " ", this.renderIcon()
+					)
+				));
+			} else {
+				// default label in right
+				return (React.createElement("div", {className: $pt.LayoutHelper.classSet(compCSS)}, 
+					React.createElement("a", {href: "javascript:void(0);", 
+					   className: $pt.LayoutHelper.classSet(css), 
+					   onClick: this.onClicked, 
+					   disabled: !this.isEnabled(), 
+					   ref: "a"}, 
+						this.renderIcon(), " ", this.getLayout().getLabel()
+					)
+				));
+			}
+		},
+		onClicked: function () {
+			$(React.findDOMNode(this.refs.a)).toggleClass('effect');
+			if (this.isEnabled()) {
+				var onclick = this.getComponentOption("click");
+				if (onclick) {
+					onclick.call(this, this.getModel());
+				}
+			}
+		},
+		/**
+		 * get icon
+		 * @returns {string}
+		 */
+		getIcon: function () {
+			return this.getComponentOption("icon");
+		},
+		/**
+		 * get button style
+		 * @returns {string}
+		 */
+		getStyle: function () {
+			return this.getComponentOption("style");
+		},
+		/**
+		 * get label position
+		 * @returns {string}
+		 */
+		getLabelPosition: function () {
+			return this.getComponentOption("labelPosition");
+		},
+		/**
+		 * @overrides always return null
+		 * @returns {*}
+		 */
+		getValueFromModel: function () {
+			return null;
+		},
+		/**
+		 * @overrides do nothing
+		 * @param value
+		 */
+		setValueToModel: function (value) {
+			// nothing
 		}
-	},
-	/**
-	 * get icon
-	 * @returns {string}
-	 */
-	getIcon: function () {
-		return this.getComponentOption("icon");
-	},
-	/**
-	 * get button style
-	 * @returns {string}
-	 */
-	getStyle: function () {
-		return this.getComponentOption("style");
-	},
-	/**
-	 * get label position
-	 * @returns {string}
-	 */
-	getLabelPosition: function () {
-		return this.getComponentOption("labelPosition");
-	},
-	/**
-	 * @overrides always return null
-	 * @returns {*}
-	 */
-	getValueFromModel: function () {
-		return null;
-	},
-	/**
-	 * @overrides do nothing
-	 * @param value
-	 */
-	setValueToModel: function (value) {
-		// nothing
-	}
-}));
+	}));
+	context.NFormButton = NFormButton;
+}(this, jQuery, $pt));
+
 /**
  * checkbox
  *
@@ -4031,87 +4043,88 @@ var NFormButton = React.createClass($pt.defineCellComponent({
  *      }
  * }
  */
-var NCheck = React.createClass($pt.defineCellComponent({
-	propTypes: {
-		// model
-		model: React.PropTypes.object,
-		// CellLayout
-		layout: React.PropTypes.object
-	},
-	/**
-	 * will update
-	 * @param nextProps
-	 */
-	componentWillUpdate: function (nextProps) {
-		// remove post change listener to handle model change
-		this.removePostChangeListener(this.onModelChanged);
-		this.removeEnableDependencyMonitor();
-	},
-	/**
-	 * did update
-	 * @param prevProps
-	 * @param prevState
-	 */
-	componentDidUpdate: function (prevProps, prevState) {
-		// set model value to component
-		this.getComponent().prop("checked", this.getValueFromModel());
-		// add post change listener to handle model change
-		this.addPostChangeListener(this.onModelChanged);
-		this.addEnableDependencyMonitor();
-	},
-	/**
-	 * did mount
-	 */
-	componentDidMount: function () {
-		// set model value to component
-		this.getComponent().prop("checked", this.getValueFromModel());
-		// add post change listener to handle model change
-		this.addPostChangeListener(this.onModelChanged);
-		this.addEnableDependencyMonitor();
-	},
-	/**
-	 * will unmount
-	 */
-	componentWillUnmount: function () {
-		// remove post change listener to handle model change
-		this.removePostChangeListener(this.onModelChanged);
-		this.removeEnableDependencyMonitor();
-	},
-	/**
-	 * render label
-	 * @param labelInLeft {boolean}
-	 * @returns {XML}
-	 */
-	renderLabel: function (labelInLeft) {
-		if (this.isLabelAttached()) {
-			var label = this.getLayout().getLabel();
-			if (label == null || label.isEmpty()) {
-				return null;
-			}
-			var css = {
-				'check-label': true,
-				disabled: !this.isEnabled(),
-				'check-label-left': labelInLeft
-			};
-			return React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
-			             onClick: this.isEnabled() ? this.onButtonClicked : null}, 
+(function (context, $, $pt) {
+	var NCheck = React.createClass($pt.defineCellComponent({
+		propTypes: {
+			// model
+			model: React.PropTypes.object,
+			// CellLayout
+			layout: React.PropTypes.object
+		},
+		/**
+		 * will update
+		 * @param nextProps
+		 */
+		componentWillUpdate: function (nextProps) {
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.onModelChanged);
+			this.removeEnableDependencyMonitor();
+		},
+		/**
+		 * did update
+		 * @param prevProps
+		 * @param prevState
+		 */
+		componentDidUpdate: function (prevProps, prevState) {
+			// set model value to component
+			this.getComponent().prop("checked", this.getValueFromModel());
+			// add post change listener to handle model change
+			this.addPostChangeListener(this.onModelChanged);
+			this.addEnableDependencyMonitor();
+		},
+		/**
+		 * did mount
+		 */
+		componentDidMount: function () {
+			// set model value to component
+			this.getComponent().prop("checked", this.getValueFromModel());
+			// add post change listener to handle model change
+			this.addPostChangeListener(this.onModelChanged);
+			this.addEnableDependencyMonitor();
+		},
+		/**
+		 * will unmount
+		 */
+		componentWillUnmount: function () {
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.onModelChanged);
+			this.removeEnableDependencyMonitor();
+		},
+		/**
+		 * render label
+		 * @param labelInLeft {boolean}
+		 * @returns {XML}
+		 */
+		renderLabel: function (labelInLeft) {
+			if (this.isLabelAttached()) {
+				var label = this.getLayout().getLabel();
+				if (label == null || label.isEmpty()) {
+					return null;
+				}
+				var css = {
+					'check-label': true,
+					disabled: !this.isEnabled(),
+					'check-label-left': labelInLeft
+				};
+				return React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
+				             onClick: this.isEnabled() ? this.onButtonClicked : null}, 
                 this.getLayout().getLabel()
             );
-		}
-		return null;
-	},
-	/**
-	 * render check box, using font awesome instead
-	 * @returns {XML}
-	 */
-	renderCheckbox: function () {
-		var checked = this.isChecked();
-		var css = {
-			disabled: !this.isEnabled(),
-			checked: checked,
-			'check-container': true
-		};
-		return (React.createElement("div", {className: "check-container"}, 
+			}
+			return null;
+		},
+		/**
+		 * render check box, using font awesome instead
+		 * @returns {XML}
+		 */
+		renderCheckbox: function () {
+			var checked = this.isChecked();
+			var css = {
+				disabled: !this.isEnabled(),
+				checked: checked,
+				'check-container': true
+			};
+			return (React.createElement("div", {className: "check-container"}, 
             React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
                   onClick: this.isEnabled() ? this.onButtonClicked : null, 
                   onKeyUp: this.isEnabled() ? this.onKeyUp: null, 
@@ -4119,84 +4132,87 @@ var NCheck = React.createClass($pt.defineCellComponent({
                   ref: "out"}, 
             React.createElement("span", {className: "check", onClick: this.onInnerClicked})
         )));
-	},
-	/**
-	 * render
-	 * @returns {XML}
-	 */
-	render: function () {
-		var css = {
-			'n-disabled': !this.isEnabled()
-		};
-		css[this.getComponentCSS('n-checkbox')] = true;
-		var isLabelAtLeft = this.isLabelAtLeft();
-		return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
-			React.createElement("input", {type: "checkbox", style: {display: "none"}, 
-			       onChange: this.onComponentChanged, ref: "txt"}), 
-			isLabelAtLeft ? this.renderLabel(true) : null, 
-			this.renderCheckbox(), 
-			!isLabelAtLeft ? this.renderLabel(false) : null
-		));
-	},
-	/**
-	 * inner span clicked, force focus to outer span
-	 * for fix the outer span cannot gain focus in IE11
-	 */
-	onInnerClicked: function () {
-		$(React.findDOMNode(this.refs.out)).focus();
-	},
-	/**
-	 * handle button clicked event
-	 */
-	onButtonClicked: function () {
-		this.setValueToModel(!this.isChecked());
-	},
-	onKeyUp: function (evt) {
-		if (evt.keyCode == '32') {
-			this.onButtonClicked();
+		},
+		/**
+		 * render
+		 * @returns {XML}
+		 */
+		render: function () {
+			var css = {
+				'n-disabled': !this.isEnabled()
+			};
+			css[this.getComponentCSS('n-checkbox')] = true;
+			var isLabelAtLeft = this.isLabelAtLeft();
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
+				React.createElement("input", {type: "checkbox", style: {display: "none"}, 
+				       onChange: this.onComponentChanged, ref: "txt"}), 
+				isLabelAtLeft ? this.renderLabel(true) : null, 
+				this.renderCheckbox(), 
+				!isLabelAtLeft ? this.renderLabel(false) : null
+			));
+		},
+		/**
+		 * inner span clicked, force focus to outer span
+		 * for fix the outer span cannot gain focus in IE11
+		 */
+		onInnerClicked: function () {
+			$(React.findDOMNode(this.refs.out)).focus();
+		},
+		/**
+		 * handle button clicked event
+		 */
+		onButtonClicked: function () {
+			this.setValueToModel(!this.isChecked());
+		},
+		onKeyUp: function (evt) {
+			if (evt.keyCode == '32') {
+				this.onButtonClicked();
+			}
+		},
+		/**
+		 * on component change
+		 * @param evt
+		 */
+		onComponentChanged: function (evt) {
+			// synchronize value to model
+			this.setValueToModel(evt.target.checked);
+		},
+		/**
+		 * on model change
+		 * @param evt
+		 */
+		onModelChanged: function (evt) {
+			this.getComponent().prop("checked", evt.new === true);
+			this.forceUpdate();
+		},
+		/**
+		 * is checked or not
+		 * @returns {boolean}
+		 */
+		isChecked: function () {
+			return this.getValueFromModel() === true;
+		},
+		/**
+		 * is label attached
+		 * @returns {boolean}
+		 */
+		isLabelAttached: function () {
+			return this.getComponentOption('labelAttached') !== null;
+		},
+		isLabelAtLeft: function () {
+			return this.getComponentOption('labelAttached') === 'left';
+		},
+		/**
+		 * get component
+		 * @returns {jQuery}
+		 */
+		getComponent: function () {
+			return $(React.findDOMNode(this.refs.txt));
 		}
-	},
-	/**
-	 * on component change
-	 * @param evt
-	 */
-	onComponentChanged: function (evt) {
-		// synchronize value to model
-		this.setValueToModel(evt.target.checked);
-	},
-	/**
-	 * on model change
-	 * @param evt
-	 */
-	onModelChanged: function (evt) {
-		this.getComponent().prop("checked", evt.new === true);
-		this.forceUpdate();
-	},
-	/**
-	 * is checked or not
-	 * @returns {boolean}
-	 */
-	isChecked: function () {
-		return this.getValueFromModel() === true;
-	},
-	/**
-	 * is label attached
-	 * @returns {boolean}
-	 */
-	isLabelAttached: function () {
-		return this.getComponentOption('labelAttached') !== null;
-	},
-	isLabelAtLeft: function () {
-		return this.getComponentOption('labelAttached') === 'left';
-	},
-	/**
-	 * get component
-	 * @returns {jQuery}
-	 */
-	getComponent: function () {
-		return $(React.findDOMNode(this.refs.txt));
-	}
-}));
+	}));
+	context.NCheck = NCheck;
+}(this, jQuery, $pt));
+
 /**
  * datetime picker, see datetimepicker from bootstrap
  *
@@ -4231,609 +4247,645 @@ var NCheck = React.createClass($pt.defineCellComponent({
  *      }
  * }
  */
-var NDateTime = React.createClass($pt.defineCellComponent({
-	statics: {
-		FORMAT: 'YYYY/MM/DD',
-		DAY_VIEW_HEADER_FORMAT: 'MMMM YYYY',
-		HEADER_YEAR_FORMAT: null,
-		VALUE_FORMAT: $pt.ComponentConstants.Default_Date_Format,
-		LOCALE: 'en'
-	},
-	propTypes: {
-		// model
-		model: React.PropTypes.object,
-		// CellLayout
-		layout: React.PropTypes.object
-	},
-	getDefaultProps: function () {
-		return {
-			defaultOptions: {
-				//format: "YYYY/MM/DD",
-				//dayViewHeaderFormat: "MMMM YYYY",
-				//locale: 'en',
-				stepping: 1,
-				useCurrent: false,
-				minDate: false,
-				maxDate: false,
-				collapse: true,
-				defaultDate: false,
-				disabledDates: false,
-				enabledDates: false,
-				icons: {
-					time: 'glyphicon glyphicon-time',
-					date: 'glyphicon glyphicon-calendar',
-					up: 'glyphicon glyphicon-chevron-up',
-					down: 'glyphicon glyphicon-chevron-down',
-					previous: 'glyphicon glyphicon-chevron-left',
-					next: 'glyphicon glyphicon-chevron-right',
-					today: 'glyphicon glyphicon-screenshot',
-					clear: 'glyphicon glyphicon-trash'
-				},
-				useStrict: false,
-				sideBySide: true,
-				daysOfWeekDisabled: [],
-				calendarWeeks: false,
-				viewMode: 'days',
-				toolbarPlacement: 'default',
-				showTodayButton: true,
-				showClear: true,
-				showClose: true,
-				tooltips: {
-					today: 'Go to today',
-					clear: 'Clear selection',
-					close: 'Close the picker',
-					selectMonth: 'Select Month',
-					prevMonth: 'Previous Month',
-					nextMonth: 'Next Month',
-					selectYear: 'Select Year',
-					prevYear: 'Previous Year',
-					nextYear: 'Next Year',
-					selectDecade: 'Select Decade',
-					prevDecade: 'Previous Decade',
-					nextDecade: 'Next Decade',
-					prevCentury: 'Previous Century',
-					nextCentury: 'Next Century'
+(function (context, $, $pt) {
+	var NDateTime = React.createClass($pt.defineCellComponent({
+		statics: {
+			FORMAT: 'YYYY/MM/DD',
+			DAY_VIEW_HEADER_FORMAT: 'MMMM YYYY',
+			HEADER_YEAR_FORMAT: null,
+			VALUE_FORMAT: $pt.ComponentConstants.Default_Date_Format,
+			LOCALE: 'en',
+			DATE_PICKER_VERTICAL_OFFSET: 35 // equals row height according to current testing
+		},
+		propTypes: {
+			// model
+			model: React.PropTypes.object,
+			// CellLayout
+			layout: React.PropTypes.object
+		},
+		getDefaultProps: function () {
+			return {
+				defaultOptions: {
+					//format: "YYYY/MM/DD",
+					//dayViewHeaderFormat: "MMMM YYYY",
+					//locale: 'en',
+					stepping: 1,
+					useCurrent: false,
+					minDate: false,
+					maxDate: false,
+					collapse: true,
+					defaultDate: false,
+					disabledDates: false,
+					enabledDates: false,
+					icons: {
+						time: 'glyphicon glyphicon-time',
+						date: 'glyphicon glyphicon-calendar',
+						up: 'glyphicon glyphicon-chevron-up',
+						down: 'glyphicon glyphicon-chevron-down',
+						previous: 'glyphicon glyphicon-chevron-left',
+						next: 'glyphicon glyphicon-chevron-right',
+						today: 'glyphicon glyphicon-screenshot',
+						clear: 'glyphicon glyphicon-trash'
+					},
+					useStrict: false,
+					sideBySide: true,
+					daysOfWeekDisabled: [],
+					calendarWeeks: false,
+					viewMode: 'days',
+					toolbarPlacement: 'default',
+					showTodayButton: true,
+					showClear: true,
+					showClose: true,
+					tooltips: {
+						today: 'Go to today',
+						clear: 'Clear selection',
+						close: 'Close the picker',
+						selectMonth: 'Select Month',
+						prevMonth: 'Previous Month',
+						nextMonth: 'Next Month',
+						selectYear: 'Select Year',
+						prevYear: 'Previous Year',
+						nextYear: 'Next Year',
+						selectDecade: 'Select Decade',
+						prevDecade: 'Previous Decade',
+						nextDecade: 'Next Decade',
+						prevCentury: 'Previous Century',
+						nextCentury: 'Next Century'
+					}
+					//,
+					// value format can be different with display format
+					//valueFormat: $pt.ComponentConstants.Default_Date_Format
 				}
-				//,
-				// value format can be different with display format
-				//valueFormat: $pt.ComponentConstants.Default_Date_Format
-			}
-		};
-	},
-	/**
-	 * will update
-	 * @param nextProps
-	 */
-	componentWillUpdate: function (nextProps) {
-		// remove post change listener to handle model change
-		this.removePostChangeListener(this.onModelChange);
-		this.removeEnableDependencyMonitor();
-	},
-	/**
-	 * overrride react method
-	 * @param prevProps
-	 * @param prevState
-	 * @override
-	 */
-	componentDidUpdate: function (prevProps, prevState) {
-		this.getComponent().data("DateTimePicker").date(this.getValueFromModel());
-		// add post change listener
-		this.addPostChangeListener(this.onModelChange);
-		this.addEnableDependencyMonitor();
-	},
-	/**
-	 * override react method
-	 * @override
-	 */
-	componentDidMount: function () {
-		this.createComponent();
-		this.getComponent().data("DateTimePicker").date(this.getValueFromModel());
-		// add post change listener
-		this.addPostChangeListener(this.onModelChange);
-		this.addEnableDependencyMonitor();
-	},
-	/**
-	 * override react method
-	 * @override
-	 */
-	componentWillUnmount: function () {
-		// remove post change listener
-		this.removePostChangeListener(this.onModelChange);
-		this.removeEnableDependencyMonitor();
-	},
-	/**
-	 * create component
-	 */
-	createComponent: function () {
-		var _this = this;
-		var component = this.getComponent().datetimepicker(this.createDisplayOptions({
-			format: NDateTime.FORMAT,
-			dayViewHeaderFormat: NDateTime.DAY_VIEW_HEADER_FORMAT,
-			locale: NDateTime.LOCALE,
-			stepping: null,
-			useCurrent: null,
-			minDate: null,
-			maxDate: null,
-			collapse: null,
-			disabledDates: null,
-			enabledDates: null,
-			icons: null,
-			useStrict: null,
-			sideBySide: null,
-			daysOfWeekDisabled: null,
-			calendarWeeks: null,
-			viewMode: null,
-			toolbarPlacement: null,
-			showTodayButton: null,
-			showClear: null,
-			showClose: null,
-			tooltips: null
-		})).on("dp.change", this.onComponentChange);
+			};
+		},
+		/**
+		 * will update
+		 * @param nextProps
+		 */
+		componentWillUpdate: function (nextProps) {
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.onModelChange);
+			this.removeEnableDependencyMonitor();
+		},
+		/**
+		 * overrride react method
+		 * @param prevProps
+		 * @param prevState
+		 * @override
+		 */
+		componentDidUpdate: function (prevProps, prevState) {
+			this.getComponent().data("DateTimePicker").date(this.getValueFromModel());
+			// add post change listener
+			this.addPostChangeListener(this.onModelChange);
+			this.addEnableDependencyMonitor();
+		},
+		/**
+		 * override react method
+		 * @override
+		 */
+		componentDidMount: function () {
+			this.createComponent();
+			this.getComponent().data("DateTimePicker").date(this.getValueFromModel());
+			// add post change listener
+			this.addPostChangeListener(this.onModelChange);
+			this.addEnableDependencyMonitor();
+		},
+		/**
+		 * override react method
+		 * @override
+		 */
+		componentWillUnmount: function () {
+			// remove post change listener
+			this.removePostChangeListener(this.onModelChange);
+			this.removeEnableDependencyMonitor();
+		},
+		/**
+		 * create component
+		 */
+		createComponent: function () {
+			var _this = this;
+			var component = this.getComponent().datetimepicker(this.createDisplayOptions({
+				format: NDateTime.FORMAT,
+				dayViewHeaderFormat: NDateTime.DAY_VIEW_HEADER_FORMAT,
+				locale: NDateTime.LOCALE,
+				stepping: null,
+				useCurrent: null,
+				minDate: null,
+				maxDate: null,
+				collapse: null,
+				disabledDates: null,
+				enabledDates: null,
+				icons: null,
+				useStrict: null,
+				sideBySide: null,
+				daysOfWeekDisabled: null,
+				calendarWeeks: null,
+				viewMode: null,
+				toolbarPlacement: null,
+				showTodayButton: null,
+				showClear: null,
+				showClose: null,
+				tooltips: null
+			})).on("dp.change", this.onComponentChange);
 
-		var picker = component.data('DateTimePicker');
-		component.on('dp.show', function (evt) {
-			_this.resetPopupContent.call(_this, picker, evt.target);
-		}).on('dp.update', function (evt) {
-			_this.resetPopupContent.call(_this, picker, evt.target);
-		});
-	},
-	resetPopupContent: function (picker, target) {
-		var headerYearFormat = this.getHeaderYearFormat();
-		//var yearsFormat = this.getComponentOption('yearsFormat');
-		if (headerYearFormat) {
-			var viewDate = picker.viewDate();
-
+			var picker = component.data('DateTimePicker');
+			component.on('dp.show', function (evt) {
+				_this.resetPopupContent.call(_this, picker, evt.target);
+			}).on('dp.update', function (evt) {
+				_this.resetPopupContent.call(_this, picker, evt.target);
+			});
+		},
+		resetPopupContent: function (picker, target) {
 			var widget = $(target).children('div.bootstrap-datetimepicker-widget');
-			var monthsView = widget.find('.datepicker-months');
-			var monthsViewHeader = monthsView.find('th');
-			monthsViewHeader.eq(1).text(viewDate.format(headerYearFormat));
-
-			//var startYear = viewDate.clone().subtract(5, 'y');
-			//var endYear = viewDate.clone().add(6, 'y');
-			//var yearsView = widget.find('.datepicker-years');
-			//var yearsViewHeader = yearsView.find('th');
-			//yearsViewHeader.eq(1).text(startYear.format(headerYearFormat) + '-' + endYear.format(headerYearFormat));
-			//if (yearsFormat) {
-			//    yearsView.find('td').children('span.year').each(function () {
-			//        var $this = $(this);
-			//        $this.text(moment($this.text() * 1, 'YYYY').format(yearsFormat));
-			//    });
-			//}
-		}
-		//var startDecade = viewDate.clone().subtract(49, 'y');
-		//var endDecade = startDecade.clone().add(100, 'y');
-		//var decadesView = widget.find('.datepicker-decades');
-		//var decadesViewHeader = decadesView.find('th');
-		//var header = headerYearFormat ? (startDecade.format(headerYearFormat) + '-' + endDecade.format(headerYearFormat)) : (startDecade.year() + ' - ' + endDecade.year());
-		//decadesViewHeader.eq(1).text(header);
-		//yearsFormat = yearsFormat ? yearsFormat : 'YYYY';
-		//decadesView.find('td').children('span').each(function (index) {
-		//    var $this = $(this);
-		//    var text = $this.text();
-		//    if (text.isBlank()) {
-		//        return;
-		//    }
-		//    var start = startDecade.clone().add(index * 10, 'y');
-		//    var end = start.clone().add(10, 'y');
-		//    $this.html(start.format(yearsFormat) + '</br>- ' + end.format(yearsFormat));
-		//});
-	},
-	/**
-	 * create display options
-	 * @param options
-	 */
-	createDisplayOptions: function (options) {
-		var _this = this;
-		Object.keys(options).forEach(function (key) {
-			var value = _this.getComponentOption(key);
-			if (value !== null) {
-				options[key] = value;
+			if (widget.closest('.n-table').length != 0) {
+				var tableBodyContainer = $(target).closest('.n-table-body-container');
+				// date time picker in table, move the popover to body,
+				// Don't know why the popup hasn't place on body in original library, the z-index really sucks.
+				var inputOffset = widget.prev().offset();
+				var widgetOffset = widget.offset();
+				var widgetHeight = widget.outerHeight(true);
+				// console.log("Widget height: " + widgetHeight);
+				if (widgetOffset.top == null || widgetOffset.top == 'auto' || inputOffset.top > widgetOffset.top) {
+					// on top
+					widgetOffset.top = inputOffset.top - widgetHeight + NDateTime.DATE_PICKER_VERTICAL_OFFSET;
+				} else {
+					// on bottom
+					widgetOffset.top = inputOffset.top + widget.prev().height();
+				}
+				// console.log("Input Offset: " + JSON.stringify(inputOffset));
+				// console.log("Widget Offset: " + JSON.stringify(widgetOffset));
+				widget.css({top: widgetOffset.top, left: widgetOffset.left, bottom: "auto", right: "auto", height: 'auto'});
+				widget.detach().appendTo($('body'));
+				// console.log(widget.css("top") + "," + widget.css("left") + "," + widget.css("bottom") + "," + widget.css("right") + "," + widget.outerHeight(true));
+				tableBodyContainer.hide().show(0);
 			}
-		});
-		return options;
-	},
-	/**
-	 * render
-	 * @returns {XML}
-	 */
-	render: function () {
-		var css = {
-			'input-group-addon': true,
-			link: true,
-			disabled: !this.isEnabled()
-		};
-		var divCSS = {
-			'n-datetime': true,
-			'n-disabled': !this.isEnabled()
-		};
-		return (React.createElement("div", {className: $pt.LayoutHelper.classSet(divCSS)}, 
-			React.createElement("div", {className: "input-group", ref: "div"}, 
-				React.createElement("input", {type: "text", 
-				       className: "form-control", 
-				       disabled: !this.isEnabled(), 
 
-				       onFocus: this.onComponentFocused, 
-				       onBlur: this.onComponentBlurred}), 
+			var headerYearFormat = this.getHeaderYearFormat();
+			//var yearsFormat = this.getComponentOption('yearsFormat');
+			if (headerYearFormat) {
+				var viewDate = picker.viewDate();
+
+				var monthsView = widget.find('.datepicker-months');
+				var monthsViewHeader = monthsView.find('th');
+				monthsViewHeader.eq(1).text(viewDate.format(headerYearFormat));
+
+				//var startYear = viewDate.clone().subtract(5, 'y');
+				//var endYear = viewDate.clone().add(6, 'y');
+				//var yearsView = widget.find('.datepicker-years');
+				//var yearsViewHeader = yearsView.find('th');
+				//yearsViewHeader.eq(1).text(startYear.format(headerYearFormat) + '-' + endYear.format(headerYearFormat));
+				//if (yearsFormat) {
+				//    yearsView.find('td').children('span.year').each(function () {
+				//        var $this = $(this);
+				//        $this.text(moment($this.text() * 1, 'YYYY').format(yearsFormat));
+				//    });
+				//}
+			}
+			//var startDecade = viewDate.clone().subtract(49, 'y');
+			//var endDecade = startDecade.clone().add(100, 'y');
+			//var decadesView = widget.find('.datepicker-decades');
+			//var decadesViewHeader = decadesView.find('th');
+			//var header = headerYearFormat ? (startDecade.format(headerYearFormat) + '-' + endDecade.format(headerYearFormat)) : (startDecade.year() + ' - ' + endDecade.year());
+			//decadesViewHeader.eq(1).text(header);
+			//yearsFormat = yearsFormat ? yearsFormat : 'YYYY';
+			//decadesView.find('td').children('span').each(function (index) {
+			//    var $this = $(this);
+			//    var text = $this.text();
+			//    if (text.isBlank()) {
+			//        return;
+			//    }
+			//    var start = startDecade.clone().add(index * 10, 'y');
+			//    var end = start.clone().add(10, 'y');
+			//    $this.html(start.format(yearsFormat) + '</br>- ' + end.format(yearsFormat));
+			//});
+		},
+		/**
+		 * create display options
+		 * @param options
+		 */
+		createDisplayOptions: function (options) {
+			var _this = this;
+			Object.keys(options).forEach(function (key) {
+				var value = _this.getComponentOption(key);
+				if (value !== null) {
+					options[key] = value;
+				}
+			});
+			return options;
+		},
+		/**
+		 * render
+		 * @returns {XML}
+		 */
+		render: function () {
+			var css = {
+				'input-group-addon': true,
+				link: true,
+				disabled: !this.isEnabled()
+			};
+			var divCSS = {
+				'n-datetime': true,
+				'n-disabled': !this.isEnabled()
+			};
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(divCSS)}, 
+				React.createElement("div", {className: "input-group", ref: "div"}, 
+					React.createElement("input", {type: "text", 
+					       className: "form-control", 
+					       disabled: !this.isEnabled(), 
+
+					       onFocus: this.onComponentFocused, 
+					       onBlur: this.onComponentBlurred}), 
                 React.createElement("span", {className: $pt.LayoutHelper.classSet(css)}, 
                     React.createElement("span", {className: "fa fa-fw fa-calendar"})
                 )
-			), 
-			this.renderNormalLine(), 
-			this.renderFocusLine()
-		));
-	},
-	onComponentFocused: function () {
-		$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-		$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
-	},
-	onComponentBlurred: function () {
-		$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-		$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
-	},
-	/**
-	 * on component change
-	 * @param evt
-	 */
-	onComponentChange: function (evt) {
-		// synchronize value to model
-		if (evt.date !== false) {
-			this.setValueToModel(evt.date);
-		} else {
-			this.setValueToModel(null);
+				), 
+				this.renderNormalLine(), 
+				this.renderFocusLine()
+			));
+		},
+		onComponentFocused: function () {
+			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+		},
+		onComponentBlurred: function () {
+			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+		},
+		/**
+		 * on component change
+		 * @param evt
+		 */
+		onComponentChange: function (evt) {
+			// synchronize value to model
+			if (evt.date !== false) {
+				this.setValueToModel(evt.date);
+			} else {
+				this.setValueToModel(null);
+			}
+		},
+		/**
+		 * on model change
+		 * @param evt
+		 */
+		onModelChange: function (evt) {
+			this.getComponent().data('DateTimePicker').date(this.convertValueFromModel(evt.new));
+		},
+		/**
+		 * get component
+		 * @returns {*|jQuery|HTMLElement}
+		 * @override
+		 */
+		getComponent: function () {
+			return $(React.findDOMNode(this.refs.div));
+		},
+		/**
+		 * get value from model
+		 * @returns {*}
+		 * @override
+		 */
+		getValueFromModel: function () {
+			return this.convertValueFromModel(this.getModel().get(this.getDataId()));
+		},
+		/**
+		 * set value to model
+		 * @param value momentjs object
+		 * @override
+		 */
+		setValueToModel: function (value) {
+			this.getModel().set(this.getDataId(), value == null ? null : value.format(this.getValueFormat()));
+		},
+		/**
+		 * convert value from model
+		 * @param value string date with value format
+		 * @returns {*} moment date
+		 */
+		convertValueFromModel: function (value) {
+			return value == null ? null : moment(value, this.getValueFormat());
+		},
+		/**
+		 * get value format
+		 * @returns {string}
+		 */
+		getValueFormat: function () {
+			var valueFormat = this.getComponentOption('valueFormat');
+			return valueFormat ? valueFormat : NDateTime.VALUE_FORMAT;
+		},
+		getHeaderYearFormat: function () {
+			var format = this.getComponentOption('headerYearFormat');
+			return format ? format : NDateTime.HEADER_YEAR_FORMAT;
 		}
-	},
-	/**
-	 * on model change
-	 * @param evt
-	 */
-	onModelChange: function (evt) {
-		this.getComponent().data('DateTimePicker').date(this.convertValueFromModel(evt.new));
-	},
-	/**
-	 * get component
-	 * @returns {*|jQuery|HTMLElement}
-	 * @override
-	 */
-	getComponent: function () {
-		return $(React.findDOMNode(this.refs.div));
-	},
-	/**
-	 * get value from model
-	 * @returns {*}
-	 * @override
-	 */
-	getValueFromModel: function () {
-		return this.convertValueFromModel(this.getModel().get(this.getDataId()));
-	},
-	/**
-	 * set value to model
-	 * @param value momentjs object
-	 * @override
-	 */
-	setValueToModel: function (value) {
-		this.getModel().set(this.getDataId(), value == null ? null : value.format(this.getValueFormat()));
-	},
-	/**
-	 * convert value from model
-	 * @param value string date with value format
-	 * @returns {*} moment date
-	 */
-	convertValueFromModel: function (value) {
-		return value == null ? null : moment(value, this.getValueFormat());
-	},
-	/**
-	 * get value format
-	 * @returns {string}
-	 */
-	getValueFormat: function () {
-		var valueFormat = this.getComponentOption('valueFormat');
-		return valueFormat ? valueFormat : NDateTime.VALUE_FORMAT;
-	},
-	getHeaderYearFormat: function () {
-		var format = this.getComponentOption('headerYearFormat');
-		return format ? format : NDateTime.HEADER_YEAR_FORMAT;
-	}
-}));
+	}));
+	context.NDateTime = NDateTime;
+}(this, jQuery, $pt));
+
 /**
  * exception modal dialog
  * z-index is 9999 and 9998, the max z-index.
  */
-var NExceptionModal = React.createClass({displayName: "NExceptionModal",
-	statics: {
-		getExceptionModal: function (className) {
-			if ($pt.exceptionDialog === undefined || $pt.exceptionDialog === null) {
-				// must initial here. since the function will execute immediately after load,
-				// and NExceptionModal doesn't defined in that time
-				var exceptionContainer = $("#exception_modal_container");
-				if (exceptionContainer.length == 0) {
-					$("<div id='exception_modal_container' />").appendTo($(document.body));
+(function (context, $, $pt) {
+	var NExceptionModal = React.createClass({displayName: "NExceptionModal",
+		statics: {
+			getExceptionModal: function (className) {
+				if ($pt.exceptionDialog === undefined || $pt.exceptionDialog === null) {
+					// must initial here. since the function will execute immediately after load,
+					// and NExceptionModal doesn't defined in that time
+					var exceptionContainer = $("#exception_modal_container");
+					if (exceptionContainer.length == 0) {
+						$("<div id='exception_modal_container' />").appendTo($(document.body));
+					}
+					$pt.exceptionDialog = React.render(React.createElement(NExceptionModal, {className: className}),
+						document.getElementById("exception_modal_container"));
 				}
-				$pt.exceptionDialog = React.render(React.createElement(NExceptionModal, {className: className}),
-					document.getElementById("exception_modal_container"));
-			}
-			return $pt.exceptionDialog;
+				return $pt.exceptionDialog;
+			},
+			TITLE: 'Exception Raised...'
 		},
-		TITLE: 'Exception Raised...'
-	},
-	propTypes: {
-		className: React.PropTypes.string
-	},
-	getDefaultProps: function () {
-		return {};
-	},
-	getInitialState: function () {
-		return {
-			visible: false,
-			status: null,
-			message: null
-		};
-	},
-	/**
-	 * set z-index
-	 */
-	setZIndex: function () {
-		var div = $(React.findDOMNode(this.refs.body)).closest(".modal");
-		if (div.length > 0) {
-			div.css({"z-index": 9999});
-			div.prev().css({"z-index": 9998});
-		}
-		document.body.style.paddingRight = 0;
-	},
-	/**
-	 * did update
-	 * @param prevProps
-	 * @param prevState
-	 */
-	componentDidUpdate: function (prevProps, prevState) {
-		this.setZIndex();
-	},
-	/**
-	 * did mount
-	 */
-	componentDidMount: function () {
-		this.setZIndex();
-	},
-	/**
-	 * render content
-	 */
-	renderContent: function () {
-		var status = this.state.status;
-		var statusMessage = $pt.ComponentConstants.Http_Status[status];
-		var message = this.state.message;
-		return (React.createElement("div", null, 
-			React.createElement("h6", null, status, ": ", statusMessage), 
-			message != null ? (React.createElement("pre", null, message)) : null
-		));
-	},
-	/**
-	 * render
-	 * @returns {*}
-	 */
-	render: function () {
-		if (!this.state.visible) {
-			return null;
-		}
-
-		var css = {
-			'n-exception-modal': true
-		};
-		if (this.props.className) {
-			css[this.props.className] = true;
-		}
-		return (React.createElement(Modal, {className: $pt.LayoutHelper.classSet(css), bsStyle: "danger", 
-		               onHide: this.hide, backdrop: "static"}, 
-			React.createElement(Modal.Header, {closeButton: true}, 
-				React.createElement(Modal.Title, null, NExceptionModal.TITLE)
-			), 
-
-			React.createElement(Modal.Body, {ref: "body"}, 
-				this.renderContent()
-			)
-		));
-	},
-	/**
-	 * hide dialog
-	 */
-	hide: function () {
-		this.setState({visible: false, status: null, message: null});
-	},
-	/**
-	 * show dialog
-	 * @param status http status
-	 * @param message error message
-	 */
-	show: function (status, message) {
-		$(':focus').blur();
-		this.setState({visible: true, status: status, message: message});
-	}
-});
-var NFile = React.createClass($pt.defineCellComponent({
-	statics: {},
-	propTypes: {
-		// model
-		model: React.PropTypes.object,
-		// CellLayout
-		layout: React.PropTypes.object
-	},
-	getDefaultProps: function () {
-		return {
-			defaultOptions: {
-				multiple: true,
-				browseLabel: '',
-				browseIcon: '<i class="fa fa-fw fa-folder-open-o"></i>',
-				browseClass: 'btn btn-link',
-				uploadLabel: '',
-				uploadIcon: '<i class="fa fa-fw fa-upload"></i>',
-				uploadClass: 'btn btn-link',
-				removeLabel: '',
-				removeIcon: '<i class="fa fa-fw fa-trash-o"></i>',
-				removeClass: 'btn btn-link',
-				showClose: false,
-				showPreview: true
+		propTypes: {
+			className: React.PropTypes.string
+		},
+		getDefaultProps: function () {
+			return {};
+		},
+		getInitialState: function () {
+			return {
+				visible: false,
+				status: null,
+				message: null
+			};
+		},
+		/**
+		 * set z-index
+		 */
+		setZIndex: function () {
+			var div = $(React.findDOMNode(this.refs.body)).closest(".modal");
+			if (div.length > 0) {
+				div.css({"z-index": 9999});
+				div.prev().css({"z-index": 9998});
 			}
-		};
-	},
-	getInitialState: function () {
-		return {};
-	},
-	componentDidMount: function () {
-		var input = $(React.findDOMNode(this.refs.file));
-		input.fileinput(this.createDisplayOptions({
-			ajaxDeleteSettings: null,
-			ajaxSettings: null,
-			allowedFileExtensions: null,
-			allowedFileTypes: null,
-			allowedPreviewMimeTypes: null,
-			allowedPreviewTypes: null,
-			autoReplace: null,
-			browseClass: null,
-			browseIcon: null,
-			browseLabel: null,
-			buttonLabelClass: null,
-			captionClass: null,
-			customLayoutTags: null,
-			customPreviewTags: null,
-			deleteExtraData: null,
-			deleteUrl: null,
-			dropZoneEnabled: null,
-			dropZoneTitle: null,
-			dropZoneTitleClass: null,
-			fileTypeSettings: null,
-			initialCaption: null,
-			initialPreview: null,
-			initialPreviewConfig: null,
-			initialPreviewCount: null,
-			initialPreviewDelimiter: null,
-			initialPreviewShowDelete: null,
-			initialPreviewThumbTags: null,
-			language: null,
-			mainClass: null,
-			maxFileCount: null,
-			maxFileSize: null,
-			maxImageHeight: null,
-			maxImageWidth: null,
-			minFileCount: null,
-			minImageHeight: null,
-			minImageWidth: null,
-			msgErrorClass: null,
-			msgFileNotFound: null,
-			msgFileNotReadable: null,
-			msgFilePreviewAborted: null,
-			msgFilePreviewError: null,
-			msgFileSecured: null,
-			msgFilesTooLess: null,
-			msgFilesTooMany: null,
-			msgFoldersNotAllowed: null,
-			msgImageHeightLarge: null,
-			msgImageHeightSmall: null,
-			msgImageWidthLarge: null,
-			msgImageWidthSmall: null,
-			msgInvalidFileExtension: null,
-			msgInvalidFileType: null,
-			msgLoading: null,
-			msgProgress: null,
-			msgSelected: null,
-			msgSizeTooLarge: null,
-			msgUploadAborted: null,
-			msgValidationError: null,
-			msgValidationErrorClass: null,
-			msgValidationErrorIcon: null,
-			msgZoomModalHeading: null,
-			msgZoomTitle: null,
-			overwriteInitial: null,
-			previewClass: null,
-			previewFileExtSettings: null,
-			previewFileIcon: null,
-			previewFileIconClass: null,
-			previewFileIconSettings: null,
-			previewFileType: null,
-			previewSettings: null,
-			previewThumbTags: null,
-			progressClass: null,
-			progressCompleteClass: null,
-			removeClass: null,
-			removeIcon: null,
-			removeLabel: null,
-			removeTitle: null,
-			showAjaxErrorDetails: null,
-			showCaption: null,
-			showClose: null,
-			showPreview: null,
-			showRemove: null,
-			showUpload: null,
-			showUploadedThumbs: null,
-			uploadAsync: null,
-			uploadClass: null,
-			uploadExtraData: null,
-			uploadIcon: null,
-			uploadLabel: null,
-			uploadTitle: null,
-			uploadUrl: null,
-			validateInitialCount: null,
-			zoomIndicator: null
-		}));
-		// event monitor
-		var monitors = this.getEventMonitor();
-		Object.keys(monitors).forEach(function (eventKey) {
-			input.on(eventKey, monitors[eventKey]);
-		});
-
-		var comp = $(React.findDOMNode(this.refs.comp));
-		comp.find('.kv-fileinput-caption')
-			.focus(this.onComponentFocused)
-			.blur(this.onComponentBlurred);
-		comp.find('.input-group-btn>.btn')
-			.focus(this.onComponentFocused)
-			.blur(this.onComponentBlurred);
-	},
-	componentWillUnmount: function () {
-		var input = $(React.findDOMNode(this.refs.file));
-		// event monitor
-		var monitors = this.getEventMonitor();
-		Object.keys(monitors).forEach(function (eventKey) {
-			input.off(eventKey, monitors[eventKey]);
-		});
-		// destroy the component
-		input.fileinput('destroy');
-	},
-	render: function () {
-		var css = {};
-		css[this.getComponentCSS('n-file')] = true;
-		var inputCSS = {
-			file: true
-		};
-		return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), ref: "comp"}, 
-			React.createElement("input", {type: "file", 
-			       className: $pt.LayoutHelper.classSet(inputCSS), 
-			       multiple: this.allowMultipleFiles(), 
-			       disabled: !this.isEnabled(), 
-			       ref: "file"}), 
-			this.renderNormalLine(), 
-			this.renderFocusLine()
-		));
-	},
-	createDisplayOptions: function (options) {
-		var _this = this;
-		Object.keys(options).forEach(function (key) {
-			options[key] = _this.getComponentOption(key);
-			if (options[key] == null) {
-				delete options[key];
+			document.body.style.paddingRight = 0;
+		},
+		/**
+		 * did update
+		 * @param prevProps
+		 * @param prevState
+		 */
+		componentDidUpdate: function (prevProps, prevState) {
+			this.setZIndex();
+		},
+		/**
+		 * did mount
+		 */
+		componentDidMount: function () {
+			this.setZIndex();
+		},
+		/**
+		 * render content
+		 */
+		renderContent: function () {
+			var status = this.state.status;
+			var statusMessage = $pt.ComponentConstants.Http_Status[status];
+			var message = this.state.message;
+			return (React.createElement("div", null, 
+				React.createElement("h6", null, status, ": ", statusMessage), 
+				message != null ? (React.createElement("pre", null, message)) : null
+			));
+		},
+		/**
+		 * render
+		 * @returns {*}
+		 */
+		render: function () {
+			if (!this.state.visible) {
+				return null;
 			}
-		});
-		return options;
-	},
-	allowMultipleFiles: function () {
-		return this.getComponentOption('multiple');
-	},
-	onComponentFocused: function () {
-		$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-		$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
-	},
-	onComponentBlurred: function () {
-		$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-		$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
-	}
-}));
+
+			var css = {
+				'n-exception-modal': true
+			};
+			if (this.props.className) {
+				css[this.props.className] = true;
+			}
+			return (React.createElement(Modal, {className: $pt.LayoutHelper.classSet(css), bsStyle: "danger", 
+			               onHide: this.hide, backdrop: "static"}, 
+				React.createElement(Modal.Header, {closeButton: true}, 
+					React.createElement(Modal.Title, null, NExceptionModal.TITLE)
+				), 
+
+				React.createElement(Modal.Body, {ref: "body"}, 
+					this.renderContent()
+				)
+			));
+		},
+		/**
+		 * hide dialog
+		 */
+		hide: function () {
+			this.setState({visible: false, status: null, message: null});
+		},
+		/**
+		 * show dialog
+		 * @param status http status
+		 * @param message error message
+		 */
+		show: function (status, message) {
+			$(':focus').blur();
+			this.setState({visible: true, status: status, message: message});
+		}
+	});
+	context.NExceptionModal = NExceptionModal;
+}(this, jQuery, $pt));
+
+(function (context, $, $pt) {
+	var NFile = React.createClass($pt.defineCellComponent({
+		statics: {},
+		propTypes: {
+			// model
+			model: React.PropTypes.object,
+			// CellLayout
+			layout: React.PropTypes.object
+		},
+		getDefaultProps: function () {
+			return {
+				defaultOptions: {
+					multiple: true,
+					browseLabel: '',
+					browseIcon: '<i class="fa fa-fw fa-folder-open-o"></i>',
+					browseClass: 'btn btn-link',
+					uploadLabel: '',
+					uploadIcon: '<i class="fa fa-fw fa-upload"></i>',
+					uploadClass: 'btn btn-link',
+					removeLabel: '',
+					removeIcon: '<i class="fa fa-fw fa-trash-o"></i>',
+					removeClass: 'btn btn-link',
+					showClose: false,
+					showPreview: true
+				}
+			};
+		},
+		getInitialState: function () {
+			return {};
+		},
+		componentDidMount: function () {
+			var input = $(React.findDOMNode(this.refs.file));
+			input.fileinput(this.createDisplayOptions({
+				ajaxDeleteSettings: null,
+				ajaxSettings: null,
+				allowedFileExtensions: null,
+				allowedFileTypes: null,
+				allowedPreviewMimeTypes: null,
+				allowedPreviewTypes: null,
+				autoReplace: null,
+				browseClass: null,
+				browseIcon: null,
+				browseLabel: null,
+				buttonLabelClass: null,
+				captionClass: null,
+				customLayoutTags: null,
+				customPreviewTags: null,
+				deleteExtraData: null,
+				deleteUrl: null,
+				dropZoneEnabled: null,
+				dropZoneTitle: null,
+				dropZoneTitleClass: null,
+				fileTypeSettings: null,
+				initialCaption: null,
+				initialPreview: null,
+				initialPreviewConfig: null,
+				initialPreviewCount: null,
+				initialPreviewDelimiter: null,
+				initialPreviewShowDelete: null,
+				initialPreviewThumbTags: null,
+				language: null,
+				mainClass: null,
+				maxFileCount: null,
+				maxFileSize: null,
+				maxImageHeight: null,
+				maxImageWidth: null,
+				minFileCount: null,
+				minImageHeight: null,
+				minImageWidth: null,
+				msgErrorClass: null,
+				msgFileNotFound: null,
+				msgFileNotReadable: null,
+				msgFilePreviewAborted: null,
+				msgFilePreviewError: null,
+				msgFileSecured: null,
+				msgFilesTooLess: null,
+				msgFilesTooMany: null,
+				msgFoldersNotAllowed: null,
+				msgImageHeightLarge: null,
+				msgImageHeightSmall: null,
+				msgImageWidthLarge: null,
+				msgImageWidthSmall: null,
+				msgInvalidFileExtension: null,
+				msgInvalidFileType: null,
+				msgLoading: null,
+				msgProgress: null,
+				msgSelected: null,
+				msgSizeTooLarge: null,
+				msgUploadAborted: null,
+				msgValidationError: null,
+				msgValidationErrorClass: null,
+				msgValidationErrorIcon: null,
+				msgZoomModalHeading: null,
+				msgZoomTitle: null,
+				overwriteInitial: null,
+				previewClass: null,
+				previewFileExtSettings: null,
+				previewFileIcon: null,
+				previewFileIconClass: null,
+				previewFileIconSettings: null,
+				previewFileType: null,
+				previewSettings: null,
+				previewThumbTags: null,
+				progressClass: null,
+				progressCompleteClass: null,
+				removeClass: null,
+				removeIcon: null,
+				removeLabel: null,
+				removeTitle: null,
+				showAjaxErrorDetails: null,
+				showCaption: null,
+				showClose: null,
+				showPreview: null,
+				showRemove: null,
+				showUpload: null,
+				showUploadedThumbs: null,
+				uploadAsync: null,
+				uploadClass: null,
+				uploadExtraData: null,
+				uploadIcon: null,
+				uploadLabel: null,
+				uploadTitle: null,
+				uploadUrl: null,
+				validateInitialCount: null,
+				zoomIndicator: null
+			}));
+			// event monitor
+			var monitors = this.getEventMonitor();
+			Object.keys(monitors).forEach(function (eventKey) {
+				input.on(eventKey, monitors[eventKey]);
+			});
+
+			var comp = $(React.findDOMNode(this.refs.comp));
+			comp.find('.kv-fileinput-caption')
+				.focus(this.onComponentFocused)
+				.blur(this.onComponentBlurred);
+			comp.find('.input-group-btn>.btn')
+				.focus(this.onComponentFocused)
+				.blur(this.onComponentBlurred);
+		},
+		componentWillUnmount: function () {
+			var input = $(React.findDOMNode(this.refs.file));
+			// event monitor
+			var monitors = this.getEventMonitor();
+			Object.keys(monitors).forEach(function (eventKey) {
+				input.off(eventKey, monitors[eventKey]);
+			});
+			// destroy the component
+			input.fileinput('destroy');
+		},
+		render: function () {
+			var css = {};
+			css[this.getComponentCSS('n-file')] = true;
+			var inputCSS = {
+				file: true
+			};
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), ref: "comp"}, 
+				React.createElement("input", {type: "file", 
+				       className: $pt.LayoutHelper.classSet(inputCSS), 
+				       multiple: this.allowMultipleFiles(), 
+				       disabled: !this.isEnabled(), 
+				       ref: "file"}), 
+				this.renderNormalLine(), 
+				this.renderFocusLine()
+			));
+		},
+		createDisplayOptions: function (options) {
+			var _this = this;
+			Object.keys(options).forEach(function (key) {
+				options[key] = _this.getComponentOption(key);
+				if (options[key] == null) {
+					delete options[key];
+				}
+			});
+			return options;
+		},
+		allowMultipleFiles: function () {
+			return this.getComponentOption('multiple');
+		},
+		onComponentFocused: function () {
+			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+		},
+		onComponentBlurred: function () {
+			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+		}
+	}));
+	context.NFile = NFile;
+}(this, jQuery, $pt));
+
 /**
  * form component, a div
  *
@@ -4870,516 +4922,534 @@ var NFile = React.createClass($pt.defineCellComponent({
  *      }
  * }
  */
-var NForm = React.createClass({displayName: "NForm",
-	propTypes: {
-		// model
-		model: React.PropTypes.object,
-		// layout, FormLayout
-		layout: React.PropTypes.object,
-		direction: React.PropTypes.oneOf(['vertical', 'horizontal']),
-		className: React.PropTypes.string
-	},
-	getDefaultProps: function () {
-		return {
-			next: {
-				icon: 'angle-double-right',
-				text: 'Next',
-				style: 'primary',
-				labelPosition: 'left'
-			},
-			previous: {
-				icon: 'angle-double-left',
-				text: 'Previous',
-				style: 'primary'
-			},
-			direction: 'vertical'
-		};
-	},
-	getInitialState: function () {
-		return {
-			activeCard: null,
-			next: $.extend({}, this.props.next, {
-				click: this.onNextClicked
-			}),
-			previous: $.extend({}, this.props.previous, {
-				click: this.onPreviousClicked
-			}),
-			expanded: {}
-		};
-	},
-	/**
-	 * will update
-	 * @param nextProps
-	 */
-	componentWillUpdate: function (nextProps) {
-		var _this = this;
-		this.getLayout().getCards().forEach(function (card) {
-			if (card.hasBadge()) {
-				_this.getModel().removeListener(card.getBadgeId(), 'post', 'change', _this.onModelChanged);
-			}
-		});
-	},
-	/**
-	 * did update
-	 * @param prevProps
-	 * @param prevState
-	 */
-	componentDidUpdate: function (prevProps, prevState) {
-		var _this = this;
-		this.getLayout().getCards().forEach(function (card) {
-			if (card.hasBadge()) {
-				_this.getModel().addListener(card.getBadgeId(), 'post', 'change', _this.onModelChanged);
-			}
-		});
-	},
-	/**
-	 * did mount
-	 */
-	componentDidMount: function () {
-		var _this = this;
-		this.getLayout().getCards().forEach(function (card) {
-			if (card.hasBadge()) {
-				_this.getModel().addListener(card.getBadgeId(), 'post', 'change', _this.onModelChanged);
-			}
-		});
-	},
-	/**
-	 * will unmount
-	 */
-	componentWillUnmount: function () {
-		var _this = this;
-		this.getLayout().getCards().forEach(function (card) {
-			if (card.hasBadge()) {
-				_this.getModel().removeListener(card.getBadgeId(), 'post', 'change', _this.onModelChanged);
-			}
-		});
-	},
-	/**
-	 * render sections
-	 * @param sections {[SectionLayout]}
-	 * @returns {XML}
-	 */
-	renderSections: function (sections) {
-		var layout = {};
-		var _this = this;
-		sections.forEach(function (section) {
-			var cell = {
-				label: section.getLabel(),
+(function (context, $, $pt) {
+	var NForm = React.createClass({displayName: "NForm",
+		statics: {
+			LABEL_DIRECTION: 'vertical'
+		},
+		propTypes: {
+			// model
+			model: React.PropTypes.object,
+			// layout, FormLayout
+			layout: React.PropTypes.object,
+			direction: React.PropTypes.oneOf(['vertical', 'horizontal']),
+			className: React.PropTypes.string
+		},
+		getDefaultProps: function () {
+			return {
+				next: {
+					icon: 'angle-double-right',
+					text: 'Next',
+					style: 'primary',
+					labelPosition: 'left'
+				},
+				previous: {
+					icon: 'angle-double-left',
+					text: 'Previous',
+					style: 'primary'
+				}
+			};
+		},
+		getInitialState: function () {
+			return {
+				activeCard: null,
+				next: $.extend({}, this.props.next, {
+					click: this.onNextClicked
+				}),
+				previous: $.extend({}, this.props.previous, {
+					click: this.onPreviousClicked
+				}),
+				expanded: {}
+			};
+		},
+		/**
+		 * will update
+		 * @param nextProps
+		 */
+		componentWillUpdate: function (nextProps) {
+			var _this = this;
+			this.getLayout().getCards().forEach(function (card) {
+				if (card.hasBadge()) {
+					_this.getModel().removeListener(card.getBadgeId(), 'post', 'change', _this.onModelChanged);
+				}
+			});
+		},
+		/**
+		 * did update
+		 * @param prevProps
+		 * @param prevState
+		 */
+		componentDidUpdate: function (prevProps, prevState) {
+			var _this = this;
+			this.getLayout().getCards().forEach(function (card) {
+				if (card.hasBadge()) {
+					_this.getModel().addListener(card.getBadgeId(), 'post', 'change', _this.onModelChanged);
+				}
+			});
+		},
+		/**
+		 * did mount
+		 */
+		componentDidMount: function () {
+			var _this = this;
+			this.getLayout().getCards().forEach(function (card) {
+				if (card.hasBadge()) {
+					_this.getModel().addListener(card.getBadgeId(), 'post', 'change', _this.onModelChanged);
+				}
+			});
+		},
+		/**
+		 * will unmount
+		 */
+		componentWillUnmount: function () {
+			var _this = this;
+			this.getLayout().getCards().forEach(function (card) {
+				if (card.hasBadge()) {
+					_this.getModel().removeListener(card.getBadgeId(), 'post', 'change', _this.onModelChanged);
+				}
+			});
+		},
+		/**
+		 * render sections
+		 * @param sections {[SectionLayout]}
+		 * @returns {XML}
+		 */
+		renderSections: function (sections) {
+			var layout = {};
+			var _this = this;
+			sections.forEach(function (section) {
+				var cell = {
+					label: section.getLabel(),
+					comp: {
+						type: $pt.ComponentConstants.Panel,
+						style: section.getStyle(),
+						expanded: section.isExpanded(),
+						collapsible: section.isCollapsible(),
+						visible: section.getVisible(),
+						expandedLabel: section.getExpandedLabel(),
+						collapsedLabel: section.getCollapsedLabel()
+					},
+					pos: {
+						width: section.getWidth(),
+						col: section.getColumnIndex(),
+						row: section.getRowIndex()
+					}
+				};
+				if (section.hasCheckInTitle()) {
+					cell.comp.checkInTitle = {
+						data: section.getCheckInTitleDataId(),
+						collapsible: section.getCheckInTitleCollapsible(),
+						label: section.getCheckInTitleLabel()
+					};
+					var otherOptions = section.getCheckInTitleOption();
+					Object.keys(otherOptions).forEach(function (key) {
+						cell.comp.checkInTitle[key] = otherOptions[key];
+					});
+				}
+				cell.comp.editLayout = section.getCells();
+				layout[_this.getSectionKey(section)] = cell;
+			});
+			var sectionLayout = {
 				comp: {
 					type: $pt.ComponentConstants.Panel,
-					style: section.getStyle(),
-					expanded: section.isExpanded(),
-					collapsible: section.isCollapsible(),
-					visible: section.getVisible(),
-					expandedLabel: section.getExpandedLabel(),
-					collapsedLabel: section.getCollapsedLabel()
+					editLayout: layout
 				},
 				pos: {
-					width: section.getWidth(),
-					col: section.getColumnIndex(),
-					row: section.getRowIndex()
+					width: 12
 				}
 			};
-			if (section.hasCheckInTitle()) {
-				cell.comp.checkInTitle = {
-					data: section.getCheckInTitleDataId(),
-					collapsible: section.getCheckInTitleCollapsible(),
-					label: section.getCheckInTitleLabel()
+			return React.createElement(NPanel, {model: this.getModel(), 
+			               layout: $pt.createCellLayout(sections[0].getParentCard().getId() + '-body', sectionLayout), 
+			               direction: this.getLabelDirection()});
+		},
+		/**
+		 * attach previous button
+		 * @param left
+		 * @param card
+		 */
+		attachPreviousButton: function (left, card) {
+			if (this.getLayout().isCardButtonShown()) {
+				// add default previous
+				if (this.isPreviousCardBackable(card.getId())) {
+					left.splice(0, 0, this.state.previous);
+				} else {
+					left.splice(0, 0, $.extend({
+						enabled: false
+					}, this.state.previous));
+				}
+			}
+		},
+		/**
+		 * attach next button
+		 * @param right {{}[]} right buttons definition
+		 */
+		attachNextButton: function (right) {
+			if (this.getLayout().isCardButtonShown()) {
+				right.push(this.state.next);
+			}
+		},
+		/**
+		 * wrap custom button
+		 * @param button {{successCallback: string, click: function}}
+		 * @returns {{}}
+		 */
+		wrapCustomButton: function (button) {
+			var _this = this;
+			var newButton = $.extend({}, button);
+			if (button.successCallback === 'next') {
+				newButton.click = function (model) {
+					if (button.click.call(_this, model)) {
+						_this.onNextClicked();
+					}
 				};
-				var otherOptions = section.getCheckInTitleOption();
-				Object.keys(otherOptions).forEach(function (key) {
-					cell.comp.checkInTitle[key] = otherOptions[key];
+			} else if (button.successCallback === 'prev') {
+				newButton.click = function (model) {
+					if (button.click.call(_this, model)) {
+						_this.onPreviousClicked();
+					}
+				};
+			} else if (button.successCallback === 'return') {
+				newButton.click = function (model) {
+					var cardId = button.click.call(_this, model);
+					if (typeof cardId === 'string') {
+						_this.jumpToCard(cardId);
+					}
+				};
+			}
+			return newButton;
+		},
+		/**
+		 * wrap custom buttons
+		 * @param buttons
+		 * @returns {{}[]}
+		 */
+		wrapCustomButtons: function (buttons) {
+			if (buttons == null) {
+				return null;
+			} else if (Array.isArray(buttons)) {
+				var _this = this;
+				return buttons.map(function (button) {
+					return _this.wrapCustomButton(button);
+				});
+			} else {
+				return [this.wrapCustomButton(buttons)];
+			}
+		},
+		/**
+		 * render card
+		 * @param card {CardLayout}
+		 * @param isCards {boolean}
+		 * @param index {number}
+		 * @returns {XML}
+		 */
+		renderCard: function (card, isCards, index) {
+			var css = {
+				'n-card': true
+			};
+			var right = [];
+			right.push.apply(right, this.wrapCustomButtons(card.getRightButtons()));
+			var left = [];
+			left.push.apply(left, this.wrapCustomButtons(card.getLeftButtons()));
+			var footer = null;
+			if (isCards) {
+				css['n-card-active'] = card.getId() == this.state.activeCard;
+				if (index == 0) {
+					// first card
+					this.attachNextButton(right);
+				} else if (index == this.props.layout.getCards().length - 1) {
+					// last card
+					this.attachPreviousButton(left, card);
+					var finishButton = card.getFinishButton();
+					if (finishButton) {
+						right.push(finishButton);
+					}
+				} else {
+					// middle cards
+					this.attachPreviousButton(left, card);
+					this.attachNextButton(right);
+				}
+			} else {
+				// no cards, render sections directly
+				css['n-card-active'] = true;
+			}
+			if (right.length != 0 || left.length != 0) {
+				right = right.reverse();
+				footer = (React.createElement(NPanelFooter, {right: right, left: left, model: this.getModel()}));
+			}
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
+				this.renderSections(card.getSections()), 
+				footer
+			));
+		},
+		/**
+		 * render badge
+		 * @param card
+		 * @returns {XML}
+		 */
+		renderBadge: function (card) {
+			if (card.hasBadge()) {
+				var badgeRender = card.getBadgeRender();
+				var badge = badgeRender ? badgeRender.call(this, this.getModel().get(card.getBadgeId()), this.getModel()) : this.getModel().get(card.getBadgeId());
+				return (React.createElement("span", {className: "badge"}, " ", badge));
+			} else {
+				return null;
+			}
+		},
+		/**
+		 * render card title
+		 * @returns {XML}
+		 */
+		renderWizards: function () {
+			var css = $pt.LayoutHelper.classSet({
+				'nav': true,
+				'nav-justified': true,
+				'nav-pills': true,
+				'nav-direction-vertical': false,
+				'n-cards-nav': true,
+				'n-cards-free': this.getLayout().isFreeCard()
+			});
+			var _this = this;
+			return (React.createElement("ul", {className: css}, 
+				this.getLayout().getCards().map(function (card) {
+					var css = {
+						active: card.getId() == _this.state.activeCard,
+						before: _this.isBeforeActiveCard(card.getId()),
+						after: _this.isAfterActiveCard(card.getId())
+					};
+					var click = null;
+					if (_this.getLayout().isFreeCard()) {
+						click = function () {
+							_this.jumpToCard(card.getId());
+						};
+					}
+					var icon = null;
+					if (card.getIcon() != null) {
+						var iconCSS = {
+							fa: true,
+							'fa-fw': true
+						};
+						iconCSS['fa-' + card.getIcon()] = true;
+						icon = React.createElement("span", {className: $pt.LayoutHelper.classSet(iconCSS)});
+					}
+					return (React.createElement("li", {className: $pt.LayoutHelper.classSet(css)}, 
+						React.createElement("a", {href: "javascript:void(0);", onClick: click}, 
+							icon, " ", card.getLabel(), 
+							_this.renderBadge(card)
+						)
+					));
+				})
+			));
+		},
+		/**
+		 * render cards
+		 * @returns {[XML]}
+		 */
+		renderCards: function () {
+			var cards = this.getLayout().getCards();
+			if (cards.length == 1) {
+				// no card needs
+				return this.renderCard(cards[0], false);
+			} else {
+				// cards need
+				var _this = this;
+				this.initActiveCard();
+				var nodes = [];
+				nodes.push(this.renderWizards());
+				var index = 0;
+				cards.forEach(function (card) {
+					nodes.push(_this.renderCard(card, true, index));
+					index++;
+				});
+				return nodes;
+			}
+		},
+		/**
+		 * initialize active card
+		 */
+		initActiveCard: function () {
+			if (this.state.activeCard != null) {
+				return;
+			}
+			var _this = this;
+			var cards = this.getLayout().getCards();
+			cards.forEach(function (card) {
+				if (card.isActive()) {
+					_this.state.activeCard = card.getId();
+				}
+			});
+			if (!this.state.activeCard) {
+				// no card active, set first card as active
+				this.state.activeCard = cards[0].getId();
+			}
+		},
+		/**
+		 * render
+		 * @returns {XML}
+		 */
+		render: function () {
+			var css = {
+				'n-form': true
+			};
+			if (this.props.className) {
+				css[this.props.className] = true;
+			}
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, this.renderCards()));
+		},
+		/**
+		 * on model changed
+		 * @param evt
+		 */
+		onModelChanged: function (evt) {
+			this.forceUpdate();
+		},
+		/**
+		 * on previous clicked
+		 */
+		onPreviousClicked: function () {
+			var activeIndex = this.getActiveCardIndex();
+			var prevCard = this.getLayout().getCards()[activeIndex - 1];
+			if (prevCard.isBackable()) {
+				this.setState({
+					activeCard: prevCard.getId()
 				});
 			}
-			cell.comp.editLayout = section.getCells();
-			layout[_this.getSectionKey(section)] = cell;
-		});
-		var sectionLayout = {
-			comp: {
-				type: $pt.ComponentConstants.Panel,
-				editLayout: layout
-			},
-			pos: {
-				width: 12
-			}
-		};
-		return React.createElement(NPanel, {model: this.getModel(), 
-		               layout: $pt.createCellLayout(sections[0].getParentCard().getId() + '-body', sectionLayout), 
-		               direction: this.props.direction});
-	},
-	/**
-	 * attach previous button
-	 * @param left
-	 * @param card
-	 */
-	attachPreviousButton: function (left, card) {
-		if (this.getLayout().isCardButtonShown()) {
-			// add default previous
-			if (this.isPreviousCardBackable(card.getId())) {
-				left.splice(0, 0, this.state.previous);
-			} else {
-				left.splice(0, 0, $.extend({
-					enabled: false
-				}, this.state.previous));
-			}
-		}
-	},
-	/**
-	 * attach next button
-	 * @param right {{}[]} right buttons definition
-	 */
-	attachNextButton: function (right) {
-		if (this.getLayout().isCardButtonShown()) {
-			right.push(this.state.next);
-		}
-	},
-	/**
-	 * wrap custom button
-	 * @param button {{successCallback: string, click: function}}
-	 * @returns {{}}
-	 */
-	wrapCustomButton: function (button) {
-		var _this = this;
-		var newButton = $.extend({}, button);
-		if (button.successCallback === 'next') {
-			newButton.click = function (model) {
-				if (button.click.call(_this, model)) {
-					_this.onNextClicked();
-				}
-			};
-		} else if (button.successCallback === 'prev') {
-			newButton.click = function (model) {
-				if (button.click.call(_this, model)) {
-					_this.onPreviousClicked();
-				}
-			};
-		} else if (button.successCallback === 'return') {
-			newButton.click = function (model) {
-				var cardId = button.click.call(_this, model);
-				if (typeof cardId === 'string') {
-					_this.jumpToCard(cardId);
-				}
-			};
-		}
-		return newButton;
-	},
-	/**
-	 * wrap custom buttons
-	 * @param buttons
-	 * @returns {{}[]}
-	 */
-	wrapCustomButtons: function (buttons) {
-		if (buttons == null) {
-			return null;
-		} else if (Array.isArray(buttons)) {
-			var _this = this;
-			return buttons.map(function (button) {
-				return _this.wrapCustomButton(button);
-			});
-		} else {
-			return [this.wrapCustomButton(buttons)];
-		}
-	},
-	/**
-	 * render card
-	 * @param card {CardLayout}
-	 * @param isCards {boolean}
-	 * @param index {number}
-	 * @returns {XML}
-	 */
-	renderCard: function (card, isCards, index) {
-		var css = {
-			'n-card': true
-		};
-		var right = [];
-		right.push.apply(right, this.wrapCustomButtons(card.getRightButtons()));
-		var left = [];
-		left.push.apply(left, this.wrapCustomButtons(card.getLeftButtons()));
-		var footer = null;
-		if (isCards) {
-			css['n-card-active'] = card.getId() == this.state.activeCard;
-			if (index == 0) {
-				// first card
-				this.attachNextButton(right);
-			} else if (index == this.props.layout.getCards().length - 1) {
-				// last card
-				this.attachPreviousButton(left, card);
-				var finishButton = card.getFinishButton();
-				if (finishButton) {
-					right.push(finishButton);
-				}
-			} else {
-				// middle cards
-				this.attachPreviousButton(left, card);
-				this.attachNextButton(right);
-			}
-		} else {
-			// no cards, render sections directly
-			css['n-card-active'] = true;
-		}
-		if (right.length != 0 || left.length != 0) {
-			right = right.reverse();
-			footer = (React.createElement(NPanelFooter, {right: right, left: left, model: this.getModel()}));
-		}
-		return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
-			this.renderSections(card.getSections()), 
-			footer
-		));
-	},
-	/**
-	 * render badge
-	 * @param card
-	 * @returns {XML}
-	 */
-	renderBadge: function (card) {
-		if (card.hasBadge()) {
-			var badgeRender = card.getBadgeRender();
-			var badge = badgeRender ? badgeRender.call(this, this.getModel().get(card.getBadgeId()), this.getModel()) : this.getModel().get(card.getBadgeId());
-			return (React.createElement("span", {className: "badge"}, " ", badge));
-		} else {
-			return null;
-		}
-	},
-	/**
-	 * render card title
-	 * @returns {XML}
-	 */
-	renderWizards: function () {
-		var css = $pt.LayoutHelper.classSet({
-			'nav': true,
-			'nav-justified': true,
-			'nav-pills': true,
-			'nav-direction-vertical': false,
-			'n-cards-nav': true,
-			'n-cards-free': this.getLayout().isFreeCard()
-		});
-		var _this = this;
-		return (React.createElement("ul", {className: css}, 
-			this.getLayout().getCards().map(function (card) {
-				var css = {
-					active: card.getId() == _this.state.activeCard,
-					before: _this.isBeforeActiveCard(card.getId()),
-					after: _this.isAfterActiveCard(card.getId())
-				};
-				var click = null;
-				if (_this.getLayout().isFreeCard()) {
-					click = function () {
-						_this.jumpToCard(card.getId());
-					};
-				}
-				var icon = null;
-				if (card.getIcon() != null) {
-					var iconCSS = {
-						fa: true,
-						'fa-fw': true
-					};
-					iconCSS['fa-' + card.getIcon()] = true;
-					icon = React.createElement("span", {className: $pt.LayoutHelper.classSet(iconCSS)});
-				}
-				return (React.createElement("li", {className: $pt.LayoutHelper.classSet(css)}, 
-					React.createElement("a", {href: "javascript:void(0);", onClick: click}, 
-						icon, " ", card.getLabel(), 
-						_this.renderBadge(card)
-					)
-				));
-			})
-		));
-	},
-	/**
-	 * render cards
-	 * @returns {[XML]}
-	 */
-	renderCards: function () {
-		var cards = this.getLayout().getCards();
-		if (cards.length == 1) {
-			// no card needs
-			return this.renderCard(cards[0], false);
-		} else {
-			// cards need
-			var _this = this;
-			this.initActiveCard();
-			var nodes = [];
-			nodes.push(this.renderWizards());
-			var index = 0;
-			cards.forEach(function (card) {
-				nodes.push(_this.renderCard(card, true, index));
-				index++;
-			});
-			return nodes;
-		}
-	},
-	/**
-	 * initialize active card
-	 */
-	initActiveCard: function () {
-		if (this.state.activeCard != null) {
-			return;
-		}
-		var _this = this;
-		var cards = this.getLayout().getCards();
-		cards.forEach(function (card) {
-			if (card.isActive()) {
-				_this.state.activeCard = card.getId();
-			}
-		});
-		if (!this.state.activeCard) {
-			// no card active, set first card as active
-			this.state.activeCard = cards[0].getId();
-		}
-	},
-	/**
-	 * render
-	 * @returns {XML}
-	 */
-	render: function () {
-		return (React.createElement("div", {className: this.props.className}, this.renderCards()));
-	},
-	/**
-	 * on model changed
-	 * @param evt
-	 */
-	onModelChanged: function (evt) {
-		this.forceUpdate();
-	},
-	/**
-	 * on previous clicked
-	 */
-	onPreviousClicked: function () {
-		var activeIndex = this.getActiveCardIndex();
-		var prevCard = this.getLayout().getCards()[activeIndex - 1];
-		if (prevCard.isBackable()) {
+		},
+		/**
+		 * on next clicked
+		 */
+		onNextClicked: function () {
+			var activeIndex = this.getActiveCardIndex();
+			var nextCard = this.getLayout().getCards()[activeIndex + 1];
 			this.setState({
-				activeCard: prevCard.getId()
+				activeCard: nextCard.getId()
 			});
-		}
-	},
-	/**
-	 * on next clicked
-	 */
-	onNextClicked: function () {
-		var activeIndex = this.getActiveCardIndex();
-		var nextCard = this.getLayout().getCards()[activeIndex + 1];
-		this.setState({
-			activeCard: nextCard.getId()
-		});
-		// }
-	},
-	/**
-	 * jump to card
-	 * @param cardId
-	 */
-	jumpToCard: function (cardId) {
-		this.setState({
-			activeCard: cardId
-		});
-	},
-	/**
-	 * get active card index
-	 * @param cardId optional, use activeCard if no parameter
-	 * @return {number}
-	 */
-	getActiveCardIndex: function (cardId) {
-		var activeCardId = cardId ? cardId : this.state.activeCard;
-		var cards = this.getLayout().getCards();
-		var activeIndex = 0;
-		for (var index = 0, count = cards.length; index < count; index++) {
-			if (cards[index].getId() == activeCardId) {
-				activeIndex = index;
-				break;
+			// }
+		},
+		/**
+		 * jump to card
+		 * @param cardId
+		 */
+		jumpToCard: function (cardId) {
+			this.setState({
+				activeCard: cardId
+			});
+		},
+		/**
+		 * get active card index
+		 * @param cardId optional, use activeCard if no parameter
+		 * @return {number}
+		 */
+		getActiveCardIndex: function (cardId) {
+			var activeCardId = cardId ? cardId : this.state.activeCard;
+			var cards = this.getLayout().getCards();
+			var activeIndex = 0;
+			for (var index = 0, count = cards.length; index < count; index++) {
+				if (cards[index].getId() == activeCardId) {
+					activeIndex = index;
+					break;
+				}
 			}
-		}
-		return activeIndex;
-	},
-	/**
-	 * get section key
-	 * @param section
-	 * @returns {string}
-	 */
-	getSectionKey: function (section) {
-		return section.getParentCard().getId() + '-' + section.getId();
-	},
-	/**
-	 * is previous card backable
-	 * @param cardId
-	 * @return {*}
-	 */
-	isPreviousCardBackable: function (cardId) {
-		if (this.getLayout().isFreeCard()) {
-			return true;
-		}
+			return activeIndex;
+		},
+		/**
+		 * get section key
+		 * @param section
+		 * @returns {string}
+		 */
+		getSectionKey: function (section) {
+			return section.getParentCard().getId() + '-' + section.getId();
+		},
+		/**
+		 * is previous card backable
+		 * @param cardId
+		 * @return {*}
+		 */
+		isPreviousCardBackable: function (cardId) {
+			if (this.getLayout().isFreeCard()) {
+				return true;
+			}
 
-		var index = this.getActiveCardIndex(cardId);
-		var cards = this.getLayout().getCards();
-		return cards[index - 1].isBackable();
-	},
-	/**
-	 * check the given card is before active card or not
-	 * @param cardId
-	 * @returns {boolean}
-	 */
-	isAfterActiveCard: function (cardId) {
-		return this.getActiveCardIndex(cardId) - this.getActiveCardIndex() > 0;
-	},
-	/**
-	 * check the given card is after active card or not
-	 * @param cardId
-	 * @returns {boolean}
-	 */
-	isBeforeActiveCard: function (cardId) {
-		return this.getActiveCardIndex(cardId) - this.getActiveCardIndex() < 0;
-	},
-	/**
-	 * get model
-	 * @returns {*}
-	 */
-	getModel: function () {
-		return this.props.model;
-	},
-	/**
-	 * get layout
-	 * @returns {*}
-	 */
-	getLayout: function () {
-		return this.props.layout;
-	},
-	/**
-	 * get cell component, react class instance
-	 * @param key
-	 * @return {object}
-	 */
-	getCellComponent: function (key) {
-		var cell = this.refs[key];
-		if (cell) {
-			return cell.refs[key];
+			var index = this.getActiveCardIndex(cardId);
+			var cards = this.getLayout().getCards();
+			return cards[index - 1].isBackable();
+		},
+		/**
+		 * check the given card is before active card or not
+		 * @param cardId
+		 * @returns {boolean}
+		 */
+		isAfterActiveCard: function (cardId) {
+			return this.getActiveCardIndex(cardId) - this.getActiveCardIndex() > 0;
+		},
+		/**
+		 * check the given card is after active card or not
+		 * @param cardId
+		 * @returns {boolean}
+		 */
+		isBeforeActiveCard: function (cardId) {
+			return this.getActiveCardIndex(cardId) - this.getActiveCardIndex() < 0;
+		},
+		/**
+		 * get model
+		 * @returns {*}
+		 */
+		getModel: function () {
+			return this.props.model;
+		},
+		getLabelDirection: function() {
+			return this.props.direction ? this.props.direction : NForm.LABEL_DIRECTION;
+		},
+		/**
+		 * get layout
+		 * @returns {*}
+		 */
+		getLayout: function () {
+			return this.props.layout;
+		},
+		/**
+		 * get cell component, react class instance
+		 * @param key
+		 * @return {object}
+		 */
+		getCellComponent: function (key) {
+			var cell = this.refs[key];
+			if (cell) {
+				return cell.refs[key];
+			}
+			return null;
 		}
-		return null;
-	}
-});
+	});
+	context.NForm = NForm;
+}(this, jQuery, $pt));
 
 /**
  * Created by brad.wu on 9/10/2015.
  */
-var NFormButtonFooter = React.createClass($pt.defineCellComponent({
-	propTypes: {
-		// model
-		model: React.PropTypes.object,
-		// layout, FormLayout
-		layout: React.PropTypes.object
-	},
-	render: function () {
-		var buttonLayout = this.getButtonLayout();
-		return React.createElement(NPanelFooter, {model: this.props.model, 
-		                     save: buttonLayout.save, 
-		                     validate: buttonLayout.validate, 
-		                     cancel: buttonLayout.cancel, 
-		                     reset: buttonLayout.reset, 
-		                     left: buttonLayout.left, 
-		                     right: buttonLayout.right});
-	},
-	getButtonLayout: function () {
-		return this.getComponentOption('buttonLayout');
-	}
-}));
+(function (context, $, $pt) {
+	var NFormButtonFooter = React.createClass($pt.defineCellComponent({
+		propTypes: {
+			// model
+			model: React.PropTypes.object,
+			// layout, FormLayout
+			layout: React.PropTypes.object
+		},
+		render: function () {
+			var buttonLayout = this.getButtonLayout();
+			return React.createElement(NPanelFooter, {model: this.props.model, 
+			                     save: buttonLayout.save, 
+			                     validate: buttonLayout.validate, 
+			                     cancel: buttonLayout.cancel, 
+			                     reset: buttonLayout.reset, 
+			                     left: buttonLayout.left, 
+			                     right: buttonLayout.right});
+		},
+		getButtonLayout: function () {
+			return this.getComponentOption('buttonLayout');
+		}
+	}));
+	context.NFormButtonFooter = NFormButtonFooter;
+}(this, jQuery, $pt));
+
 /**
  * Created by brad.wu on 8/18/2015.
  * depends cell components which will be renderred in cell.
@@ -5398,460 +5468,463 @@ var NFormButtonFooter = React.createClass($pt.defineCellComponent({
  *      }
  * }
  */
-var NFormCell = React.createClass($pt.defineCellComponent({
-	statics: {
-		REQUIRED_ICON: 'asterisk',
-		TOOLTIP_ICON: 'question-circle',
-		LABEL_WIDTH: 4,
-		__componentRenderer: {},
-		registerComponentRenderer: function (type, func) {
-			NFormCell.__componentRenderer[type] = func;
-		},
-		getComponentRenderer: function (type) {
-			if (NFormCell.__componentRenderer[type] == null) {
-				if (NFormCell['__' + type] != null) {
-					NFormCell.registerComponentRenderer(type, NFormCell['__' + type]);
-					return NFormCell.getComponentRenderer(type);
+(function (context, $, $pt) {
+	var NFormCell = React.createClass($pt.defineCellComponent({
+		statics: {
+			REQUIRED_ICON: 'asterisk',
+			TOOLTIP_ICON: 'question-circle',
+			LABEL_WIDTH: 4,
+			__componentRenderer: {},
+			registerComponentRenderer: function (type, func) {
+				NFormCell.__componentRenderer[type] = func;
+			},
+			getComponentRenderer: function (type) {
+				if (NFormCell.__componentRenderer[type] == null) {
+					if (NFormCell['__' + type] != null) {
+						NFormCell.registerComponentRenderer(type, NFormCell['__' + type]);
+						return NFormCell.getComponentRenderer(type);
+					} else {
+						throw $pt.createComponentException($pt.ComponentConstants.Err_Unsupported_Component,
+							"Component type[" + type + "] is not supported yet.");
+					}
 				} else {
-					throw $pt.createComponentException($pt.ComponentConstants.Err_Unsupported_Component,
-						"Component type[" + type + "] is not supported yet.");
+					return NFormCell.__componentRenderer[type];
 				}
-			} else {
-				return NFormCell.__componentRenderer[type];
+			},
+			/**
+			 * render label
+			 * @returns {XML}
+			 * @private
+			 */
+			__label: function (model, layout) {
+				return React.createElement(NLabel, {model: model, layout: layout, ref: layout.getId()});
+			},
+			/**
+			 * render text input
+			 * @returns {XML}
+			 * @private
+			 */
+			__text: function (model, layout) {
+				return React.createElement(NText, {model: model, layout: layout, ref: layout.getId()});
+			},
+			/**
+			 * render text area
+			 * @returns {XML}
+			 * @private
+			 */
+			__textarea: function (model, layout) {
+				return React.createElement(NTextArea, {model: model, layout: layout, ref: layout.getId()});
+			},
+			/**
+			 * render checkbox
+			 * @returns {XML}
+			 * @private
+			 */
+			__check: function (model, layout) {
+				return React.createElement(NCheck, {model: model, layout: layout, ref: layout.getId()});
+			},
+			/**
+			 * render toggle button
+			 * @returns {XML}
+			 * @private
+			 */
+			__toggle: function (model, layout) {
+				return React.createElement(NToggle, {model: model, layout: layout, ref: layout.getId()});
+			},
+			/**
+			 * render radio
+			 * @returns {XML}
+			 * @private
+			 */
+			__radio: function (model, layout) {
+				return React.createElement(NRadio, {model: model, layout: layout, ref: layout.getId()});
+			},
+			/**
+			 * render datetime picker
+			 * @returns {XML}
+			 * @private
+			 */
+			__date: function (model, layout) {
+				return React.createElement(NDateTime, {model: model, layout: layout, ref: layout.getId()});
+			},
+			/**
+			 * render select
+			 * @returns {XML}
+			 * @private
+			 */
+			__select: function (model, layout) {
+				return React.createElement(NSelect, {model: model, layout: layout, ref: layout.getId()});
+			},
+			/**
+			 * render search text
+			 * @returns {XML}
+			 * @private
+			 */
+			__search: function (model, layout) {
+				return React.createElement(NSearchText, {model: model, layout: layout, ref: layout.getId()});
+			},
+			/**
+			 * render table
+			 * @returns {XML}
+			 * @private
+			 */
+			__table: function (model, layout) {
+				return React.createElement(NTable, {model: model, layout: layout, ref: layout.getId()});
+			},
+			/**
+			 * render tree
+			 * @returns {XML}
+			 * @private
+			 */
+			__tree: function (model, layout) {
+				return React.createElement(NTree, {model: model, layout: layout, ref: layout.getId()});
+			},
+			/**
+			 * render file
+			 * @return {XML}
+			 * @private
+			 */
+			__file: function (model, layout) {
+				return React.createElement(NFile, {model: model, layout: layout, ref: layout.getId()});
+			},
+			/**
+			 * render button
+			 * @returns {XML}
+			 * @private
+			 */
+			__button: function (model, layout) {
+				return React.createElement(NFormButton, {model: model, layout: layout, ref: layout.getId()});
+			},
+			/**
+			 * render tab
+			 * @returns {XML}
+			 * @private
+			 */
+			__tab: function (model, layout, direction) {
+				return React.createElement(NFormTab, {model: model, layout: layout, direction: direction, ref: layout.getId()});
+			},
+			/**
+			 * render array tab
+			 * @returns {XML}
+			 * @private
+			 */
+			__atab: function (model, layout, direction) {
+				return React.createElement(NArrayTab, {model: model, layout: layout, direction: direction, ref: layout.getId()});
+			},
+			/**
+			 * render panel
+			 * @returns {XML}
+			 * @private
+			 */
+			__panel: function (model, layout, direction) {
+				return React.createElement(NPanel, {model: model, layout: layout, direction: direction, ref: layout.getId()});
+			},
+			/**
+			 * render array panel
+			 * @returns {XML}
+			 * @private
+			 */
+			__apanel: function (model, layout, direction) {
+				return React.createElement(NArrayPanel, {model: model, layout: layout, direction: direction, ref: layout.getId()});
+			},
+			/**
+			 * render form
+			 * @returns {XML}
+			 * @private
+			 */
+			__form: function (model, layout, direction) {
+				var formLayout = $pt.createFormLayout(layout.getComponentOption('editLayout'));
+				return React.createElement(NForm, {model: model, layout: formLayout, direction: direction, ref: layout.getId()});
+			},
+			/**
+			 * render button footer
+			 * @returns {XML}
+			 * @private
+			 */
+			__buttonfooter: function (model, layout) {
+				return React.createElement(NFormButtonFooter, {model: model, layout: layout, ref: layout.getId()});
+			},
+			/**
+			 * render nothing
+			 * @returns {null}
+			 * @private
+			 */
+			__nothing: function () {
+				return null;
 			}
+		},
+		propTypes: {
+			// model, whole model, not only for this cell
+			// use id to get the value of this cell from model
+			model: React.PropTypes.object,
+			// CellLayout
+			layout: React.PropTypes.object,
+			direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
+		},
+		getDefaultProps: function () {
+			return {
+				defaultOptions: {
+					paintRequired: true
+				},
+				direction: 'vertical'
+			};
+		},
+		/**
+		 * will update
+		 * @param nextProps
+		 */
+		componentWillUpdate: function (nextProps) {
+			this.destroyPopover();
+			this.removePostChangeListener(this.onModelChanged);
+			this.removePostValidateListener(this.onModelValidateChanged);
+			this.removeVisibleDependencyMonitor();
+			this.removeEnableDependencyMonitor();
+		},
+		/**
+		 * did update
+		 * @param prevProps
+		 * @param prevState
+		 */
+		componentDidUpdate: function (prevProps, prevState) {
+			this.renderPopover();
+			this.addPostChangeListener(this.onModelChanged);
+			this.addPostValidateListener(this.onModelValidateChanged);
+			this.addVisibleDependencyMonitor();
+			this.addEnableDependencyMonitor();
+		},
+		/**
+		 * did mount
+		 */
+		componentDidMount: function () {
+			this.renderPopover();
+			this.addPostChangeListener(this.onModelChanged);
+			this.addPostValidateListener(this.onModelValidateChanged);
+			this.addVisibleDependencyMonitor();
+			this.addEnableDependencyMonitor();
+		},
+		/**
+		 * will unmount
+		 */
+		componentWillUnmount: function () {
+			this.destroyPopover();
+			this.removePostChangeListener(this.onModelChanged);
+			this.removePostValidateListener(this.onModelValidateChanged);
+			this.removeVisibleDependencyMonitor();
+			this.removeEnableDependencyMonitor();
+		},
+		destroyPopover: function () {
+			var comp = this.refs.comp;
+			if (comp != null) {
+				$(React.findDOMNode(comp)).popover("destroy");
+			}
+		},
+		/**
+		 * render error popover
+		 */
+		renderPopover: function () {
+			if (this.getLayout().getComponentType().popover !== false && this.getModel().hasError(this.getDataId())) {
+				var messages = this.getModel().getError(this.getDataId());
+				var _this = this;
+				var popover = {
+					placement: 'top',
+					trigger: 'hover',
+					html: true,
+					content: messages.map(function (msg) {
+						return "<span style='display:block'>" + msg.format([_this.getLayout().getLabel()]) + "</span>";
+					}),
+					// false is very import, since when destroy popover,
+					// the really destroy will be invoked by some delay,
+					// and before really destory invoked,
+					// the new popover is bind by componentDidUpdate method.
+					// and finally new popover will be destroyed.
+					animation: false
+				};
+
+				var comp = this.refs.comp;
+				if (comp != null) {
+					$(React.findDOMNode(comp)).popover(popover);
+				}
+			}
+		},
+		/**
+		 * render input component
+		 * @param componentDefinition
+		 */
+		renderInputComponent: function (componentDefinition) {
+			// always pass form model to component,
+			// since maybe getModel() returns inner model which defined with comp: {model: another}
+			var direction = this.props.direction ? this.props.direction : 'vertical';
+			if (componentDefinition.render) {
+				// user defined component
+				return componentDefinition.render.call(this, this.getFormModel(), this.getLayout(), direction);
+			}
+
+			// pre-defined components
+			var type = componentDefinition.type;
+			if (!type) {
+				type = "text";
+			}
+			return (React.createElement("div", {ref: "comp"}, 
+				NFormCell.getComponentRenderer(type).call(this, this.getFormModel(), this.getLayout(), direction)
+			));
 		},
 		/**
 		 * render label
 		 * @returns {XML}
-		 * @private
 		 */
-		__label: function (model, layout) {
-			return React.createElement(NLabel, {model: model, layout: layout, ref: layout.getId()});
-		},
-		/**
-		 * render text input
-		 * @returns {XML}
-		 * @private
-		 */
-		__text: function (model, layout) {
-			return React.createElement(NText, {model: model, layout: layout, ref: layout.getId()});
-		},
-		/**
-		 * render text area
-		 * @returns {XML}
-		 * @private
-		 */
-		__textarea: function (model, layout) {
-			return React.createElement(NTextArea, {model: model, layout: layout, ref: layout.getId()});
-		},
-		/**
-		 * render checkbox
-		 * @returns {XML}
-		 * @private
-		 */
-		__check: function (model, layout) {
-			return React.createElement(NCheck, {model: model, layout: layout, ref: layout.getId()});
-		},
-		/**
-		 * render toggle button
-		 * @returns {XML}
-		 * @private
-		 */
-		__toggle: function (model, layout) {
-			return React.createElement(NToggle, {model: model, layout: layout, ref: layout.getId()});
-		},
-		/**
-		 * render radio
-		 * @returns {XML}
-		 * @private
-		 */
-		__radio: function (model, layout) {
-			return React.createElement(NRadio, {model: model, layout: layout, ref: layout.getId()});
-		},
-		/**
-		 * render datetime picker
-		 * @returns {XML}
-		 * @private
-		 */
-		__date: function (model, layout) {
-			return React.createElement(NDateTime, {model: model, layout: layout, ref: layout.getId()});
-		},
-		/**
-		 * render select
-		 * @returns {XML}
-		 * @private
-		 */
-		__select: function (model, layout) {
-			return React.createElement(NSelect, {model: model, layout: layout, ref: layout.getId()});
-		},
-		/**
-		 * render search text
-		 * @returns {XML}
-		 * @private
-		 */
-		__search: function (model, layout) {
-			return React.createElement(NSearchText, {model: model, layout: layout, ref: layout.getId()});
-		},
-		/**
-		 * render table
-		 * @returns {XML}
-		 * @private
-		 */
-		__table: function (model, layout) {
-			return React.createElement(NTable, {model: model, layout: layout, ref: layout.getId()});
-		},
-		/**
-		 * render tree
-		 * @returns {XML}
-		 * @private
-		 */
-		__tree: function(model, layout) {
-			return React.createElement(NTree, {model: model, layout: layout, ref: layout.getId()});
-		},
-		/**
-		 * render file
-		 * @return {XML}
-		 * @private
-		 */
-		__file: function (model, layout) {
-			return React.createElement(NFile, {model: model, layout: layout, ref: layout.getId()});
-		},
-		/**
-		 * render button
-		 * @returns {XML}
-		 * @private
-		 */
-		__button: function (model, layout) {
-			return React.createElement(NFormButton, {model: model, layout: layout, ref: layout.getId()});
-		},
-		/**
-		 * render tab
-		 * @returns {XML}
-		 * @private
-		 */
-		__tab: function (model, layout, direction) {
-			return React.createElement(NFormTab, {model: model, layout: layout, direction: direction, ref: layout.getId()});
-		},
-		/**
-		 * render array tab
-		 * @returns {XML}
-		 * @private
-		 */
-		__atab: function (model, layout, direction) {
-			return React.createElement(NArrayTab, {model: model, layout: layout, direction: direction, ref: layout.getId()});
-		},
-		/**
-		 * render panel
-		 * @returns {XML}
-		 * @private
-		 */
-		__panel: function (model, layout, direction) {
-			return React.createElement(NPanel, {model: model, layout: layout, direction: direction, ref: layout.getId()});
-		},
-		/**
-		 * render array panel
-		 * @returns {XML}
-		 * @private
-		 */
-		__apanel: function (model, layout, direction) {
-			return React.createElement(NArrayPanel, {model: model, layout: layout, direction: direction, ref: layout.getId()});
-		},
-		/**
-		 * render form
-		 * @returns {XML}
-		 * @private
-		 */
-		__form: function (model, layout, direction) {
-			var formLayout = $pt.createFormLayout(layout.getComponentOption('editLayout'));
-			return React.createElement(NForm, {model: model, layout: formLayout, direction: direction, ref: layout.getId()});
-		},
-		/**
-		 * render button footer
-		 * @returns {XML}
-		 * @private
-		 */
-		__buttonfooter: function (model, layout) {
-			return React.createElement(NFormButtonFooter, {model: model, layout: layout, ref: layout.getId()});
-		},
-		/**
-		 * render nothing
-		 * @returns {null}
-		 * @private
-		 */
-		__nothing: function () {
-			return null;
-		}
-	},
-	propTypes: {
-		// model, whole model, not only for this cell
-		// use id to get the value of this cell from model
-		model: React.PropTypes.object,
-		// CellLayout
-		layout: React.PropTypes.object,
-		direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
-	},
-	getDefaultProps: function () {
-		return {
-			defaultOptions: {
-				paintRequired: true
-			},
-			direction: 'vertical'
-		};
-	},
-	/**
-	 * will update
-	 * @param nextProps
-	 */
-	componentWillUpdate: function (nextProps) {
-		this.destroyPopover();
-		this.removePostChangeListener(this.onModelChanged);
-		this.removePostValidateListener(this.onModelValidateChanged);
-		this.removeVisibleDependencyMonitor();
-		this.removeEnableDependencyMonitor();
-	},
-	/**
-	 * did update
-	 * @param prevProps
-	 * @param prevState
-	 */
-	componentDidUpdate: function (prevProps, prevState) {
-		this.renderPopover();
-		this.addPostChangeListener(this.onModelChanged);
-		this.addPostValidateListener(this.onModelValidateChanged);
-		this.addVisibleDependencyMonitor();
-		this.addEnableDependencyMonitor();
-	},
-	/**
-	 * did mount
-	 */
-	componentDidMount: function () {
-		this.renderPopover();
-		this.addPostChangeListener(this.onModelChanged);
-		this.addPostValidateListener(this.onModelValidateChanged);
-		this.addVisibleDependencyMonitor();
-		this.addEnableDependencyMonitor();
-	},
-	/**
-	 * will unmount
-	 */
-	componentWillUnmount: function () {
-		this.destroyPopover();
-		this.removePostChangeListener(this.onModelChanged);
-		this.removePostValidateListener(this.onModelValidateChanged);
-		this.removeVisibleDependencyMonitor();
-		this.removeEnableDependencyMonitor();
-	},
-	destroyPopover: function () {
-		var comp = this.refs.comp;
-		if (comp != null) {
-			$(React.findDOMNode(comp)).popover("destroy");
-		}
-	},
-	/**
-	 * render error popover
-	 */
-	renderPopover: function () {
-		if (this.getLayout().getComponentType().popover !== false && this.getModel().hasError(this.getDataId())) {
-			var messages = this.getModel().getError(this.getDataId());
-			var _this = this;
-			var popover = {
-				placement: 'top',
-				trigger: 'hover',
-				html: true,
-				content: messages.map(function (msg) {
-					return "<span style='display:block'>" + msg.format([_this.getLayout().getLabel()]) + "</span>";
-				}),
-				// false is very import, since when destroy popover,
-				// the really destroy will be invoked by some delay,
-				// and before really destory invoked,
-				// the new popover is bind by componentDidUpdate method.
-				// and finally new popover will be destroyed.
-				animation: false
-			};
-
-			var comp = this.refs.comp;
-			if (comp != null) {
-				$(React.findDOMNode(comp)).popover(popover);
-			}
-		}
-	},
-	/**
-	 * render input component
-	 * @param componentDefinition
-	 */
-	renderInputComponent: function (componentDefinition) {
-		// always pass form model to component,
-		// since maybe getModel() returns inner model which defined with comp: {model: another}
-		var direction = this.props.direction ? this.props.direction : 'vertical';
-		if (componentDefinition.render) {
-			// user defined component
-			return componentDefinition.render.call(this, this.getFormModel(), this.getLayout(), direction);
-		}
-
-		// pre-defined components
-		var type = componentDefinition.type;
-		if (!type) {
-			type = "text";
-		}
-		return (React.createElement("div", {ref: "comp"}, 
-			NFormCell.getComponentRenderer(type).call(this, this.getFormModel(), this.getLayout(), direction)
-		));
-	},
-	/**
-	 * render label
-	 * @returns {XML}
-	 */
-	renderLabel: function () {
-		var requiredPaint = this.getComponentOption("paintRequired");
-		var requireIconCSS = {
-			fa: true,
-			'fa-fw': true,
-			required: true
-		};
-		requireIconCSS['fa-' + NFormCell.REQUIRED_ICON] = true;
-		var requiredLabel = requiredPaint && this.getModel().isRequired(this.getDataId()) ?
-			(React.createElement("span", {className: $pt.LayoutHelper.classSet(requireIconCSS)})) : null;
-		//var showColon = !this.getLayout().getLabel().endsWith('?')
-		//{showColon ? ':' : null}
-		var tooltip = this.getComponentOption('tooltip');
-		var tooltipIcon = null;
-		if (tooltip != null && !tooltip.isBlank()) {
-			var tooltipCSS = {
+		renderLabel: function () {
+			var requiredPaint = this.getComponentOption("paintRequired");
+			var requireIconCSS = {
 				fa: true,
 				'fa-fw': true,
-				'n-form-cell-tooltip': true
+				required: true
 			};
-			tooltipCSS['fa-' + NFormCell.TOOLTIP_ICON] = true;
-			tooltipIcon = React.createElement("span", {className: $pt.LayoutHelper.classSet(tooltipCSS), title: tooltip});
-		}
-		return (React.createElement("span", {className: this.getLayout().getLabelCSS(), onClick: this.onLabelClicked, ref: "label"}, 
+			requireIconCSS['fa-' + NFormCell.REQUIRED_ICON] = true;
+			var requiredLabel = requiredPaint && this.getModel().isRequired(this.getDataId()) ?
+				(React.createElement("span", {className: $pt.LayoutHelper.classSet(requireIconCSS)})) : null;
+			//var showColon = !this.getLayout().getLabel().endsWith('?')
+			//{showColon ? ':' : null}
+			var tooltip = this.getComponentOption('tooltip');
+			var tooltipIcon = null;
+			if (tooltip != null && !tooltip.isBlank()) {
+				var tooltipCSS = {
+					fa: true,
+					'fa-fw': true,
+					'n-form-cell-tooltip': true
+				};
+				tooltipCSS['fa-' + NFormCell.TOOLTIP_ICON] = true;
+				tooltipIcon = React.createElement("span", {className: $pt.LayoutHelper.classSet(tooltipCSS), title: tooltip});
+			}
+			return (React.createElement("span", {className: this.getLayout().getLabelCSS(), onClick: this.onLabelClicked, ref: "label"}, 
 			this.getLayout().getLabel(), 
-			tooltipIcon, 
-			requiredLabel
+				tooltipIcon, 
+				requiredLabel
 		));
-	},
-	/**
-	 * render
-	 * @returns {XML}
-	 */
-	render: function () {
-		if (!this.isVisible()) {
-			return (React.createElement("div", {className: this.getCSSClassName() + ' n-form-cell-invisible'}));
-		} else {
-			var css = this.getCSSClassName();
-			if (this.getModel().hasError(this.getDataId())) {
-				css += " has-error";
-			}
-			if (!this.isEnabled()) {
-				css += ' n-form-cell-disabled';
-			}
-			// read component definition
-			var type = this.getLayout().getComponentType();
-			if (type.label === false) {
-				return (React.createElement("div", {className: css, ref: "div"}, 
-					this.renderInputComponent(type)
-				));
+		},
+		/**
+		 * render
+		 * @returns {XML}
+		 */
+		render: function () {
+			if (!this.isVisible()) {
+				return (React.createElement("div", {className: this.getCSSClassName() + ' n-form-cell-invisible'}));
 			} else {
-				var labelDirection = this.getComponentOption("labelDirection");
-				if (labelDirection == null) {
-					labelDirection = this.props.direction ? this.props.direction : 'vertical';
+				var css = this.getCSSClassName();
+				if (this.getModel().hasError(this.getDataId())) {
+					css += " has-error";
 				}
-				if (labelDirection != 'vertical') {
-					return (React.createElement("div", {className: css + ' horizontal-label', ref: "div"}, 
-						React.createElement("div", {className: "row"}, 
-							React.createElement("div", {className: this.getHorizontalLabelCSS()}, 
-								this.renderLabel()
-							), 
-							React.createElement("div", {className: this.getHorizontalComponentCSS()}, 
-								this.renderInputComponent(type)
-							)
-						)
-					));
-				} else {
-					return (React.createElement("div", {className: css + ' vertical-label', ref: "div"}, 
-						this.renderLabel(), 
+				if (!this.isEnabled()) {
+					css += ' n-form-cell-disabled';
+				}
+				// read component definition
+				var type = this.getLayout().getComponentType();
+				if (type.label === false) {
+					return (React.createElement("div", {className: css, ref: "div"}, 
 						this.renderInputComponent(type)
 					));
+				} else {
+					var labelDirection = this.getComponentOption("labelDirection");
+					if (labelDirection == null) {
+						labelDirection = this.props.direction ? this.props.direction : 'vertical';
+					}
+					if (labelDirection != 'vertical') {
+						return (React.createElement("div", {className: css + ' horizontal-label', ref: "div"}, 
+							React.createElement("div", {className: "row"}, 
+								React.createElement("div", {className: this.getHorizontalLabelCSS()}, 
+									this.renderLabel()
+								), 
+								React.createElement("div", {className: this.getHorizontalComponentCSS()}, 
+									this.renderInputComponent(type)
+								)
+							)
+						));
+					} else {
+						return (React.createElement("div", {className: css + ' vertical-label', ref: "div"}, 
+							this.renderLabel(), 
+							this.renderInputComponent(type)
+						));
+					}
 				}
 			}
-		}
-	},
-	/**
-	 * on model change
-	 * @param evt
-	 */
-	onModelChanged: function (evt) {
-		this.getModel().validate(evt.id);
-	},
-	/**
-	 * on model validate change
-	 * @param evt not used
-	 */
-	onModelValidateChanged: function (evt) {
-		// TODO maybe will introduce performance issue, cannot sure now.
-		// this.forceUpdate();
-		var div;
-		if (this.getModel().hasError(this.getDataId())) {
-			this.renderPopover();
-			div = this.refs.div;
-			if (div != null) {
-				$(React.findDOMNode(div)).addClass('has-error');
+		},
+		/**
+		 * on model change
+		 * @param evt
+		 */
+		onModelChanged: function (evt) {
+			this.getModel().validate(evt.id);
+		},
+		/**
+		 * on model validate change
+		 * @param evt not used
+		 */
+		onModelValidateChanged: function (evt) {
+			// TODO maybe will introduce performance issue, cannot sure now.
+			// this.forceUpdate();
+			var div;
+			if (this.getModel().hasError(this.getDataId())) {
+				this.renderPopover();
+				div = this.refs.div;
+				if (div != null) {
+					$(React.findDOMNode(div)).addClass('has-error');
+				}
+			} else {
+				this.destroyPopover();
+				div = this.refs.div;
+				if (div != null) {
+					$(React.findDOMNode(div)).removeClass('has-error');
+				}
 			}
-		} else {
-			this.destroyPopover();
-			div = this.refs.div;
-			if (div != null) {
-				$(React.findDOMNode(div)).removeClass('has-error');
+		},
+		/**
+		 * on label clicked
+		 */
+		onLabelClicked: function () {
+			$(React.findDOMNode(this.refs.comp)).focus();
+		},
+		/**
+		 * get css class
+		 * @returns {string}
+		 */
+		getCSSClassName: function () {
+			var width = this.getLayout().getWidth();
+			var css = {
+				'n-form-cell': true
+			};
+			if (typeof width === 'number') {
+				css['col-sm-' + width] = true;
+				css['col-md-' + width] = true;
+				css['col-lg-' + width] = true;
+			} else {
+				css['col-sm-' + (width.sm ? width.sm : width.width)] = true;
+				css['col-md-' + (width.md ? width.md : width.width)] = true;
+				css['col-lg-' + (width.lg ? width.lg : width.width)] = true;
 			}
+			return this.getLayout().getCellCSS($pt.LayoutHelper.classSet(css));
+		},
+		/**
+		 * get label css when horizontal direction
+		 * @returns {string}
+		 */
+		getHorizontalLabelCSS: function () {
+			var width = this.getHorizontalLabelWidth();
+			return "col-sm-" + width + " col-md-" + width + " col-lg-" + width;
+		},
+		/**
+		 * get component css when horizontal direction
+		 * @returns {string}
+		 */
+		getHorizontalComponentCSS: function () {
+			var width = 12 - this.getHorizontalLabelWidth();
+			return "col-sm-" + width + " col-md-" + width + " col-lg-" + width;
+		},
+		getHorizontalLabelWidth: function () {
+			var width = this.getComponentOption('labelWidth');
+			return width ? width : NFormCell.LABEL_WIDTH;
 		}
-	},
-	/**
-	 * on label clicked
-	 */
-	onLabelClicked: function () {
-		$(React.findDOMNode(this.refs.comp)).focus();
-	},
-	/**
-	 * get css class
-	 * @returns {string}
-	 */
-	getCSSClassName: function () {
-		var width = this.getLayout().getWidth();
-		var css = {
-			'n-form-cell': true
-		};
-		if (typeof width === 'number') {
-			css['col-sm-' + width] = true;
-			css['col-md-' + width] = true;
-			css['col-lg-' + width] = true;
-		} else {
-			css['col-sm-' + (width.sm ? width.sm : width.width)] = true;
-			css['col-md-' + (width.md ? width.md : width.width)] = true;
-			css['col-lg-' + (width.lg ? width.lg : width.width)] = true;
-		}
-		return this.getLayout().getCellCSS($pt.LayoutHelper.classSet(css));
-	},
-	/**
-	 * get label css when horizontal direction
-	 * @returns {string}
-	 */
-	getHorizontalLabelCSS: function () {
-		var width = this.getHorizontalLabelWidth();
-		return "col-sm-" + width + " col-md-" + width + " col-lg-" + width;
-	},
-	/**
-	 * get component css when horizontal direction
-	 * @returns {string}
-	 */
-	getHorizontalComponentCSS: function () {
-		var width = 12 - this.getHorizontalLabelWidth();
-		return "col-sm-" + width + " col-md-" + width + " col-lg-" + width;
-	},
-	getHorizontalLabelWidth: function () {
-		var width = this.getComponentOption('labelWidth');
-		return width ? width : NFormCell.LABEL_WIDTH;
-	}
-}));
+	}));
+	context.NFormCell = NFormCell;
+}(this, jQuery, $pt));
 
 /**
  * Created by brad.wu on 8/20/2015.
@@ -5890,605 +5963,622 @@ var NFormCell = React.createClass($pt.defineCellComponent({
  *      }
  * }
  */
-var NFormTab = React.createClass($pt.defineCellComponent({
-	propTypes: {
-		// model
-		model: React.PropTypes.object,
-		// CellLayout
-		layout: React.PropTypes.object,
-		direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
-	},
-	getDefaultProps: function () {
-		return {
-			defaultOptions: {
-				tabType: 'tab',
-				justified: false,
-				titleDirection: 'horizontal'
-			}
-		};
-	},
-	getInitialState: function () {
-		return {
-			activeTabIndex: null
-		};
-	},
-	/**
-	 * will update
-	 * @param nextProps
-	 */
-	componentWillUpdate: function (nextProps) {
-		var _this = this;
-		this.state.tabs.forEach(function (tab) {
-			if (tab.badgeId) {
-				_this.removeDependencyMonitor([tab.badgeId]);
-			}
-		});
-	},
-	/**
-	 * did update
-	 * @param prevProps
-	 * @param prevState
-	 */
-	componentDidUpdate: function (prevProps, prevState) {
-		var _this = this;
-		this.state.tabs.forEach(function (tab) {
-			if (tab.badgeId) {
-				_this.addDependencyMonitor([tab.badgeId]);
-			}
-		});
-	},
-	/**
-	 * did mount
-	 */
-	componentDidMount: function () {
-		var _this = this;
-		this.state.tabs.forEach(function (tab) {
-			if (tab.badgeId) {
-				_this.addDependencyMonitor([tab.badgeId]);
-			}
-		});
-	},
-	/**
-	 * will unmount
-	 */
-	componentWillUnmount: function () {
-		var _this = this;
-		this.state.tabs.forEach(function (tab) {
-			if (tab.badgeId) {
-				_this.removeDependencyMonitor([tab.badgeId]);
-			}
-		});
-	},
-	renderTabContent: function (layout, index) {
-		var activeIndex = this.getActiveTabIndex();
-		var css = {
-			'n-form-tab-card': true,
-			show: index == activeIndex,
-			hide: index != activeIndex
-		};
-		return (React.createElement(NForm, {model: this.getModel(), 
-		               layout: layout, 
-		               direction: this.props.direction, 
-		               className: $pt.LayoutHelper.classSet(css), 
-		               key: 'form-' + index}));
-	},
-	render: function () {
-		var tabs = this.getTabs();
-		return (React.createElement("div", {className: this.getComponentCSS('n-form-tab')}, 
-			React.createElement(NTab, {type: this.getComponentOption('tabType'), 
-			      justified: this.getComponentOption('justified'), 
-			      direction: this.getComponentOption('titleDirection'), 
-			      size: this.getComponentOption('titleIconSize'), 
-			      tabClassName: this.getAdditionalCSS('tabs'), 
-			      tabs: tabs, 
-			      canActive: this.getComponentOption('canActive'), 
-			      onActive: this.onTabClicked}), 
-
-			React.createElement("div", {className: "n-form-tab-content", ref: "content"}, 
-				this.getTabLayouts().map(this.renderTabContent)
-			)
-		));
-	},
-	getTabs: function () {
-		if (this.state.tabs == null) {
-			// clone from definition
-			this.state.tabs = this.getComponentOption('tabs').slice(0);
-		}
-		var _this = this;
-		this.state.tabs.forEach(function (tab) {
-			if (tab.badgeId) {
-				tab.badge = _this.getModel().get(tab.badgeId);
-				if (tab.badgeRender) {
-					tab.badge = tab.badgeRender.call(_this, tab.badge, _this.getModel());
+(function (context, $, $pt) {
+	var NFormTab = React.createClass($pt.defineCellComponent({
+		propTypes: {
+			// model
+			model: React.PropTypes.object,
+			// CellLayout
+			layout: React.PropTypes.object,
+			direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
+		},
+		getDefaultProps: function () {
+			return {
+				defaultOptions: {
+					tabType: 'tab',
+					justified: false,
+					titleDirection: 'horizontal'
 				}
-			}
-		});
-		return this.state.tabs;
-	},
-	/**
-	 * get tab layouts
-	 * @returns {FormLayout[]}
-	 */
-	getTabLayouts: function () {
-		return this.getTabs().map(function (tab) {
-			return $pt.createFormLayout(tab.layout || tab.editLayout);
-		});
-	},
-	/**
-	 * on tab clicked
-	 * @param tabValue {string} tab value
-	 * @param index {number}
-	 */
-	onTabClicked: function (tabValue, index) {
-		this.setState({
-			activeTabIndex: index
-		});
-		var onActive = this.getComponentOption('onActive');
-		if (onActive) {
-			onActive.call(this, tabValue, index);
-		}
-	},
-	/**
-	 * get active tab index
-	 * @returns {number}
-	 */
-	getActiveTabIndex: function () {
-		if (this.state.activeTabIndex == null) {
-			// get initial active tab index, or 0 if not set
+			};
+		},
+		getInitialState: function () {
+			return {
+				activeTabIndex: null
+			};
+		},
+		/**
+		 * will update
+		 * @param nextProps
+		 */
+		componentWillUpdate: function (nextProps) {
 			var _this = this;
-			this.state.activeTabIndex = 0;
-			this.getComponentOption('tabs').forEach(function (tab, index) {
-				if (tab.active === true) {
-					_this.state.activeTabIndex = index;
+			this.state.tabs.forEach(function (tab) {
+				if (tab.badgeId) {
+					_this.removeDependencyMonitor([tab.badgeId]);
 				}
 			});
+		},
+		/**
+		 * did update
+		 * @param prevProps
+		 * @param prevState
+		 */
+		componentDidUpdate: function (prevProps, prevState) {
+			var _this = this;
+			this.state.tabs.forEach(function (tab) {
+				if (tab.badgeId) {
+					_this.addDependencyMonitor([tab.badgeId]);
+				}
+			});
+		},
+		/**
+		 * did mount
+		 */
+		componentDidMount: function () {
+			var _this = this;
+			this.state.tabs.forEach(function (tab) {
+				if (tab.badgeId) {
+					_this.addDependencyMonitor([tab.badgeId]);
+				}
+			});
+		},
+		/**
+		 * will unmount
+		 */
+		componentWillUnmount: function () {
+			var _this = this;
+			this.state.tabs.forEach(function (tab) {
+				if (tab.badgeId) {
+					_this.removeDependencyMonitor([tab.badgeId]);
+				}
+			});
+		},
+		renderTabContent: function (layout, index) {
+			var activeIndex = this.getActiveTabIndex();
+			var css = {
+				'n-form-tab-card': true,
+				show: index == activeIndex,
+				hide: index != activeIndex
+			};
+			return (React.createElement(NForm, {model: this.getModel(), 
+			               layout: layout, 
+			               direction: this.props.direction, 
+			               className: $pt.LayoutHelper.classSet(css), 
+			               key: 'form-' + index}));
+		},
+		render: function () {
+			var tabs = this.getTabs();
+			return (React.createElement("div", {className: this.getComponentCSS('n-form-tab')}, 
+				React.createElement(NTab, {type: this.getComponentOption('tabType'), 
+				      justified: this.getComponentOption('justified'), 
+				      direction: this.getComponentOption('titleDirection'), 
+				      size: this.getComponentOption('titleIconSize'), 
+				      tabClassName: this.getAdditionalCSS('tabs'), 
+				      tabs: tabs, 
+				      canActive: this.getComponentOption('canActive'), 
+				      onActive: this.onTabClicked}), 
+
+				React.createElement("div", {className: "n-form-tab-content", ref: "content"}, 
+					this.getTabLayouts().map(this.renderTabContent)
+				)
+			));
+		},
+		getTabs: function () {
+			if (this.state.tabs == null) {
+				// clone from definition
+				this.state.tabs = this.getComponentOption('tabs').slice(0);
+			}
+			var _this = this;
+			this.state.tabs.forEach(function (tab) {
+				if (tab.badgeId) {
+					tab.badge = _this.getModel().get(tab.badgeId);
+					if (tab.badgeRender) {
+						tab.badge = tab.badgeRender.call(_this, tab.badge, _this.getModel());
+					}
+				}
+			});
+			return this.state.tabs;
+		},
+		/**
+		 * get tab layouts
+		 * @returns {FormLayout[]}
+		 */
+		getTabLayouts: function () {
+			return this.getTabs().map(function (tab) {
+				return $pt.createFormLayout(tab.layout || tab.editLayout);
+			});
+		},
+		/**
+		 * on tab clicked
+		 * @param tabValue {string} tab value
+		 * @param index {number}
+		 */
+		onTabClicked: function (tabValue, index) {
+			this.setState({
+				activeTabIndex: index
+			});
+			var onActive = this.getComponentOption('onActive');
+			if (onActive) {
+				onActive.call(this, tabValue, index);
+			}
+		},
+		/**
+		 * get active tab index
+		 * @returns {number}
+		 */
+		getActiveTabIndex: function () {
+			if (this.state.activeTabIndex == null) {
+				// get initial active tab index, or 0 if not set
+				var _this = this;
+				this.state.activeTabIndex = 0;
+				this.getComponentOption('tabs').forEach(function (tab, index) {
+					if (tab.active === true) {
+						_this.state.activeTabIndex = index;
+					}
+				});
+			}
+			return this.state.activeTabIndex;
 		}
-		return this.state.activeTabIndex;
-	}
-}));
+	}));
+	context.NFormTab = NFormTab;
+}(this, jQuery, $pt));
 
 /**
  * icon based on font-awesome
  */
-var NIcon = React.createClass({displayName: "NIcon",
-	propTypes: {
-		size: React.PropTypes.oneOf(["lg", "2x", "3x", "4x", "5x"]),
-		fixWidth: React.PropTypes.bool,
+(function (context, $, $pt) {
+	var NIcon = React.createClass({displayName: "NIcon",
+		propTypes: {
+			size: React.PropTypes.oneOf(["lg", "2x", "3x", "4x", "5x"]),
+			fixWidth: React.PropTypes.bool,
 
-		icon: React.PropTypes.string.isRequired,
-		spin: React.PropTypes.bool,
-		pulse: React.PropTypes.bool,
-		rotate: React.PropTypes.oneOf([90, 180, 270]),
-		flip: React.PropTypes.oneOf(["h", "v"]),
-		iconClassName: React.PropTypes.string,
+			icon: React.PropTypes.string.isRequired,
+			spin: React.PropTypes.bool,
+			pulse: React.PropTypes.bool,
+			rotate: React.PropTypes.oneOf([90, 180, 270]),
+			flip: React.PropTypes.oneOf(["h", "v"]),
+			iconClassName: React.PropTypes.string,
 
-		backIcon: React.PropTypes.string,
-		backSpin: React.PropTypes.bool,
-		backPulse: React.PropTypes.bool,
-		backRotate: React.PropTypes.oneOf([90, 180, 270]),
-		backFlip: React.PropTypes.oneOf(["h", "v"]),
-		backClassName: React.PropTypes.string,
+			backIcon: React.PropTypes.string,
+			backSpin: React.PropTypes.bool,
+			backPulse: React.PropTypes.bool,
+			backRotate: React.PropTypes.oneOf([90, 180, 270]),
+			backFlip: React.PropTypes.oneOf(["h", "v"]),
+			backClassName: React.PropTypes.string,
 
-		tooltip: React.PropTypes.string
-	},
-	getDefaultProps: function () {
-		return {
-			fixWidth: false,
-			spin: false
-		};
-	},
-	/**
-	 * get size
-	 * @returns {*}
-	 */
-	getSize: function () {
-		var size = {
-			"fa-lg": this.props.size === "lg",
-			"fa-2x": this.props.size === "2x",
-			"fa-3x": this.props.size === "3x",
-			"fa-4x": this.props.size === "4x",
-			"fa-5x": this.props.size === "5x",
-			"fa-fw": this.props.fixWidth
-		};
-		if (this.props.size) {
-			size['fa-' + this.props.size] = true;
-		}
-		return size;
-	},
-	/**
-	 * get icon
-	 * @returns {*}
-	 */
-	getIcon: function () {
-		var c = {
-			"fa": true,
-			"fa-spin": this.props.spin,
-			"fa-pulse": this.props.pulse,
-			"fa-rotate-90": this.props.rotate == 90,
-			"fa-rotate-180": this.props.rotate == 180,
-			"fa-rotate-270": this.props.rotate == 270,
-			"fa-flip-horizontal": this.props.flip === "h",
-			"fa-flip-vertical": this.props.flip === "v"
-		};
-		c["fa-" + this.props.icon] = true;
-		if (this.props.iconClassName) {
-			c[this.props.iconClassName] = true;
-		}
-		return c;
-	},
-	/**
-	 * get background icon
-	 * @returns {*}
-	 */
-	getBackIcon: function () {
-		var c = {
-			"fa": true,
-			"fa-spin": this.props.backSpin,
-			"fa-pulse": this.props.backPulse,
-			"fa-rotate-90": this.props.backRotate == 90,
-			"fa-rotate-180": this.props.backRotate == 180,
-			"fa-rotate-270": this.props.backRotate == 270,
-			"fa-flip-horizontal": this.props.backFlip === "h",
-			"fa-flip-vertical": this.props.backFlip === "v"
-		};
-		c["fa-" + this.props.backIcon] = true;
-		if (this.props.backClassName) {
-			c[this.props.backClassName] = true;
-		}
-		return c;
-	},
-	/**
-	 * render
-	 * @returns {XML}
-	 */
-	render: function () {
-		var size = this.getSize();
-		var iconClasses = this.getIcon();
-		if (this.props.backIcon) {
-			size["fa-stack"] = true;
-			iconClasses['fa-stack-1x'] = true;
-			var backIconClasses = this.getBackIcon();
-			backIconClasses['fa-stack-2x'] = true;
-			return (React.createElement("span", {className: $pt.LayoutHelper.classSet(size), title: this.props.tooltip}, 
+			tooltip: React.PropTypes.string
+		},
+		getDefaultProps: function () {
+			return {
+				fixWidth: false,
+				spin: false
+			};
+		},
+		/**
+		 * get size
+		 * @returns {*}
+		 */
+		getSize: function () {
+			var size = {
+				"fa-lg": this.props.size === "lg",
+				"fa-2x": this.props.size === "2x",
+				"fa-3x": this.props.size === "3x",
+				"fa-4x": this.props.size === "4x",
+				"fa-5x": this.props.size === "5x",
+				"fa-fw": this.props.fixWidth
+			};
+			if (this.props.size) {
+				size['fa-' + this.props.size] = true;
+			}
+			return size;
+		},
+		/**
+		 * get icon
+		 * @returns {*}
+		 */
+		getIcon: function () {
+			var c = {
+				"fa": true,
+				"fa-spin": this.props.spin,
+				"fa-pulse": this.props.pulse,
+				"fa-rotate-90": this.props.rotate == 90,
+				"fa-rotate-180": this.props.rotate == 180,
+				"fa-rotate-270": this.props.rotate == 270,
+				"fa-flip-horizontal": this.props.flip === "h",
+				"fa-flip-vertical": this.props.flip === "v"
+			};
+			c["fa-" + this.props.icon] = true;
+			if (this.props.iconClassName) {
+				c[this.props.iconClassName] = true;
+			}
+			return c;
+		},
+		/**
+		 * get background icon
+		 * @returns {*}
+		 */
+		getBackIcon: function () {
+			var c = {
+				"fa": true,
+				"fa-spin": this.props.backSpin,
+				"fa-pulse": this.props.backPulse,
+				"fa-rotate-90": this.props.backRotate == 90,
+				"fa-rotate-180": this.props.backRotate == 180,
+				"fa-rotate-270": this.props.backRotate == 270,
+				"fa-flip-horizontal": this.props.backFlip === "h",
+				"fa-flip-vertical": this.props.backFlip === "v"
+			};
+			c["fa-" + this.props.backIcon] = true;
+			if (this.props.backClassName) {
+				c[this.props.backClassName] = true;
+			}
+			return c;
+		},
+		/**
+		 * render
+		 * @returns {XML}
+		 */
+		render: function () {
+			var size = this.getSize();
+			var iconClasses = this.getIcon();
+			if (this.props.backIcon) {
+				size["fa-stack"] = true;
+				iconClasses['fa-stack-1x'] = true;
+				var backIconClasses = this.getBackIcon();
+				backIconClasses['fa-stack-2x'] = true;
+				return (React.createElement("span", {className: $pt.LayoutHelper.classSet(size), title: this.props.tooltip}, 
                 React.createElement("i", {className: $pt.LayoutHelper.classSet(iconClasses)}), 
                 React.createElement("i", {className: $pt.LayoutHelper.classSet(backIconClasses)})
             ));
+			}
+			return React.createElement("span", {className: $pt.LayoutHelper.classSet($.extend(iconClasses, size)), 
+			             title: this.props.tooltip});
 		}
-		return React.createElement("span", {className: $pt.LayoutHelper.classSet($.extend(iconClasses, size)), title: this.props.tooltip});
-	}
-});
+	});
+	context.NIcon = NIcon;
+}(this, jQuery, $pt));
+
 /**
  * Jumbortron
  */
-var NJumbortron = React.createClass({displayName: "NJumbortron",
-	propTypes: {
-		highlightText: React.PropTypes.oneOfType(
-			React.PropTypes.string,
-			React.PropTypes.arrayOf(React.PropTypes.string)).isRequired
-	},
-	renderText: function () {
-		if (Array.isArray(this.props.highlightText)) {
-			return this.props.highlightText.map(function (text) {
-				return React.createElement("h4", null, text);
-			});
-		} else {
-			return React.createElement("h4", null, this.props.highlightText);
+(function (context, $, $pt) {
+	var NJumbortron = React.createClass({displayName: "NJumbortron",
+		propTypes: {
+			highlightText: React.PropTypes.oneOfType(
+				React.PropTypes.string,
+				React.PropTypes.arrayOf(React.PropTypes.string)).isRequired
+		},
+		renderText: function () {
+			if (Array.isArray(this.props.highlightText)) {
+				return this.props.highlightText.map(function (text) {
+					return React.createElement("h4", null, text);
+				});
+			} else {
+				return React.createElement("h4", null, this.props.highlightText);
+			}
+		},
+		render: function () {
+			return (
+				React.createElement("div", {className: "n-jumbotron jumbotron"}, 
+					this.renderText()
+				)
+			);
 		}
-	},
-	render: function () {
-		return (
-			React.createElement("div", {className: "n-jumbotron jumbotron"}, 
-				this.renderText()
-			)
-		);
-	}
-});
+	});
+	context.NJumbortron = NJumbortron;
+}(this, jQuery, $pt));
+
 /**
  * Created by brad.wu on 8/21/2015.
  */
-var NLabel = React.createClass($pt.defineCellComponent({
-	propTypes: {
-		// model
-		model: React.PropTypes.object,
-		// CellLayout
-		layout: React.PropTypes.object
-	},
-	getDefaultProps: function () {
-		return {
-			defaultOptions: {
-				textFromModel: true
-			}
-		};
-	},
-	/**
-	 * will update
-	 * @param nextProps
-	 */
-	componentWillUpdate: function (nextProps) {
-		// remove post change listener to handle model change
-		this.removePostChangeListener(this.__forceUpdate);
-		this.removeEnableDependencyMonitor();
-	},
-	/**
-	 * did update
-	 * @param prevProps
-	 * @param prevState
-	 */
-	componentDidUpdate: function (prevProps, prevState) {
-		// add post change listener to handle model change
-		this.addPostChangeListener(this.__forceUpdate);
-		this.addEnableDependencyMonitor();
-	},
-	/**
-	 * did mount
-	 */
-	componentDidMount: function () {
-		// add post change listener to handle model change
-		this.addPostChangeListener(this.__forceUpdate);
-		this.addEnableDependencyMonitor();
-	},
-	/**
-	 * will unmount
-	 */
-	componentWillUnmount: function () {
-		// remove post change listener to handle model change
-		this.removePostChangeListener(this.onModelChanged);
-		this.removeEnableDependencyMonitor();
-	},
-	render: function () {
-		var texts = this.getText();
-		if (!Array.isArray(texts)) {
-			var currency = this.getComponentOption('currency');
-			if (currency && texts != null && !(texts + '').isBlank()) {
-				var fraction = this.getComponentOption('fraction');
-				fraction = fraction ? fraction * 1 : 0;
-				texts = (texts + '').currencyFormat(fraction);
-			}
-			if (texts == null || (texts + '').isBlank()) {
-				texts = this.getComponentOption('replaceBlank') || this.getComponentOption('placeholder');
-			}
+(function (context, $, $pt) {
+	var NLabel = React.createClass($pt.defineCellComponent({
+		propTypes: {
+			// model
+			model: React.PropTypes.object,
+			// CellLayout
+			layout: React.PropTypes.object
+		},
+		getDefaultProps: function () {
+			return {
+				defaultOptions: {
+					textFromModel: true
+				}
+			};
+		},
+		/**
+		 * will update
+		 * @param nextProps
+		 */
+		componentWillUpdate: function (nextProps) {
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.__forceUpdate);
+			this.removeEnableDependencyMonitor();
+		},
+		/**
+		 * did update
+		 * @param prevProps
+		 * @param prevState
+		 */
+		componentDidUpdate: function (prevProps, prevState) {
+			// add post change listener to handle model change
+			this.addPostChangeListener(this.__forceUpdate);
+			this.addEnableDependencyMonitor();
+		},
+		/**
+		 * did mount
+		 */
+		componentDidMount: function () {
+			// add post change listener to handle model change
+			this.addPostChangeListener(this.__forceUpdate);
+			this.addEnableDependencyMonitor();
+		},
+		/**
+		 * will unmount
+		 */
+		componentWillUnmount: function () {
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.onModelChanged);
+			this.removeEnableDependencyMonitor();
+		},
+		render: function () {
+			var texts = this.getText();
+			if (!Array.isArray(texts)) {
+				var currency = this.getComponentOption('currency');
+				if (currency && texts != null && !(texts + '').isBlank()) {
+					var fraction = this.getComponentOption('fraction');
+					fraction = fraction ? fraction * 1 : 0;
+					texts = (texts + '').currencyFormat(fraction);
+				}
+				if (texts == null || (texts + '').isBlank()) {
+					texts = this.getComponentOption('replaceBlank') || this.getComponentOption('placeholder');
+				}
 
-			var left = this.getComponentOption('left');
-			var right = this.getComponentOption('right');
-			texts = left ? (left + texts) : texts;
-			texts = right ? (texts + right) : texts;
-			texts = [texts];
+				var left = this.getComponentOption('left');
+				var right = this.getComponentOption('right');
+				texts = left ? (left + texts) : texts;
+				texts = right ? (texts + right) : texts;
+				texts = [texts];
+			}
+			var css = {
+				'n-disabled': !this.isEnabled()
+			};
+			css[this.getComponentCSS('n-label')] = true;
+			var style = this.getComponentOption('style');
+			if (style) {
+				css['n-label-' + style] = true;
+			}
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
+				texts.map(function (text) {
+					return React.createElement("span", null, text);
+				})
+			));
+		},
+		getText: function () {
+			if (this.isTextFromModel()) {
+				return this.getValueFromModel();
+			} else {
+				return this.getLayout().getLabel();
+			}
+		},
+		isTextFromModel: function () {
+			return this.getComponentOption('textFromModel') !== false;
 		}
-		var css = {
-			'n-disabled': !this.isEnabled()
-		};
-		css[this.getComponentCSS('n-label')] = true;
-		var style = this.getComponentOption('style');
-		if (style) {
-			css['n-label-' + style] = true;
-		}
-		return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
-			texts.map(function (text) {
-				return React.createElement("span", null, text);
-			})
-		));
-	},
-	getText: function () {
-		if (this.isTextFromModel()) {
-			return this.getValueFromModel();
-		} else {
-			return this.getLayout().getLabel();
-		}
-	},
-	isTextFromModel: function () {
-		return this.getComponentOption('textFromModel') !== false;
-	}
-}));
+	}));
+	context.NLabel = NLabel;
+}(this, jQuery, $pt));
+
 /**
  * modal confirm dialog
  * z-index is 9699 and 9698, less than exception dialog, on request dialog and code search dialog, more than any other.
  *
  * depends NFormButton
  */
-var NConfirm = React.createClass({displayName: "NConfirm",
-	statics: {
-		getConfirmModal: function (className) {
-			if ($pt.confirmDialog === undefined || $pt.confirmDialog === null) {
-				var confirmContainer = $("#confirm_modal_container");
-				if (confirmContainer.length == 0) {
-					$("<div id='confirm_modal_container' />").appendTo($(document.body));
+(function (context, $, $pt) {
+	var NConfirm = React.createClass({displayName: "NConfirm",
+		statics: {
+			getConfirmModal: function (className) {
+				if ($pt.confirmDialog === undefined || $pt.confirmDialog === null) {
+					var confirmContainer = $("#confirm_modal_container");
+					if (confirmContainer.length == 0) {
+						$("<div id='confirm_modal_container' />").appendTo($(document.body));
+					}
+					$pt.confirmDialog = React.render(React.createElement(NConfirm, {className: className}),
+						document.getElementById("confirm_modal_container"));
 				}
-				$pt.confirmDialog = React.render(React.createElement(NConfirm, {className: className}),
-					document.getElementById("confirm_modal_container"));
-			}
-			return $pt.confirmDialog;
+				return $pt.confirmDialog;
+			},
+			OK_TEXT: 'OK',
+			OK_ICON: 'check',
+			CLOSE_TEXT: 'Close',
+			CLOSE_ICON: 'ban',
+			CANCEL_TEXT: 'Cancel',
+			CANCEL_ICON: 'ban'
 		},
-		OK_TEXT: 'OK',
-		OK_ICON: 'check',
-		CLOSE_TEXT: 'Close',
-		CLOSE_ICON: 'ban',
-		CANCEL_TEXT: 'Cancel',
-		CANCEL_ICON: 'ban'
-	},
-	propTypes: {
-		className: React.PropTypes.string
-	},
-	getDefaultProps: function () {
-		return {};
-	},
-	getInitialState: function () {
-		return {
-			visible: false,
-			title: null,
-			options: null,
-			onConfirm: null
-		};
-	},
-	/**
-	 * set z-index
-	 */
-	setZIndex: function () {
-		var div = $(React.findDOMNode(this.refs.body)).closest(".modal");
-		if (div.length > 0) {
-			div.css({
-				"z-index": 9699
-			});
-			div.prev().css({
-				"z-index": 9698
-			});
-		}
-		document.body.style.paddingRight = 0;
-	},
-	/**
-	 * did update
-	 * @param prevProps
-	 * @param prevState
-	 */
-	componentDidUpdate: function (prevProps, prevState) {
-		this.setZIndex();
-	},
-	/**
-	 * did mount
-	 */
-	componentDidMount: function () {
-		this.setZIndex();
-	},
-	/**
-	 * render confirm button
-	 * @returns {XML}
-	 */
-	renderConfirmButton: function () {
-		if (this.state.options && this.state.options.disableConfirm) {
-			return null;
-		}
-		var layout = $pt.createCellLayout('pseudo-button', {
-			label: NConfirm.OK_TEXT,
-			comp: {
-				type: $pt.ComponentConstants.Button,
-				icon: NConfirm.OK_ICON,
-				style: 'primary',
-				click: this.onConfirmClicked.bind(this)
+		propTypes: {
+			className: React.PropTypes.string
+		},
+		getDefaultProps: function () {
+			return {};
+		},
+		getInitialState: function () {
+			return {
+				visible: false,
+				title: null,
+				options: null,
+				onConfirm: null
+			};
+		},
+		/**
+		 * set z-index
+		 */
+		setZIndex: function () {
+			var div = $(React.findDOMNode(this.refs.body)).closest(".modal");
+			if (div.length > 0) {
+				div.css({
+					"z-index": 9699
+				});
+				div.prev().css({
+					"z-index": 9698
+				});
 			}
-		});
-		return React.createElement(NFormButton, {layout: layout});
-	},
-	/**
-	 * render close button
-	 * @returns {XML}
-	 */
-	renderCloseButton: function () {
-		if (this.state.options && this.state.options.disableClose) {
-			return null;
-		}
-		var layout = $pt.createCellLayout('pseudo-button', {
-			label: (this.state.options && this.state.options.close) ? NConfirm.CLOSE_TEXT : NConfirm.CANCEL_TEXT,
-			comp: {
-				type: $pt.ComponentConstants.Button,
-				icon: (this.state.options && this.state.options.close) ? NConfirm.CLOSE_ICON : NConfirm.CANCEL_ICON,
-				style: 'danger',
-				click: this.onCancelClicked.bind(this)
+			document.body.style.paddingRight = 0;
+		},
+		/**
+		 * did update
+		 * @param prevProps
+		 * @param prevState
+		 */
+		componentDidUpdate: function (prevProps, prevState) {
+			this.setZIndex();
+		},
+		/**
+		 * did mount
+		 */
+		componentDidMount: function () {
+			this.setZIndex();
+		},
+		/**
+		 * render confirm button
+		 * @returns {XML}
+		 */
+		renderConfirmButton: function () {
+			if (this.state.options && this.state.options.disableConfirm) {
+				return null;
 			}
-		});
-		return React.createElement(NFormButton, {layout: layout});
-	},
-	/**
-	 * render footer
-	 * @returns {XML}
-	 */
-	renderFooter: function () {
-		if (this.state.options && this.state.options.disableButtons) {
-			return React.createElement("div", {className: "modal-footer-empty"});
-		}
-		return (React.createElement(Modal.Footer, null, 
-			this.renderCloseButton(), 
-			this.renderConfirmButton()
-		));
-	},
-	/**
-	 * render content
-	 */
-	renderContent: function () {
-		var messages = this.state.options;
-		if (typeof messages === "string") {
-			messages = [messages];
-		}
-		if (!Array.isArray(messages)) {
-			messages = messages.messages;
+			var layout = $pt.createCellLayout('pseudo-button', {
+				label: NConfirm.OK_TEXT,
+				comp: {
+					type: $pt.ComponentConstants.Button,
+					icon: NConfirm.OK_ICON,
+					style: 'primary',
+					click: this.onConfirmClicked.bind(this)
+				}
+			});
+			return React.createElement(NFormButton, {layout: layout});
+		},
+		/**
+		 * render close button
+		 * @returns {XML}
+		 */
+		renderCloseButton: function () {
+			if (this.state.options && this.state.options.disableClose) {
+				return null;
+			}
+			var layout = $pt.createCellLayout('pseudo-button', {
+				label: (this.state.options && this.state.options.close) ? NConfirm.CLOSE_TEXT : NConfirm.CANCEL_TEXT,
+				comp: {
+					type: $pt.ComponentConstants.Button,
+					icon: (this.state.options && this.state.options.close) ? NConfirm.CLOSE_ICON : NConfirm.CANCEL_ICON,
+					style: 'danger',
+					click: this.onCancelClicked.bind(this)
+				}
+			});
+			return React.createElement(NFormButton, {layout: layout});
+		},
+		/**
+		 * render footer
+		 * @returns {XML}
+		 */
+		renderFooter: function () {
+			if (this.state.options && this.state.options.disableButtons) {
+				return React.createElement("div", {className: "modal-footer-empty"});
+			}
+			return (React.createElement(Modal.Footer, null, 
+				this.renderCloseButton(), 
+				this.renderConfirmButton()
+			));
+		},
+		/**
+		 * render content
+		 */
+		renderContent: function () {
+			var messages = this.state.options;
 			if (typeof messages === "string") {
 				messages = [messages];
 			}
-		}
-		// string array
-		return messages.map(function (element) {
-			return React.createElement("h6", null, element);
-		});
-	},
-	/**
-	 * render
-	 * @returns {XML}
-	 */
-	render: function () {
-		if (!this.state.visible) {
-			return null;
-		}
-		var css = {
-			'n-confirm': true
-		};
-		if (this.props.className) {
-			css[this.props.className] = true;
-		}
-		return (React.createElement(Modal, {className: $pt.LayoutHelper.classSet(css), 
-		               bsStyle: "danger", backdrop: "static", 
-		               onHide: this.onCancelClicked}, 
-			React.createElement(Modal.Header, {closeButton: true}, 
-				React.createElement(Modal.Title, null, this.state.title)
-			), 
-			React.createElement(Modal.Body, {ref: "body"}, 
-				this.renderContent()
-			), 
-			this.renderFooter()
-		));
-	},
-	/**
-	 * hide dialog
-	 */
-	hide: function () {
-		this.setState({
-			visible: false,
-			title: null,
-			options: null,
-			onConfirm: null,
-			onCancel: null
-		});
-	},
-	/**
-	 * on confirm clicked
-	 */
-	onConfirmClicked: function () {
-		if (this.state.onConfirm) {
-			this.state.onConfirm.call(this);
-		}
-		this.hide();
-		if (this.state.afterClose) {
-			this.state.afterClose.call(this, 'confirm');
-		}
-	},
-	/**
-	 * on cancel clicked
-	 */
-	onCancelClicked: function () {
-		if (this.state.onCancel) {
-			this.state.onCancel.call(this);
-		}
-		this.hide();
-		if (this.state.afterClose) {
-			this.state.afterClose.call(this, 'cancel');
-		}
-	},
-	/**
-	 * show dialog
-	 *
-	 * from 0.0.3
-	 * all parameters should be pass to #show in first as a JSON object
-	 *
-	 * @param title deprecated title of dialog
-	 * @param options string or string array, or object as below.
-	 *          {
+			if (!Array.isArray(messages)) {
+				messages = messages.messages;
+				if (typeof messages === "string") {
+					messages = [messages];
+				}
+			}
+			// string array
+			return messages.map(function (element) {
+				return React.createElement("h6", null, element);
+			});
+		},
+		/**
+		 * render
+		 * @returns {XML}
+		 */
+		render: function () {
+			if (!this.state.visible) {
+				return null;
+			}
+			var css = {
+				'n-confirm': true
+			};
+			if (this.props.className) {
+				css[this.props.className] = true;
+			}
+			return (React.createElement(Modal, {className: $pt.LayoutHelper.classSet(css), 
+			               bsStyle: "danger", backdrop: "static", 
+			               onHide: this.onCancelClicked}, 
+				React.createElement(Modal.Header, {closeButton: true}, 
+					React.createElement(Modal.Title, null, this.state.title)
+				), 
+				React.createElement(Modal.Body, {ref: "body"}, 
+					this.renderContent()
+				), 
+				this.renderFooter()
+			));
+		},
+		/**
+		 * hide dialog
+		 */
+		hide: function () {
+			this.setState({
+				visible: false,
+				title: null,
+				options: null,
+				onConfirm: null,
+				onCancel: null
+			});
+		},
+		/**
+		 * on confirm clicked
+		 */
+		onConfirmClicked: function () {
+			if (this.state.onConfirm) {
+				this.state.onConfirm.call(this);
+			}
+			this.hide();
+			if (this.state.afterClose) {
+				this.state.afterClose.call(this, 'confirm');
+			}
+		},
+		/**
+		 * on cancel clicked
+		 */
+		onCancelClicked: function () {
+			if (this.state.onCancel) {
+				this.state.onCancel.call(this);
+			}
+			this.hide();
+			if (this.state.afterClose) {
+				this.state.afterClose.call(this, 'cancel');
+			}
+		},
+		/**
+		 * show dialog
+		 *
+		 * from 0.0.3
+		 * all parameters should be pass to #show in first as a JSON object
+		 *
+		 * @param title deprecated title of dialog
+		 * @param options string or string array, or object as below.
+		 *          {
 	 *              disableButtons: true, // hide button bar
 	 *              disableConfirm: true, // hide confirm button
 	 *              disableClose: true, // hide close button
@@ -6499,986 +6589,1189 @@ var NConfirm = React.createClass({displayName: "NConfirm",
 	 *              afterClose: function,
 	 *              title: string
 	 *          }
-	 * @param onConfirm deprecated callback function when confirm button clicked
-	 * @param onCancel deprecated callback function when cancel button clicked
-	 */
-	show: function (title, options, onConfirm, onCancel) {
-		$(':focus').blur();
-		var state;
-		if (typeof title === 'string') {
-			state = {
-				visible: true,
-				title: title,
-				options: options,
-				onConfirm: onConfirm,
-				onCancel: onCancel,
-				afterClose: options.afterClose
-			};
-		} else {
-			// for new API
-			options = title;
-			state = {
-				visible: true,
-				title: options.title,
-				options: {
-					disableButtons: options.disableButtons,
-					disableConfirm: options.disableConfirm,
-					disableClose: options.disableClose,
-					close: options.close,
-					messages: options.messages
-				},
-				onConfirm: options.onConfirm,
-				onCancel: options.onCancel,
-				afterClose: options.afterClose
-			};
+		 * @param onConfirm deprecated callback function when confirm button clicked
+		 * @param onCancel deprecated callback function when cancel button clicked
+		 */
+		show: function (title, options, onConfirm, onCancel) {
+			$(':focus').blur();
+			var state;
+			if (typeof title === 'string') {
+				state = {
+					visible: true,
+					title: title,
+					options: options,
+					onConfirm: onConfirm,
+					onCancel: onCancel,
+					afterClose: options.afterClose
+				};
+			} else {
+				// for new API
+				options = title;
+				state = {
+					visible: true,
+					title: options.title,
+					options: {
+						disableButtons: options.disableButtons,
+						disableConfirm: options.disableConfirm,
+						disableClose: options.disableClose,
+						close: options.close,
+						messages: options.messages
+					},
+					onConfirm: options.onConfirm,
+					onCancel: options.onCancel,
+					afterClose: options.afterClose
+				};
+			}
+			this.setState(state);
 		}
-		this.setState(state);
-	}
-});
+	});
+	context.NConfirm = NConfirm;
+}(this, jQuery, $pt));
+
 /**
  * modal form dialog
  *
  * depends NPanelFooter, NForm, NConfirm
  */
-var NModalForm = React.createClass({displayName: "NModalForm",
-	statics: {
-		/**
-		 * create form modal dialog
-		 * @param title
-		 * @param className
-		 * @returns {object}
-		 */
-		createFormModal: function (title, className) {
-			if ($pt.formModalIndex === undefined || $pt.formModalIndex === null) {
-				$pt.formModalIndex = 1500;
-			} else {
-				$pt.formModalIndex += 1;
-			}
-			var containerId = "form_modal_container_" + $pt.formModalIndex;
-			var container = $("#" + containerId);
-			if (container.length == 0) {
-				$("<div id='" + containerId + "' />").appendTo($(document.body));
-			}
-			var css = {
-				"n-modal-form": true
-			};
-			if (className) {
-				css[className] = true;
-			}
-			return React.render(React.createElement(NModalForm, {title: title, className: $pt.LayoutHelper.classSet(css), 
-			                                zIndex: $pt.formModalIndex}),
-				document.getElementById(containerId));
+(function (context, $, $pt) {
+	var NModalForm = React.createClass({displayName: "NModalForm",
+		statics: {
+			/**
+			 * create form modal dialog
+			 * @param title
+			 * @param className
+			 * @returns {object}
+			 */
+			createFormModal: function (title, className) {
+				if ($pt.formModalIndex === undefined || $pt.formModalIndex === null) {
+					$pt.formModalIndex = 1500;
+				} else {
+					$pt.formModalIndex += 1;
+				}
+				var containerId = "form_modal_container_" + $pt.formModalIndex;
+				var container = $("#" + containerId);
+				if (container.length == 0) {
+					$("<div id='" + containerId + "' />").appendTo($(document.body));
+				}
+				var css = {
+					"n-modal-form": true
+				};
+				if (className) {
+					css[className] = true;
+				}
+				return React.render(React.createElement(NModalForm, {title: title, className: $pt.LayoutHelper.classSet(css), 
+				                                zIndex: $pt.formModalIndex}),
+					document.getElementById(containerId));
+			},
+			RESET_CONFIRM_TITLE: "Reset Data",
+			RESET_CONFIRM_MESSAGE: ["Are you sure to reset data?", "All data will be lost and cannot be recovered."],
+			CANCEL_CONFIRM_TITLE: "Cancel Editing",
+			CANCEL_CONFIRM_MESSAGE: ["Are you sure to cancel current operating?", "All data will be lost and cannot be recovered."]
 		},
-		RESET_CONFIRM_TITLE: "Reset Data",
-		RESET_CONFIRM_MESSAGE: ["Are you sure to reset data?", "All data will be lost and cannot be recovered."],
-		CANCEL_CONFIRM_TITLE: "Cancel Editing",
-		CANCEL_CONFIRM_MESSAGE: ["Are you sure to cancel current operating?", "All data will be lost and cannot be recovered."]
-	},
-	propTypes: {
-		title: React.PropTypes.string,
-		className: React.PropTypes.string,
-		zIndex: React.PropTypes.number
-	},
-	getInitialState: function () {
-		return {
-			visible: false
-		};
-	},
-	/**
-	 * set z-index
-	 */
-	setZIndex: function () {
-		if (this.props.zIndex != undefined) {
-			var div = $(React.findDOMNode(this.refs.body)).closest(".modal");
-			if (div.length > 0) {
-				div.css({
-					"z-index": this.props.zIndex * 1 + 1
+		propTypes: {
+			title: React.PropTypes.string,
+			className: React.PropTypes.string,
+			zIndex: React.PropTypes.number
+		},
+		getInitialState: function () {
+			return {
+				visible: false
+			};
+		},
+		/**
+		 * set z-index
+		 */
+		setZIndex: function () {
+			if (this.props.zIndex != undefined) {
+				var div = $(React.findDOMNode(this.refs.body)).closest(".modal");
+				if (div.length > 0) {
+					div.css({
+						"z-index": this.props.zIndex * 1 + 1
+					});
+					div.prev().css({
+						"z-index": this.props.zIndex * 1
+					});
+					div.removeAttr('tabIndex');
+				}
+			}
+			document.body.style.paddingRight = 0;
+		},
+		setDraggable: function() {
+			if (!this.isDraggable() || !this.refs.top) {
+				return;
+			}
+			var top = $(React.findDOMNode(this.refs.top));
+			var modal = top.children('.modal');
+			modal.drags({handle: '.modal-header'});
+			modal.css({
+				overflow: 'visible',
+				height: 0
+			});
+			var dialog = modal.children('.modal-dialog');
+			dialog.css({
+				height: 0
+			});
+			top.find('.modal-backdrop').hide();
+
+			// the initial position
+			if (this.state.pos) {
+				// dialog content position is relative to dialog.
+				// dialog has margin.
+				var dialogPosition = {
+					top: parseInt(dialog.css('margin-top')),
+					left: parseInt(dialog.css('margin-left')),
+					bottom: parseInt(dialog.css('margin-bottom')),
+					right: parseInt(dialog.css('margin-right'))
+				};
+				var content = dialog.children('.modal-content');
+				var contentPosition = {};
+				var currentContentTop = parseInt(content.css('top'));
+				if (isNaN(currentContentTop)) {
+					if (this.state.pos.bottom != null) {
+						contentPosition.bottom = dialogPosition.bottom + content.height() - $(window).height();
+					} else if (this.state.pos.top != null) {
+						contentPosition.top = this.state.pos.top - dialogPosition.top;
+					}
+				} else {
+					contentPosition.top = currentContentTop;
+				}
+				var currentContentLeft = parseInt(content.css('left'));
+				if (isNaN(currentContentLeft)) {
+					if (this.state.pos.right != null) {
+						contentPosition.right = this.state.pos.right - dialogPosition.right;
+					} else if (this.state.pos.left != null) {
+						contentPosition.left = this.state.pos.left - dialogPosition.left;
+					}
+				} else {
+					contentPosition.left = currentContentLeft;
+				}
+				if (Object.keys(contentPosition).length > 0) {
+					content.css(contentPosition);
+				}
+			}
+		},
+		stopDraggable: function() {
+			if (this.refs.top) {
+				var top = $(React.findDOMNode(this.refs.top));
+				var modal = top.children('.modal');
+				modal.stopDrags({handle: '.modal-header'});
+			}
+		},
+		/**
+		 * did update
+		 * @param prevProps
+		 * @param prevState
+		 */
+		componentDidUpdate: function (prevProps, prevState) {
+			this.setZIndex();
+			this.setDraggable();
+		},
+		componentWillUpdate: function() {
+			this.stopDraggable();
+		},
+		/**
+		 * did mount
+		 */
+		componentDidMount: function () {
+			this.setZIndex();
+			this.setDraggable();
+		},
+		componentDidUnmount: function() {
+			this.stopDraggable();
+		},
+		/**
+		 * render footer
+		 * @returns {XML}
+		 */
+		renderFooter: function () {
+			if (this.state.footer === false || !this.state.expanded) {
+				return React.createElement("div", {ref: "footer"});
+			} else {
+				return (React.createElement(Modal.Footer, {className: "n-modal-form-footer", ref: "footer"}, 
+					React.createElement(NPanelFooter, {reset: this.getResetButton(), 
+					              validate: this.getValidationButton(), 
+					              save: this.getSaveButton(), 
+					              cancel: this.getCancelButton(), 
+					              left: this.getLeftButton(), 
+					              right: this.getRightButton(), 
+					              model: this.getModel()})
+				));
+			}
+		},
+		renderBody: function() {
+			return (React.createElement(Modal.Body, {ref: "body", className: !this.state.expanded ? 'hide': null}, 
+				React.createElement(NForm, {model: this.getModel(), layout: this.getLayout(), direction: this.getDirection(), 
+				       ref: "form"})
+			));
+		},
+		/**
+		 * render
+		 * @returns {*}
+		 */
+		render: function () {
+			if (!this.state.visible) {
+				return null;
+			}
+			var title = this.state.title ? this.state.title : this.props.title;
+			if (this.isCollapsible()) {
+				title = (React.createElement("a", {href: "javascript:void(0);", onClick: this.onTitleClicked}, title));
+			}
+			return (React.createElement(Modal, {className: this.props.className, backdrop: "static", onHide: this.hide, ref: "top"}, 
+				React.createElement(Modal.Header, {closeButton: this.isDialogCloseShown()}, 
+					React.createElement(Modal.Title, null, title)
+				), 
+				this.renderBody(), 
+				this.renderFooter()
+			));
+		},
+		/**
+		 * on title clicked
+		 */
+		onTitleClicked: function() {
+			// TODO no animotion, tried, weird.
+			this.setState({expanded: !this.state.expanded});
+		},
+		/**
+		 * on reset clicked
+		 */
+		onResetClicked: function () {
+			var reset = function () {
+				this.getModel().reset();
+				this.refs.form.forceUpdate();
+			};
+			NConfirm.getConfirmModal().show(NModalForm.RESET_CONFIRM_TITLE,
+				NModalForm.RESET_CONFIRM_MESSAGE,
+				reset.bind(this));
+		},
+		/**
+		 * on validate clicked
+		 */
+		onValidateClicked: function () {
+			this.getModel().validate();
+			this.forceUpdate();
+		},
+		/**
+		 * on cancel clicked
+		 */
+		onCancelClicked: function () {
+			NConfirm.getConfirmModal().show(NModalForm.CANCEL_CONFIRM_TITLE,
+				NModalForm.CANCEL_CONFIRM_MESSAGE,
+				this.hide.bind(this));
+		},
+		/**
+		 * get model
+		 * @returns {ModelInterface}
+		 */
+		getModel: function () {
+			return this.state.model;
+		},
+		/**
+		 * get layout
+		 * @returns {FormLayout}
+		 */
+		getLayout: function () {
+			return this.state.layout;
+		},
+		/**
+		 * get direction
+		 * @returns {string}
+		 */
+		getDirection: function () {
+			return this.state.direction;
+		},
+		/**
+		 * get left button configuration
+		 * @returns {{}|{}[]}
+		 */
+		getLeftButton: function () {
+			return this.state.buttons ? this.state.buttons.left : null;
+		},
+		/**
+		 * get right button configuration
+		 * @returns {{}|{}[]}
+		 */
+		getRightButton: function () {
+			return this.state.buttons ? this.state.buttons.right : null;
+		},
+		/**
+		 * get validation button
+		 * @returns {function}
+		 */
+		getValidationButton: function () {
+			if (this.state.buttons && this.state.buttons.validate === false) {
+				return null;
+			} else {
+				return this.onValidateClicked.bind(this);
+			}
+		},
+		/**
+		 * get cancel button
+		 * @returns {function}
+		 */
+		getCancelButton: function () {
+			if (this.state.buttons && this.state.buttons.cancel === false) {
+				return null;
+			} else {
+				return this.onCancelClicked.bind(this);
+			}
+		},
+		/**
+		 * get reset button
+		 * @returns {function}
+		 */
+		getResetButton: function () {
+			if (this.state.buttons && this.state.buttons.reset === false) {
+				return null;
+			} else {
+				return this.onResetClicked.bind(this);
+			}
+		},
+		/**
+		 * get save button configuration
+		 * @returns {{}}
+		 */
+		getSaveButton: function () {
+			return this.state.buttons ? this.state.buttons.save : null;
+		},
+		/**
+		 * is dialog close button shown
+		 * @returns boolean
+		 */
+		isDialogCloseShown: function() {
+			return this.state.buttons ? this.state.buttons.dialogCloseShown !== false : true;
+		},
+		/**
+		 * is draggable
+		 * @returns boolean
+		 */
+		isDraggable: function() {
+			return this.state.draggable;
+		},
+		/**
+		 * is collapsible
+		 * @returns boolean
+		 */
+		isCollapsible: function() {
+			return this.state.collapsible;
+		},
+		/**
+		 * is expanded
+		 * @returns boolean
+		 */
+		isExpanded: function() {
+			return this.state.expanded;
+		},
+		/**
+		 * validate
+		 * @returns {boolean}
+		 */
+		validate: function () {
+			this.getModel().validate();
+			this.forceUpdate();
+			return this.getModel().hasError();
+		},
+		/**
+		 * hide dialog
+		 * @return model
+		 */
+		hide: function () {
+			var model = this.state.model;
+			this.setState({
+				visible: false,
+				model: null,
+				layout: null,
+				buttons: null
+			});
+			return model;
+		},
+		/**
+		 * show dialog
+		 *
+		 * from 0.0.3, all parameters can be defined in first as a JSON.
+		 * @param model
+		 * @param layout
+		 * @param buttons
+		 * @param direction vertical or horizontal
+		 * @param footer {boolean}
+		 * @param title {string}
+		 */
+		show: function (model, layout, buttons, direction, footer, title) {
+			if (!model.getCurrentModel) {
+				// test the model is ModelInterface or not
+				this.setState({
+					visible: true,
+					model: model.model,
+					layout: model.layout,
+					buttons: model.buttons,
+					direction: model.direction,
+					footer: model.footer,
+					title: model.title,
+					draggable: model.draggable,
+					collapsible: model.collapsible,
+					expanded: model.expanded == null ? true : model.expanded,
+					pos: model.pos
 				});
-				div.prev().css({
-					"z-index": this.props.zIndex * 1
+			} else {
+				this.setState({
+					visible: true,
+					model: model,
+					layout: layout,
+					buttons: buttons,
+					direction: direction,
+					footer: footer,
+					title: title
 				});
-				div.removeAttr('tabIndex');
 			}
 		}
-		document.body.style.paddingRight = 0;
-	},
-	/**
-	 * did update
-	 * @param prevProps
-	 * @param prevState
-	 */
-	componentDidUpdate: function (prevProps, prevState) {
-		this.setZIndex();
-	},
-	/**
-	 * did mount
-	 */
-	componentDidMount: function () {
-		this.setZIndex();
-	},
-	/**
-	 * render footer
-	 * @returns {XML}
-	 */
-	renderFooter: function () {
-		if (this.state.footer === false) {
-			return React.createElement("div", null);
-		} else {
-			return (React.createElement(Modal.Footer, {className: "n-modal-form-footer"}, 
-				React.createElement(NPanelFooter, {reset: this.getResetButton(), 
-				              validate: this.getValidationButton(), 
-				              save: this.getSaveButton(), 
-				              cancel: this.getCancelButton(), 
-				              left: this.getLeftButton(), 
-				              right: this.getRightButton(), 
-				              model: this.getModel()})
-			));
-		}
-	},
-	/**
-	 * render
-	 * @returns {*}
-	 */
-	render: function () {
-		if (!this.state.visible) {
-			return null;
-		}
-		var title = this.state.title ? this.state.title : this.props.title;
-		return (React.createElement(Modal, {className: this.props.className, backdrop: "static", onHide: this.hide, bsStyle: "danger"}, 
-			React.createElement(Modal.Header, {closeButton: true}, 
-				React.createElement(Modal.Title, null, title)
-			), 
-			React.createElement(Modal.Body, {ref: "body"}, 
-				React.createElement(NForm, {model: this.getModel(), layout: this.getLayout(), direction: this.getDirection(), ref: "form"})
-			), 
+	});
+	context.NModalForm = NModalForm;
 
-			this.renderFooter()
-		));
-	},
-	/**
-	 * on reset clicked
-	 */
-	onResetClicked: function () {
-		var reset = function () {
-			this.getModel().reset();
-			this.refs.form.forceUpdate();
-		};
-		NConfirm.getConfirmModal().show(NModalForm.RESET_CONFIRM_TITLE,
-			NModalForm.RESET_CONFIRM_MESSAGE,
-			reset.bind(this));
-	},
-	/**
-	 * on validate clicked
-	 */
-	onValidateClicked: function () {
-		this.getModel().validate();
-		this.forceUpdate();
-	},
-	/**
-	 * on cancel clicked
-	 */
-	onCancelClicked: function () {
-		NConfirm.getConfirmModal().show(NModalForm.CANCEL_CONFIRM_TITLE,
-			NModalForm.CANCEL_CONFIRM_MESSAGE,
-			this.hide.bind(this));
-	},
-	/**
-	 * get model
-	 * @returns {ModelInterface}
-	 */
-	getModel: function () {
-		return this.state.model;
-	},
-	/**
-	 * get layout
-	 * @returns {FormLayout}
-	 */
-	getLayout: function () {
-		return this.state.layout;
-	},
-	/**
-	 * get direction
-	 * @returns {string}
-	 */
-	getDirection: function () {
-		return this.state.direction;
-	},
-	/**
-	 * get left button configuration
-	 * @returns {{}|{}[]}
-	 */
-	getLeftButton: function () {
-		return this.state.buttons ? this.state.buttons.left : null;
-	},
-	/**
-	 * get right button configuration
-	 * @returns {{}|{}[]}
-	 */
-	getRightButton: function () {
-		return this.state.buttons ? this.state.buttons.right : null;
-	},
-	/**
-	 * get validation button
-	 * @returns {function}
-	 */
-	getValidationButton: function () {
-		if (this.state.buttons && this.state.buttons.validate === false) {
-			return null;
+	$.fn.drags = function(opt) {
+		opt = $.extend({handle:"",cursor:"move"}, opt);
+		var $el = null;
+		if(opt.handle === "") {
+			$el = this;
 		} else {
-			return this.onValidateClicked.bind(this);
+			$el = this.find(opt.handle);
 		}
-	},
-	/**
-	 * get cancel button
-	 * @returns {function}
-	 */
-	getCancelButton: function () {
-		if (this.state.buttons && this.state.buttons.cancel === false) {
-			return null;
-		} else {
-			return this.onCancelClicked.bind(this);
-		}
-	},
-	/**
-	 * get reset button
-	 * @returns {function}
-	 */
-	getResetButton: function () {
-		if (this.state.buttons && this.state.buttons.reset === false) {
-			return null;
-		} else {
-			return this.onResetClicked.bind(this);
-		}
-	},
-	/**
-	 * get save button configuration
-	 * @returns {{}}
-	 */
-	getSaveButton: function () {
-		return this.state.buttons ? this.state.buttons.save : null;
-	},
-	/**
-	 * validate
-	 * @returns {boolean}
-	 */
-	validate: function () {
-		this.getModel().validate();
-		this.forceUpdate();
-		return this.getModel().hasError();
-	},
-	/**
-	 * hide dialog
-	 * @return model
-	 */
-	hide: function () {
-		var model = this.state.model;
-		this.setState({
-			visible: false,
-			model: null,
-			layout: null,
-			buttons: null
+
+		return $el.css('cursor', opt.cursor).on("mousedown", function(e) {
+			var $drag = null;
+			if(opt.handle === "") {
+				$drag = $(this).addClass('draggable');
+			} else {
+				$drag = $(this).addClass('active-handle').parent().addClass('draggable');
+			}
+			var z_idx = $drag.css('z-index'),
+			drg_h = $drag.outerHeight(),
+			drg_w = $drag.outerWidth(),
+			pos_y = $drag.offset().top + drg_h - e.pageY,
+			pos_x = $drag.offset().left + drg_w - e.pageX;
+
+			//          $drag.css('z-index', 1000).parents().on("mousemove", function(e) {
+			$drag.parents().on("mousemove", function(e) {
+				$('.draggable').offset({
+					top:e.pageY + pos_y - drg_h,
+					left:e.pageX + pos_x - drg_w
+				}).on("mouseup", function() {
+					$(this).removeClass('draggable').css('z-index', z_idx);
+				});
+			});
+			e.preventDefault(); // disable selection
+		}).on("mouseup", function() {
+			if(opt.handle === "") {
+				$(this).removeClass('draggable');
+			} else {
+				$(this).removeClass('active-handle').parent().removeClass('draggable');
+			}
 		});
-		return model;
-	},
-	/**
-	 * show dialog
-	 *
-	 * from 0.0.3, all parameters can be defined in first as a JSON.
-	 * @param model
-	 * @param layout
-	 * @param buttons
-	 * @param direction vertical or horizontal
-	 * @param footer {boolean}
-	 * @param title {string}
-	 */
-	show: function (model, layout, buttons, direction, footer, title) {
-		if (!model.getCurrentModel) {
-			// test the model is ModelInterface or not
-			this.setState({
-				visible: true,
-				model: model.model,
-				layout: model.layout,
-				buttons: model.buttons,
-				direction: model.direction,
-				footer: model.footer,
-				title: model.title
-			});
+	};
+	$.fn.stopDrags = function(opt) {
+		opt = $.extend({handle:"",cursor:"move"}, opt);
+		var $el = null;
+		if(opt.handle === "") {
+			$el = this;
 		} else {
-			this.setState({
-				visible: true,
-				model: model,
-				layout: layout,
-				buttons: buttons,
-				direction: direction,
-				footer: footer,
-				title: title
-			});
+			$el = this.find(opt.handle);
 		}
-	}
-});
+
+		var $drag = null;
+		if(opt.handle === "") {
+			$drag = $($el);
+		} else {
+			$drag = $($el).parent();
+		}
+		$drag.parents().off("mousemove");
+
+		return $el.off('mousedown mouseup');
+	};
+}(this, jQuery, $pt));
+
 /**
  * Created by brad.wu on 9/2/2015.
  */
-var NNormalLabel = React.createClass({displayName: "NNormalLabel",
-	propTypes: {
-		text: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.arrayOf(React.PropTypes.string)]),
-		style: React.PropTypes.string,
-		className: React.PropTypes.string
-	},
-	getDefaultProps: function () {
-		return {};
-	},
-	render: function () {
-		var texts = this.getText();
-		if (!Array.isArray(texts)) {
-			texts = [texts];
-		}
-		var css = {
-			'n-normal-label': true
-		};
-		if (this.props.className) {
-			css[this.props.className] = true;
-		}
-		if (this.props.style) {
-			css['n-label-' + this.props.style] = true;
-		}
-		if (this.props.size) {
-			css['n-label-' + this.props.size] = true;
-		}
-		return (React.createElement("span", {className: $pt.LayoutHelper.classSet(css)}, 
+(function (context, $, $pt) {
+	var NNormalLabel = React.createClass({displayName: "NNormalLabel",
+		propTypes: {
+			text: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.arrayOf(React.PropTypes.string)]),
+			style: React.PropTypes.string,
+			className: React.PropTypes.string
+		},
+		getDefaultProps: function () {
+			return {};
+		},
+		render: function () {
+			var texts = this.getText();
+			if (!Array.isArray(texts)) {
+				texts = [texts];
+			}
+			var css = {
+				'n-normal-label': true
+			};
+			if (this.props.className) {
+				css[this.props.className] = true;
+			}
+			if (this.props.style) {
+				css['n-label-' + this.props.style] = true;
+			}
+			if (this.props.size) {
+				css['n-label-' + this.props.size] = true;
+			}
+			return (React.createElement("span", {className: $pt.LayoutHelper.classSet(css)}, 
             texts.map(function (text) {
 	            return React.createElement("span", null, text);
             })
         ));
-	},
-	getText: function () {
-		return this.props.text;
-	}
-});
+		},
+		getText: function () {
+			return this.props.text;
+		}
+	});
+	context.NNormalLabel = NNormalLabel;
+}(this, jQuery, $pt));
+
 /**
  * on request modal dialog.
  * z-index is 9899 and 9898, less than exception dialog, more than any other.
  */
-var NOnRequestModal = React.createClass({displayName: "NOnRequestModal",
-	statics: {
-		getOnRequestModal: function (className) {
-			if ($pt.onRequestDialog === undefined || $pt.onRequestDialog === null) {
-				var onRequestContainer = $("#onrequest_modal_container");
-				if (onRequestContainer.length == 0) {
-					$("<div id='onrequest_modal_container' />").appendTo($(document.body));
+(function (context, $, $pt) {
+	var NOnRequestModal = React.createClass({displayName: "NOnRequestModal",
+		statics: {
+			getOnRequestModal: function (className) {
+				if ($pt.onRequestDialog === undefined || $pt.onRequestDialog === null) {
+					var onRequestContainer = $("#onrequest_modal_container");
+					if (onRequestContainer.length == 0) {
+						$("<div id='onrequest_modal_container' />").appendTo($(document.body));
+					}
+					$pt.onRequestDialog = React.render(
+						React.createElement(NOnRequestModal, {className: className}), document.getElementById("onrequest_modal_container"));
 				}
-				$pt.onRequestDialog = React.render(
-					React.createElement(NOnRequestModal, {className: className}), document.getElementById("onrequest_modal_container"));
-			}
-			return $pt.onRequestDialog;
+				return $pt.onRequestDialog;
+			},
+			WAITING_MESSAGE: 'Send request to server and waiting for response...'
 		},
-		WAITING_MESSAGE: 'Send request to server and waiting for response...'
-	},
-	propTypes: {
-		className: React.PropTypes.string
-	},
-	getInitialState: function () {
-		return {
-			visible: false
-		};
-	},
-	/**
-	 * set z-index
-	 */
-	setZIndex: function () {
-		var div = $(React.findDOMNode(this.refs.body)).closest(".modal");
-		if (div.length > 0) {
-			div.css({"z-index": 9899});
-			div.prev().css({"z-index": 9898});
+		propTypes: {
+			className: React.PropTypes.string
+		},
+		getInitialState: function () {
+			return {
+				visible: false
+			};
+		},
+		/**
+		 * set z-index
+		 */
+		setZIndex: function () {
+			var div = $(React.findDOMNode(this.refs.body)).closest(".modal");
+			if (div.length > 0) {
+				div.css({"z-index": 9899});
+				div.prev().css({"z-index": 9898});
+			}
+			document.body.style.paddingRight = 0;
+		},
+		/**
+		 * did update
+		 * @param prevProps
+		 * @param prevState
+		 */
+		componentDidUpdate: function (prevProps, prevState) {
+			this.setZIndex();
+		},
+		/**
+		 * did mount
+		 */
+		componentDidMount: function () {
+			this.setZIndex();
+		},
+		render: function () {
+			if (!this.state.visible) {
+				return null;
+			}
+			var css = {
+				'n-on-request': true
+			};
+			if (this.props.className) {
+				css[this.props.className] = true;
+			}
+			return (React.createElement(Modal, {className: $pt.LayoutHelper.classSet(css)}, 
+				React.createElement(Modal.Body, {ref: "body"}, 
+					React.createElement("span", {className: "fa fa-fw fa-lg fa-spin fa-spinner"}), " ", NOnRequestModal.WAITING_MESSAGE
+				)
+			));
+		},
+		/**
+		 * hide dialog
+		 */
+		hide: function () {
+			this.setState({visible: false});
+		},
+		/**
+		 * show dialog
+		 */
+		show: function () {
+			this.setState({visible: true});
 		}
-		document.body.style.paddingRight = 0;
-	},
-	/**
-	 * did update
-	 * @param prevProps
-	 * @param prevState
-	 */
-	componentDidUpdate: function (prevProps, prevState) {
-		this.setZIndex();
-	},
-	/**
-	 * did mount
-	 */
-	componentDidMount: function () {
-		this.setZIndex();
-	},
-	render: function () {
-		if (!this.state.visible) {
-			return null;
-		}
-		var css = {
-			'n-on-request': true
-		};
-		if (this.props.className) {
-			css[this.props.className] = true;
-		}
-		return (React.createElement(Modal, {className: $pt.LayoutHelper.classSet(css)}, 
-			React.createElement(Modal.Body, {ref: "body"}, 
-				React.createElement("span", {className: "fa fa-fw fa-lg fa-spin fa-spinner"}), " ", NOnRequestModal.WAITING_MESSAGE
-			)
-		));
-	},
-	/**
-	 * hide dialog
-	 */
-	hide: function () {
-		this.setState({visible: false});
-	},
-	/**
-	 * show dialog
-	 */
-	show: function () {
-		this.setState({visible: true});
-	}
-});
+	});
+	context.NOnRequestModal = NOnRequestModal;
+}(this, jQuery, $pt));
+
 /**
  * page footer.<br>
  */
-var NPageFooter = React.createClass({displayName: "NPageFooter",
-	statics: {
-		TECH_BASE: 'Parrot',
-		TECH_URL: 'https://oss.ebaotech.com/nest/parrot',
-		COMPANY: 'eBaoTech',
-		COMPANY_URL: 'https://www.ebaotech.com',
-		LEFT_TEXT: 'For best viewing, we recommend using the latest Chrome version.'
-	},
-	propTypes: {
-		name: React.PropTypes.string.isRequired
-	},
-	getDefaultProps: function () {
-		return {};
-	},
-	renderTech: function () {
-		if (NPageFooter.TECH_BASE != null && !NPageFooter.TECH_BASE.isBlank()) {
-			return (React.createElement("span", null, ", on ", React.createElement("a", {href: NPageFooter.TECH_URL, target: "_blank", tabIndex: "-1"}, NPageFooter.TECH_BASE)));
-		}
-		return null;
-	},
-	renderCompany: function () {
-		if (NPageFooter.COMPANY != null && !NPageFooter.COMPANY.isBlank()) {
-			return (React.createElement("span", null, ", by ", React.createElement("a", {href: NPageFooter.COMPANY_URL, target: "_blank", tabIndex: "-1"}, NPageFooter.COMPANY)));
-		}
-		return null;
-	},
-	render: function () {
-		return (
-			React.createElement("footer", {className: "footer"}, 
-				React.createElement("div", {className: "container"}, 
-					React.createElement("p", {className: "text-muted", style: {display: 'inline-block'}}, 
-						React.createElement("span", null, NPageFooter.LEFT_TEXT)
-					), 
+(function (context, $, $pt) {
+	var NPageFooter = React.createClass({displayName: "NPageFooter",
+		statics: {
+			TECH_BASE: 'Parrot',
+			TECH_URL: 'https://oss.ebaotech.com/nest/parrot',
+			COMPANY: 'eBaoTech',
+			COMPANY_URL: 'https://www.ebaotech.com',
+			LEFT_TEXT: 'For best viewing, we recommend using the latest Chrome version.'
+		},
+		propTypes: {
+			name: React.PropTypes.string.isRequired
+		},
+		getDefaultProps: function () {
+			return {};
+		},
+		renderTech: function () {
+			if (NPageFooter.TECH_BASE != null && !NPageFooter.TECH_BASE.isBlank()) {
+				return (
+					React.createElement("span", null, ", on ", React.createElement("a", {href: NPageFooter.TECH_URL, target: "_blank", tabIndex: "-1"}, NPageFooter.TECH_BASE)));
+			}
+			return null;
+		},
+		renderCompany: function () {
+			if (NPageFooter.COMPANY != null && !NPageFooter.COMPANY.isBlank()) {
+				return (
+					React.createElement("span", null, ", by ", React.createElement("a", {href: NPageFooter.COMPANY_URL, target: "_blank", tabIndex: "-1"}, NPageFooter.COMPANY)));
+			}
+			return null;
+		},
+		render: function () {
+			return (
+				React.createElement("footer", {className: "footer"}, 
+					React.createElement("div", {className: "container"}, 
+						React.createElement("p", {className: "text-muted", style: {display: 'inline-block'}}, 
+							React.createElement("span", null, NPageFooter.LEFT_TEXT)
+						), 
 
-					React.createElement("p", {className: "text-muted pull-right", style: {display: 'inline-block'}}, 
-						this.props.name, 
-						this.renderTech(), 
-						this.renderCompany(), "."
+						React.createElement("p", {className: "text-muted pull-right", style: {display: 'inline-block'}}, 
+							this.props.name, 
+							this.renderTech(), 
+							this.renderCompany(), "."
+						)
 					)
-				)
-			));
-	}
-});
+				));
+		}
+	});
+	context.NPageFooter = NPageFooter;
+}(this, jQuery, $pt));
+
 /**
  * Page Header<br>
  */
-var NPageHeader = React.createClass({displayName: "NPageHeader",
-	statics: {
-		SEARCH_PLACEHOLDER: 'Search...'
-	},
-	propTypes: {
-		// brand string
-		brand: React.PropTypes.string.isRequired,
-		brandUrl: React.PropTypes.string,
-		brandFunc: React.PropTypes.func,
-		// menu object
-		menus: React.PropTypes.array,
-		side: React.PropTypes.bool,
-		// search box properties
-		search: React.PropTypes.func
-	},
-	getDefaultProps: function () {
-		return {
-			side: false
-		};
-	},
-	/**
-	 * get initial state
-	 * @returns {*}
-	 */
-	getInitialState: function () {
-		return {
-			model: $pt.createModel({
-				text: null
-			})
-		};
-	},
-	/**
-	 * render search box
-	 * @returns {XML}
-	 */
-	renderSearchBox: function () {
-		var layout = $pt.createCellLayout('text', {
-			comp: {
-				placeholder: NPageHeader.SEARCH_PLACEHOLDER,
-				rightAddon: {
-					icon: 'search',
-					click: this.onSearchClicked
+(function (context, $, $pt) {
+	var NPageHeader = React.createClass({displayName: "NPageHeader",
+		statics: {
+			SEARCH_PLACEHOLDER: 'Search...'
+		},
+		propTypes: {
+			// brand string
+			brand: React.PropTypes.string.isRequired,
+			brandUrl: React.PropTypes.string,
+			brandFunc: React.PropTypes.func,
+			// menu object
+			menus: React.PropTypes.array,
+			side: React.PropTypes.bool,
+			// search box properties
+			search: React.PropTypes.func
+		},
+		getDefaultProps: function () {
+			return {
+				side: false
+			};
+		},
+		/**
+		 * get initial state
+		 * @returns {*}
+		 */
+		getInitialState: function () {
+			return {
+				model: $pt.createModel({
+					text: null
+				})
+			};
+		},
+		/**
+		 * render search box
+		 * @returns {XML}
+		 */
+		renderSearchBox: function () {
+			var layout = $pt.createCellLayout('text', {
+				comp: {
+					placeholder: NPageHeader.SEARCH_PLACEHOLDER,
+					rightAddon: {
+						icon: 'search',
+						click: this.onSearchClicked
+					}
+				}
+			});
+
+			return (React.createElement("div", {className: "navbar-form navbar-right", role: "search"}, 
+				React.createElement(NText, {model: this.state.model, layout: layout})
+			));
+		},
+		renderMenuItem: function (item, index, menus, onTopLevel) {
+			if (item.children !== undefined) {
+				// render dropdown menu
+				var _this = this;
+				return (
+					React.createElement("li", {className: onTopLevel ? "dropdown" : "dropdown-submenu"}, 
+						React.createElement("a", {href: "#", className: "dropdown-toggle", "data-toggle": "dropdown", role: "button", 
+						   "aria-expanded": "false"}, 
+							item.text, " ", onTopLevel ? React.createElement("span", {className: "caret"}) : null
+						), 
+						React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
+							item.children.map(function (childItem, childIndex, dropdownItems) {
+								return _this.renderMenuItem(childItem, childIndex, dropdownItems, false);
+							})
+						)
+					)
+				);
+			} else if (item.divider === true) {
+				// render divider
+				return (React.createElement("li", {className: "divider"}));
+			} else if (item.func !== undefined) {
+				// call javascript function
+				return (React.createElement("li", null, 
+					React.createElement("a", {href: "javascript:void(0);", onClick: this.onMenuClicked.bind(this, item.func)}, item.text)
+				));
+			} else {
+				// jump to url
+				return (React.createElement("li", null, React.createElement("a", {href: item.url}, item.text)));
+			}
+		},
+		/**
+		 * render menus
+		 * @returns {XML}
+		 */
+		renderMenus: function () {
+			var _this = this;
+			if (this.props.side) {
+				this.state.sideMenu = NSideMenu.getSideMenu(this.props.menus, null, null, true);
+			}
+			var css = {
+				'nav navbar-nav': true
+			};
+			if (this.props.side) {
+				css['nav-side'] = true;
+			}
+			return (
+				React.createElement("ul", {className: $pt.LayoutHelper.classSet(css)}, 
+					this.props.menus.map(function (item, index, menu) {
+						return _this.renderMenuItem(item, index, menu, true);
+					})
+				)
+			);
+		},
+		renderBrand: function () {
+			if (this.props.brandUrl) {
+				return React.createElement("a", {href: this.props.brandUrl}, React.createElement("span", {className: "navbar-brand"}, this.props.brand));
+			} else if (this.props.brandFunc || this.props.side) {
+				return (React.createElement("a", {href: "javascript:void(0);", 
+				           onMouseEnter: this.onBrandMouseEnter, 
+				           onMouseLeave: this.onBrandMouseLeave, 
+				           onClick: this.onBrandClicked}, 
+					React.createElement("span", {className: "navbar-brand"}, this.props.brand)
+				));
+			} else {
+				return React.createElement("span", {className: "navbar-brand"}, this.props.brand);
+			}
+		},
+		onBrandMouseEnter: function () {
+			if (this.props.side) {
+				if (this.state.sideMenu) {
+					this.state.sideMenu.show();
 				}
 			}
-		});
-
-		return (React.createElement("div", {className: "navbar-form navbar-right", role: "search"}, 
-			React.createElement(NText, {model: this.state.model, layout: layout})
-		));
-	},
-	renderMenuItem: function (item, index, menus, onTopLevel) {
-		if (item.children !== undefined) {
-			// render dropdown menu
-			var _this = this;
+		},
+		onBrandMouseLeave: function () {
+			if (this.props.side) {
+				if (this.state.sideMenu) {
+					this.state.sideMenu.willHide();
+				}
+			}
+		},
+		/**
+		 * on brand clicked
+		 */
+		onBrandClicked: function () {
+			if (this.props.brandFunc) {
+				this.props.brandFunc.call(this);
+			}
+		},
+		/**
+		 * on menu clicked
+		 * @param func
+		 */
+		onMenuClicked: function (func) {
+			func.call(this);
+		},
+		/**
+		 * on search clicked
+		 */
+		onSearchClicked: function () {
+			this.props.search.call(this, this.state.model.get('text'));
+		},
+		/**
+		 * render component
+		 * @returns {XML}
+		 */
+		render: function () {
 			return (
-				React.createElement("li", {className: onTopLevel ? "dropdown" : "dropdown-submenu"}, 
-					React.createElement("a", {href: "#", className: "dropdown-toggle", "data-toggle": "dropdown", role: "button", 
-					   "aria-expanded": "false"}, 
-						item.text, " ", onTopLevel ? React.createElement("span", {className: "caret"}) : null
-					), 
-					React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
-						item.children.map(function (childItem, childIndex, dropdownItems) {
-							return _this.renderMenuItem(childItem, childIndex, dropdownItems, false);
-						})
+				React.createElement("nav", {className: "navbar navbar-default navbar-fixed-top"}, 
+					React.createElement("div", {className: "container-fluid"}, 
+						React.createElement("div", {className: "navbar-header"}, 
+							React.createElement("button", {type: "button", className: "navbar-toggle collapsed", "data-toggle": "collapse", 
+							        "data-target": "#navbar-1"}, 
+								React.createElement("span", {className: "sr-only"}, "Toggle navigation"), 
+								React.createElement("span", {className: "icon-bar"}), 
+								React.createElement("span", {className: "icon-bar"}), 
+								React.createElement("span", {className: "icon-bar"})
+							), 
+							this.renderBrand()
+						), 
+						React.createElement("div", {className: "collapse navbar-collapse", id: "navbar-1"}, 
+							this.props.menus ? this.renderMenus() : null, 
+							this.props.search ? this.renderSearchBox() : null
+						)
 					)
 				)
 			);
-		} else if (item.divider === true) {
-			// render divider
-			return (React.createElement("li", {className: "divider"}));
-		} else if (item.func !== undefined) {
-			// call javascript function
-			return (React.createElement("li", null, 
-				React.createElement("a", {href: "javascript:void(0);", onClick: this.onMenuClicked.bind(this, item.func)}, item.text)
-			));
-		} else {
-			// jump to url
-			return (React.createElement("li", null, React.createElement("a", {href: item.url}, item.text)));
 		}
-	},
-	/**
-	 * render menus
-	 * @returns {XML}
-	 */
-	renderMenus: function () {
-		var _this = this;
-		if (this.props.side) {
-			this.state.sideMenu = NSideMenu.getSideMenu(this.props.menus, null, null, true);
-		}
-		var css = {
-			'nav navbar-nav': true
-		};
-		if (this.props.side) {
-			css['nav-side'] = true;
-		}
-		return (
-			React.createElement("ul", {className: $pt.LayoutHelper.classSet(css)}, 
-				this.props.menus.map(function (item, index, menu) {
-					return _this.renderMenuItem(item, index, menu, true);
-				})
-			)
-		);
-	},
-	renderBrand: function () {
-		if (this.props.brandUrl) {
-			return React.createElement("a", {href: this.props.brandUrl}, React.createElement("span", {className: "navbar-brand"}, this.props.brand));
-		} else if (this.props.brandFunc || this.props.side) {
-			return (React.createElement("a", {href: "javascript:void(0);", 
-			           onMouseEnter: this.onBrandMouseEnter, 
-			           onMouseLeave: this.onBrandMouseLeave, 
-			           onClick: this.onBrandClicked}, 
-				React.createElement("span", {className: "navbar-brand"}, this.props.brand)
-			));
-		} else {
-			return React.createElement("span", {className: "navbar-brand"}, this.props.brand);
-		}
-	},
-	onBrandMouseEnter: function () {
-		if (this.props.side) {
-			if (this.state.sideMenu) {
-				this.state.sideMenu.show();
-			}
-		}
-	},
-	onBrandMouseLeave: function () {
-		if (this.props.side) {
-			if (this.state.sideMenu) {
-				this.state.sideMenu.willHide();
-			}
-		}
-	},
-	/**
-	 * on brand clicked
-	 */
-	onBrandClicked: function () {
-		if (this.props.brandFunc) {
-			this.props.brandFunc.call(this);
-		}
-	},
-	/**
-	 * on menu clicked
-	 * @param func
-	 */
-	onMenuClicked: function (func) {
-		func.call(this);
-	},
-	/**
-	 * on search clicked
-	 */
-	onSearchClicked: function () {
-		this.props.search.call(this, this.state.model.get('text'));
-	},
-	/**
-	 * render component
-	 * @returns {XML}
-	 */
-	render: function () {
-		return (
-			React.createElement("nav", {className: "navbar navbar-default navbar-fixed-top"}, 
-				React.createElement("div", {className: "container-fluid"}, 
-					React.createElement("div", {className: "navbar-header"}, 
-						React.createElement("button", {type: "button", className: "navbar-toggle collapsed", "data-toggle": "collapse", 
-						        "data-target": "#navbar-1"}, 
-							React.createElement("span", {className: "sr-only"}, "Toggle navigation"), 
-							React.createElement("span", {className: "icon-bar"}), 
-							React.createElement("span", {className: "icon-bar"}), 
-							React.createElement("span", {className: "icon-bar"})
-						), 
-						this.renderBrand()
-					), 
-					React.createElement("div", {className: "collapse navbar-collapse", id: "navbar-1"}, 
-						this.props.menus ? this.renderMenus() : null, 
-						this.props.search ? this.renderSearchBox() : null
-					)
-				)
-			)
-		);
-	}
-});
+	});
+	context.NPageHeader = NPageHeader;
+}(this, jQuery, $pt));
+
 /**
  * pagination
  *
  * NOTE: never jump by itself, must register the toPage and refresh this component manually
  */
-var NPagination = React.createClass({displayName: "NPagination",
-	/**
-	 * @override
-	 */
-	propTypes: {
-		// max page buttons
-		maxPageButtons: React.PropTypes.number,
-		// page count
-		pageCount: React.PropTypes.number,
-		// current page index, start from 1
-		currentPageIndex: React.PropTypes.number,
+(function (context, $, $pt) {
+	var NPagination = React.createClass({displayName: "NPagination",
+		/**
+		 * @override
+		 */
+		propTypes: {
+			// max page buttons
+			maxPageButtons: React.PropTypes.number,
+			// page count
+			pageCount: React.PropTypes.number,
+			// current page index, start from 1
+			currentPageIndex: React.PropTypes.number,
 
-		// jump to page, will be invoked when page index changed
-		toPage: React.PropTypes.func.isRequired,
+			// jump to page, will be invoked when page index changed
+			toPage: React.PropTypes.func.isRequired,
 
-		className: React.PropTypes.string,
+			className: React.PropTypes.string,
 
-		// show status label
-		showStatus: React.PropTypes.bool
-	},
-	/**
-	 * override react method
-	 * @returns {*}
-	 * @override
-	 */
-	getDefaultProps: function () {
-		return {
-			maxPageButtons: 5,
-			pageCount: 1, // page count default 1
-			currentPageIndex: 1, // page number count from 1
-			showStatus: true
-		};
-	},
-	/**
-	 * make max page buttons is an odd number and at least 3
-	 */
-	getMaxPageButtons: function () {
-		var maxPageButtons = this.props.maxPageButtons * 1;
-		if (maxPageButtons % 2 == 0) {
-			maxPageButtons = maxPageButtons - 1;
-		}
-		if (maxPageButtons < 3) {
-			maxPageButtons = 3;
-		}
-		return maxPageButtons;
-	},
-	/**
-	 * get buttons range
-	 * @returns {{min: number, max: number}}
-	 */
-	getPageButtonsRange: function () {
-		var currentPageIndex = this.getCurrentPageIndex();
-
-		var maxPageButtons = this.getMaxPageButtons();
-		// calc the steps from currentPageIndex to maxPageIndex(pageCount)
-		var max = 0;
-		var availablePageCountFromCurrent = this.getPageCount() - currentPageIndex;
-		var maxButtonCountFromCurrent = Math.floor(maxPageButtons / 2);
-		if (availablePageCountFromCurrent >= maxButtonCountFromCurrent) {
-			//
-			max = currentPageIndex + maxButtonCountFromCurrent;
-		} else {
-			max = currentPageIndex + availablePageCountFromCurrent;
-			// move to min buttons, since no enough available pages to display
-			maxButtonCountFromCurrent += (maxButtonCountFromCurrent - availablePageCountFromCurrent);
-		}
-		// calc the steps from currentPageIndex to first page
-		var min = 0;
-		var availablePageCountBeforeCurrent = currentPageIndex - 1;
-		if (availablePageCountBeforeCurrent >= maxButtonCountFromCurrent) {
-			min = currentPageIndex - maxButtonCountFromCurrent;
-		} else {
-			min = 1;
-		}
-
-		// calc the steps
-		if ((max - min) < maxPageButtons) {
-			// no enough buttons
-			max = min + maxPageButtons - 1;
-			max = max > this.getPageCount() ? this.getPageCount() : max;
-		}
-
-		return {min: min, max: max};
-	},
-	/**
-	 * render button which jump to first page
-	 * @param buttonsRange
-	 * @returns {XML}
-	 */
-	renderFirst: function (buttonsRange) {
-		return (React.createElement("li", null, 
-			React.createElement("a", {href: "javascript:void(0);", "aria-label": "First", onClick: this.toFirst}, 
-				React.createElement("span", {className: "fa fa-fw fa-fast-backward"})
-			)
-		));
-	},
-	/**
-	 * render button which jump to previous page section
-	 * @param buttonsRange
-	 * @returns {XML}
-	 */
-	renderPreviousSection: function (buttonsRange) {
-		return (React.createElement("li", null, 
-			React.createElement("a", {href: "javascript:void(0);", "aria-label": "PreviousSection", onClick: this.toPreviousSection}, 
-				React.createElement("span", {className: "fa fa-fw fa-backward"})
-			)
-		));
-	},
-	/**
-	 * render button which jump to previous page
-	 * @param buttonsRange
-	 * @returns {XML}
-	 */
-	renderPrevious: function (buttonsRange) {
-		return (React.createElement("li", null, 
-			React.createElement("a", {href: "javascript:void(0);", "aria-label": "Previous", onClick: this.toPrevious}, 
-				React.createElement("span", {className: "fa fa-fw fa-chevron-left"})
-			)
-		));
-	},
-	/**
-	 * render buttons
-	 * @param buttonsRange
-	 * @returns {[XML]}
-	 */
-	renderButtons: function (buttonsRange) {
-		var buttons = [];
-		for (var index = buttonsRange.min; index <= buttonsRange.max; index++) {
-			buttons.push(index);
-		}
-		var _this = this;
-		return buttons.map(function (index) {
-			var css = {};
-			if (index == _this.getCurrentPageIndex()) {
-				css.active = true;
+			// show status label
+			showStatus: React.PropTypes.bool
+		},
+		/**
+		 * override react method
+		 * @returns {*}
+		 * @override
+		 */
+		getDefaultProps: function () {
+			return {
+				maxPageButtons: 5,
+				pageCount: 1, // page count default 1
+				currentPageIndex: 1, // page number count from 1
+				showStatus: true
+			};
+		},
+		/**
+		 * make max page buttons is an odd number and at least 3
+		 */
+		getMaxPageButtons: function () {
+			var maxPageButtons = this.props.maxPageButtons * 1;
+			if (maxPageButtons % 2 == 0) {
+				maxPageButtons = maxPageButtons - 1;
 			}
+			if (maxPageButtons < 3) {
+				maxPageButtons = 3;
+			}
+			return maxPageButtons;
+		},
+		/**
+		 * get buttons range
+		 * @returns {{min: number, max: number}}
+		 */
+		getPageButtonsRange: function () {
+			var currentPageIndex = this.getCurrentPageIndex();
+
+			var maxPageButtons = this.getMaxPageButtons();
+			// calc the steps from currentPageIndex to maxPageIndex(pageCount)
+			var max = 0;
+			var availablePageCountFromCurrent = this.getPageCount() - currentPageIndex;
+			var maxButtonCountFromCurrent = Math.floor(maxPageButtons / 2);
+			if (availablePageCountFromCurrent >= maxButtonCountFromCurrent) {
+				//
+				max = currentPageIndex + maxButtonCountFromCurrent;
+			} else {
+				max = currentPageIndex + availablePageCountFromCurrent;
+				// move to min buttons, since no enough available pages to display
+				maxButtonCountFromCurrent += (maxButtonCountFromCurrent - availablePageCountFromCurrent);
+			}
+			// calc the steps from currentPageIndex to first page
+			var min = 0;
+			var availablePageCountBeforeCurrent = currentPageIndex - 1;
+			if (availablePageCountBeforeCurrent >= maxButtonCountFromCurrent) {
+				min = currentPageIndex - maxButtonCountFromCurrent;
+			} else {
+				min = 1;
+			}
+
+			// calc the steps
+			if ((max - min) < maxPageButtons) {
+				// no enough buttons
+				max = min + maxPageButtons - 1;
+				max = max > this.getPageCount() ? this.getPageCount() : max;
+			}
+
+			return {min: min, max: max};
+		},
+		/**
+		 * render button which jump to first page
+		 * @param buttonsRange
+		 * @returns {XML}
+		 */
+		renderFirst: function (buttonsRange) {
 			return (React.createElement("li", null, 
-				React.createElement("a", {href: "javascript:void(0);", 
-				   onClick: _this.toPage, 
-				   "data-index": index, 
-				   className: $pt.LayoutHelper.classSet(css)}, index)
-			));
-		});
-	},
-	/**
-	 * render button which jump to next page
-	 * @param buttonsRange
-	 * @returns {XML}
-	 */
-	renderNext: function (buttonsRange) {
-		return (React.createElement("li", null, 
-			React.createElement("a", {href: "javascript:void(0);", "aria-label": "Next", onClick: this.toNext}, 
-				React.createElement("span", {className: "fa fa-fw fa-chevron-right"})
-			)
-		));
-	},
-	/**
-	 * render button which jump to next page section
-	 * @param buttonsRange
-	 * @returns {XML}
-	 */
-	renderNextSection: function (buttonsRange) {
-		return (React.createElement("li", null, 
-			React.createElement("a", {href: "javascript:void(0);", "aria-label": "NextSection", onClick: this.toNextSection}, 
-				React.createElement("span", {className: "fa fa-fw fa-forward"})
-			)
-		));
-	},
-	/**
-	 * render button which jump to last page
-	 * @param buttonsRange
-	 * @returns {XML}
-	 */
-	renderLast: function (buttonsRange) {
-		return (React.createElement("li", null, 
-			React.createElement("a", {href: "javascript:void(0);", "aria-label": "Last", onClick: this.toLast}, 
-				React.createElement("span", {className: "fa fa-fw fa-fast-forward"})
-			)
-		));
-	},
-	/**
-	 * render status
-	 * @returns {XML}
-	 */
-	renderStatus: function () {
-		if (this.props.showStatus) {
-			return (React.createElement("div", {className: "n-pagination-status col-sm-2 col-md-2 col-lg-2"}, 
-				React.createElement("div", null, 
-					"Page: ", this.getCurrentPageIndex(), " / ", this.getPageCount()
+				React.createElement("a", {href: "javascript:void(0);", "aria-label": "First", onClick: this.toFirst}, 
+					React.createElement("span", {className: "fa fa-fw fa-fast-backward"})
 				)
 			));
-		} else {
-			return null;
-		}
-	},
-	/**
-	 * override react method
-	 * @returns {XML}
-	 * @override
-	 */
-	render: function () {
-		var buttonsRange = this.getPageButtonsRange();
-		var css = {
-			row: true,
-			'n-pagination': true
-		};
-		if (this.props.className) {
-			css[this.props.className] = true;
-		}
-		var buttonCSS = {
-			'n-pagination-buttons': true,
-			'col-sm-10 col-md-10 col-lg-10': this.props.showStatus,
-			'col-sm-12 col-md-12 col-lg-12': !this.props.showStatus
-		};
-		return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
-			this.renderStatus(), 
-			React.createElement("div", {className: $pt.LayoutHelper.classSet(buttonCSS)}, 
-				React.createElement("ul", {className: "pagination"}, 
-					this.renderFirst(buttonsRange), 
-					this.renderPreviousSection(buttonsRange), 
-					this.renderPrevious(buttonsRange), 
-					this.renderButtons(buttonsRange), 
-					this.renderNext(buttonsRange), 
-					this.renderNextSection(buttonsRange), 
-					this.renderLast(buttonsRange)
+		},
+		/**
+		 * render button which jump to previous page section
+		 * @param buttonsRange
+		 * @returns {XML}
+		 */
+		renderPreviousSection: function (buttonsRange) {
+			return (React.createElement("li", null, 
+				React.createElement("a", {href: "javascript:void(0);", "aria-label": "PreviousSection", onClick: this.toPreviousSection}, 
+					React.createElement("span", {className: "fa fa-fw fa-backward"})
 				)
-			)
-		));
-	},
-	/**
-	 * get current page index
-	 * @param button
-	 * @returns {*|jQuery}
-	 */
-	getCurrentPageIndex: function (button) {
-		if (button) {
-			return $(button).attr("data-index");
-		} else {
-			return this.props.currentPageIndex * 1;
+			));
+		},
+		/**
+		 * render button which jump to previous page
+		 * @param buttonsRange
+		 * @returns {XML}
+		 */
+		renderPrevious: function (buttonsRange) {
+			return (React.createElement("li", null, 
+				React.createElement("a", {href: "javascript:void(0);", "aria-label": "Previous", onClick: this.toPrevious}, 
+					React.createElement("span", {className: "fa fa-fw fa-chevron-left"})
+				)
+			));
+		},
+		/**
+		 * render buttons
+		 * @param buttonsRange
+		 * @returns {[XML]}
+		 */
+		renderButtons: function (buttonsRange) {
+			var buttons = [];
+			for (var index = buttonsRange.min; index <= buttonsRange.max; index++) {
+				buttons.push(index);
+			}
+			var _this = this;
+			return buttons.map(function (index) {
+				var css = {};
+				if (index == _this.getCurrentPageIndex()) {
+					css.active = true;
+				}
+				return (React.createElement("li", null, 
+					React.createElement("a", {href: "javascript:void(0);", 
+					   onClick: _this.toPage, 
+					   "data-index": index, 
+					   className: $pt.LayoutHelper.classSet(css)}, index)
+				));
+			});
+		},
+		/**
+		 * render button which jump to next page
+		 * @param buttonsRange
+		 * @returns {XML}
+		 */
+		renderNext: function (buttonsRange) {
+			return (React.createElement("li", null, 
+				React.createElement("a", {href: "javascript:void(0);", "aria-label": "Next", onClick: this.toNext}, 
+					React.createElement("span", {className: "fa fa-fw fa-chevron-right"})
+				)
+			));
+		},
+		/**
+		 * render button which jump to next page section
+		 * @param buttonsRange
+		 * @returns {XML}
+		 */
+		renderNextSection: function (buttonsRange) {
+			return (React.createElement("li", null, 
+				React.createElement("a", {href: "javascript:void(0);", "aria-label": "NextSection", onClick: this.toNextSection}, 
+					React.createElement("span", {className: "fa fa-fw fa-forward"})
+				)
+			));
+		},
+		/**
+		 * render button which jump to last page
+		 * @param buttonsRange
+		 * @returns {XML}
+		 */
+		renderLast: function (buttonsRange) {
+			return (React.createElement("li", null, 
+				React.createElement("a", {href: "javascript:void(0);", "aria-label": "Last", onClick: this.toLast}, 
+					React.createElement("span", {className: "fa fa-fw fa-fast-forward"})
+				)
+			));
+		},
+		/**
+		 * render status
+		 * @returns {XML}
+		 */
+		renderStatus: function () {
+			if (this.props.showStatus) {
+				return (React.createElement("div", {className: "n-pagination-status col-sm-2 col-md-2 col-lg-2"}, 
+					React.createElement("div", null, 
+						"Page: ", this.getCurrentPageIndex(), " / ", this.getPageCount()
+					)
+				));
+			} else {
+				return null;
+			}
+		},
+		/**
+		 * override react method
+		 * @returns {XML}
+		 * @override
+		 */
+		render: function () {
+			var buttonsRange = this.getPageButtonsRange();
+			var css = {
+				row: true,
+				'n-pagination': true
+			};
+			if (this.props.className) {
+				css[this.props.className] = true;
+			}
+			var buttonCSS = {
+				'n-pagination-buttons': true,
+				'col-sm-10 col-md-10 col-lg-10': this.props.showStatus,
+				'col-sm-12 col-md-12 col-lg-12': !this.props.showStatus
+			};
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
+				this.renderStatus(), 
+				React.createElement("div", {className: $pt.LayoutHelper.classSet(buttonCSS)}, 
+					React.createElement("ul", {className: "pagination"}, 
+						this.renderFirst(buttonsRange), 
+						this.renderPreviousSection(buttonsRange), 
+						this.renderPrevious(buttonsRange), 
+						this.renderButtons(buttonsRange), 
+						this.renderNext(buttonsRange), 
+						this.renderNextSection(buttonsRange), 
+						this.renderLast(buttonsRange)
+					)
+				)
+			));
+		},
+		/**
+		 * get current page index
+		 * @param button
+		 * @returns {*|jQuery}
+		 */
+		getCurrentPageIndex: function (button) {
+			if (button) {
+				return $(button).attr("data-index");
+			} else {
+				return this.props.currentPageIndex * 1;
+			}
+		},
+		getPageCount: function () {
+			return this.props.pageCount * 1;
+		},
+		/**
+		 * jump to first page
+		 */
+		toFirst: function () {
+			this.jumpTo(1);
+		},
+		/**
+		 * jump to previous page section
+		 */
+		toPreviousSection: function () {
+			var previousIndex = this.getCurrentPageIndex() - this.getMaxPageButtons();
+			previousIndex = previousIndex < 1 ? 1 : previousIndex;
+			this.jumpTo(previousIndex);
+		},
+		/**
+		 * jump to previous page
+		 */
+		toPrevious: function () {
+			var previousIndex = this.getCurrentPageIndex() - 1;
+			this.jumpTo(previousIndex < 1 ? 1 : previousIndex);
+		},
+		/**
+		 * jump to given page according to event
+		 * @param evt
+		 */
+		toPage: function (evt) {
+			this.jumpTo(this.getCurrentPageIndex(evt.target));
+		},
+		/**
+		 * jump to next page
+		 */
+		toNext: function () {
+			var nextIndex = this.getCurrentPageIndex() + 1;
+			this.jumpTo(nextIndex > this.getPageCount() ? this.getPageCount() : nextIndex);
+		},
+		/**
+		 * jump to next page section
+		 */
+		toNextSection: function () {
+			var nextIndex = this.getCurrentPageIndex() + this.getMaxPageButtons();
+			nextIndex = nextIndex > this.getPageCount() ? this.getPageCount() : nextIndex;
+			this.jumpTo(nextIndex);
+		},
+		/**
+		 * jump to last page
+		 */
+		toLast: function () {
+			this.jumpTo(this.getPageCount());
+		},
+		/**
+		 * jump to given page index
+		 * @param pageIndex
+		 */
+		jumpTo: function (pageIndex) {
+			pageIndex = pageIndex * 1;
+			$(':focus').blur();
+			if (pageIndex - this.getCurrentPageIndex() == 0) {
+				return;
+			}
+			this.props.currentPageIndex = pageIndex;
+			this.forceUpdate();
+			if (this.props.toPage) {
+				this.props.toPage.call(this, pageIndex);
+			}
 		}
-	},
-	getPageCount: function () {
-		return this.props.pageCount * 1;
-	},
-	/**
-	 * jump to first page
-	 */
-	toFirst: function () {
-		this.jumpTo(1);
-	},
-	/**
-	 * jump to previous page section
-	 */
-	toPreviousSection: function () {
-		var previousIndex = this.getCurrentPageIndex() - this.getMaxPageButtons();
-		previousIndex = previousIndex < 1 ? 1 : previousIndex;
-		this.jumpTo(previousIndex);
-	},
-	/**
-	 * jump to previous page
-	 */
-	toPrevious: function () {
-		var previousIndex = this.getCurrentPageIndex() - 1;
-		this.jumpTo(previousIndex < 1 ? 1 : previousIndex);
-	},
-	/**
-	 * jump to given page according to event
-	 * @param evt
-	 */
-	toPage: function (evt) {
-		this.jumpTo(this.getCurrentPageIndex(evt.target));
-	},
-	/**
-	 * jump to next page
-	 */
-	toNext: function () {
-		var nextIndex = this.getCurrentPageIndex() + 1;
-		this.jumpTo(nextIndex > this.getPageCount() ? this.getPageCount() : nextIndex);
-	},
-	/**
-	 * jump to next page section
-	 */
-	toNextSection: function () {
-		var nextIndex = this.getCurrentPageIndex() + this.getMaxPageButtons();
-		nextIndex = nextIndex > this.getPageCount() ? this.getPageCount() : nextIndex;
-		this.jumpTo(nextIndex);
-	},
-	/**
-	 * jump to last page
-	 */
-	toLast: function () {
-		this.jumpTo(this.getPageCount());
-	},
-	/**
-	 * jump to given page index
-	 * @param pageIndex
-	 */
-	jumpTo: function (pageIndex) {
-		pageIndex = pageIndex * 1;
-		$(':focus').blur();
-		if (pageIndex - this.getCurrentPageIndex() == 0) {
-			return;
-		}
-		this.props.currentPageIndex = pageIndex;
-		this.forceUpdate();
-		if (this.props.toPage) {
-			this.props.toPage.call(this, pageIndex);
-		}
-	}
-});
+	});
+	context.NPagination = NPagination;
+}(this, jQuery, $pt));
+
 /**
  * panel
  * depends NForm
@@ -7516,532 +7809,539 @@ var NPagination = React.createClass({displayName: "NPagination",
  *      }
  * }
  */
-var NPanel = React.createClass($pt.defineCellComponent({
-	propTypes: {
-		// model
-		model: React.PropTypes.object,
-		// CellLayout
-		layout: React.PropTypes.object,
-		direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
-	},
-	/**
-	 * will update
-	 * @param nextProps
-	 */
-	componentWillUpdate: function (nextProps) {
-		if (this.hasCheckInTitle()) {
-			this.getModel().removeListener(this.getCheckInTitleDataId(), 'post', 'change', this.onTitleCheckChanged);
-		}
-		this.removeDependencyMonitor(this.getDependencies("collapsedLabel"));
-		this.removeDependencyMonitor(this.getDependencies("expandedLabel"));
-	},
-	/**
-	 * did update
-	 * @param prevProps
-	 * @param prevState
-	 */
-	componentDidUpdate: function (prevProps, prevState) {
-		if (this.hasCheckInTitle()) {
-			this.getModel().addListener(this.getCheckInTitleDataId(), 'post', 'change', this.onTitleCheckChanged);
-		}
-		this.addDependencyMonitor(this.getDependencies("collapsedLabel"));
-		this.addDependencyMonitor(this.getDependencies("expandedLabel"));
-	},
-	/**
-	 * did mount
-	 */
-	componentDidMount: function () {
-		if (this.hasCheckInTitle()) {
-			this.getModel().addListener(this.getCheckInTitleDataId(), 'post', 'change', this.onTitleCheckChanged);
-		}
-		this.addDependencyMonitor(this.getDependencies("collapsedLabel"));
-		this.addDependencyMonitor(this.getDependencies("expandedLabel"));
-	},
-	/**
-	 * will unmount
-	 */
-	componentWillUnmount: function () {
-		if (this.hasCheckInTitle()) {
-			this.getModel().removeListener(this.getCheckInTitleDataId(), 'post', 'change', this.onTitleCheckChanged);
-		}
-		this.addDependencyMonitor(this.getDependencies("collapsedLabel"));
-		this.addDependencyMonitor(this.getDependencies("expandedLabel"));
-	},
-	getDefaultProps: function () {
-		return {
-			defaultOptions: {
-				collapsible: false,
-				expanded: true,
-				style: 'default'
-			}
-		};
-	},
-	getInitialState: function () {
-		return {
-			expanded: null
-		};
-	},
-	/**
-	 * render check in title
-	 * @returns {XML}
-	 */
-	renderCheckInTitle: function () {
-		if (!this.hasCheckInTitle()) {
-			return null;
-		}
-
-		var layout = {
-			label: this.getCheckInTitleLabel(),
-			dataId: this.getCheckInTitleDataId(),
-			comp: $.extend({labelAttached: 'left'}, this.getCheckInTitleOption(), {
-				type: $pt.ComponentConstants.Check,
-				labelDirection: 'horizontal'
-			})
-		};
-		return (React.createElement("div", null, 
-			"(", 
-			React.createElement(NCheck, {model: this.getModel(), layout: $pt.createCellLayout('check', layout)}), 
-			")"
-		));
-	},
-	/**
-	 * render heading
-	 * @returns {XML}
-	 */
-	renderHeading: function () {
-		var label = this.getTitle();
-		var css = {
-			'panel-title': true
-		};
-		if (this.isCollapsible()) {
-			css['n-collapsible-title-check'] = this.hasCheckInTitle();
-			return (React.createElement("div", {className: "panel-heading"}, 
-				React.createElement("h4", {className: $pt.LayoutHelper.classSet(css)}, 
-					React.createElement("a", {href: "javascript:void(0);", onClick: this.onTitleClicked, ref: "head"}, label), 
-					this.renderCheckInTitle()
-				)
-			));
-		} else if (this.hasCheckInTitle()) {
-			css['n-normal-title-check'] = this.hasCheckInTitle();
-			return (React.createElement("div", {className: "panel-heading"}, 
-				React.createElement("h4", {className: $pt.LayoutHelper.classSet(css)}, 
-					React.createElement("span", {ref: "head"}, label), 
-					this.renderCheckInTitle()
-				)
-			));
-		} else {
-			return React.createElement("div", {className: "panel-heading", ref: "head"}, label);
-		}
-	},
-	/**
-	 * render row
-	 * @param row {RowLayout}
-	 */
-	renderRow: function (row) {
-		var _this = this;
-		var cells = row.getCells().map(function (cell) {
-			return React.createElement(NFormCell, {layout: cell, 
-			                  model: _this.getModel(), 
-			                  ref: cell.getId(), 
-			                  direction: _this.props.direction});
-		});
-		return (React.createElement("div", {className: "row"}, cells));
-	},
-	/**
-	 * render
-	 * @returns {XML}
-	 */
-	render: function () {
-		var label = this.getLayout().getLabel();
-		if (label == null) {
-			return (React.createElement("div", {ref: "panel"}, 
-				this.getInnerLayout().getRows().map(this.renderRow)
-			));
-		}
-		var css = {
-			panel: true
-		};
-		css['panel-' + this.getStyle()] = true;
-		css[this.getComponentCSS('n-panel')] = true;
-		var bodyStyle = {
-			display: this.isInitExpanded() ? 'block' : 'none'
-		};
-		return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), ref: "panel"}, 
-			this.renderHeading(), 
-			React.createElement("div", {className: "panel-body", style: bodyStyle, ref: "body"}, 
-				this.getInnerLayout().getRows().map(this.renderRow)
-			)
-		));
-	},
-	/**
-	 * get inner layout
-	 * @returns {SectionLayout}
-	 */
-	getInnerLayout: function () {
-		if (this.state.innerLayout == null) {
-			this.state.innerLayout = $pt.createSectionLayout({layout: this.getComponentOption('editLayout')});
-		}
-		return this.state.innerLayout;
-	},
-	/**
-	 * is collapsible or not
-	 * @returns {boolean}
-	 */
-	isCollapsible: function () {
-		return this.getComponentOption('collapsible');
-	},
-	/**
-	 * is expanded
-	 * @returns {boolean}
-	 */
-	isInitExpanded: function () {
-		if (this.state.expanded == null) {
-			// first equals 'expanded' definition
-			this.state.expanded = this.getComponentOption('expanded');
+(function (context, $, $pt) {
+	var NPanel = React.createClass($pt.defineCellComponent({
+		propTypes: {
+			// model
+			model: React.PropTypes.object,
+			// CellLayout
+			layout: React.PropTypes.object,
+			direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
+		},
+		/**
+		 * will update
+		 * @param nextProps
+		 */
+		componentWillUpdate: function (nextProps) {
 			if (this.hasCheckInTitle()) {
-				// when there is a check-box in title
-				var value = this.getCheckInTitleValue();
-				var action = this.getCheckInTitleCollapsible();
-				if (action === 'same') {
-					// check behavior same as collapsible
-					// all expanded, finally expanded
-					this.state.expanded = this.state.expanded && (value === true);
-				} else if (action === 'reverse') {
-					// check behavior reversed as collapsible
-					// all expanded, finally expanded
-					this.state.expanded = this.state.expanded && (value !== true);
+				this.getModel().removeListener(this.getCheckInTitleDataId(), 'post', 'change', this.onTitleCheckChanged);
+			}
+			this.removeDependencyMonitor(this.getDependencies("collapsedLabel"));
+			this.removeDependencyMonitor(this.getDependencies("expandedLabel"));
+		},
+		/**
+		 * did update
+		 * @param prevProps
+		 * @param prevState
+		 */
+		componentDidUpdate: function (prevProps, prevState) {
+			if (this.hasCheckInTitle()) {
+				this.getModel().addListener(this.getCheckInTitleDataId(), 'post', 'change', this.onTitleCheckChanged);
+			}
+			this.addDependencyMonitor(this.getDependencies("collapsedLabel"));
+			this.addDependencyMonitor(this.getDependencies("expandedLabel"));
+		},
+		/**
+		 * did mount
+		 */
+		componentDidMount: function () {
+			if (this.hasCheckInTitle()) {
+				this.getModel().addListener(this.getCheckInTitleDataId(), 'post', 'change', this.onTitleCheckChanged);
+			}
+			this.addDependencyMonitor(this.getDependencies("collapsedLabel"));
+			this.addDependencyMonitor(this.getDependencies("expandedLabel"));
+		},
+		/**
+		 * will unmount
+		 */
+		componentWillUnmount: function () {
+			if (this.hasCheckInTitle()) {
+				this.getModel().removeListener(this.getCheckInTitleDataId(), 'post', 'change', this.onTitleCheckChanged);
+			}
+			this.addDependencyMonitor(this.getDependencies("collapsedLabel"));
+			this.addDependencyMonitor(this.getDependencies("expandedLabel"));
+		},
+		getDefaultProps: function () {
+			return {
+				defaultOptions: {
+					collapsible: false,
+					expanded: true,
+					style: 'default'
+				}
+			};
+		},
+		getInitialState: function () {
+			return {
+				expanded: null
+			};
+		},
+		/**
+		 * render check in title
+		 * @returns {XML}
+		 */
+		renderCheckInTitle: function () {
+			if (!this.hasCheckInTitle()) {
+				return null;
+			}
+
+			var layout = {
+				label: this.getCheckInTitleLabel(),
+				dataId: this.getCheckInTitleDataId(),
+				comp: $.extend({labelAttached: 'left'}, this.getCheckInTitleOption(), {
+					type: $pt.ComponentConstants.Check,
+					labelDirection: 'horizontal'
+				})
+			};
+			return (React.createElement("div", null, 
+				"(", 
+				React.createElement(NCheck, {model: this.getModel(), layout: $pt.createCellLayout('check', layout)}), 
+				")"
+			));
+		},
+		/**
+		 * render heading
+		 * @returns {XML}
+		 */
+		renderHeading: function () {
+			var label = this.getTitle();
+			var css = {
+				'panel-title': true
+			};
+			if (this.isCollapsible()) {
+				css['n-collapsible-title-check'] = this.hasCheckInTitle();
+				return (React.createElement("div", {className: "panel-heading"}, 
+					React.createElement("h4", {className: $pt.LayoutHelper.classSet(css)}, 
+						React.createElement("a", {href: "javascript:void(0);", onClick: this.onTitleClicked, ref: "head"}, label), 
+						this.renderCheckInTitle()
+					)
+				));
+			} else if (this.hasCheckInTitle()) {
+				css['n-normal-title-check'] = this.hasCheckInTitle();
+				return (React.createElement("div", {className: "panel-heading"}, 
+					React.createElement("h4", {className: $pt.LayoutHelper.classSet(css)}, 
+						React.createElement("span", {ref: "head"}, label), 
+						this.renderCheckInTitle()
+					)
+				));
+			} else {
+				return React.createElement("div", {className: "panel-heading", ref: "head"}, label);
+			}
+		},
+		/**
+		 * render row
+		 * @param row {RowLayout}
+		 */
+		renderRow: function (row) {
+			var _this = this;
+			var cells = row.getCells().map(function (cell) {
+				return React.createElement(NFormCell, {layout: cell, 
+				                  model: _this.getModel(), 
+				                  ref: cell.getId(), 
+				                  direction: _this.props.direction});
+			});
+			return (React.createElement("div", {className: "row"}, cells));
+		},
+		/**
+		 * render
+		 * @returns {XML}
+		 */
+		render: function () {
+			var label = this.getLayout().getLabel();
+			if (label == null) {
+				return (React.createElement("div", {ref: "panel"}, 
+					this.getInnerLayout().getRows().map(this.renderRow)
+				));
+			}
+			var css = {
+				panel: true
+			};
+			css['panel-' + this.getStyle()] = true;
+			css[this.getComponentCSS('n-panel')] = true;
+			var bodyStyle = {
+				display: this.isInitExpanded() ? 'block' : 'none'
+			};
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), ref: "panel"}, 
+				this.renderHeading(), 
+				React.createElement("div", {className: "panel-body", style: bodyStyle, ref: "body"}, 
+					this.getInnerLayout().getRows().map(this.renderRow)
+				)
+			));
+		},
+		/**
+		 * get inner layout
+		 * @returns {SectionLayout}
+		 */
+		getInnerLayout: function () {
+			if (this.state.innerLayout == null) {
+				this.state.innerLayout = $pt.createSectionLayout({layout: this.getComponentOption('editLayout')});
+			}
+			return this.state.innerLayout;
+		},
+		/**
+		 * is collapsible or not
+		 * @returns {boolean}
+		 */
+		isCollapsible: function () {
+			return this.getComponentOption('collapsible');
+		},
+		/**
+		 * is expanded
+		 * @returns {boolean}
+		 */
+		isInitExpanded: function () {
+			if (this.state.expanded == null) {
+				// first equals 'expanded' definition
+				this.state.expanded = this.getComponentOption('expanded');
+				if (this.hasCheckInTitle()) {
+					// when there is a check-box in title
+					var value = this.getCheckInTitleValue();
+					var action = this.getCheckInTitleCollapsible();
+					if (action === 'same') {
+						// check behavior same as collapsible
+						// all expanded, finally expanded
+						this.state.expanded = this.state.expanded && (value === true);
+					} else if (action === 'reverse') {
+						// check behavior reversed as collapsible
+						// all expanded, finally expanded
+						this.state.expanded = this.state.expanded && (value !== true);
+					}
 				}
 			}
-		}
-		return this.state.expanded;
-	},
-	/**
-	 * get style
-	 * @returns {string}
-	 */
-	getStyle: function () {
-		return this.getComponentOption('style');
-	},
-	getTitle: function() {
-		var label = this.getLayout().getLabel();
-		if (this.state.expanded) {
-			var expandedLabel = this.getExpandedLabelRenderer();
-			if (expandedLabel) {
-				if (typeof expandedLabel === 'string') {
-					label = expandedLabel;
-				} else {
-					label = expandedLabel.when.call(this, this.getModel());
+			return this.state.expanded;
+		},
+		/**
+		 * get style
+		 * @returns {string}
+		 */
+		getStyle: function () {
+			return this.getComponentOption('style');
+		},
+		getTitle: function () {
+			var label = this.getLayout().getLabel();
+			if (this.state.expanded) {
+				var expandedLabel = this.getExpandedLabelRenderer();
+				if (expandedLabel) {
+					if (typeof expandedLabel === 'string') {
+						label = expandedLabel;
+					} else {
+						label = expandedLabel.when.call(this, this.getModel());
+					}
+				}
+			} else {
+				var collapsedLabel = this.getCollapsedLabelRenderer();
+				if (collapsedLabel) {
+					if (typeof collapsedLabel === 'string') {
+						label = collapsedLabel;
+					} else {
+						label = collapsedLabel.when.call(this, this.getModel());
+					}
 				}
 			}
-		} else {
-			var collapsedLabel = this.getCollapsedLabelRenderer();
-			if (collapsedLabel) {
-				if (typeof collapsedLabel === 'string') {
-					label = collapsedLabel;
-				} else {
-					label = collapsedLabel.when.call(this, this.getModel());
-				}
+			return label;
+		},
+		getExpandedLabelRenderer: function () {
+			return this.getComponentOption('expandedLabel');
+		},
+		getCollapsedLabelRenderer: function () {
+			return this.getComponentOption('collapsedLabel');
+		},
+		/**
+		 * has check box in title or not
+		 * @returns {boolean}
+		 */
+		hasCheckInTitle: function () {
+			return this.getComponentOption('checkInTitle') != null;
+		},
+		/**
+		 * get check box value of panel title
+		 * @returns {boolean}
+		 */
+		getCheckInTitleValue: function () {
+			var id = this.getCheckInTitleDataId();
+			return id ? this.getModel().get(id) : null;
+		},
+		/**
+		 * get check box data id of panel title
+		 * @returns {string}
+		 */
+		getCheckInTitleDataId: function () {
+			var checkInTitle = this.getComponentOption('checkInTitle');
+			return checkInTitle ? checkInTitle.data : null;
+		},
+		/**
+		 * get check box label of panel title
+		 * @returns {string}
+		 */
+		getCheckInTitleLabel: function () {
+			var checkInTitle = this.getComponentOption('checkInTitle');
+			return checkInTitle ? checkInTitle.label : null;
+		},
+		/**
+		 * get check box value and collapsible is related or not
+		 * @returns {same|reverse}
+		 */
+		getCheckInTitleCollapsible: function () {
+			var checkInTitle = this.getComponentOption('checkInTitle');
+			return checkInTitle ? checkInTitle.collapsible : null;
+		},
+		/**
+		 * get other check in title options
+		 * @returns {null}
+		 */
+		getCheckInTitleOption: function () {
+			var checkInTitle = this.getComponentOption('checkInTitle');
+			if (checkInTitle) {
+				var options = $.extend({}, checkInTitle);
+				delete options.data;
+				delete options.label;
+				delete options.collapsible;
+				return options;
+			} else {
+				return null;
 			}
-		}
-		return label;
-	},
-	getExpandedLabelRenderer: function () {
-		return this.getComponentOption('expandedLabel');
-	},
-	getCollapsedLabelRenderer: function () {
-		return this.getComponentOption('collapsedLabel');
-	},
-	/**
-	 * has check box in title or not
-	 * @returns {boolean}
-	 */
-	hasCheckInTitle: function () {
-		return this.getComponentOption('checkInTitle') != null;
-	},
-	/**
-	 * get check box value of panel title
-	 * @returns {boolean}
-	 */
-	getCheckInTitleValue: function () {
-		var id = this.getCheckInTitleDataId();
-		return id ? this.getModel().get(id) : null;
-	},
-	/**
-	 * get check box data id of panel title
-	 * @returns {string}
-	 */
-	getCheckInTitleDataId: function () {
-		var checkInTitle = this.getComponentOption('checkInTitle');
-		return checkInTitle ? checkInTitle.data : null;
-	},
-	/**
-	 * get check box label of panel title
-	 * @returns {string}
-	 */
-	getCheckInTitleLabel: function () {
-		var checkInTitle = this.getComponentOption('checkInTitle');
-		return checkInTitle ? checkInTitle.label : null;
-	},
-	/**
-	 * get check box value and collapsible is related or not
-	 * @returns {same|reverse}
-	 */
-	getCheckInTitleCollapsible: function () {
-		var checkInTitle = this.getComponentOption('checkInTitle');
-		return checkInTitle ? checkInTitle.collapsible : null;
-	},
-	/**
-	 * get other check in title options
-	 * @returns {null}
-	 */
-	getCheckInTitleOption: function () {
-		var checkInTitle = this.getComponentOption('checkInTitle');
-		if (checkInTitle) {
-			var options = $.extend({}, checkInTitle);
-			delete options.data;
-			delete options.label;
-			delete options.collapsible;
-			return options;
-		} else {
-			return null;
-		}
-	},
-	/**
-	 * on title clicked
-	 * @param e
-	 */
-	onTitleClicked: function (e) {
-		e.selected = false;
-		e.preventDefault();
-		this.toggleExpanded(!this.state.expanded);
-	},
-	/**
-	 * on title check-box value changed
-	 * @param evt
-	 */
-	onTitleCheckChanged: function (evt) {
-		var value = evt.new;
-		var collapsible = this.getCheckInTitleCollapsible();
-		if (collapsible === 'same') {
-			this.toggleExpanded(value);
-		} else if (collapsible === 'reverse') {
-			this.toggleExpanded(!value);
-		}
-	},
-	/**
-	 * toggle panel expanded
-	 * @param expanded {boolean}
-	 */
-	toggleExpanded: function (expanded) {
-		if (expanded) {
-			if (this.canExpanded()) {
-				// panel can be expanded
-				$(React.findDOMNode(this.refs.body)).slideDown(300, function () {
-					this.setState({expanded: true});
-				}.bind(this));
-			}
-		} else {
-			$(React.findDOMNode(this.refs.body)).slideUp(300, function () {
-				this.setState({expanded: false});
-			}.bind(this));
-		}
-	},
-	/**
-	 * check the panel can expanded or not
-	 * @returns {boolean}
-	 */
-	canExpanded: function () {
-		if (this.hasCheckInTitle()) {
-			var value = this.getCheckInTitleValue();
+		},
+		/**
+		 * on title clicked
+		 * @param e
+		 */
+		onTitleClicked: function (e) {
+			e.selected = false;
+			e.preventDefault();
+			this.toggleExpanded(!this.state.expanded);
+		},
+		/**
+		 * on title check-box value changed
+		 * @param evt
+		 */
+		onTitleCheckChanged: function (evt) {
+			var value = evt.new;
 			var collapsible = this.getCheckInTitleCollapsible();
 			if (collapsible === 'same') {
-				// check behavior same as collapsible
-				return value === true;
+				this.toggleExpanded(value);
 			} else if (collapsible === 'reverse') {
-				// check behavior reversed as collapsible
-				return value !== true;
+				this.toggleExpanded(!value);
 			}
+		},
+		/**
+		 * toggle panel expanded
+		 * @param expanded {boolean}
+		 */
+		toggleExpanded: function (expanded) {
+			if (expanded) {
+				if (this.canExpanded()) {
+					// panel can be expanded
+					$(React.findDOMNode(this.refs.body)).slideDown(300, function () {
+						this.setState({expanded: true});
+					}.bind(this));
+				}
+			} else {
+				$(React.findDOMNode(this.refs.body)).slideUp(300, function () {
+					this.setState({expanded: false});
+				}.bind(this));
+			}
+		},
+		/**
+		 * check the panel can expanded or not
+		 * @returns {boolean}
+		 */
+		canExpanded: function () {
+			if (this.hasCheckInTitle()) {
+				var value = this.getCheckInTitleValue();
+				var collapsible = this.getCheckInTitleCollapsible();
+				if (collapsible === 'same') {
+					// check behavior same as collapsible
+					return value === true;
+				} else if (collapsible === 'reverse') {
+					// check behavior reversed as collapsible
+					return value !== true;
+				}
+			}
+			return true;
 		}
-		return true;
-	}
-}));
+	}));
+	context.NPanel = NPanel;
+}(this, jQuery, $pt));
 
 /**
  * panel footer which only contains buttons
  * depends NFormButton
  */
-var NPanelFooter = React.createClass({displayName: "NPanelFooter",
-	statics: {
-		RESET_TEXT: "Reset",
-		RESET_ICON: "reply-all",
-		RESET_STYLE: "warning",
+(function (context, $, $pt) {
+	var NPanelFooter = React.createClass({displayName: "NPanelFooter",
+		statics: {
+			RESET_TEXT: "Reset",
+			RESET_ICON: "reply-all",
+			RESET_STYLE: "warning",
 
-		VALIDATE_TEXT: "Validate",
-		VALIDATE_ICON: "bug",
-		VALIDATE_STYLE: "default",
+			VALIDATE_TEXT: "Validate",
+			VALIDATE_ICON: "bug",
+			VALIDATE_STYLE: "default",
 
-		SAVE_TEXT: 'Save',
-		SAVE_ICON: 'floppy-o',
-		SAVE_STYLE: 'primary',
+			SAVE_TEXT: 'Save',
+			SAVE_ICON: 'floppy-o',
+			SAVE_STYLE: 'primary',
 
-		CANCEL_TEXT: 'Cancel',
-		CANCEL_ICON: 'ban',
-		CANCEL_STYLE: 'danger'
-	},
-	propTypes: {
-		save: React.PropTypes.func,
-		validate: React.PropTypes.func,
-		cancel: React.PropTypes.func,
-		reset: React.PropTypes.func,
+			CANCEL_TEXT: 'Cancel',
+			CANCEL_ICON: 'ban',
+			CANCEL_STYLE: 'danger'
+		},
+		propTypes: {
+			save: React.PropTypes.func,
+			validate: React.PropTypes.func,
+			cancel: React.PropTypes.func,
+			reset: React.PropTypes.func,
 
-		left: React.PropTypes.arrayOf(React.PropTypes.shape({
-			icon: React.PropTypes.string,
-			text: React.PropTypes.string,
-			style: React.PropTypes.string,
-			click: React.PropTypes.func.isRequired,
-			enabled: React.PropTypes.shape({
-				when: React.PropTypes.func,
-				depends: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.arrayOf(React.PropTypes.string)])
-			})
-		})),
-		right: React.PropTypes.arrayOf(React.PropTypes.shape({
-			icon: React.PropTypes.string,
-			text: React.PropTypes.string,
-			style: React.PropTypes.string, // references to bootstrap styles
-			click: React.PropTypes.func.isRequired,
-			enabled: React.PropTypes.shape({
-				when: React.PropTypes.func,
-				depends: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.arrayOf(React.PropTypes.string)])
-			})
-		})),
+			left: React.PropTypes.arrayOf(React.PropTypes.shape({
+				icon: React.PropTypes.string,
+				text: React.PropTypes.string,
+				style: React.PropTypes.string,
+				click: React.PropTypes.func.isRequired,
+				enabled: React.PropTypes.shape({
+					when: React.PropTypes.func,
+					depends: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.arrayOf(React.PropTypes.string)])
+				})
+			})),
+			right: React.PropTypes.arrayOf(React.PropTypes.shape({
+				icon: React.PropTypes.string,
+				text: React.PropTypes.string,
+				style: React.PropTypes.string, // references to bootstrap styles
+				click: React.PropTypes.func.isRequired,
+				enabled: React.PropTypes.shape({
+					when: React.PropTypes.func,
+					depends: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.arrayOf(React.PropTypes.string)])
+				})
+			})),
 
-		// model, pass to click
-		model: React.PropTypes.object
-	},
-	/**
-	 * will update
-	 * @param nextProps
-	 */
-	componentWillUpdate: function (nextProps) {
-	},
-	/**
-	 * did update
-	 * @param prevProps
-	 * @param prevState
-	 */
-	componentDidUpdate: function (prevProps, prevState) {
-	},
-	/**
-	 * did mount
-	 */
-	componentDidMount: function () {
-	},
-	/**
-	 * will unmount
-	 */
-	componentWillUnmount: function () {
-	},
-	/**
-	 * render left buttons
-	 */
-	renderLeftButtons: function () {
-		if (this.props.left) {
-			if (Array.isArray(this.props.left)) {
-				return this.props.left.map(this.renderButton);
+			// model, pass to click
+			model: React.PropTypes.object
+		},
+		/**
+		 * will update
+		 * @param nextProps
+		 */
+		componentWillUpdate: function (nextProps) {
+		},
+		/**
+		 * did update
+		 * @param prevProps
+		 * @param prevState
+		 */
+		componentDidUpdate: function (prevProps, prevState) {
+		},
+		/**
+		 * did mount
+		 */
+		componentDidMount: function () {
+		},
+		/**
+		 * will unmount
+		 */
+		componentWillUnmount: function () {
+		},
+		/**
+		 * render left buttons
+		 */
+		renderLeftButtons: function () {
+			if (this.props.left) {
+				if (Array.isArray(this.props.left)) {
+					return this.props.left.map(this.renderButton);
+				} else {
+					return this.renderButton(this.props.left);
+				}
 			} else {
-				return this.renderButton(this.props.left);
+				return null;
 			}
-		} else {
-			return null;
-		}
-	},
-	/**
-	 * render right buttons
-	 */
-	renderRightButtons: function () {
-		if (this.props.right) {
-			if (Array.isArray(this.props.right)) {
-				return this.props.right.map(this.renderButton);
+		},
+		/**
+		 * render right buttons
+		 */
+		renderRightButtons: function () {
+			if (this.props.right) {
+				if (Array.isArray(this.props.right)) {
+					return this.props.right.map(this.renderButton);
+				} else {
+					return this.renderButton(this.props.right);
+				}
 			} else {
-				return this.renderButton(this.props.right);
+				return null;
 			}
-		} else {
-			return null;
-		}
-	},
-	/**
-	 * render button
-	 */
-	renderButton: function (option) {
-		var layout = {
-			label: option.text,
-			comp: {
-				type: $pt.ComponentConstants.Button,
-				icon: option.icon,
-				style: option.style,
-				click: option.click,
-				enabled: option.enabled,
-				visible: option.visible
-			}
-		};
-		return React.createElement(NFormButton, {model: this.getModel(), layout: $pt.createCellLayout('pseudo-button', layout)});
-	},
-	/**
-	 * render
-	 * @returns {XML}
-	 */
-	render: function () {
-		return (React.createElement("div", {className: "row n-panel-footer"}, 
-			React.createElement("div", {className: "col-sm-12 col-md-12 col-lg-12"}, 
-				React.createElement(ButtonToolbar, {className: "n-panel-footer-left"}, 
-					this.props.reset ? this.renderButton({
-						icon: NPanelFooter.RESET_ICON,
-						text: NPanelFooter.RESET_TEXT,
-						style: NPanelFooter.RESET_STYLE,
-						click: this.props.reset.click ? this.props.reset.click : this.props.reset,
-						enabled: this.props.reset.enabled ? this.props.reset.enabled : true,
-						visible: this.props.reset.visible ? this.props.reset.visible : true
-					}) : null, 
-					this.props.validate ? this.renderButton({
-						icon: NPanelFooter.VALIDATE_ICON,
-						text: NPanelFooter.VALIDATE_TEXT,
-						style: NPanelFooter.VALIDATE_STYLE,
-						click: this.props.validate.click ? this.props.validate.click : this.props.validate,
-						enabled: this.props.validate.enabled ? this.props.validate.enabled : true,
-						visible: this.props.validate.visible ? this.props.validate.visible : true
-					}) : null, 
-					this.renderLeftButtons()
-				), 
-				React.createElement(ButtonToolbar, {className: "n-panel-footer-right"}, 
-					this.props.cancel ? this.renderButton({
-						icon: NPanelFooter.CANCEL_ICON,
-						text: NPanelFooter.CANCEL_TEXT,
-						style: NPanelFooter.CANCEL_STYLE,
-						click: this.props.cancel.click ? this.props.cancel.click : this.props.cancel,
-						enabled: this.props.cancel.enabled ? this.props.cancel.enabled : true,
-						visible: this.props.cancel.visible ? this.props.cancel.visible : true
-					}) : null, 
-					this.props.save ? this.renderButton({
-						icon: NPanelFooter.SAVE_ICON,
-						text: NPanelFooter.SAVE_TEXT,
-						style: NPanelFooter.SAVE_STYLE,
-						click: this.props.save.click ? this.props.save.click : this.props.save,
-						enabled: this.props.save.enabled ? this.props.save.enabled : true,
-						visible: this.props.save.visible ? this.props.save.visible : true
-					}) : null, 
-					this.renderRightButtons()
+		},
+		/**
+		 * render button
+		 */
+		renderButton: function (option) {
+			var layout = {
+				label: option.text,
+				comp: {
+					type: $pt.ComponentConstants.Button,
+					icon: option.icon,
+					style: option.style,
+					click: option.click,
+					enabled: option.enabled,
+					visible: option.visible
+				}
+			};
+			return React.createElement(NFormButton, {model: this.getModel(), layout: $pt.createCellLayout('pseudo-button', layout)});
+		},
+		/**
+		 * render
+		 * @returns {XML}
+		 */
+		render: function () {
+			return (React.createElement("div", {className: "row n-panel-footer"}, 
+				React.createElement("div", {className: "col-sm-12 col-md-12 col-lg-12"}, 
+					React.createElement(ButtonToolbar, {className: "n-panel-footer-left"}, 
+						this.props.reset ? this.renderButton({
+							icon: NPanelFooter.RESET_ICON,
+							text: NPanelFooter.RESET_TEXT,
+							style: NPanelFooter.RESET_STYLE,
+							click: this.props.reset.click ? this.props.reset.click : this.props.reset,
+							enabled: this.props.reset.enabled ? this.props.reset.enabled : true,
+							visible: this.props.reset.visible ? this.props.reset.visible : true
+						}) : null, 
+						this.props.validate ? this.renderButton({
+							icon: NPanelFooter.VALIDATE_ICON,
+							text: NPanelFooter.VALIDATE_TEXT,
+							style: NPanelFooter.VALIDATE_STYLE,
+							click: this.props.validate.click ? this.props.validate.click : this.props.validate,
+							enabled: this.props.validate.enabled ? this.props.validate.enabled : true,
+							visible: this.props.validate.visible ? this.props.validate.visible : true
+						}) : null, 
+						this.renderLeftButtons()
+					), 
+					React.createElement(ButtonToolbar, {className: "n-panel-footer-right"}, 
+						this.props.cancel ? this.renderButton({
+							icon: NPanelFooter.CANCEL_ICON,
+							text: NPanelFooter.CANCEL_TEXT,
+							style: NPanelFooter.CANCEL_STYLE,
+							click: this.props.cancel.click ? this.props.cancel.click : this.props.cancel,
+							enabled: this.props.cancel.enabled ? this.props.cancel.enabled : true,
+							visible: this.props.cancel.visible ? this.props.cancel.visible : true
+						}) : null, 
+						this.props.save ? this.renderButton({
+							icon: NPanelFooter.SAVE_ICON,
+							text: NPanelFooter.SAVE_TEXT,
+							style: NPanelFooter.SAVE_STYLE,
+							click: this.props.save.click ? this.props.save.click : this.props.save,
+							enabled: this.props.save.enabled ? this.props.save.enabled : true,
+							visible: this.props.save.visible ? this.props.save.visible : true
+						}) : null, 
+						this.renderRightButtons()
+					)
 				)
-			)
-		));
-	},
-	/**
-	 * get model
-	 * @returns {ModelInterface}
-	 */
-	getModel: function () {
-		return this.props.model;
-	}
-});
+			));
+		},
+		/**
+		 * get model
+		 * @returns {ModelInterface}
+		 */
+		getModel: function () {
+			return this.props.model;
+		}
+	});
+	context.NPanelFooter = NPanelFooter;
+}(this, jQuery, $pt));
+
 /**
  * radio button
  * layout: {
@@ -8073,89 +8373,90 @@ var NPanelFooter = React.createClass({displayName: "NPanelFooter",
  *      }
  * }
  */
-var NRadio = React.createClass($pt.defineCellComponent({
-	propTypes: {
-		// model
-		model: React.PropTypes.object,
-		// CellLayout
-		layout: React.PropTypes.object
-	},
-	getDefaultProps: function () {
-		return {
-			defaultOptions: {
-				direction: 'horizontal',
-				labelAtLeft: false
-			}
-		};
-	},
-	/**
-	 * will update
-	 * @param nextProps
-	 */
-	componentWillUpdate: function (nextProps) {
-		// remove post change listener to handle model change
-		this.removePostChangeListener(this.onModelChanged);
-		this.removeEnableDependencyMonitor();
-	},
-	/**
-	 * did update
-	 * @param prevProps
-	 * @param prevState
-	 */
-	componentDidUpdate: function (prevProps, prevState) {
-		// add post change listener to handle model change
-		this.addPostChangeListener(this.onModelChanged);
-		this.addEnableDependencyMonitor();
-	},
-	/**
-	 * did mount
-	 */
-	componentDidMount: function () {
-		// add post change listener to handle model change
-		this.addPostChangeListener(this.onModelChanged);
-		this.addEnableDependencyMonitor();
-	},
-	/**
-	 * will unmount
-	 */
-	componentWillUnmount: function () {
-		// remove post change listener to handle model change
-		this.removePostChangeListener(this.onModelChanged);
-		this.removeEnableDependencyMonitor();
-	},
-	/**
-	 * render label
-	 * @param option {{text:string}}
-	 * @param labelInLeft {boolean}
-	 * @returns {XML}
-	 */
-	renderLabel: function (option, labelInLeft) {
-		var css = {
-			'radio-label': true,
-			disabled: !this.isEnabled(),
-			'radio-label-left': labelInLeft
-		};
-		return React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
-		             onClick: this.isEnabled() ? this.onButtonClicked.bind(this, option) : null}, 
+(function (context, $, $pt) {
+	var NRadio = React.createClass($pt.defineCellComponent({
+		propTypes: {
+			// model
+			model: React.PropTypes.object,
+			// CellLayout
+			layout: React.PropTypes.object
+		},
+		getDefaultProps: function () {
+			return {
+				defaultOptions: {
+					direction: 'horizontal',
+					labelAtLeft: false
+				}
+			};
+		},
+		/**
+		 * will update
+		 * @param nextProps
+		 */
+		componentWillUpdate: function (nextProps) {
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.onModelChanged);
+			this.removeEnableDependencyMonitor();
+		},
+		/**
+		 * did update
+		 * @param prevProps
+		 * @param prevState
+		 */
+		componentDidUpdate: function (prevProps, prevState) {
+			// add post change listener to handle model change
+			this.addPostChangeListener(this.onModelChanged);
+			this.addEnableDependencyMonitor();
+		},
+		/**
+		 * did mount
+		 */
+		componentDidMount: function () {
+			// add post change listener to handle model change
+			this.addPostChangeListener(this.onModelChanged);
+			this.addEnableDependencyMonitor();
+		},
+		/**
+		 * will unmount
+		 */
+		componentWillUnmount: function () {
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.onModelChanged);
+			this.removeEnableDependencyMonitor();
+		},
+		/**
+		 * render label
+		 * @param option {{text:string}}
+		 * @param labelInLeft {boolean}
+		 * @returns {XML}
+		 */
+		renderLabel: function (option, labelInLeft) {
+			var css = {
+				'radio-label': true,
+				disabled: !this.isEnabled(),
+				'radio-label-left': labelInLeft
+			};
+			return React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
+			             onClick: this.isEnabled() ? this.onButtonClicked.bind(this, option) : null}, 
             option.text
         );
-	},
-	/**
-	 * render radio button, using font awesome instead
-	 * @params option radio option
-	 * @returns {XML}
-	 */
-	renderRadio: function (option) {
-		var checked = this.getValueFromModel() == option.id;
-		var css = {
-			disabled: !this.isEnabled(),
-			checked: checked,
-			'radio-container': true
-		};
-		var labelAtLeft = this.isLabelAtLeft();
-		return (React.createElement("div", {className: "n-radio-option"}, 
-			labelAtLeft ? this.renderLabel(option, true) : null, 
-			React.createElement("div", {className: "radio-container"}, 
+		},
+		/**
+		 * render radio button, using font awesome instead
+		 * @params option radio option
+		 * @returns {XML}
+		 */
+		renderRadio: function (option) {
+			var checked = this.getValueFromModel() == option.id;
+			var css = {
+				disabled: !this.isEnabled(),
+				checked: checked,
+				'radio-container': true
+			};
+			var labelAtLeft = this.isLabelAtLeft();
+			return (React.createElement("div", {className: "n-radio-option"}, 
+				labelAtLeft ? this.renderLabel(option, true) : null, 
+				React.createElement("div", {className: "radio-container"}, 
                 React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
                       onClick: this.isEnabled() ? this.onButtonClicked.bind(this, option) : null, 
                       onKeyUp: this.isEnabled() ? this.onKeyUp.bind(this, option): null, 
@@ -8163,378 +8464,385 @@ var NRadio = React.createClass($pt.defineCellComponent({
                       ref: 'out-' + option.id}, 
                     React.createElement("span", {className: "check", onClick: this.onInnerClicked.bind(this, option)})
                 )
-			), 
-			labelAtLeft ? null : this.renderLabel(option, false)
-		));
-	},
-	render: function () {
-		var css = {
-			'n-radio': true,
-			vertical: this.getComponentOption('direction') === 'vertical',
-			'n-disabled': !this.isEnabled()
-		};
-		return (React.createElement("div", {className: this.getComponentCSS($pt.LayoutHelper.classSet(css))}, 
-			this.getComponentOption("data").map(this.renderRadio), 
-			React.createElement("input", {type: "hidden", style: {display: "none"}, 
-			       onChange: this.onComponentChanged, value: this.getValueFromModel(), 
-			       ref: "txt"})
-		));
-	},
-	/**
-	 * inner span clicked, force focus to outer span
-	 * for fix the outer span cannot gain focus in IE11
-	 * @param option
-	 */
-	onInnerClicked: function (option) {
-		$(React.findDOMNode(this.refs['out-' + option.id])).focus();
-	},
-	/**
-	 * on button clicked
-	 * @param option
-	 */
-	onButtonClicked: function (option) {
-		this.setValueToModel(option.id);
-	},
-	onKeyUp: function (option, evt) {
-		if (evt.keyCode == '32') {
-			this.onButtonClicked(option);
+				), 
+				labelAtLeft ? null : this.renderLabel(option, false)
+			));
+		},
+		render: function () {
+			var css = {
+				'n-radio': true,
+				vertical: this.getComponentOption('direction') === 'vertical',
+				'n-disabled': !this.isEnabled()
+			};
+			return (React.createElement("div", {className: this.getComponentCSS($pt.LayoutHelper.classSet(css))}, 
+				this.getComponentOption("data").map(this.renderRadio), 
+				React.createElement("input", {type: "hidden", style: {display: "none"}, 
+				       onChange: this.onComponentChanged, value: this.getValueFromModel(), 
+				       ref: "txt"})
+			));
+		},
+		/**
+		 * inner span clicked, force focus to outer span
+		 * for fix the outer span cannot gain focus in IE11
+		 * @param option
+		 */
+		onInnerClicked: function (option) {
+			$(React.findDOMNode(this.refs['out-' + option.id])).focus();
+		},
+		/**
+		 * on button clicked
+		 * @param option
+		 */
+		onButtonClicked: function (option) {
+			this.setValueToModel(option.id);
+		},
+		onKeyUp: function (option, evt) {
+			if (evt.keyCode == '32') {
+				this.onButtonClicked(option);
+			}
+		},
+		/**
+		 * on component change
+		 * @param evt
+		 */
+		onComponentChanged: function (evt) {
+			// synchronize value to model
+			this.setValueToModel(evt.target.checked);
+		},
+		/**
+		 * on model changed
+		 * @param evt
+		 */
+		onModelChanged: function (evt) {
+			this.getComponent().val(evt.new);
+			this.forceUpdate();
+		},
+		/**
+		 * get component
+		 * @returns {jQuery}
+		 */
+		getComponent: function () {
+			return $(React.findDOMNode(this.refs.txt));
+		},
+		isLabelAtLeft: function () {
+			return this.getComponentOption('labelAtLeft');
 		}
-	},
-	/**
-	 * on component change
-	 * @param evt
-	 */
-	onComponentChanged: function (evt) {
-		// synchronize value to model
-		this.setValueToModel(evt.target.checked);
-	},
-	/**
-	 * on model changed
-	 * @param evt
-	 */
-	onModelChanged: function (evt) {
-		this.getComponent().val(evt.new);
-		this.forceUpdate();
-	},
-	/**
-	 * get component
-	 * @returns {jQuery}
-	 */
-	getComponent: function () {
-		return $(React.findDOMNode(this.refs.txt));
-	},
-	isLabelAtLeft: function () {
-		return this.getComponentOption('labelAtLeft');
-	}
-}));
+	}));
+	context.NRadio = NRadio;
+}(this, jQuery, $pt));
+
 /**
  * search text
  */
-var NSearchText = React.createClass($pt.defineCellComponent({
-	statics: {
-		ADVANCED_SEARCH_BUTTON_ICON: 'search',
-		ADVANCED_SEARCH_DIALOG_NAME_LABEL: 'Name',
-		ADVANCED_SEARCH_DIALOG_BUTTON_TEXT: 'Search',
-		ADVANCED_SEARCH_DIALOG_CODE_LABEL: 'Code',
-		ADVANCED_SEARCH_DIALOG_RESULT_TITLE: 'Search Result'
-	},
-	propTypes: {
-		// model
-		model: React.PropTypes.object,
-		// CellLayout
-		layout: React.PropTypes.object
-	},
-	getDefaultProps: function () {
-		return {
-			defaultOptions: {}
-		};
-	},
-	getInitialState: function () {
-		return {};
-	},
-	/**
-	 * will update
-	 * @param nextProps
-	 */
-	componentWillUpdate: function (nextProps) {
-		// remove post change listener to handle model change
-		this.removePostChangeListener(this.onModelChange);
-		this.removeEnableDependencyMonitor();
-	},
-	/**
-	 * did update
-	 * @param prevProps
-	 * @param prevState
-	 */
-	componentDidUpdate: function (prevProps, prevState) {
-		this.getComponent().val(this.getValueFromModel());
-		// add post change listener to handle model change
-		this.addPostChangeListener(this.onModelChange);
-		this.addEnableDependencyMonitor();
-	},
-	/**
-	 * did mount
-	 */
-	componentDidMount: function () {
-		// set model value to component
-		this.getComponent().val(this.getValueFromModel());
-		// add post change listener to handle model change
-		this.addPostChangeListener(this.onModelChange);
-		this.addEnableDependencyMonitor();
-	},
-	/**
-	 * will unmount
-	 */
-	componentWillUnmount: function () {
-		// remove post change listener to handle model change
-		this.removePostChangeListener(this.onModelChange);
-		this.removeEnableDependencyMonitor();
-	},
-	/**
-	 * render
-	 * @returns {XML}
-	 */
-	render: function () {
-		var enabled = this.isEnabled();
-		var css = {
-			'n-search-text': true
-		};
-		if (!enabled) {
-			css['n-disabled'] = true;
-		}
-		var middleSpanStyle = {
-			width: '0'
-		};
-		return (React.createElement("div", {className: this.getComponentCSS($pt.LayoutHelper.classSet(css))}, 
-			React.createElement("div", {className: "input-group"}, 
-				React.createElement("input", {type: "text", className: "form-control search-code", onKeyUp: this.onComponentChange, ref: "code", 
-				       disabled: !enabled, onFocus: this.onComponentFocused, onBlur: this.onComponentBlurred}), 
-				React.createElement("span", {className: "input-group-btn", style: middleSpanStyle}), 
-				React.createElement("input", {type: "text", className: "form-control search-label", onFocus: this.onLabelFocused, ref: "label", 
-				       disabled: !enabled}), 
+(function (context, $, $pt) {
+	var NSearchText = React.createClass($pt.defineCellComponent({
+		statics: {
+			ADVANCED_SEARCH_BUTTON_ICON: 'search',
+			ADVANCED_SEARCH_DIALOG_NAME_LABEL: 'Name',
+			ADVANCED_SEARCH_DIALOG_BUTTON_TEXT: 'Search',
+			ADVANCED_SEARCH_DIALOG_CODE_LABEL: 'Code',
+			ADVANCED_SEARCH_DIALOG_RESULT_TITLE: 'Search Result'
+		},
+		propTypes: {
+			// model
+			model: React.PropTypes.object,
+			// CellLayout
+			layout: React.PropTypes.object
+		},
+		getDefaultProps: function () {
+			return {
+				defaultOptions: {}
+			};
+		},
+		getInitialState: function () {
+			return {};
+		},
+		/**
+		 * will update
+		 * @param nextProps
+		 */
+		componentWillUpdate: function (nextProps) {
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.onModelChange);
+			this.removeEnableDependencyMonitor();
+		},
+		/**
+		 * did update
+		 * @param prevProps
+		 * @param prevState
+		 */
+		componentDidUpdate: function (prevProps, prevState) {
+			this.getComponent().val(this.getValueFromModel());
+			// add post change listener to handle model change
+			this.addPostChangeListener(this.onModelChange);
+			this.addEnableDependencyMonitor();
+		},
+		/**
+		 * did mount
+		 */
+		componentDidMount: function () {
+			// set model value to component
+			this.getComponent().val(this.getValueFromModel());
+			// add post change listener to handle model change
+			this.addPostChangeListener(this.onModelChange);
+			this.addEnableDependencyMonitor();
+		},
+		/**
+		 * will unmount
+		 */
+		componentWillUnmount: function () {
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.onModelChange);
+			this.removeEnableDependencyMonitor();
+		},
+		/**
+		 * render
+		 * @returns {XML}
+		 */
+		render: function () {
+			var enabled = this.isEnabled();
+			var css = {
+				'n-search-text': true
+			};
+			if (!enabled) {
+				css['n-disabled'] = true;
+			}
+			var middleSpanStyle = {
+				width: '0'
+			};
+			return (React.createElement("div", {className: this.getComponentCSS($pt.LayoutHelper.classSet(css))}, 
+				React.createElement("div", {className: "input-group"}, 
+					React.createElement("input", {type: "text", className: "form-control search-code", onKeyUp: this.onComponentChange, ref: "code", 
+					       disabled: !enabled, onFocus: this.onComponentFocused, onBlur: this.onComponentBlurred}), 
+					React.createElement("span", {className: "input-group-btn", style: middleSpanStyle}), 
+					React.createElement("input", {type: "text", className: "form-control search-label", onFocus: this.onLabelFocused, ref: "label", 
+					       disabled: !enabled}), 
 				React.createElement("span", {className: "input-group-addon advanced-search-btn", 
 				      onClick: enabled ? this.showAdvancedSearchDialog : null}, 
 					React.createElement("span", {className: 'fa fa-fw fa-' + NSearchText.ADVANCED_SEARCH_BUTTON_ICON})
 				), 
-				this.renderNormalLine(), 
-				this.renderFocusLine()
-			)
-		));
-	},
-	/**
-	 * transfer focus to first text input
-	 */
-	onLabelFocused: function () {
-		this.getComponent().focus();
-	},
-	onComponentFocused: function () {
-		$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-		$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
-	},
-	onComponentBlurred: function () {
-		$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-		$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
-	},
-	/**
-	 * on component changed
-	 */
-	onComponentChange: function (evt) {
-		if (this.state.search != null) {
-			clearTimeout(this.state.search);
-		}
-		var value = evt.target.value;
-
-		var triggerDigits = this.getSearchTriggerDigits();
-		if (triggerDigits == null) {
-			throw new $pt.createComponentException(
-				$pt.ComponentConstants.Err_Search_Text_Trigger_Digits_Not_Defined,
-				"Trigger digits cannot be null in search text.");
-		}
-		this.setLabelText("");
-		if (value != null) {
-			if (triggerDigits == -1 || value.length == triggerDigits) {
-				var _this = this;
-				this.state.search = setTimeout(function () {
-					$pt.doPost(_this.getSearchUrl(), {
-						code: value
-					}, {
-						quiet: true
-					}).done(function (data) {
-						if (typeof data === 'string') {
-							data = JSON.parse(data);
-						}
-						_this.setLabelText(data.name);
-					});
-				}, 300);
+					this.renderNormalLine(), 
+					this.renderFocusLine()
+				)
+			));
+		},
+		/**
+		 * transfer focus to first text input
+		 */
+		onLabelFocused: function () {
+			this.getComponent().focus();
+		},
+		onComponentFocused: function () {
+			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+		},
+		onComponentBlurred: function () {
+			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+		},
+		/**
+		 * on component changed
+		 */
+		onComponentChange: function (evt) {
+			if (this.state.search != null) {
+				clearTimeout(this.state.search);
 			}
-		}
-		this.setValueToModel(value);
-	},
-	/**
-	 * on model change
-	 * @param evt
-	 */
-	onModelChange: function (evt) {
-		this.getComponent().val(evt.new);
-	},
-	/**
-	 * show advanced search dialog
-	 */
-	showAdvancedSearchDialog: function () {
-		if (!this.state.searchDialog) {
-			this.state.searchDialog = NModalForm.createFormModal(this.getLayout().getLabel(), 'advanced-search-dialog');
-		}
-		this.state.searchDialog.show({
-			model: this.getAdvancedSearchDialogModel(),
-			layout: this.getAdvancedSearchDialogLayout(),
-			buttons: {
-				reset: false,
-				validate: false,
-				cancel: false
-			}
-		});
-	},
-	/**
-	 * pickup advanced result item
-	 * @param item
-	 */
-	pickupAdvancedResultItem: function (item) {
-		this.setLabelText(item.name);
-		this.getModel().set(this.getDataId(), item.code);
-	},
-	setLabelText: function (text) {
-		$(React.findDOMNode(this.refs.label)).val(text);
-	},
-	/**
-	 * get search url
-	 * @returns {string}
-	 */
-	getSearchUrl: function () {
-		return this.getComponentOption("searchUrl");
-	},
-	/**
-	 * get advanced search url
-	 * @returns {string}
-	 */
-	getAdvancedSearchUrl: function () {
-		return this.getComponentOption("advancedUrl");
-	},
-	/**
-	 * get minimum digits to trigger search
-	 * @returns {number}
-	 */
-	getSearchTriggerDigits: function () {
-		return this.getComponentOption("searchTriggerDigits");
-	},
-	getComponent: function () {
-		return $(React.findDOMNode(this.refs.code));
-	},
-	// search dialog
-	getAdvancedSearchDialogModel: function () {
-		var model = this.getComponentOption('searchDialogModel');
-		if (model == null) {
-			model = {
-				name: null,
-				countPerPage: 10,
-				pageIndex: 1,
+			var value = evt.target.value;
 
-				items: null,
-				criteria: {
-					pageIndex: 1,
-					pageCount: 1,
-					countPerPage: 10
+			var triggerDigits = this.getSearchTriggerDigits();
+			if (triggerDigits == null) {
+				throw new $pt.createComponentException(
+					$pt.ComponentConstants.Err_Search_Text_Trigger_Digits_Not_Defined,
+					"Trigger digits cannot be null in search text.");
+			}
+			this.setLabelText("");
+			if (value != null) {
+				if (triggerDigits == -1 || value.length == triggerDigits) {
+					var _this = this;
+					this.state.search = setTimeout(function () {
+						$pt.doPost(_this.getSearchUrl(), {
+							code: value
+						}, {
+							quiet: true
+						}).done(function (data) {
+							if (typeof data === 'string') {
+								data = JSON.parse(data);
+							}
+							_this.setLabelText(data.name);
+						});
+					}, 300);
 				}
-			};
-		}
-		return $pt.createModel(model);
-	},
-	getAdvancedSearchDialogLayout: function () {
-		var _this = this;
-		var layout = this.getComponentOption('searchDialogLayout');
-		if (layout == null) {
-			layout = {
-				name: {
-					label: NSearchText.ADVANCED_SEARCH_DIALOG_NAME_LABEL,
-					comp: {
-						type: $pt.ComponentConstants.Text
-					},
-					pos: {
-						row: 10,
-						col: 10,
-						width: 6
-					}
-				},
-				button: {
-					label: NSearchText.ADVANCED_SEARCH_DIALOG_BUTTON_TEXT,
-					comp: {
-						type: $pt.ComponentConstants.Button,
-						style: 'primary',
-						click: function (model) {
-							var currentModel = $.extend({}, model.getCurrentModel());
-							// 移除查询结果和翻页查询条件JSON, 只留下当前需要查询的条件数据
-							delete currentModel.items;
-							delete currentModel.criteria;
+			}
+			this.setValueToModel(value);
+		},
+		/**
+		 * on model change
+		 * @param evt
+		 */
+		onModelChange: function (evt) {
+			this.getComponent().val(evt.new);
+		},
+		/**
+		 * show advanced search dialog
+		 */
+		showAdvancedSearchDialog: function () {
+			if (!this.state.searchDialog) {
+				this.state.searchDialog = NModalForm.createFormModal(this.getLayout().getLabel(), 'advanced-search-dialog');
+			}
+			this.state.searchDialog.show({
+				model: this.getAdvancedSearchDialogModel(),
+				layout: this.getAdvancedSearchDialogLayout(),
+				buttons: {
+					reset: false,
+					validate: false,
+					cancel: false
+				}
+			});
+		},
+		/**
+		 * pickup advanced result item
+		 * @param item
+		 */
+		pickupAdvancedResultItem: function (item) {
+			this.setLabelText(item.name);
+			this.getModel().set(this.getDataId(), item.code);
+		},
+		setLabelText: function (text) {
+			$(React.findDOMNode(this.refs.label)).val(text);
+		},
+		/**
+		 * get search url
+		 * @returns {string}
+		 */
+		getSearchUrl: function () {
+			return this.getComponentOption("searchUrl");
+		},
+		/**
+		 * get advanced search url
+		 * @returns {string}
+		 */
+		getAdvancedSearchUrl: function () {
+			return this.getComponentOption("advancedUrl");
+		},
+		/**
+		 * get minimum digits to trigger search
+		 * @returns {number}
+		 */
+		getSearchTriggerDigits: function () {
+			return this.getComponentOption("searchTriggerDigits");
+		},
+		getComponent: function () {
+			return $(React.findDOMNode(this.refs.code));
+		},
+		// search dialog
+		getAdvancedSearchDialogModel: function () {
+			var model = this.getComponentOption('searchDialogModel');
+			if (model == null) {
+				model = {
+					name: null,
+					countPerPage: 10,
+					pageIndex: 1,
 
-							$pt.doPost(_this.getAdvancedSearchUrl(), currentModel, {
-								done: function (data) {
-									if (typeof data === 'string') {
-										data = JSON.parse(data);
-									}
-									model.mergeCurrentModel(data);
-									model.set('criteria_url', this.getAdvancedSearchUrl());
-									console.debug(model.getCurrentModel());
-									this.state.searchDialog.forceUpdate();
-								}.bind(_this)
-							});
+					items: null,
+					criteria: {
+						pageIndex: 1,
+						pageCount: 1,
+						countPerPage: 10
+					}
+				};
+			}
+			return $pt.createModel(model);
+		},
+		getAdvancedSearchDialogLayout: function () {
+			var _this = this;
+			var layout = this.getComponentOption('searchDialogLayout');
+			if (layout == null) {
+				layout = {
+					name: {
+						label: NSearchText.ADVANCED_SEARCH_DIALOG_NAME_LABEL,
+						comp: {
+							type: $pt.ComponentConstants.Text
+						},
+						pos: {
+							row: 10,
+							col: 10,
+							width: 6
 						}
 					},
-					css: {
-						comp: 'pull-right pull-down'
-					},
-					pos: {
-						row: 10,
-						col: 20,
-						width: 6
-					}
-				},
-				items: {
-					label: NSearchText.ADVANCED_SEARCH_DIALOG_RESULT_TITLE,
-					comp: {
-						type: $pt.ComponentConstants.Table,
-						indexable: true,
-						searchable: false,
-						rowOperations: {
-							icon: "check",
-							click: function (row) {
-								_this.pickupAdvancedResultItem(row);
-								_this.state.searchDialog.hide();
+					button: {
+						label: NSearchText.ADVANCED_SEARCH_DIALOG_BUTTON_TEXT,
+						comp: {
+							type: $pt.ComponentConstants.Button,
+							style: 'primary',
+							click: function (model) {
+								var currentModel = $.extend({}, model.getCurrentModel());
+								// 移除查询结果和翻页查询条件JSON, 只留下当前需要查询的条件数据
+								delete currentModel.items;
+								delete currentModel.criteria;
+
+								$pt.doPost(_this.getAdvancedSearchUrl(), currentModel, {
+									done: function (data) {
+										if (typeof data === 'string') {
+											data = JSON.parse(data);
+										}
+										model.mergeCurrentModel(data);
+										model.set('criteria_url', this.getAdvancedSearchUrl());
+										console.debug(model.getCurrentModel());
+										this.state.searchDialog.forceUpdate();
+									}.bind(_this)
+								});
 							}
 						},
-						pageable: true,
-						criteria: "criteria",
-						columns: [{
-							title: NSearchText.ADVANCED_SEARCH_DIALOG_CODE_LABEL,
-							width: 200,
-							data: "code"
-						}, {
-							title: NSearchText.ADVANCED_SEARCH_DIALOG_NAME_LABEL,
-							width: 400,
-							data: "name"
-						}]
+						css: {
+							comp: 'pull-right pull-down'
+						},
+						pos: {
+							row: 10,
+							col: 20,
+							width: 6
+						}
 					},
-					pos: {
-						row: 20,
-						col: 10,
-						width: 12
+					items: {
+						label: NSearchText.ADVANCED_SEARCH_DIALOG_RESULT_TITLE,
+						comp: {
+							type: $pt.ComponentConstants.Table,
+							indexable: true,
+							searchable: false,
+							rowOperations: {
+								icon: "check",
+								click: function (row) {
+									_this.pickupAdvancedResultItem(row);
+									_this.state.searchDialog.hide();
+								}
+							},
+							pageable: true,
+							criteria: "criteria",
+							columns: [{
+								title: NSearchText.ADVANCED_SEARCH_DIALOG_CODE_LABEL,
+								width: 200,
+								data: "code"
+							}, {
+								title: NSearchText.ADVANCED_SEARCH_DIALOG_NAME_LABEL,
+								width: 400,
+								data: "name"
+							}]
+						},
+						pos: {
+							row: 20,
+							col: 10,
+							width: 12
+						}
 					}
-				}
-			};
-		} else {
-			layout = layout.call(this);
+				};
+			} else {
+				layout = layout.call(this);
+			}
+			return $pt.createFormLayout(layout);
 		}
-		return $pt.createFormLayout(layout);
-	}
-}));
+	}));
+	context.NSearchText = NSearchText;
+}(this, jQuery, $pt));
+
 /**
  * select component, see select2 from jQuery
  *
@@ -8577,1675 +8885,1702 @@ var NSearchText = React.createClass($pt.defineCellComponent({
  *      }
  * }
  */
-var NSelect = React.createClass($pt.defineCellComponent({
-	statics: {
-		PLACEHOLDER: "Please Select..."
-	},
-	propTypes: {
-		// model
-		model: React.PropTypes.object,
-		// CellLayout
-		layout: React.PropTypes.object
-	},
-	getDefaultProps: function () {
-		return {
-			defaultOptions: {
-				allowClear: true,
-				minimumResultsForSearch: 1,
-				width: "100%",
-				data: [],
+(function (context, $, $pt) {
+	var NSelect = React.createClass($pt.defineCellComponent({
+		statics: {
+			PLACEHOLDER: "Please Select..."
+		},
+		propTypes: {
+			// model
+			model: React.PropTypes.object,
+			// CellLayout
+			layout: React.PropTypes.object
+		},
+		getDefaultProps: function () {
+			return {
+				defaultOptions: {
+					allowClear: true,
+					minimumResultsForSearch: 1,
+					width: "100%",
+					data: [],
 
-				availableWhenNoParentValue: false
-				// other
-				/*
-				 parentPropId: parent property id
-				 parentModel: parent model, default is this.props.model is not defined
-				 parentFilter: filter of options according to parent property value,
-				 can be property of self options
-				 or a function with parameters
-				 1: parent value
-				 2: self options array
-				 */
+					availableWhenNoParentValue: false
+					// other
+					/*
+					 parentPropId: parent property id
+					 parentModel: parent model, default is this.props.model is not defined
+					 parentFilter: filter of options according to parent property value,
+					 can be property of self options
+					 or a function with parameters
+					 1: parent value
+					 2: self options array
+					 */
+				}
+			};
+		},
+		/**
+		 * will update
+		 */
+		componentWillUpdate: function (nextProps) {
+			this.removePostChangeListener(this.onModelChanged);
+			this.removeEnableDependencyMonitor();
+			if (this.hasParent()) {
+				// add post change listener into parent model
+				this.getParentModel().removeListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
 			}
-		};
-	},
-	/**
-	 * will update
-	 */
-	componentWillUpdate: function (nextProps) {
-		this.removePostChangeListener(this.onModelChanged);
-		this.removeEnableDependencyMonitor();
-		if (this.hasParent()) {
-			// add post change listener into parent model
-			this.getParentModel().removeListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
-		}
-	},
-	/**
-	 * did update
-	 * @param prevProps
-	 * @param prevState
-	 */
-	componentDidUpdate: function (prevProps, prevState) {
-		// react will not clear the options when component updating,
-		// so have to reset select options manually
-		if (prevProps.model != this.props.model) {
+		},
+		/**
+		 * did update
+		 * @param prevProps
+		 * @param prevState
+		 */
+		componentDidUpdate: function (prevProps, prevState) {
+			// react will not clear the options when component updating,
+			// so have to reset select options manually
+			if (prevProps.model != this.props.model) {
+				var options = this.createDisplayOptions({
+					allowClear: null,
+					placeholder: null,
+					minimumResultsForSearch: null,
+					data: null
+				});
+				this.resetOptions(options);
+			}
+			// reset the value when component update
+			this.getComponent().val(this.getValueFromModel()).trigger("change");
+			this.addEnableDependencyMonitor();
+			this.addPostChangeListener(this.onModelChanged);
+			if (this.hasParent()) {
+				// remove post change listener from parent model
+				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+			}
+
+			this.removeTooltip();
+		},
+		/**
+		 * did mount
+		 */
+		componentDidMount: function () {
+			// Set up Select2
+			this.createComponent();
+			this.addPostChangeListener(this.onModelChanged);
+			this.addEnableDependencyMonitor();
+			if (this.hasParent()) {
+				// add post change listener into parent model
+				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+			}
+			this.removeTooltip();
+		},
+		/**
+		 * will unmount
+		 */
+		componentWillUnmount: function () {
+			// remove post change listener
+			this.removePostChangeListener(this.onModelChanged);
+			this.removeEnableDependencyMonitor();
+			if (this.hasParent()) {
+				// remove post change listener from parent model
+				this.getParentModel().removeListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+			}
+			// remove the jquery dom element
+			this.getComponent().next("span").remove();
+		},
+		/**
+		 * create component
+		 */
+		createComponent: function () {
 			var options = this.createDisplayOptions({
 				allowClear: null,
 				placeholder: null,
 				minimumResultsForSearch: null,
 				data: null
+			}, this.getLayout());
+			this.getComponent().fireOnDisable()
+				.select2(options)
+				.val(this.getValueFromModel())
+				.trigger("change")
+				.change(this.onComponentChanged);
+
+			this.renderBorderBottom();
+		},
+		renderBorderBottom: function () {
+			var top = $(React.findDOMNode(this.refs.div));
+			var selection = top.find('.select2-selection');
+			if (selection.find('hr.normal-line').length == 0) {
+				selection.append('<hr class="' + this.getAdditionalCSS('normal-line', 'normal-line') + '"/>')
+					.append('<hr class="' + this.getAdditionalCSS('focus-line', 'focus-line') + '"/>');
+			}
+		},
+		/**
+		 * create display options
+		 * @param options
+		 */
+		createDisplayOptions: function (options) {
+			var _this = this;
+			Object.keys(options).forEach(function (key) {
+				options[key] = _this.getComponentOption(key);
 			});
-			this.resetOptions(options);
-		}
-		// reset the value when component update
-		this.getComponent().val(this.getValueFromModel()).trigger("change");
-		this.addEnableDependencyMonitor();
-		this.addPostChangeListener(this.onModelChanged);
-		if (this.hasParent()) {
-			// remove post change listener from parent model
-			this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
-		}
-
-		this.removeTooltip();
-	},
-	/**
-	 * did mount
-	 */
-	componentDidMount: function () {
-		// Set up Select2
-		this.createComponent();
-		this.addPostChangeListener(this.onModelChanged);
-		this.addEnableDependencyMonitor();
-		if (this.hasParent()) {
-			// add post change listener into parent model
-			this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
-		}
-		this.removeTooltip();
-	},
-	/**
-	 * will unmount
-	 */
-	componentWillUnmount: function () {
-		// remove post change listener
-		this.removePostChangeListener(this.onModelChanged);
-		this.removeEnableDependencyMonitor();
-		if (this.hasParent()) {
-			// remove post change listener from parent model
-			this.getParentModel().removeListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
-		}
-		// remove the jquery dom element
-		this.getComponent().next("span").remove();
-	},
-	/**
-	 * create component
-	 */
-	createComponent: function () {
-		var options = this.createDisplayOptions({
-			allowClear: null,
-			placeholder: null,
-			minimumResultsForSearch: null,
-			data: null
-		}, this.getLayout());
-		this.getComponent().fireOnDisable()
-			.select2(options)
-			.val(this.getValueFromModel())
-			.trigger("change")
-			.change(this.onComponentChanged);
-
-		this.renderBorderBottom();
-	},
-	renderBorderBottom: function () {
-		var top = $(React.findDOMNode(this.refs.div));
-		var selection = top.find('.select2-selection');
-		if (selection.find('hr.normal-line').length == 0) {
-			selection.append('<hr class="' + this.getAdditionalCSS('normal-line', 'normal-line') + '"/>')
-				.append('<hr class="' + this.getAdditionalCSS('focus-line', 'focus-line') + '"/>');
-		}
-	},
-	/**
-	 * create display options
-	 * @param options
-	 */
-	createDisplayOptions: function (options) {
-		var _this = this;
-		Object.keys(options).forEach(function (key) {
-			options[key] = _this.getComponentOption(key);
-		});
-		if (options.placeholder == null) {
-			options.placeholder = NSelect.PLACEHOLDER;
-		}
-		// if has parent, filter options by parent property value
-		if (this.hasParent()) {
-			options.data = this.getAvailableOptions(this.getParentPropertyValue());
-		} else {
-			options.data = this.convertDataOptions(options.data);
-		}
-
-		// TODO hard code, multiple is not supported yet
-		options.multiple = false;
-
-		return options;
-	},
-	/**
-	 * convert data options, options can be CodeTable object or an array
-	 * @param options
-	 * @returns {*}
-	 */
-	convertDataOptions: function (options) {
-		return Array.isArray(options) ? options : options.list();
-	},
-	/**
-	 * remove tooltip, which is default set by select2 component.
-	 * it's unnecessary.
-	 */
-	removeTooltip: function () {
-		//$("#select2-" + this.getId() + "-container").removeAttr("title");
-		var top = $(React.findDOMNode(this.refs.div));
-		var renderer = top.find('.select2-selection__rendered');
-		renderer.removeAttr('title');
-	},
-	/**
-	 * render
-	 * @returns {XML}
-	 */
-	render: function () {
-		var css = {
-			'n-disabled': !this.isEnabled()
-		};
-		css[this.getComponentCSS('n-select')] = true;
-		return React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
-		            ref: "div"}, 
-			React.createElement("select", {style: {width: this.getComponentOption("width")}, 
-			        disabled: !this.isEnabled(), 
-			        ref: "select"})
-		);
-	},
-	/**
-	 * on component change
-	 * @param evt
-	 */
-	onComponentChanged: function (evt) {
-		var value = this.getComponent().val();
-		if (value != this.getValueFromModel()) {
-			// synchronize value to model
-			this.setValueToModel(this.getComponent().val());
-		}
-		this.removeTooltip();
-	},
-	/**
-	 * on model change
-	 * @param evt
-	 */
-	onModelChanged: function (evt) {
-		var oldValue = this.getComponent().val();
-		if (oldValue == evt.new) {
-			// do nothing
-			return;
-		} else {
-			this.getComponent().val(evt.new).trigger("change");
-		}
-	},
-	/**
-	 * on parent model change
-	 * @param evt
-	 */
-	onParentModelChanged: function (evt) {
-		var data = this.getAvailableOptions(evt.new);
-		this.resetOptions({data: data});
-	},
-	/**
-	 * get parent model
-	 * @returns {*}
-	 */
-	getParentModel: function () {
-		var parentModel = this.getComponentOption("parentModel");
-		return parentModel == null ? this.getModel() : parentModel;
-	},
-	/**
-	 * get parent property value
-	 * @returns {*}
-	 */
-	getParentPropertyValue: function () {
-		return this.getParentModel().get(this.getParentPropertyId());
-	},
-	/**
-	 * get parent property id
-	 * @returns {string}
-	 */
-	getParentPropertyId: function () {
-		return this.getComponentOption("parentPropId");
-	},
-	/**
-	 * has parent or not
-	 * @returns {boolean}
-	 */
-	hasParent: function () {
-		return this.getParentPropertyId() != null;
-	},
-	/**
-	 * get available options.
-	 * if no parent assigned, return all data options
-	 * @param parentValue
-	 * @returns {[*]}
-	 */
-	getAvailableOptions: function (parentValue) {
-		if (parentValue == null) {
-			return this.isAvailableWhenNoParentValue() ? this.convertDataOptions(this.getComponentOption("data")) : [];
-		} else {
-			var filter = this.getComponentOption("parentFilter");
-			if (typeof filter === 'object') {
-				// call code table filter
-				return this.convertDataOptions(this.getComponentOption('data').filter($.extend({}, filter, {value: parentValue})));
+			if (options.placeholder == null) {
+				options.placeholder = NSelect.PLACEHOLDER;
+			}
+			// if has parent, filter options by parent property value
+			if (this.hasParent()) {
+				options.data = this.getAvailableOptions(this.getParentPropertyValue());
 			} else {
-				// call local filter
-				var data = this.convertDataOptions(this.getComponentOption("data"));
-				if (typeof filter === "function") {
-					return filter.call(this, parentValue, data);
+				options.data = this.convertDataOptions(options.data);
+			}
+
+			// TODO hard code, multiple is not supported yet
+			options.multiple = false;
+
+			return options;
+		},
+		/**
+		 * convert data options, options can be CodeTable object or an array
+		 * @param options
+		 * @returns {*}
+		 */
+		convertDataOptions: function (options) {
+			return Array.isArray(options) ? options : options.list();
+		},
+		/**
+		 * remove tooltip, which is default set by select2 component.
+		 * it's unnecessary.
+		 */
+		removeTooltip: function () {
+			//$("#select2-" + this.getId() + "-container").removeAttr("title");
+			var top = $(React.findDOMNode(this.refs.div));
+			var renderer = top.find('.select2-selection__rendered');
+			renderer.removeAttr('title');
+		},
+		/**
+		 * render
+		 * @returns {XML}
+		 */
+		render: function () {
+			var css = {
+				'n-disabled': !this.isEnabled()
+			};
+			css[this.getComponentCSS('n-select')] = true;
+			return React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
+			            ref: "div"}, 
+				React.createElement("select", {style: {width: this.getComponentOption("width")}, 
+				        disabled: !this.isEnabled(), 
+				        ref: "select"})
+			);
+		},
+		/**
+		 * on component change
+		 * @param evt
+		 */
+		onComponentChanged: function (evt) {
+			var value = this.getComponent().val();
+			if (value != this.getValueFromModel()) {
+				// synchronize value to model
+				this.setValueToModel(this.getComponent().val());
+			}
+			this.removeTooltip();
+		},
+		/**
+		 * on model change
+		 * @param evt
+		 */
+		onModelChanged: function (evt) {
+			var oldValue = this.getComponent().val();
+			if (oldValue == evt.new) {
+				// do nothing
+				return;
+			} else {
+				this.getComponent().val(evt.new).trigger("change");
+			}
+		},
+		/**
+		 * on parent model change
+		 * @param evt
+		 */
+		onParentModelChanged: function (evt) {
+			var data = this.getAvailableOptions(evt.new);
+			this.resetOptions({data: data});
+		},
+		/**
+		 * get parent model
+		 * @returns {*}
+		 */
+		getParentModel: function () {
+			var parentModel = this.getComponentOption("parentModel");
+			return parentModel == null ? this.getModel() : parentModel;
+		},
+		/**
+		 * get parent property value
+		 * @returns {*}
+		 */
+		getParentPropertyValue: function () {
+			return this.getParentModel().get(this.getParentPropertyId());
+		},
+		/**
+		 * get parent property id
+		 * @returns {string}
+		 */
+		getParentPropertyId: function () {
+			return this.getComponentOption("parentPropId");
+		},
+		/**
+		 * has parent or not
+		 * @returns {boolean}
+		 */
+		hasParent: function () {
+			return this.getParentPropertyId() != null;
+		},
+		/**
+		 * get available options.
+		 * if no parent assigned, return all data options
+		 * @param parentValue
+		 * @returns {[*]}
+		 */
+		getAvailableOptions: function (parentValue) {
+			if (parentValue == null) {
+				return this.isAvailableWhenNoParentValue() ? this.convertDataOptions(this.getComponentOption("data")) : [];
+			} else {
+				var filter = this.getComponentOption("parentFilter");
+				if (typeof filter === 'object') {
+					// call code table filter
+					return this.convertDataOptions(this.getComponentOption('data').filter($.extend({}, filter, {value: parentValue})));
 				} else {
-					return data.filter(function (item) {
-						return item[filter] == parentValue;
-					});
+					// call local filter
+					var data = this.convertDataOptions(this.getComponentOption("data"));
+					if (typeof filter === "function") {
+						return filter.call(this, parentValue, data);
+					} else {
+						return data.filter(function (item) {
+							return item[filter] == parentValue;
+						});
+					}
 				}
 			}
-		}
-	},
-	/**
-	 * is available when no parent value.
-	 * if no parent assigned, always return true.
-	 * @returns {boolean}
-	 */
-	isAvailableWhenNoParentValue: function () {
-		// when has parent, return availableWhenNoParentValue
-		// or return true
-		return this.hasParent() ? this.getComponentOption("availableWhenNoParentValue") : true;
-	},
-	/**
-	 * reset select options
-	 * @param newOptions
-	 */
-	resetOptions: function (newOptions) {
-		// really sucks because select2 doesn't support change the options dynamically
-		var component = this.getComponent();
-		var orgValue = this.getValueFromModel(); //component.val();
-		var orgSelected = false;
-		// first is Options object, second is really options
-		var originalOptions = component.data("select2").options.options;
-		component.html("");
-		// data
-		$.extend(originalOptions, newOptions);
-		var innerHTML = "";
-		originalOptions.data.forEach(function (element) {
-			if (element.id == orgValue) {
-				innerHTML += "<option value=\"" + element.id + "\"" + (element.id == orgValue ? " selected" : "") + ">" + element.text + "</option>";
-				orgSelected = true;
-			} else {
-				innerHTML += "<option value=\"" + element.id + "\">" + element.text + "</option>";
-			}
-		});
-		component.append(innerHTML);
-		component.select2(originalOptions);
-		this.renderBorderBottom();
+		},
+		/**
+		 * is available when no parent value.
+		 * if no parent assigned, always return true.
+		 * @returns {boolean}
+		 */
+		isAvailableWhenNoParentValue: function () {
+			// when has parent, return availableWhenNoParentValue
+			// or return true
+			return this.hasParent() ? this.getComponentOption("availableWhenNoParentValue") : true;
+		},
+		/**
+		 * reset select options
+		 * @param newOptions
+		 */
+		resetOptions: function (newOptions) {
+			// really sucks because select2 doesn't support change the options dynamically
+			var component = this.getComponent();
+			var orgValue = this.getValueFromModel(); //component.val();
+			var orgSelected = false;
+			// first is Options object, second is really options
+			var originalOptions = component.data("select2").options.options;
+			component.html("");
+			// data
+			$.extend(originalOptions, newOptions);
+			var innerHTML = "";
+			originalOptions.data.forEach(function (element) {
+				if (element.id == orgValue) {
+					innerHTML += "<option value=\"" + element.id + "\"" + (element.id == orgValue ? " selected" : "") + ">" + element.text + "</option>";
+					orgSelected = true;
+				} else {
+					innerHTML += "<option value=\"" + element.id + "\">" + element.text + "</option>";
+				}
+			});
+			component.append(innerHTML);
+			component.select2(originalOptions);
+			this.renderBorderBottom();
 
-		if (!orgSelected) {
-			// if the original value cannot match the available option, set to null.
-			component.val("").trigger("change");
+			if (!orgSelected) {
+				// if the original value cannot match the available option, set to null.
+				component.val("").trigger("change");
+			}
+		},
+		getComponent: function () {
+			return $(React.findDOMNode(this.refs.select));
 		}
-	},
-	getComponent: function () {
-		return $(React.findDOMNode(this.refs.select));
-	}
-}));
+	}));
 
 // to fix the select2 disabled property not work in IE8-10
 // provided by https://gist.github.com/cmcnulty/7036509
-(function ($) {
-	"use strict";
+	(function ($) {
+		"use strict";
 
-	$.fn.fireOnDisable = function (settings) {
-		// Only perform this DOM change if we have to watch changes with
-		// propertychange
-		// Also only perform if getOwnPropertyDescriptor exists - IE>=8
-		// I suppose I could test for "propertychange fires, but not when form
-		// element is disabled" - but it would be overkill
-		if (!( 'onpropertychange' in document.createElement('input') ) || Object.getOwnPropertyDescriptor === undefined) {
-			return this;
-		}
+		$.fn.fireOnDisable = function (settings) {
+			// Only perform this DOM change if we have to watch changes with
+			// propertychange
+			// Also only perform if getOwnPropertyDescriptor exists - IE>=8
+			// I suppose I could test for "propertychange fires, but not when form
+			// element is disabled" - but it would be overkill
+			if (!( 'onpropertychange' in document.createElement('input') ) || Object.getOwnPropertyDescriptor === undefined) {
+				return this;
+			}
 
-		// IE9-10 use HTMLElement proto, IE8 uses Element proto
-		var someProto = window.HTMLElement === undefined ? window.Element.prototype : window.HTMLElement.prototype,
-			someTrigger = function () {
-			},
-			origDisabled = Object.getOwnPropertyDescriptor(someProto, 'disabled');
-
-		if (document.createEvent) {
-			someTrigger = function (newVal) {
-				var event = document.createEvent('MutationEvent');
-				/*
-				 * Instantiate the event as close to native as possible:
-				 * event.initMutationEvent(eventType, canBubble, cancelable,
-				 * relatedNodeArg, prevValueArg, newValueArg, attrNameArg,
-				 * attrChangeArg);
-				 */
-				event.initMutationEvent('DOMAttrModified', true, false, this.getAttributeNode('disabled'), '', '', 'disabled', 1);
-				this.dispatchEvent(event);
-			};
-		} else if (document.fireEvent) {
-			someTrigger = function () {
-				this.fireEvent('onpropertychange');
-			};
-		}
-
-		return this.each(function () {
-			// call prototype's set, and then trigger the change.
-			Object.defineProperty(this, 'disabled', {
-				set: function (isDisabled) {
-					// We store preDisabled here, so that when we inquire as to
-					// the result after throwing the event, it will be accurate
-					// We can't throw the event after the native send, because
-					// it won't be be sent.
-					// We must do a native fire/dispatch, because native
-					// listeners don't catch jquery trigger 'propertychange'
-					// events
-					$.data(this, 'preDisabled', isDisabled);
-					if (isDisabled) {
-						// Trigger with dispatchEvent
-						someTrigger.call(this, isDisabled);
-					}
-
-					return origDisabled.set.call(this, isDisabled);
+			// IE9-10 use HTMLElement proto, IE8 uses Element proto
+			var someProto = window.HTMLElement === undefined ? window.Element.prototype : window.HTMLElement.prototype,
+				someTrigger = function () {
 				},
-				get: function () {
-					var isDisabled = $.data(this, 'preDisabled');
-					if (isDisabled === undefined) {
-						isDisabled = origDisabled.get.call(this);
+				origDisabled = Object.getOwnPropertyDescriptor(someProto, 'disabled');
+
+			if (document.createEvent) {
+				someTrigger = function (newVal) {
+					var event = document.createEvent('MutationEvent');
+					/*
+					 * Instantiate the event as close to native as possible:
+					 * event.initMutationEvent(eventType, canBubble, cancelable,
+					 * relatedNodeArg, prevValueArg, newValueArg, attrNameArg,
+					 * attrChangeArg);
+					 */
+					event.initMutationEvent('DOMAttrModified', true, false, this.getAttributeNode('disabled'), '', '', 'disabled', 1);
+					this.dispatchEvent(event);
+				};
+			} else if (document.fireEvent) {
+				someTrigger = function () {
+					this.fireEvent('onpropertychange');
+				};
+			}
+
+			return this.each(function () {
+				// call prototype's set, and then trigger the change.
+				Object.defineProperty(this, 'disabled', {
+					set: function (isDisabled) {
+						// We store preDisabled here, so that when we inquire as to
+						// the result after throwing the event, it will be accurate
+						// We can't throw the event after the native send, because
+						// it won't be be sent.
+						// We must do a native fire/dispatch, because native
+						// listeners don't catch jquery trigger 'propertychange'
+						// events
+						$.data(this, 'preDisabled', isDisabled);
+						if (isDisabled) {
+							// Trigger with dispatchEvent
+							someTrigger.call(this, isDisabled);
+						}
+
+						return origDisabled.set.call(this, isDisabled);
+					},
+					get: function () {
+						var isDisabled = $.data(this, 'preDisabled');
+						if (isDisabled === undefined) {
+							isDisabled = origDisabled.get.call(this);
+						}
+						return isDisabled;
 					}
-					return isDisabled;
-				}
+				});
 			});
-		});
-	};
-})(jQuery);
-
-var NSideMenu = React.createClass({displayName: "NSideMenu",
-	statics: {
-		/**
-		 * get side menu
-		 * @param menus
-		 * @param containerId optional, default is 'side_menu_container'
-		 * @param className
-		 * @param hover
-		 * @returns {react element}
-		 */
-		getSideMenu: function (menus, containerId, className, hover) {
-			if (!containerId) {
-				containerId = "side_menu_container";
-			}
-			if ($pt.sideMenu == null) {
-				$pt.sideMenu = {};
-			}
-			if ($pt.sideMenu[containerId] == null) {
-				// must initial here. since the function will execute immediately after load,
-				// and NExceptionModal doesn't defined in that time
-				var sideMenuContainer = $("#" + containerId);
-				if (sideMenuContainer.length == 0) {
-					$("<div id='" + containerId + "' />").appendTo($(document.body));
-				}
-				$pt.sideMenu[containerId] = React.render(
-					React.createElement(NSideMenu, {menus: menus, 
-					           className: className, 
-					           hover: hover ? true : false}),
-					document.getElementById(containerId));
-			}
-			return $pt.sideMenu[containerId];
-		}
-	},
-	propTypes: {
-		// menu object
-		menus: React.PropTypes.array,
-		hover: React.PropTypes.bool,
-
-		className: React.PropTypes.string
-	},
-	getDefaultProps: function () {
-		return {
-			hover: false
 		};
-	},
-	getInitialState: function () {
-		return {};
-	},
-	componentDidMount: function () {
-		$(React.findDOMNode(this.refs.menus)).hide();
-	},
-	renderMenuItem: function (item, index, menus, onTopLevel) {
-		if (item.children !== undefined) {
-			// render dropdown menu
-			var _this = this;
-			var id = 'item_' + index;
-			return (
-				React.createElement("li", {ref: id}, 
-					React.createElement("a", {href: "javascript:void(0);", 
-					   onClick: this.onParentMenuClicked.bind(this, id), ref: id + '_link'}, 
-						item.text, 
-						React.createElement("span", {className: "fa fa-fw fa-angle-double-down n-side-menu-ul", ref: id + '_icon'})
-					), 
-					React.createElement("ul", {ref: id + '_child', style: {
+	})(jQuery);
+	context.NSelect = NSelect;
+}(this, jQuery, $pt));
+
+(function (context, $, $pt) {
+	var NSideMenu = React.createClass({displayName: "NSideMenu",
+		statics: {
+			/**
+			 * get side menu
+			 * @param menus
+			 * @param containerId optional, default is 'side_menu_container'
+			 * @param className
+			 * @param hover
+			 * @returns {react element}
+			 */
+			getSideMenu: function (menus, containerId, className, hover) {
+				if (!containerId) {
+					containerId = "side_menu_container";
+				}
+				if ($pt.sideMenu == null) {
+					$pt.sideMenu = {};
+				}
+				if ($pt.sideMenu[containerId] == null) {
+					// must initial here. since the function will execute immediately after load,
+					// and NExceptionModal doesn't defined in that time
+					var sideMenuContainer = $("#" + containerId);
+					if (sideMenuContainer.length == 0) {
+						$("<div id='" + containerId + "' />").appendTo($(document.body));
+					}
+					$pt.sideMenu[containerId] = React.render(
+						React.createElement(NSideMenu, {menus: menus, 
+						           className: className, 
+						           hover: hover ? true : false}),
+						document.getElementById(containerId));
+				}
+				return $pt.sideMenu[containerId];
+			}
+		},
+		propTypes: {
+			// menu object
+			menus: React.PropTypes.array,
+			hover: React.PropTypes.bool,
+
+			className: React.PropTypes.string
+		},
+		getDefaultProps: function () {
+			return {
+				hover: false
+			};
+		},
+		getInitialState: function () {
+			return {};
+		},
+		componentDidMount: function () {
+			$(React.findDOMNode(this.refs.menus)).hide();
+		},
+		renderMenuItem: function (item, index, menus, onTopLevel) {
+			if (item.children !== undefined) {
+				// render dropdown menu
+				var _this = this;
+				var id = 'item_' + index;
+				return (
+					React.createElement("li", {ref: id}, 
+						React.createElement("a", {href: "javascript:void(0);", 
+						   onClick: this.onParentMenuClicked.bind(this, id), ref: id + '_link'}, 
+							item.text, 
+							React.createElement("span", {className: "fa fa-fw fa-angle-double-down n-side-menu-ul", ref: id + '_icon'})
+						), 
+						React.createElement("ul", {ref: id + '_child', style: {
                     display: 'none'
                 }}, 
-						item.children.map(function (childItem, childIndex, dropdownItems) {
-							return _this.renderMenuItem(childItem, index + '_' + childIndex, dropdownItems, false);
-						})
+							item.children.map(function (childItem, childIndex, dropdownItems) {
+								return _this.renderMenuItem(childItem, index + '_' + childIndex, dropdownItems, false);
+							})
+						)
+					)
+				);
+			} else if (item.func !== undefined) {
+				// call javascript function
+				return (React.createElement("li", null, 
+					React.createElement("a", {href: "javascript:void(0);", 
+					   onClick: this.onMenuClicked.bind(this, item.func, item.value)}, item.text)
+				));
+			} else if (item.divider === true) {
+				return null;
+			} else {
+				// jump to url
+				return (React.createElement("li", null, React.createElement("a", {href: item.url}, item.text)));
+			}
+		},
+		render: function () {
+			var _this = this;
+			return (React.createElement("div", {className: "n-side-menu", ref: "menus", 
+			             onMouseEnter: this.onMouseEnter, onMouseLeave: this.onMouseLeave}, 
+				React.createElement("ul", {className: "nav navbar-nav"}, 
+					this.props.menus.map(function (item, index, menu) {
+						return _this.renderMenuItem(item, index, menu, true);
+					}), 
+					React.createElement("li", {className: "n-side-menu-close"}, 
+						React.createElement("a", {href: "javascript:void(0);", onClick: this.onCloseClicked}, 
+							React.createElement("span", {className: "fa fa-fw fa-arrow-circle-left"})
+						)
 					)
 				)
-			);
-		} else if (item.func !== undefined) {
-			// call javascript function
-			return (React.createElement("li", null, 
-				React.createElement("a", {href: "javascript:void(0);", 
-				   onClick: this.onMenuClicked.bind(this, item.func, item.value)}, item.text)
 			));
-		} else if (item.divider === true) {
-			return null;
-		} else {
-			// jump to url
-			return (React.createElement("li", null, React.createElement("a", {href: item.url}, item.text)));
-		}
-	},
-	render: function () {
-		var _this = this;
-		return (React.createElement("div", {className: "n-side-menu", ref: "menus", 
-		             onMouseEnter: this.onMouseEnter, onMouseLeave: this.onMouseLeave}, 
-			React.createElement("ul", {className: "nav navbar-nav"}, 
-				this.props.menus.map(function (item, index, menu) {
-					return _this.renderMenuItem(item, index, menu, true);
-				}), 
-				React.createElement("li", {className: "n-side-menu-close"}, 
-					React.createElement("a", {href: "javascript:void(0);", onClick: this.onCloseClicked}, 
-						React.createElement("span", {className: "fa fa-fw fa-arrow-circle-left"})
-					)
-				)
-			)
-		));
-	},
-	onMouseEnter: function () {
-		if (this.props.hover) {
-			this.show();
-		}
-	},
-	onMouseLeave: function () {
-		if (this.props.hover) {
-			this.willHide();
-		}
-	},
-	/**
-	 * on menu clicked
-	 * @param func
-	 * @param value
-	 */
-	onMenuClicked: function (func, value) {
-		func.call(this, value);
-	},
-	onParentMenuClicked: function (id) {
-		$(React.findDOMNode(this.refs[id + '_link'])).blur();
-		var ul = $(React.findDOMNode(this.refs[id + '_child']));
-		ul.toggle('fade', function () {
-			// if close, then close all sub menus
-			if (ul.not(':visible')) {
-				ul.find('ul').hide();
+		},
+		onMouseEnter: function () {
+			if (this.props.hover) {
+				this.show();
 			}
-		});
-		$(React.findDOMNode(this.refs[id + '_icon'])).toggleClass('fa-angle-double-down fa-angle-double-up');
-
-		this.collapseMenus(id);
-	},
-	/**
-	 * collapse menus
-	 * @param id {string} menu id which keep expanding
-	 */
-	collapseMenus: function (id) {
-		var _this = this;
-		Object.keys(this.refs).forEach(function (key) {
-			if (key.endsWith('_link')) {
-				var linkId = key.substr(0, key.length - 5);
-				if (linkId != id) {
-					var ul = $(React.findDOMNode(_this.refs[linkId + '_child']));
-					ul.hide('fade', function () {
-						ul.find('ul').hide();
-					});
+		},
+		onMouseLeave: function () {
+			if (this.props.hover) {
+				this.willHide();
+			}
+		},
+		/**
+		 * on menu clicked
+		 * @param func
+		 * @param value
+		 */
+		onMenuClicked: function (func, value) {
+			func.call(this, value);
+		},
+		onParentMenuClicked: function (id) {
+			$(React.findDOMNode(this.refs[id + '_link'])).blur();
+			var ul = $(React.findDOMNode(this.refs[id + '_child']));
+			ul.toggle('fade', function () {
+				// if close, then close all sub menus
+				if (ul.not(':visible')) {
+					ul.find('ul').hide();
 				}
+			});
+			$(React.findDOMNode(this.refs[id + '_icon'])).toggleClass('fa-angle-double-down fa-angle-double-up');
+
+			this.collapseMenus(id);
+		},
+		/**
+		 * collapse menus
+		 * @param id {string} menu id which keep expanding
+		 */
+		collapseMenus: function (id) {
+			var _this = this;
+			Object.keys(this.refs).forEach(function (key) {
+				if (key.endsWith('_link')) {
+					var linkId = key.substr(0, key.length - 5);
+					if (linkId != id) {
+						var ul = $(React.findDOMNode(_this.refs[linkId + '_child']));
+						ul.hide('fade', function () {
+							ul.find('ul').hide();
+						});
+					}
+				}
+			});
+			$(React.findDOMNode(this.refs[id + '_icon'])).toggleClass('fa-angle-double-down fa-angle-double-up');
+		},
+		/**
+		 * on close button clicked
+		 */
+		onCloseClicked: function () {
+			this.hide();
+		},
+		/**
+		 * show side menu
+		 */
+		show: function () {
+			if (this.state.willHide) {
+				clearTimeout(this.state.willHide);
+				this.state.willHide = null;
 			}
-		});
-		$(React.findDOMNode(this.refs[id + '_icon'])).toggleClass('fa-angle-double-down fa-angle-double-up');
-	},
-	/**
-	 * on close button clicked
-	 */
-	onCloseClicked: function () {
-		this.hide();
-	},
-	/**
-	 * show side menu
-	 */
-	show: function () {
-		if (this.state.willHide) {
-			clearTimeout(this.state.willHide);
-			this.state.willHide = null;
+			$(React.findDOMNode(this.refs.menus)).show('fade');
+		},
+		/**
+		 * hide side menu
+		 */
+		hide: function () {
+			var _this = this;
+			$(React.findDOMNode(this.refs.menus)).hide('fade', function () {
+				_this.collapseMenus();
+			});
+		},
+		willHide: function () {
+			var _this = this;
+			this.state.willHide = setTimeout(function () {
+				_this.hide();
+			}, 300);
 		}
-		$(React.findDOMNode(this.refs.menus)).show('fade');
-	},
-	/**
-	 * hide side menu
-	 */
-	hide: function () {
-		var _this = this;
-		$(React.findDOMNode(this.refs.menus)).hide('fade', function () {
-			_this.collapseMenus();
-		});
-	},
-	willHide: function () {
-		var _this = this;
-		this.state.willHide = setTimeout(function () {
-			_this.hide();
-		}, 300);
-	}
-});
+	});
+	context.NSideMenu = NSideMenu;
+}(this, jQuery, $pt));
+
 /**
  * normal tab
  */
-var NTab = React.createClass({displayName: "NTab",
-	propTypes: {
-		type: React.PropTypes.oneOf(['tab', 'pill']),
-		justified: React.PropTypes.bool,
-		direction: React.PropTypes.oneOf(['vertical', 'horizontal']),
-		size: React.PropTypes.oneOf(["lg", "2x", "3x", "4x", "5x"]),
-		removable: React.PropTypes.bool,
-		canActive: React.PropTypes.func,
-		onActive: React.PropTypes.func,
-		canRemove: React.PropTypes.func,
-		onRemove: React.PropTypes.func,
-		tabClassName: React.PropTypes.string,
-
-		tabs: React.PropTypes.arrayOf(React.PropTypes.shape({
-			label: React.PropTypes.string,
-			icon: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.element]),
-			active: React.PropTypes.bool,
-			value: React.PropTypes.any,
-			badge: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number]),
-			innerId: React.PropTypes.string,
+(function (context, $, $pt) {
+	var NTab = React.createClass({displayName: "NTab",
+		propTypes: {
+			type: React.PropTypes.oneOf(['tab', 'pill']),
+			justified: React.PropTypes.bool,
+			direction: React.PropTypes.oneOf(['vertical', 'horizontal']),
+			size: React.PropTypes.oneOf(["lg", "2x", "3x", "4x", "5x"]),
 			removable: React.PropTypes.bool,
-			className: React.PropTypes.string
-		}))
-	},
-	getDefaultProps: function () {
-		return {
-			type: 'tab',
-			justified: false,
-			removable: false
-		};
-	},
-	getInitialState: function () {
-		return {
-			activeTabIndex: null
-		};
-	},
-	componentDidMount: function () {
-		var activeTabIndex = this.getActiveTabIndex();
-		this.props.tabs.map(function (tab, index) {
-			if (activeTabIndex == index) {
-				$('#' + tab.innerId).show();
-			} else {
-				$('#' + tab.innerId).hide();
-			}
-		});
-	},
-	/**
-	 * render icon
-	 * @param icon {string|XML}
-	 * @param size {string}
-	 * @returns {XML}
-	 */
-	renderIcon: function (icon, size) {
-		if (typeof icon === 'string') {
-			var css = {
-				'fa': true,
-				'fa-fw': true
+			canActive: React.PropTypes.func,
+			onActive: React.PropTypes.func,
+			canRemove: React.PropTypes.func,
+			onRemove: React.PropTypes.func,
+			tabClassName: React.PropTypes.string,
+
+			tabs: React.PropTypes.arrayOf(React.PropTypes.shape({
+				label: React.PropTypes.string,
+				icon: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.element]),
+				active: React.PropTypes.bool,
+				value: React.PropTypes.any,
+				badge: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number]),
+				innerId: React.PropTypes.string,
+				removable: React.PropTypes.bool,
+				className: React.PropTypes.string
+			}))
+		},
+		getDefaultProps: function () {
+			return {
+				type: 'tab',
+				justified: false,
+				removable: false
 			};
-			css['fa-' + icon] = true;
-			if (size) {
-				css['fa-' + size] = true;
-			}
-			return React.createElement("span", {className: $pt.LayoutHelper.classSet(css)});
-		} else {
-			return icon;
-		}
-	},
-	/**
-	 * render label
-	 * @param label {string}
-	 * @returns {XML}
-	 */
-	renderLabel: function (label) {
-		if (label) {
-			return React.createElement("span", null, ' ' + label);
-		} else {
-			return null;
-		}
-	},
-	renderBadge: function (badge) {
-		if (badge) {
-			return React.createElement("span", {className: "badge"}, badge);
-		} else {
-			return null;
-		}
-	},
-	/**
-	 * render tab
-	 * @param tab {{active:boolean, label:string, icon:string, badge:string, removable: boolean, visible:boolean}}
-	 * @param index
-	 * @returns {XML}
-	 */
-	renderTab: function (tab, index) {
-		var css = $pt.LayoutHelper.classSet({
-			active: index == this.getActiveTabIndex(),
-			hide: tab.visible === false
-		});
-		var removeButton = (
-			React.createElement("a", {href: "javascript:void(0);", className: "n-tab-delete", 
-			   onClick: this.onRemoveClicked}, 
-				React.createElement("span", {className: "fa fa-fw fa-times"})
-			));
-		return (React.createElement("li", {role: "presentation", className: css}, 
-			React.createElement("a", {href: "javascript:void(0);", onClick: this.onClicked}, 
-				this.renderIcon(tab.icon, this.props.size), 
-				this.renderLabel(tab.label), 
-				this.renderBadge(tab.badge)
-			), 
-			this.canRemove(tab) ? removeButton : null
-		));
-	},
-	/**
-	 * render
-	 * @returns {XML}
-	 */
-	render: function () {
-		var css = {
-			'nav': true,
-			'nav-justified': this.props.justified === true,
-			'nav-tabs': this.props.type === 'tab',
-			'nav-pills': this.props.type === 'pill',
-			'nav-direction-vertical': this.props.direction === 'vertical'
-		};
-		if (this.props.tabClassName) {
-			css[this.props.tabClassName] = true;
-		}
-		return (React.createElement("div", {className: "n-tab"}, 
-			React.createElement("ul", {className: $pt.LayoutHelper.classSet(css), ref: "tabs"}, 
-				this.props.tabs.map(this.renderTab)
-			)
-		));
-	},
-	/**
-	 * check the given tab can be removed or not
-	 * @param tab {{removable: boolean}}
-	 * @returns {boolean}
-	 */
-	canRemove: function (tab) {
-		if (tab.removable != null) {
-			return tab.removable === true;
-		} else {
-			return this.props.removable;
-		}
-	},
-	/**
-	 * get active tab index
-	 * @returns {number}
-	 */
-	getActiveTabIndex: function () {
-		if (this.state.activeTabIndex != null) {
-			return this.state.activeTabIndex;
-		}
-		var activeTabIndex = 0;
-		this.props.tabs.forEach(function (tab, index) {
-			if (tab.active === true) {
-				activeTabIndex = index;
-			}
-		});
-		this.state.activeTabIndex = activeTabIndex;
-		return this.state.activeTabIndex;
-	},
-	/**
-	 * on tab clicked
-	 * @param evt
-	 */
-	onClicked: function (evt) {
-		var newTab = $(evt.target).closest('li');
-		var newTabIndex = newTab.index();
-
-		var canActive = this.props.canActive;
-		if (canActive) {
-			var activeTab = this.props.tabs[this.state.activeTabIndex];
-			var ret = canActive.call(this, this.props.tabs[newTabIndex].value, newTabIndex, activeTab.value, this.state.activeTabIndex);
-			if (ret === false) {
-				$(':focus').blur();
-				return;
-			}
-		}
-
-		newTab.addClass('active');
-		newTab.parent().children('li').not(newTab).removeClass('active');
-		this.state.activeTabIndex = newTabIndex;
-
-		var activeInnerId = this.props.tabs[this.state.activeTabIndex].innerId;
-		this.props.tabs.map(function (tab) {
-			if (tab.innerId == activeInnerId) {
-				$('#' + tab.innerId).show();
+		},
+		getInitialState: function () {
+			return {
+				activeTabIndex: null
+			};
+		},
+		componentDidMount: function () {
+			var activeTabIndex = this.getActiveTabIndex();
+			this.props.tabs.map(function (tab, index) {
+				if (activeTabIndex == index) {
+					$('#' + tab.innerId).show();
+				} else {
+					$('#' + tab.innerId).hide();
+				}
+			});
+		},
+		/**
+		 * render icon
+		 * @param icon {string|XML}
+		 * @param size {string}
+		 * @returns {XML}
+		 */
+		renderIcon: function (icon, size) {
+			if (typeof icon === 'string') {
+				var css = {
+					'fa': true,
+					'fa-fw': true
+				};
+				css['fa-' + icon] = true;
+				if (size) {
+					css['fa-' + size] = true;
+				}
+				return React.createElement("span", {className: $pt.LayoutHelper.classSet(css)});
 			} else {
-				$('#' + tab.innerId).hide();
+				return icon;
 			}
-		});
-		var onActive = this.props.onActive;
-		if (onActive) {
-			onActive.call(this, this.props.tabs[this.state.activeTabIndex].value, this.state.activeTabIndex);
+		},
+		/**
+		 * render label
+		 * @param label {string}
+		 * @returns {XML}
+		 */
+		renderLabel: function (label) {
+			if (label) {
+				return React.createElement("span", null, ' ' + label);
+			} else {
+				return null;
+			}
+		},
+		renderBadge: function (badge) {
+			if (badge) {
+				return React.createElement("span", {className: "badge"}, badge);
+			} else {
+				return null;
+			}
+		},
+		/**
+		 * render tab
+		 * @param tab {{active:boolean, label:string, icon:string, badge:string, removable: boolean, visible:boolean}}
+		 * @param index
+		 * @returns {XML}
+		 */
+		renderTab: function (tab, index) {
+			var css = $pt.LayoutHelper.classSet({
+				active: index == this.getActiveTabIndex(),
+				hide: tab.visible === false
+			});
+			var removeButton = (
+				React.createElement("a", {href: "javascript:void(0);", className: "n-tab-delete", 
+				   onClick: this.onRemoveClicked}, 
+					React.createElement("span", {className: "fa fa-fw fa-times"})
+				));
+			return (React.createElement("li", {role: "presentation", className: css}, 
+				React.createElement("a", {href: "javascript:void(0);", onClick: this.onClicked}, 
+					this.renderIcon(tab.icon, this.props.size), 
+					this.renderLabel(tab.label), 
+					this.renderBadge(tab.badge)
+				), 
+				this.canRemove(tab) ? removeButton : null
+			));
+		},
+		/**
+		 * render
+		 * @returns {XML}
+		 */
+		render: function () {
+			var css = {
+				'nav': true,
+				'nav-justified': this.props.justified === true,
+				'nav-tabs': this.props.type === 'tab',
+				'nav-pills': this.props.type === 'pill',
+				'nav-direction-vertical': this.props.direction === 'vertical'
+			};
+			if (this.props.tabClassName) {
+				css[this.props.tabClassName] = true;
+			}
+			return (React.createElement("div", {className: "n-tab"}, 
+				React.createElement("ul", {className: $pt.LayoutHelper.classSet(css), ref: "tabs"}, 
+					this.props.tabs.map(this.renderTab)
+				)
+			));
+		},
+		/**
+		 * check the given tab can be removed or not
+		 * @param tab {{removable: boolean}}
+		 * @returns {boolean}
+		 */
+		canRemove: function (tab) {
+			if (tab.removable != null) {
+				return tab.removable === true;
+			} else {
+				return this.props.removable;
+			}
+		},
+		/**
+		 * get active tab index
+		 * @returns {number}
+		 */
+		getActiveTabIndex: function () {
+			if (this.state.activeTabIndex != null) {
+				return this.state.activeTabIndex;
+			}
+			var activeTabIndex = 0;
+			this.props.tabs.forEach(function (tab, index) {
+				if (tab.active === true) {
+					activeTabIndex = index;
+				}
+			});
+			this.state.activeTabIndex = activeTabIndex;
+			return this.state.activeTabIndex;
+		},
+		/**
+		 * on tab clicked
+		 * @param evt
+		 */
+		onClicked: function (evt) {
+			var newTab = $(evt.target).closest('li');
+			var newTabIndex = newTab.index();
+
+			var canActive = this.props.canActive;
+			if (canActive) {
+				var activeTab = this.props.tabs[this.state.activeTabIndex];
+				var ret = canActive.call(this, this.props.tabs[newTabIndex].value, newTabIndex, activeTab.value, this.state.activeTabIndex);
+				if (ret === false) {
+					$(':focus').blur();
+					return;
+				}
+			}
+
+			newTab.addClass('active');
+			newTab.parent().children('li').not(newTab).removeClass('active');
+			this.state.activeTabIndex = newTabIndex;
+
+			var activeInnerId = this.props.tabs[this.state.activeTabIndex].innerId;
+			this.props.tabs.map(function (tab) {
+				if (tab.innerId == activeInnerId) {
+					$('#' + tab.innerId).show();
+				} else {
+					$('#' + tab.innerId).hide();
+				}
+			});
+			var onActive = this.props.onActive;
+			if (onActive) {
+				onActive.call(this, this.props.tabs[this.state.activeTabIndex].value, this.state.activeTabIndex);
+			}
+		},
+		/**
+		 * on tab remove clicked
+		 * @param evt
+		 */
+		onRemoveClicked: function (evt) {
+			var selectedTab = $(evt.target).closest('li');
+			selectedTab.addClass('active');
+			selectedTab.parent().children('li').not(selectedTab).removeClass('active');
+
+			var activeIndex = selectedTab.index();
+			var activeTab = this.props.tabs[activeIndex];
+			var activeValue = activeTab.value;
+
+			// check it can remove or not
+			var canRemove = this.props.canRemove;
+			if (canRemove) {
+				var ret = canRemove.call(this, activeValue, activeIndex);
+				if (ret === false) {
+					return;
+				}
+			}
+
+			// remove tab
+			this.props.tabs[activeIndex].visible = false;
+			var _this = this;
+			// find the visible tab
+			// if tab index more than removed one, stop finding
+			// or return the last visible tab which before removed tab
+			this.props.tabs.some(function (tab, index) {
+				if (tab.visible !== false) {
+					_this.state.activeTabIndex = index;
+					return index > activeIndex;
+				}
+			});
+
+			this.forceUpdate(function () {
+				var onRemove = _this.props.onRemove;
+				if (onRemove) {
+					onRemove.call(_this, activeValue, activeIndex);
+				}
+			});
 		}
-	},
-	/**
-	 * on tab remove clicked
-	 * @param evt
-	 */
-	onRemoveClicked: function (evt) {
-		var selectedTab = $(evt.target).closest('li');
-		selectedTab.addClass('active');
-		selectedTab.parent().children('li').not(selectedTab).removeClass('active');
-
-		var activeIndex = selectedTab.index();
-		var activeTab = this.props.tabs[activeIndex];
-		var activeValue = activeTab.value;
-
-		// check it can remove or not
-		var canRemove = this.props.canRemove;
-		if (canRemove) {
-			var ret = canRemove.call(this, activeValue, activeIndex);
-			if (ret === false) {
-				return;
-			}
-		}
-
-		// remove tab
-		this.props.tabs[activeIndex].visible = false;
-		var _this = this;
-		// find the visible tab
-		// if tab index more than removed one, stop finding
-		// or return the last visible tab which before removed tab
-		this.props.tabs.some(function (tab, index) {
-			if (tab.visible !== false) {
-				_this.state.activeTabIndex = index;
-				return index > activeIndex;
-			}
-		});
-
-		this.forceUpdate(function () {
-			var onRemove = _this.props.onRemove;
-			if (onRemove) {
-				onRemove.call(_this, activeValue, activeIndex);
-			}
-		});
-	}
-});
+	});
+	context.NTab = NTab;
+}(this, jQuery, $pt));
 
 /**
  * table
  *
  * depends NIcon, NText, NModalForm, NConfirm, NPagination
  */
-var NTable = React.createClass($pt.defineCellComponent({
-	statics: {
-		__operationButtonWidth: 31,
-		__minOperationButtonWidth: 40,
-		TOOLTIP_EDIT: null,
-		TOOLTIP_REMOVE: null,
-		/**
-		 * set operation button width
-		 * @param width {number}
-		 */
-		setOperationButtonWidth: function (width) {
-			NTable.__operationButtonWidth = width;
-		},
-		ADD_BUTTON_ICON: "plus",
-		ADD_BUTTON_TEXT: "",
-		SEARCH_PLACE_HOLDER: "Search...",
-		ROW_EDIT_BUTTON_ICON: "pencil",
-		ROW_REMOVE_BUTTON_ICON: "trash-o",
-		EDIT_DIALOG_SAVE_BUTTON_TEXT: "Save",
-		EDIT_DIALOG_SAVE_BUTTON_ICON: 'floppy-o',
-		SORT_ICON: "sort",
-		SORT_ASC_ICON: "sort-amount-asc",
-		SORT_DESC_ICON: "sort-amount-desc",
-		NO_DATA_LABEL: "No Data",
-		DETAIL_ERROR_MESSAGE: "Detail error please open item and do validate.",
-		REMOVE_CONFIRM_TITLE: "Delete data?",
-		REMOVE_CONFIRM_MESSAGE: ["Are you sure you want to delete data?", "Deleted data cannot be recovered."],
-		BOOLEAN_TRUE_DISPLAY_TEXT: 'Y',
-		BOOLEAN_FALSE_DISPLAY_TEXT: 'N',
-		PAGE_JUMPING_PROXY: null
-	},
-	propTypes: {
-		// model
-		model: React.PropTypes.object,
-		// CellLayout
-		layout: React.PropTypes.object
-	},
-	getDefaultProps: function () {
-		return {
-			defaultOptions: {
-				header: true,
-
-				scrollY: false,
-				scrollX: false,
-				fixedRightColumns: 0,
-				fixedLeftColumns: 0,
-
-				addable: false,
-				searchable: true,
-
-				operationFixed: false,
-				editable: false,
-				removable: false,
-
-				indexable: false,
-				indexFixed: false,
-
-				rowSelectFixed: false,
-
-				sortable: true,
-
-				pageable: false,
-				countPerPage: 20,
-
-				dialogResetVisible: false,
-				dialogValidateVisible: false,
-
-				collapsible: false,
-				expanded: true
-			}
-		};
-	},
-	/**
-	 * get initial state
-	 * @returns {*}
-	 */
-	getInitialState: function () {
-		var _this = this;
-		return {
-			sortColumn: null,
-			sortWay: null, // asc|desc
-
-			countPerPage: 20,
-			pageCount: 1,
-			currentPageIndex: 1,
-
-			searchText: null,
-			searchModel: $pt.createModel({
-				text: null
-			}),
-			searchLayout: $pt.createCellLayout('text', {
+(function (context, $, $pt) {
+	var NTable = React.createClass($pt.defineCellComponent({
+		statics: {
+			__operationButtonWidth: 31,
+			__minOperationButtonWidth: 40,
+			ROW_HEIGHT: 32,
+			TOOLTIP_EDIT: null,
+			TOOLTIP_REMOVE: null,
+			/**
+			 * set operation button width
+			 * @param width {number}
+			 */
+			setOperationButtonWidth: function (width) {
+				NTable.__operationButtonWidth = width;
+			},
+			ADD_BUTTON_ICON: "plus",
+			ADD_BUTTON_TEXT: "",
+			SEARCH_PLACE_HOLDER: "Search...",
+			ROW_EDIT_BUTTON_ICON: "pencil",
+			ROW_REMOVE_BUTTON_ICON: "trash-o",
+			EDIT_DIALOG_SAVE_BUTTON_TEXT: "Save",
+			EDIT_DIALOG_SAVE_BUTTON_ICON: 'floppy-o',
+			SORT_ICON: "sort",
+			SORT_ASC_ICON: "sort-amount-asc",
+			SORT_DESC_ICON: "sort-amount-desc",
+			NO_DATA_LABEL: "No Data",
+			DETAIL_ERROR_MESSAGE: "Detail error please open item and do validate.",
+			REMOVE_CONFIRM_TITLE: "Delete data?",
+			REMOVE_CONFIRM_MESSAGE: ["Are you sure you want to delete data?", "Deleted data cannot be recovered."],
+			BOOLEAN_TRUE_DISPLAY_TEXT: 'Y',
+			BOOLEAN_FALSE_DISPLAY_TEXT: 'N',
+			PAGE_JUMPING_PROXY: null,
+			registerInlineEditor: function(type, definition) {
+				if (NTable.__inlineEditors[type] != null) {
+					console.warn("Inline editor[" + type + "] is repalced.");
+					console.warn("From:");
+					console.warn(NTable.__inlineEditors[type]);
+					console.warn("To:");
+					console.warn(definition);
+				}
+				NTable.__inlineEditors[type] = definition;
+			},
+			getInlineEditor: function(type) {
+				var editor = NTable.__inlineEditors[type];
+				if (editor == null) {
+					editor = NTable['__' + type];
+				}
+				if (editor == null) {
+					throw $pt.createComponentException($pt.ComponentConstants.Err_Unsupported_Component,
+						"Inline component type[" + type + "] is not supported yet.");
+				}
+				return editor;
+			},
+			__inlineEditors: {},
+			__text: {
 				comp: {
-					placeholder: NTable.SEARCH_PLACE_HOLDER
-				},
-				css: {
-					comp: 'n-table-search-box'
+					type: {type: $pt.ComponentConstants.Text, label: false}
 				}
-			})
-		};
-	},
-	/**
-	 * attach listeners
-	 */
-	attachListeners: function () {
-		var _this = this;
-		this.getScrollBodyComponent().on("scroll", function (e) {
-			var $this = $(this);
-			_this.getScrollHeaderComponent().scrollLeft($this.scrollLeft());
-			_this.getFixedLeftBodyComponent().scrollTop($this.scrollTop());
-			_this.getFixedRightBodyComponent().scrollTop($this.scrollTop());
-		});
-		this.getDivComponent().on("mouseenter", "tbody tr", function (e) {
-			//$(this).addClass("hover");
-			var index = $(this).parent().children().index($(this));
-			_this.getDivComponent().find("tbody tr:nth-child(" + (index + 1) + ")").addClass("hover");
-		}).on("mouseleave", "tbody tr", function (e) {
-			var index = $(this).parent().children().index($(this));
-			_this.getDivComponent().find("tbody tr:nth-child(" + (index + 1) + ")").removeClass("hover");
-		});
-		this.renderIfIE8();
-		this.renderHeaderPopover();
-		this.addPostChangeListener(this.onModelChanged);
-		this.state.searchModel.addPostChangeListener('text', this.onSearchBoxChanged);
-		this.addPostRemoveListener(this.onModelChanged);
-		this.addPostAddListener(this.onModelChanged);
-		this.addPostValidateListener(this.onModelValidateChanged);
-	},
-	/**
-	 * detach listeners
-	 */
-	detachListeners: function () {
-		this.getScrollBodyComponent().off("scroll");
-		this.getDivComponent().off("mouseenter", "tbody tr").off("mouseleave", "tbody tr");
-		$(React.findDOMNode(this.refs[this.getHeaderLabelId()])).popover("destroy");
-		this.removePostChangeListener(this.onModelChanged);
-		this.state.searchModel.removePostChangeListener('text', this.onSearchBoxChanged);
-		this.removePostRemoveListener(this.onModelChanged);
-		this.removePostAddListener(this.onModelChanged);
-		this.removePostValidateListener(this.onModelValidateChanged);
-	},
-	/**
-	 * will update
-	 * @param nextProps
-	 */
-	componentWillUpdate: function (nextProps) {
-		this.detachListeners();
-		if (nextProps != this.props) {
-			// clear definition
-			this.columns = null;
-		}
-	},
-	/**
-	 * did update
-	 * @param prevProps
-	 * @param prevState
-	 */
-	componentDidUpdate: function (prevProps, prevState) {
-		this.attachListeners();
-	},
-	/**
-	 * did mount
-	 */
-	componentDidMount: function () {
-		this.attachListeners();
-	},
-	/**
-	 * will unmount
-	 */
-	componentWillUnmount: function () {
-		this.detachListeners();
-	},
-	/**
-	 * render when IE8, fixed the height of table since IE8 doesn't support max-height
-	 */
-	renderIfIE8: function () {
-		if (!this.isIE8() || !this.hasVerticalScrollBar()) {
-			return;
-		}
-		var mainTable = this.getComponent();
-		var leftFixedDiv = this.getFixedLeftBodyComponent();
-		var rightFixedDiv = this.getFixedRightBodyComponent();
-		var trs = mainTable.find("tr");
-		var rowCount = trs.length;
-		var height = rowCount * 32; // 32 is defined in css, if value in css is changed, it must be changed together
-		if (height > this.getComponentOption("scrollY")) {
-			height = this.getComponentOption("scrollY");
-		}
-		// calculate height of body if ie8 and scrollY
-		mainTable.closest("div").css({
-			height: height + 17
-		});
-		leftFixedDiv.css({
-			height: height
-		});
-		rightFixedDiv.css({
-			height: height
-		});
-	},
-	isIE: function () {
-		return $.browser.msie;
-	},
-	/**
-	 * check browser is IE8 or not
-	 * @returns {boolean}
-	 */
-	isIE8: function () {
-		return $.browser.msie && $.browser.versionNumber == 8;
-	},
-	/**
-	 * check browser is firefox or not
-	 * @returns {boolean}
-	 */
-	isFirefox: function () {
-		return $.browser.mozilla;
-	},
-	/**
-	 * prepare display options
-	 */
-	prepareDisplayOptions: function () {
-		if (this.columns != null) {
-			// already initialized, do nothing and return
-			return;
-		}
-		// this.state.searchModel.addListener('text', 'post', 'change', this.onSearchBoxChanged);
+			},
+			__check: {
+				comp: {
+					type: {type: $pt.ComponentConstants.Check, label: false}
+				}
+			},
+			__date: {
+				comp: {
+					type: {type: $pt.ComponentConstants.Date, label: false}
+				}
+			},
+			__select: {
+				comp: {
+					type: {type: $pt.ComponentConstants.Select, label: false}
+				}
+			},
+			__radio: {
+				comp: {
+					type: {type: $pt.ComponentConstants.Radio, label: false}
+				}
+			}
+		},
+		propTypes: {
+			// model
+			model: React.PropTypes.object,
+			// CellLayout
+			layout: React.PropTypes.object
+		},
+		getDefaultProps: function () {
+			return {
+				defaultOptions: {
+					header: true,
 
-		// copy from this.props.columns
-		this.columns = this.getComponentOption("columns");
-		// is it is json array, construct to TableColumnLayout object
-		if (Array.isArray(this.columns)) {
-			this.columns = $pt.createTableColumnLayout(this.columns);
-		} else {
-			// get original columns definition can create new object
-			this.columns = $pt.createTableColumnLayout(this.columns.columns());
-		}
-		this.fixedRightColumns = this.getComponentOption("fixedRightColumns");
-		this.fixedLeftColumns = this.getComponentOption("fixedLeftColumns");
+					scrollY: false,
+					scrollX: false,
+					fixedRightColumns: 0,
+					fixedLeftColumns: 0,
 
-		var config = null;
-		// if editable or removable, auto add last column to render the buttons
-		var editable = this.isEditable();
-		var removable = this.isRemovable();
-		var rowOperations = this.getComponentOption("rowOperations");
-		if (rowOperations !== undefined && rowOperations !== null && !Array.isArray(rowOperations)) {
-			rowOperations = [rowOperations];
-		}
-		var hasUserDefinedRowOperations = rowOperations !== undefined && rowOperations !== null;
-		if (editable || removable || hasUserDefinedRowOperations) {
-			config = {
-				editable: editable,
-				removable: removable,
-				rowOperations: rowOperations,
-				title: ""
-			};
-			config.width = (config.editable ? NTable.__operationButtonWidth : 0) + (config.removable ? NTable.__operationButtonWidth : 0);
-			if (hasUserDefinedRowOperations) {
-				config.width += NTable.__operationButtonWidth * config.rowOperations.length;
-			}
-			config.width = config.width < NTable.__minOperationButtonWidth ? NTable.__minOperationButtonWidth : config.width;
-			this.columns.push(config);
-			if (this.fixedRightColumns > 0 || this.getComponentOption("operationFixed") === true) {
-				this.fixedRightColumns++;
-			}
-		}
-		// if row selectable, auto add first column to render the row select checkbox
-		var rowSelectable = this.isRowSelectable();
-		if (rowSelectable) {
-			config = {
-				rowSelectable: rowSelectable,
-				width: 40,
-				title: ''
-			};
-			this.columns.splice(0, 0, config);
-			if (this.fixedLeftColumns > 0 || this.getComponentOption('rowSelectFixed') === true) {
-				this.fixedLeftColumns++;
-			}
-		}
-		// if indexable, auto add first column to render the row index
-		var indexable = this.isIndexable();
-		if (indexable) {
-			config = {
-				indexable: true,
-				width: 40,
-				title: "#"
-			};
-			this.columns.splice(0, 0, config);
-			if (this.fixedLeftColumns > 0 || this.getComponentOption("indexFixed") === true) {
-				this.fixedLeftColumns++;
-			}
-		}
-	},
-	/**
-	 * render search  box
-	 * @returns {XML}
-	 */
-	renderSearchBox: function () {
-		if (this.isSearchable()) {
-			return (React.createElement(NText, {model: this.state.searchModel, layout: this.state.searchLayout}));
-		} else {
-			return null;
-		}
-	},
-	/**
-	 * render heading buttons
-	 * @returns {XML}
-	 */
-	renderHeadingButtons: function () {
-		if (this.isAddable()) {
-			return (React.createElement("a", {href: "javascript:void(0);", 
-			           onClick: this.onAddClicked, 
-			           className: "n-table-heading-buttons pull-right", 
-			           ref: "add-button", style: {
-					display: this.state.expanded ? 'block' : 'none'
-				}}, 
-				React.createElement(NIcon, {icon: NTable.ADD_BUTTON_ICON}), 
-				NTable.ADD_BUTTON_TEXT
-			));
-		} else {
-			return null;
-		}
-	},
-	/**
-	 * render panel heading label
-	 * @returns {XML}
-	 */
-	renderPanelHeadingLabel: function () {
-		var css = "col-sm-3 col-md-3 col-lg-3";
-		if (this.getModel().hasError(this.getDataId())) {
-			css += " has-error";
-		}
-		var spanCSS = {
-			'n-table-heading-label': true
-		};
+					addable: false,
+					searchable: true,
 
-		if (this.isCollapsible()) {
-			spanCSS['n-table-heading-label-collapsible'] = true;
-		}
-		return React.createElement("div", {className: css}, 
-			React.createElement("span", {className: this.getAdditionalCSS("headingLabel", $pt.LayoutHelper.classSet(spanCSS)), 
-			      ref: this.getHeaderLabelId(), onClick: this.isCollapsible() ? this.onTitleClicked : null}, 
-				this.getLayout().getLabel()
-			)
-		);
-	},
-	/**
-	 * render header popover
-	 */
-	renderHeaderPopover: function () {
-		if (this.getModel().hasError(this.getDataId())) {
-			var messages = this.getModel().getError(this.getDataId());
+					operationFixed: false,
+					editable: false,
+					removable: false,
+
+					indexable: false,
+					indexFixed: false,
+
+					rowSelectFixed: false,
+
+					sortable: true,
+
+					pageable: false,
+					countPerPage: 20,
+
+					dialogResetVisible: false,
+					dialogValidateVisible: false,
+
+					collapsible: false,
+					expanded: true
+				}
+			};
+		},
+		/**
+		 * get initial state
+		 * @returns {*}
+		 */
+		getInitialState: function () {
 			var _this = this;
-			var content = messages.map(function (msg) {
-				if (typeof msg === "string") {
-					return "<span style='display:block'>" + msg.format([_this.getLayout().getLabel()]) + "</span>";
-				} else {
-					return "<span style='display:block'>" + NTable.DETAIL_ERROR_MESSAGE + "</span>";
-				}
+			return {
+				sortColumn: null,
+				sortWay: null, // asc|desc
+
+				countPerPage: 20,
+				pageCount: 1,
+				currentPageIndex: 1,
+
+				searchText: null,
+				searchModel: $pt.createModel({
+					text: null
+				}),
+				searchLayout: $pt.createCellLayout('text', {
+					comp: {
+						placeholder: NTable.SEARCH_PLACE_HOLDER
+					},
+					css: {
+						comp: 'n-table-search-box'
+					}
+				})
+			};
+		},
+		/**
+		 * attach listeners
+		 */
+		attachListeners: function () {
+			var _this = this;
+			this.getScrollBodyComponent().on("scroll", function (e) {
+				var $this = $(this);
+				_this.getScrollHeaderComponent().scrollLeft($this.scrollLeft());
+				_this.getFixedLeftBodyComponent().scrollTop($this.scrollTop());
+				_this.getFixedRightBodyComponent().scrollTop($this.scrollTop());
 			});
-			$(React.findDOMNode(this.refs[this.getHeaderLabelId()])).popover({
-				placement: 'top',
-				trigger: 'hover',
-				html: true,
-				content: content,
-				// false is very import, since when destroy popover,
-				// the really destroy will be invoked by some delay,
-				// and before really destory invoked,
-				// the new popover is bind by componentDidUpdate method.
-				// and finally new popover will be destroyed.
-				animation: false
+			this.getDivComponent().on("mouseenter", "tbody tr", function (e) {
+				//$(this).addClass("hover");
+				var index = $(this).parent().children().index($(this));
+				_this.getDivComponent().find("tbody tr:nth-child(" + (index + 1) + ")").addClass("hover");
+			}).on("mouseleave", "tbody tr", function (e) {
+				var index = $(this).parent().children().index($(this));
+				_this.getDivComponent().find("tbody tr:nth-child(" + (index + 1) + ")").removeClass("hover");
 			});
-		}
-	},
-	/**
-	 * render panel heading
-	 * @returns {XML}
-	 */
-	renderPanelHeading: function () {
-		if (!this.isHeading()) {
-			return null;
-		}
-		return (React.createElement("div", {className: this.getAdditionalCSS("heading", "panel-heading n-table-heading")}, 
-			React.createElement("div", {className: "row"}, 
-				this.renderPanelHeadingLabel(), 
-				React.createElement("div", {className: "col-sm-9 col-md-9 col-lg-9"}, 
-					this.renderHeadingButtons(), 
-					this.renderSearchBox()
-				)
-			)
-		));
-	},
-	/**
-	 * render sort button
-	 * @param column
-	 * @returns {XML}
-	 */
-	renderTableHeaderSortButton: function (column) {
-		if (this.isSortable(column)) {
-			var icon = NTable.SORT_ICON;
-			var sortClass = this.getAdditionalCSS("sort", "pull-right n-table-sort");
-			if (this.state.sortColumn == column) {
-				sortClass += " " + this.getAdditionalCSS("sorted", "n-table-sorted");
-				if (this.state.sortWay == "asc") {
-					icon = NTable.SORT_ASC_ICON;
-				} else {
-					icon = NTable.SORT_DESC_ICON;
-				}
+			this.renderIfIE8();
+			this.renderHeaderPopover();
+			this.addPostChangeListener(this.onModelChanged);
+			this.state.searchModel.addPostChangeListener('text', this.onSearchBoxChanged);
+			this.addPostRemoveListener(this.onModelChanged);
+			this.addPostAddListener(this.onModelChanged);
+			this.addPostValidateListener(this.onModelValidateChanged);
+		},
+		/**
+		 * detach listeners
+		 */
+		detachListeners: function () {
+			this.getScrollBodyComponent().off("scroll");
+			this.getDivComponent().off("mouseenter", "tbody tr").off("mouseleave", "tbody tr");
+			$(React.findDOMNode(this.refs[this.getHeaderLabelId()])).popover("destroy");
+			this.removePostChangeListener(this.onModelChanged);
+			this.state.searchModel.removePostChangeListener('text', this.onSearchBoxChanged);
+			this.removePostRemoveListener(this.onModelChanged);
+			this.removePostAddListener(this.onModelChanged);
+			this.removePostValidateListener(this.onModelValidateChanged);
+		},
+		/**
+		 * will update
+		 * @param nextProps
+		 */
+		componentWillUpdate: function (nextProps) {
+			this.detachListeners();
+			if (nextProps != this.props) {
+				// clear definition
+				this.columns = null;
 			}
-			return (React.createElement("a", {href: "javascript:void(0);", className: sortClass, 
-			           onClick: this.onSortClicked.bind(this, column)}, 
-				React.createElement(NIcon, {icon: icon})
-			));
-		}
-	},
-	/**
-	 * render checkbox
-	 * @param column
-	 * @returns {XML}
-	 */
-	renderTableHeaderCheckBox: function (column) {
-		var data = this.getDataToDisplay();
-		var range = this.computePagination(data);
-		var allSelected = this.isCurrentPageAllSelected(column, data, range);
-		var model = $pt.createModel({
-			allCheck: allSelected
-		});
-		var layout = $pt.createCellLayout('allCheck', {
-			comp: {
-				type: $pt.ComponentConstants.Check
+		},
+		/**
+		 * did update
+		 * @param prevProps
+		 * @param prevState
+		 */
+		componentDidUpdate: function (prevProps, prevState) {
+			this.attachListeners();
+		},
+		/**
+		 * did mount
+		 */
+		componentDidMount: function () {
+			this.attachListeners();
+		},
+		/**
+		 * will unmount
+		 */
+		componentWillUnmount: function () {
+			this.detachListeners();
+		},
+		/**
+		 * render when IE8, fixed the height of table since IE8 doesn't support max-height
+		 */
+		renderIfIE8: function () {
+			if (!this.isIE8() || !this.hasVerticalScrollBar()) {
+				return;
 			}
-		});
-		var _this = this;
-		model.addListener('allCheck', 'post', 'change', function (evt) {
-			var selected = evt.new;
-			if (data != null) {
-				var rowIndex = 1;
-				data.forEach(function (row) {
-					if (rowIndex >= range.min && rowIndex <= range.max) {
-						$pt.setValueIntoJSON(row, column.rowSelectable, selected);
-					}
-					rowIndex++;
-				});
-				_this.forceUpdate();
+			var mainTable = this.getComponent();
+			var leftFixedDiv = this.getFixedLeftBodyComponent();
+			var rightFixedDiv = this.getFixedRightBodyComponent();
+			var trs = mainTable.find("tr");
+			var rowCount = trs.length;
+			var height = rowCount * NTable.ROW_HEIGHT; // 32 is defined in css, if value in css is changed, it must be changed together
+			if (height > this.getComponentOption("scrollY")) {
+				height = this.getComponentOption("scrollY");
 			}
-		});
-		return React.createElement(NCheck, {model: model, layout: layout});
-	},
-	/**
-	 * render heading content.
-	 * at least and only one parameter can be true.
-	 * if more than one parameter is true, priority as all > leftFixed > rightFixed
-	 * @param all {boolean} render all columns?
-	 * @param leftFixed {boolean} render left fixed columns?
-	 * @param rightFixed {boolean} render right fixed columns?
-	 * @returns {XML}
-	 * @see #getRenderColumnIndexRange
-	 */
-	renderTableHeading: function (all, leftFixed, rightFixed) {
-		var indexToRender = this.getRenderColumnIndexRange(all, leftFixed, rightFixed);
-		var columnIndex = 0;
-		var _this = this;
-		return (React.createElement("thead", null, 
-		React.createElement("tr", null, 
-			this.columns.map(function (column) {
-				if (columnIndex >= indexToRender.min && columnIndex <= indexToRender.max) {
-					// column is fixed.
-					columnIndex++;
-					var style = {};
-					style.width = column.width;
-					if (!(column.visible === undefined || column.visible === true)) {
-						style.display = "none";
-					}
-					if (column.rowSelectable) {
-						return (React.createElement("td", {style: style}, 
-							_this.renderTableHeaderCheckBox(column)
-						));
-					} else {
-						return (React.createElement("td", {style: style}, 
-							column.title, 
-							_this.renderTableHeaderSortButton(column)
-						));
-					}
-				} else {
-					columnIndex++;
-				}
-			})
-		)
-		));
-	},
-	/**
-	 * render operation cell
-	 * @param column
-	 * @param data
-	 * @returns {XML}
-	 */
-	renderOperationCell: function (column, data) {
-		var editButton = column.editable ?
-			(React.createElement(Button, {bsSize: "xsmall", bsStyle: "link", onClick: this.onEditClicked.bind(this, data), 
-			         className: "n-table-op-btn"}, 
-				React.createElement(NIcon, {icon: NTable.ROW_EDIT_BUTTON_ICON, size: "lg", tooltip: NTable.TOOLTIP_EDIT})
-			)) : null;
-		var removeButton = column.removable ?
-			(React.createElement(Button, {bsSize: "xsmall", bsStyle: "link", onClick: this.onRemoveClicked.bind(this, data), 
-			         className: "n-table-op-btn"}, 
-				React.createElement(NIcon, {icon: NTable.ROW_REMOVE_BUTTON_ICON, size: "lg", tooltip: NTable.TOOLTIP_REMOVE})
-			)) : null;
-		var rowOperations = column.rowOperations;
-		if (rowOperations === undefined || rowOperations === null) {
-			rowOperations = [];
-		}
-		var _this = this;
-		return (React.createElement(ButtonGroup, {className: "n-table-op-btn-group"}, 
-			rowOperations.map(function (opt) {
-				// for compatibility, keep the key 'func', offically is key 'click'
-				var click = opt.click || opt.func;
-				return (React.createElement(Button, {bsSize: "xsmall", bsStyle: "link", className: "n-table-op-btn", 
-				                onClick: _this.onRowOperationClicked.bind(_this, click, data)}, 
-					React.createElement(NIcon, {icon: opt.icon, size: "lg", tooltip: opt.tooltip})
-				));
-			}), 
-			editButton, 
-			removeButton
-		));
-	},
-	/**
-	 * render row select cell
-	 * @param column
-	 * @param data
-	 * @returns {XML}
-	 */
-	renderRowSelectCell: function (column, data) {
-		var model = $pt.createModel(data);
-		model.useBaseAsCurrent();
-		var _this = this;
-		model.addListener(column.rowSelectable, 'post', 'change', function (evt) {
-			_this.forceUpdate();
-		});
-		var layout = $pt.createCellLayout(column.rowSelectable, {
-			comp: {
-				type: $pt.ComponentConstants.Check
+			// calculate height of body if ie8 and scrollY
+			mainTable.closest("div").css({
+				height: height + 17
+			});
+			leftFixedDiv.css({
+				height: height
+			});
+			rightFixedDiv.css({
+				height: height
+			});
+		},
+		isIE: function () {
+			return $.browser.msie;
+		},
+		/**
+		 * check browser is IE8 or not
+		 * @returns {boolean}
+		 */
+		isIE8: function () {
+			return $.browser.msie && $.browser.versionNumber == 8;
+		},
+		/**
+		 * check browser is firefox or not
+		 * @returns {boolean}
+		 */
+		isFirefox: function () {
+			return $.browser.mozilla;
+		},
+		/**
+		 * prepare display options
+		 */
+		prepareDisplayOptions: function () {
+			if (this.columns != null) {
+				// already initialized, do nothing and return
+				return;
 			}
-		});
-		return (React.createElement(NCheck, {model: model, layout: layout}));
-	},
-	/**
-	 * render table body rows
-	 * @param row {*} data of row, json object
-	 * @param rowIndex {number}
-	 * @param all {boolean}
-	 * @param leftFixed {boolean}
-	 * @param rightFixed {boolean}
-	 * @returns {XML}
-	 */
-	renderTableBodyRow: function (row, rowIndex, all, leftFixed, rightFixed) {
-		var indexToRender = this.getRenderColumnIndexRange(all, leftFixed, rightFixed);
-		var columnIndex = 0;
-		var _this = this;
-		var className = rowIndex % 2 == 0 ? "even" : "odd";
-		if (this.getModel().hasError(this.getDataId())) {
-			var rowError = null;
-			var errors = this.getModel().getError(this.getDataId());
-			for (var index = 0, count = errors.length; index < count; index++) {
-				if (typeof errors[index] !== "string") {
-					rowError = errors[index].getError(row);
-				}
-			}
-			if (rowError != null) {
-				className += " has-error";
-			}
-		}
-		return (React.createElement("tr", {className: className}, 
-			this.columns.map(function (column) {
-				if (columnIndex >= indexToRender.min && columnIndex <= indexToRender.max) {
-					// column is fixed.
-					columnIndex++;
-					var style = {
-						width: column.width
-					};
-					if (!(column.visible === undefined || column.visible === true)) {
-						style.display = "none";
-					}
-					var data;
-					if (column.editable || column.removable || column.rowOperations != null) {
-						// operation column
-						data = _this.renderOperationCell(column, row);
-						style['text-align'] = "center";
-					} else if (column.indexable) {
-						// index column
-						data = rowIndex;
-					} else if (column.rowSelectable) {
-						data = _this.renderRowSelectCell(column, row);
-					} else {
-						// data is property name
-						data = _this.getDisplayTextOfColumn(column, row);
-					}
-					return (React.createElement("td", {style: style}, data));
-				} else {
-					columnIndex++;
-				}
-			})
-		));
-	},
-	/**
-	 * render table body
-	 * at least and only one parameter can be true.
-	 * if more than one parameter is true, priority as all > leftFixed > rightFixed
-	 * @param all
-	 * @param leftFixed
-	 * @param rightFixed
-	 * @returns {XML}
-	 */
-	renderTableBody: function (all, leftFixed, rightFixed) {
-		var data = this.getDataToDisplay();
-		if (data == null || data.length == 0) {
-			// no data
-			return null;
-		}
-		var rowIndex = 1;
-		var _this = this;
-		var range = this.computePagination(data);
-		return (React.createElement("tbody", null, 
-		data.map(function (element) {
-			if (rowIndex >= range.min && rowIndex <= range.max) {
-				return _this.renderTableBodyRow(element, rowIndex++, all, leftFixed, rightFixed);
+			// this.state.searchModel.addListener('text', 'post', 'change', this.onSearchBoxChanged);
+
+			// copy from this.props.columns
+			this.columns = this.getComponentOption("columns");
+			// is it is json array, construct to TableColumnLayout object
+			if (Array.isArray(this.columns)) {
+				this.columns = $pt.createTableColumnLayout(this.columns);
 			} else {
-				rowIndex++;
+				// get original columns definition can create new object
+				this.columns = $pt.createTableColumnLayout(this.columns.columns());
+			}
+			this.fixedRightColumns = this.getComponentOption("fixedRightColumns");
+			this.fixedLeftColumns = this.getComponentOption("fixedLeftColumns");
+
+			var config = null;
+			// if editable or removable, auto add last column to render the buttons
+			var editable = this.isEditable();
+			var removable = this.isRemovable();
+			var rowOperations = this.getComponentOption("rowOperations");
+			if (rowOperations !== undefined && rowOperations !== null && !Array.isArray(rowOperations)) {
+				rowOperations = [rowOperations];
+			}
+			var hasUserDefinedRowOperations = rowOperations !== undefined && rowOperations !== null;
+			if (editable || removable || hasUserDefinedRowOperations) {
+				config = {
+					editable: editable,
+					removable: removable,
+					rowOperations: rowOperations,
+					title: ""
+				};
+				config.width = (config.editable ? NTable.__operationButtonWidth : 0) + (config.removable ? NTable.__operationButtonWidth : 0);
+				if (hasUserDefinedRowOperations) {
+					config.width += NTable.__operationButtonWidth * config.rowOperations.length;
+				}
+				config.width = config.width < NTable.__minOperationButtonWidth ? NTable.__minOperationButtonWidth : config.width;
+				this.columns.push(config);
+				if (this.fixedRightColumns > 0 || this.getComponentOption("operationFixed") === true) {
+					this.fixedRightColumns++;
+				}
+			}
+			// if row selectable, auto add first column to render the row select checkbox
+			var rowSelectable = this.isRowSelectable();
+			if (rowSelectable) {
+				config = {
+					rowSelectable: rowSelectable,
+					width: 40,
+					title: ''
+				};
+				this.columns.splice(0, 0, config);
+				if (this.fixedLeftColumns > 0 || this.getComponentOption('rowSelectFixed') === true) {
+					this.fixedLeftColumns++;
+				}
+			}
+			// if indexable, auto add first column to render the row index
+			var indexable = this.isIndexable();
+			if (indexable) {
+				config = {
+					indexable: true,
+					width: 40,
+					title: "#"
+				};
+				this.columns.splice(0, 0, config);
+				if (this.fixedLeftColumns > 0 || this.getComponentOption("indexFixed") === true) {
+					this.fixedLeftColumns++;
+				}
+			}
+		},
+		/**
+		 * render search  box
+		 * @returns {XML}
+		 */
+		renderSearchBox: function () {
+			if (this.isSearchable()) {
+				return (React.createElement(NText, {model: this.state.searchModel, layout: this.state.searchLayout}));
+			} else {
 				return null;
 			}
-		})
-		));
-	},
-	/**
-	 * render table with no scroll Y
-	 * @returns {XML}
-	 */
-	renderTableNoScrollY: function () {
-		return (React.createElement("div", {className: this.getAdditionalCSS("panelBody", "n-table-panel-body")}, 
-			React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border"), 
-			       style: this.computeTableStyle(), 
-			       ref: "table"}, 
-				this.renderTableHeading(true), 
-				this.renderTableBody(true)
-			)
-		));
-	},
-	/**
-	 * render table with scroll Y
-	 * @returns {XML}
-	 */
-	renderTableScrollY: function () {
-		var style = this.computeTableStyle();
-		var scrolledHeaderDivStyle = {
-			"overflow-y": "scroll"
-		};
-		var scrolledBodyDivStyle = {
-			maxHeight: this.getComponentOption("scrollY"),
-			overflowY: "scroll"
-		};
-		return (React.createElement("div", {className: this.getAdditionalCSS("panelBody", "n-table-panel-body")}, 
-			React.createElement("div", {className: "n-table-scroll-head", ref: this.getScrolledHeaderDivId(), style: scrolledHeaderDivStyle}, 
-				React.createElement("div", {className: "n-table-scroll-head-inner", style: style}, 
-					React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border"), 
-					       style: style}, 
-						this.renderTableHeading(true)
+		},
+		/**
+		 * render heading buttons
+		 * @returns {XML}
+		 */
+		renderHeadingButtons: function () {
+			if (this.isAddable()) {
+				return (React.createElement("a", {href: "javascript:void(0);", 
+				           onClick: this.onAddClicked, 
+				           className: "n-table-heading-buttons pull-right", 
+				           ref: "add-button", style: {
+					display: this.state.expanded ? 'block' : 'none'
+				}}, 
+					React.createElement(NIcon, {icon: NTable.ADD_BUTTON_ICON}), 
+					NTable.ADD_BUTTON_TEXT
+				));
+			} else {
+				return null;
+			}
+		},
+		/**
+		 * render panel heading label
+		 * @returns {XML}
+		 */
+		renderPanelHeadingLabel: function () {
+			var css = "col-sm-3 col-md-3 col-lg-3";
+			if (this.getModel().hasError(this.getDataId())) {
+				css += " has-error";
+			}
+			var spanCSS = {
+				'n-table-heading-label': true
+			};
+
+			if (this.isCollapsible()) {
+				spanCSS['n-table-heading-label-collapsible'] = true;
+			}
+			return (React.createElement("div", {className: css}, 
+				React.createElement("span", {className: this.getAdditionalCSS("headingLabel", $pt.LayoutHelper.classSet(spanCSS)), 
+				      ref: this.getHeaderLabelId(), onClick: this.isCollapsible() ? this.onTitleClicked : null}, 
+					this.getLayout().getLabel()
+				)
+			));
+		},
+		/**
+		 * render header popover
+		 */
+		renderHeaderPopover: function () {
+			if (this.getModel().hasError(this.getDataId())) {
+				var messages = this.getModel().getError(this.getDataId());
+				var _this = this;
+				var content = messages.map(function (msg) {
+					if (typeof msg === "string") {
+						return "<span style='display:block'>" + msg.format([_this.getLayout().getLabel()]) + "</span>";
+					} else {
+						return "<span style='display:block'>" + NTable.DETAIL_ERROR_MESSAGE + "</span>";
+					}
+				});
+				$(React.findDOMNode(this.refs[this.getHeaderLabelId()])).popover({
+					placement: 'top',
+					trigger: 'hover',
+					html: true,
+					content: content,
+					// false is very import, since when destroy popover,
+					// the really destroy will be invoked by some delay,
+					// and before really destory invoked,
+					// the new popover is bind by componentDidUpdate method.
+					// and finally new popover will be destroyed.
+					animation: false
+				});
+			}
+		},
+		/**
+		 * render panel heading
+		 * @returns {XML}
+		 */
+		renderPanelHeading: function () {
+			if (!this.isHeading()) {
+				return null;
+			}
+			return (React.createElement("div", {className: this.getAdditionalCSS("heading", "panel-heading n-table-heading")}, 
+				React.createElement("div", {className: "row"}, 
+					this.renderPanelHeadingLabel(), 
+					React.createElement("div", {className: "col-sm-9 col-md-9 col-lg-9"}, 
+						this.renderHeadingButtons(), 
+						this.renderSearchBox()
 					)
 				)
-			), 
-			React.createElement("div", {className: "n-table-scroll-body", style: scrolledBodyDivStyle, ref: this.getScrolledBodyDivId()}, 
-				React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border"), style: style, 
+			));
+		},
+		/**
+		 * render sort button
+		 * @param column
+		 * @returns {XML}
+		 */
+		renderTableHeaderSortButton: function (column) {
+			if (this.isSortable(column)) {
+				var icon = NTable.SORT_ICON;
+				var sortClass = this.getAdditionalCSS("sort", "pull-right n-table-sort");
+				if (this.state.sortColumn == column) {
+					sortClass += " " + this.getAdditionalCSS("sorted", "n-table-sorted");
+					if (this.state.sortWay == "asc") {
+						icon = NTable.SORT_ASC_ICON;
+					} else {
+						icon = NTable.SORT_DESC_ICON;
+					}
+				}
+				return (React.createElement("a", {href: "javascript:void(0);", className: sortClass, 
+				           onClick: this.onSortClicked.bind(this, column)}, 
+					React.createElement(NIcon, {icon: icon})
+				));
+			}
+		},
+		/**
+		 * render checkbox
+		 * @param column
+		 * @returns {XML}
+		 */
+		renderTableHeaderCheckBox: function (column) {
+			var data = this.getDataToDisplay();
+			var range = this.computePagination(data);
+			var allSelected = this.isCurrentPageAllSelected(column, data, range);
+			var model = $pt.createModel({
+				allCheck: allSelected
+			});
+			var layout = $pt.createCellLayout('allCheck', {
+				comp: {
+					type: $pt.ComponentConstants.Check
+				}
+			});
+			var _this = this;
+			model.addListener('allCheck', 'post', 'change', function (evt) {
+				var selected = evt.new;
+				if (data != null) {
+					var rowIndex = 1;
+					data.forEach(function (row) {
+						if (rowIndex >= range.min && rowIndex <= range.max) {
+							$pt.setValueIntoJSON(row, column.rowSelectable, selected);
+						}
+						rowIndex++;
+					});
+					_this.forceUpdate();
+				}
+			});
+			return React.createElement(NCheck, {model: model, layout: layout});
+		},
+		/**
+		 * render heading content.
+		 * at least and only one parameter can be true.
+		 * if more than one parameter is true, priority as all > leftFixed > rightFixed
+		 * @param all {boolean} render all columns?
+		 * @param leftFixed {boolean} render left fixed columns?
+		 * @param rightFixed {boolean} render right fixed columns?
+		 * @returns {XML}
+		 * @see #getRenderColumnIndexRange
+		 */
+		renderTableHeading: function (all, leftFixed, rightFixed) {
+			var indexToRender = this.getRenderColumnIndexRange(all, leftFixed, rightFixed);
+			var columnIndex = 0;
+			var _this = this;
+			return (React.createElement("thead", null, 
+			React.createElement("tr", null, 
+				this.columns.map(function (column) {
+					if (columnIndex >= indexToRender.min && columnIndex <= indexToRender.max) {
+						// column is fixed.
+						columnIndex++;
+						var style = {};
+						style.width = column.width;
+						if (!(column.visible === undefined || column.visible === true)) {
+							style.display = "none";
+						}
+						if (column.rowSelectable) {
+							return (React.createElement("td", {style: style}, 
+								_this.renderTableHeaderCheckBox(column)
+							));
+						} else {
+							return (React.createElement("td", {style: style}, 
+								column.title, 
+								_this.renderTableHeaderSortButton(column)
+							));
+						}
+					} else {
+						columnIndex++;
+					}
+				})
+			)
+			));
+		},
+		/**
+		 * render operation cell
+		 * @param column
+		 * @param data
+		 * @returns {XML}
+		 */
+		renderOperationCell: function (column, data) {
+			var editButton = column.editable ?
+				(React.createElement(Button, {bsSize: "xsmall", bsStyle: "link", onClick: this.onEditClicked.bind(this, data), 
+				         className: "n-table-op-btn"}, 
+					React.createElement(NIcon, {icon: NTable.ROW_EDIT_BUTTON_ICON, size: "lg", tooltip: NTable.TOOLTIP_EDIT})
+				)) : null;
+			var removeButton = column.removable ?
+				(React.createElement(Button, {bsSize: "xsmall", bsStyle: "link", onClick: this.onRemoveClicked.bind(this, data), 
+				         className: "n-table-op-btn"}, 
+					React.createElement(NIcon, {icon: NTable.ROW_REMOVE_BUTTON_ICON, size: "lg", tooltip: NTable.TOOLTIP_REMOVE})
+				)) : null;
+			var rowOperations = column.rowOperations;
+			if (rowOperations === undefined || rowOperations === null) {
+				rowOperations = [];
+			}
+			var _this = this;
+			return (React.createElement(ButtonGroup, {className: "n-table-op-btn-group"}, 
+				rowOperations.map(function (opt) {
+					// for compatibility, keep the key 'func', offically is key 'click'
+					var click = opt.click || opt.func;
+					return (React.createElement(Button, {bsSize: "xsmall", bsStyle: "link", className: "n-table-op-btn", 
+					                onClick: _this.onRowOperationClicked.bind(_this, click, data)}, 
+						React.createElement(NIcon, {icon: opt.icon, size: "lg", tooltip: opt.tooltip})
+					));
+				}), 
+				editButton, 
+				removeButton
+			));
+		},
+		/**
+		 * render row select cell
+		 * @param column
+		 * @param data
+		 * @returns {XML}
+		 */
+		renderRowSelectCell: function (column, data) {
+			var model = $pt.createModel(data);
+			model.useBaseAsCurrent();
+			var _this = this;
+			model.addListener(column.rowSelectable, 'post', 'change', function (evt) {
+				_this.forceUpdate();
+			});
+			var layout = $pt.createCellLayout(column.rowSelectable, {
+				comp: {
+					type: $pt.ComponentConstants.Check
+				}
+			});
+			return (React.createElement(NCheck, {model: model, layout: layout}));
+		},
+		/**
+		 * render table body rows
+		 * @param row {*} data of row, json object
+		 * @param rowIndex {number}
+		 * @param all {boolean}
+		 * @param leftFixed {boolean}
+		 * @param rightFixed {boolean}
+		 * @returns {XML}
+		 */
+		renderTableBodyRow: function (row, rowIndex, all, leftFixed, rightFixed) {
+			var indexToRender = this.getRenderColumnIndexRange(all, leftFixed, rightFixed);
+			var columnIndex = 0;
+			var _this = this;
+			var className = rowIndex % 2 == 0 ? "even" : "odd";
+			if (this.getModel().hasError(this.getDataId())) {
+				var rowError = null;
+				var errors = this.getModel().getError(this.getDataId());
+				for (var index = 0, count = errors.length; index < count; index++) {
+					if (typeof errors[index] !== "string") {
+						rowError = errors[index].getError(row);
+					}
+				}
+				if (rowError != null) {
+					className += " has-error";
+				}
+			}
+
+			var inlineModel = null;
+			return (React.createElement("tr", {className: className}, 
+				this.columns.map(function (column) {
+					if (columnIndex >= indexToRender.min && columnIndex <= indexToRender.max) {
+						// column is fixed.
+						columnIndex++;
+						var style = {
+							width: column.width
+						};
+						if (!(column.visible === undefined || column.visible === true)) {
+							style.display = "none";
+						}
+						var data;
+						if (column.editable || column.removable || column.rowOperations != null) {
+							// operation column
+							data = _this.renderOperationCell(column, row);
+							style['text-align'] = "center";
+						} else if (column.indexable) {
+							// index column
+							data = rowIndex;
+						} else if (column.rowSelectable) {
+							data = _this.renderRowSelectCell(column, row);
+						} else if (column.inline) {
+							if (inlineModel == null) {
+								inlineModel = _this.createEditingModel(row);
+								inlineModel.useBaseAsCurrent();
+							}
+							// inline editor or something, can be pre-defined or just declare as be constructed as a form layout
+							if (typeof column.inline === 'string') {
+								var layout = NTable.getInlineEditor(column.inline);
+								layout.pos = {width: 12};
+								if (layout.css) {
+									layout.css.cell = 'inline-editor' + (layout.css.cell) ? (' ' + layout.css.cell) : '';
+								} else {
+									layout.css = {cell: 'inline-editor'};
+								}
+								if (column.inline === 'select' || column.inline === 'radio') {
+									// set code table
+									if (column.codes) {
+										layout = $.extend(true, {}, {comp: {data: column.codes}}, layout);
+									}
+								}
+								// pre-defined, use with data together
+								data = React.createElement(NFormCell, {model: inlineModel, layout: $pt.createCellLayout(column.data, layout), direction: "horizontal"});
+							} else if (column.inline.inlineType == 'cell') {
+								column.inline.pos = {width: 12};
+								if (column.inline.css) {
+									column.inline.css.cell = 'inline-editor' + (column.inline.css.cell) ? (' ' + column.inline.css.cell) : '';
+								} else {
+									column.inline.css = {cell: 'inline-editor'};
+								}
+								data = React.createElement(NFormCell, {model: inlineModel, layout: $pt.createCellLayout(column.data, column.inline), 
+													direction: "horizontal", 
+													className: column.inline.__className});
+							} else {
+								// any other, treat as form layout
+								// column.data is not necessary
+								data = React.createElement(NForm, {model: inlineModel, layout: $pt.createFormLayout(column.inline), direction: "horizontal"});
+							}
+						} else {
+							// data is property name
+							data = _this.getDisplayTextOfColumn(column, row);
+						}
+						return (React.createElement("td", {style: style}, data));
+					} else {
+						columnIndex++;
+					}
+				})
+			));
+		},
+		/**
+		 * render table body
+		 * at least and only one parameter can be true.
+		 * if more than one parameter is true, priority as all > leftFixed > rightFixed
+		 * @param all
+		 * @param leftFixed
+		 * @param rightFixed
+		 * @returns {XML}
+		 */
+		renderTableBody: function (all, leftFixed, rightFixed) {
+			var data = this.getDataToDisplay();
+			if (data == null || data.length == 0) {
+				// no data
+				return null;
+			}
+			var rowIndex = 1;
+			var _this = this;
+			var range = this.computePagination(data);
+			return (React.createElement("tbody", null, 
+			data.map(function (element) {
+				if (rowIndex >= range.min && rowIndex <= range.max) {
+					return _this.renderTableBodyRow(element, rowIndex++, all, leftFixed, rightFixed);
+				} else {
+					rowIndex++;
+					return null;
+				}
+			})
+			));
+		},
+		/**
+		 * render table with no scroll Y
+		 * @returns {XML}
+		 */
+		renderTableNoScrollY: function () {
+			return (React.createElement("div", {className: this.getAdditionalCSS("panelBody", "n-table-panel-body")}, 
+				React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border"), 
+				       style: this.computeTableStyle(), 
 				       ref: "table"}, 
+					this.renderTableHeading(true), 
 					this.renderTableBody(true)
 				)
-			)
-		));
-	},
-	/**
-	 * render table
-	 * @returns {XML}
-	 */
-	renderTable: function () {
-		if (this.hasVerticalScrollBar() && this.hasDataToDisplay()) {
-			return this.renderTableScrollY();
-		} else {
-			return this.renderTableNoScrollY();
-		}
-	},
-	/**
-	 * render fixed left columns with scroll Y
-	 * @returns {XML}
-	 */
-	renderFixedLeftColumnsScrollY: function () {
-		var divStyle = {
-			width: this.computeFixedLeftColumnsWidth()
-		};
-		var bodyDivStyle = {
-			width: "100%",
-			overflow: "hidden"
-		};
-		if (this.hasHorizontalScrollBar()) {
-			// for IE8 box model
-			bodyDivStyle.maxHeight = this.getComponentOption("scrollY") - ((this.isIE8()) ? 0 : 18);
-		}
-		var tableStyle = {
-			width: "100%"
-		};
-		return (
-			React.createElement("div", {className: "n-table-fix-left", style: divStyle}, 
-				React.createElement("table", {cellSpacing: "0", style: tableStyle, 
-				       className: this.getAdditionalCSS("table", "n-table cell-border")}, 
-					this.renderTableHeading(false, true)
+			));
+		},
+		/**
+		 * render table with scroll Y
+		 * @returns {XML}
+		 */
+		renderTableScrollY: function () {
+			var style = this.computeTableStyle();
+			var scrolledHeaderDivStyle = {
+				"overflow-y": "scroll"
+			};
+			var scrolledBodyDivStyle = {
+				maxHeight: this.getComponentOption("scrollY"),
+				overflowY: "scroll"
+			};
+			return (React.createElement("div", {className: this.getAdditionalCSS("panelBody", "n-table-panel-body")}, 
+				React.createElement("div", {className: "n-table-scroll-head", ref: this.getScrolledHeaderDivId(), style: scrolledHeaderDivStyle}, 
+					React.createElement("div", {className: "n-table-scroll-head-inner", style: style}, 
+						React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border"), 
+						       style: style}, 
+							this.renderTableHeading(true)
+						)
+					)
 				), 
-				React.createElement("div", {ref: this.getFixedLeftBodyDivId(), style: bodyDivStyle}, 
+				React.createElement("div", {className: "n-table-scroll-body", style: scrolledBodyDivStyle, ref: this.getScrolledBodyDivId()}, 
 					React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border"), 
-					       style: tableStyle}, 
-						this.renderTableBody(false, true)
+					       style: style, 
+					       ref: "table"}, 
+						this.renderTableBody(true)
 					)
 				)
-			)
-		);
-	},
-	/**
-	 * render fixed left columns with no scroll Y
-	 * @returns {XML}
-	 */
-	renderFixedLeftColumnsNoScrollY: function () {
-		var divStyle = {
-			width: this.computeFixedLeftColumnsWidth()
-		};
-		var tableStyle = {
-			width: "100%"
-		};
-		return (React.createElement("div", {className: "n-table-fix-left", style: divStyle}, 
-			React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border"), style: tableStyle}, 
-				this.renderTableHeading(false, true), 
-				this.renderTableBody(false, true)
-			)
-		));
-	},
-	/**
-	 * render fixed left columns
-	 * @returns {XML}
-	 */
-	renderFixedLeftColumns: function () {
-		if (!this.hasFixedLeftColumns() && this.hasDataToDisplay()) {
-			return null;
-		}
-		if (this.hasVerticalScrollBar()) {
-			return this.renderFixedLeftColumnsScrollY();
-		} else {
-			return this.renderFixedLeftColumnsNoScrollY();
-		}
-	},
-	/**
-	 * render fixed right columns with no scroll Y
-	 * @returns {XML}
-	 */
-	renderFixedRightColumnsNoScrollY: function () {
-		var divStyle = {
-			width: this.computeFixedRightColumnsWidth()
-		};
-		var tableStyle = {
-			width: "100%"
-		};
-		return (React.createElement("div", {className: "n-table-fix-right", style: divStyle}, 
-			React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border"), style: tableStyle}, 
-				this.renderTableHeading(false, false, true), 
-				this.renderTableBody(false, false, true)
-			)
-		));
-	},
-	/**
-	 * render fixed right columns with scroll Y
-	 * @returns {XML}
-	 */
-	renderFixedRightColumnsScrollY: function () {
-		var divStyle = {
-			width: this.computeFixedRightColumnsWidth(),
-			right: "16px"
-		};
-		var bodyDivStyle = {
-			width: "100%",
-			overflow: "hidden"
-		};
-		if (this.hasHorizontalScrollBar()) {
-			// ie8 box mode, scrollbar is not in height.
-			// ie>8 or chrome, scrollbar is in height.
-			bodyDivStyle.maxHeight = this.getComponentOption("scrollY") - ((this.isIE8()) ? 0 : 18);
-		}
-		var tableStyle = {
-			width: "100%"
-		};
-		return (
-			React.createElement("div", {className: "n-table-fix-right", style: divStyle}, 
-				React.createElement("div", {className: "n-table-fix-right-head-wrapper"}, 
-					React.createElement("div", {className: "n-table-fix-right-top-corner"}), 
+			));
+		},
+		/**
+		 * render table
+		 * @returns {XML}
+		 */
+		renderTable: function () {
+			if (this.hasVerticalScrollBar() && this.hasDataToDisplay()) {
+				return this.renderTableScrollY();
+			} else {
+				return this.renderTableNoScrollY();
+			}
+		},
+		/**
+		 * render fixed left columns with scroll Y
+		 * @returns {XML}
+		 */
+		renderFixedLeftColumnsScrollY: function () {
+			var divStyle = {
+				width: this.computeFixedLeftColumnsWidth()
+			};
+			var bodyDivStyle = {
+				width: "100%",
+				overflow: "hidden"
+			};
+			if (this.hasHorizontalScrollBar()) {
+				// for IE8 box model
+				bodyDivStyle.maxHeight = this.getComponentOption("scrollY") - ((this.isIE8()) ? 0 : 18);
+			}
+			var tableStyle = {
+				width: "100%"
+			};
+			return (
+				React.createElement("div", {className: "n-table-fix-left", style: divStyle}, 
 					React.createElement("table", {cellSpacing: "0", style: tableStyle, 
 					       className: this.getAdditionalCSS("table", "n-table cell-border")}, 
-						this.renderTableHeading(false, false, true)
-					)
-				), 
-				React.createElement("div", {ref: this.getFixedRightBodyDivId(), style: bodyDivStyle}, 
-					React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border")}, 
-						this.renderTableBody(false, false, true)
+						this.renderTableHeading(false, true)
+					), 
+					React.createElement("div", {ref: this.getFixedLeftBodyDivId(), style: bodyDivStyle}, 
+						React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border"), 
+						       style: tableStyle}, 
+							this.renderTableBody(false, true)
+						)
 					)
 				)
-			)
-		);
-	},
-	/**
-	 * render fixed right columns
-	 * @returns {XML}
-	 */
-	renderFixedRightColumns: function () {
-		if (!this.hasFixedRightColumns() && this.hasDataToDisplay()) {
-			return null;
-		}
-		if (this.hasVerticalScrollBar()) {
-			return this.renderFixedRightColumnsScrollY();
-		} else {
-			return this.renderFixedRightColumnsNoScrollY();
-		}
-	},
-	/**
-	 * render not data reminder label
-	 * @returns {XML}
-	 */
-	renderNoDataReminder: function () {
-		if (this.hasDataToDisplay()) {
-			return null;
-		} else {
-			return (React.createElement("div", {className: "n-table-no-data"}, React.createElement("span", null, NTable.NO_DATA_LABEL)));
-		}
-	},
-	/**
-	 * render pagination
-	 * @returns {XML}
-	 */
-	renderPagination: function () {
-		if (this.isPageable() && this.hasDataToDisplay()) {
-			// only show when pageable and has data to display
-			return (React.createElement(NPagination, {className: "n-table-pagination", pageCount: this.state.pageCount, 
-			                     currentPageIndex: this.state.currentPageIndex, toPage: this.toPage.bind(this)}));
-		} else {
-			return null;
-		}
-	},
-	renderRightTopCorner: function () {
-		var rightCorner = null;
-		if (this.hasVerticalScrollBar() && !this.hasFixedRightColumns()) {
+			);
+		},
+		/**
+		 * render fixed left columns with no scroll Y
+		 * @returns {XML}
+		 */
+		renderFixedLeftColumnsNoScrollY: function () {
 			var divStyle = {
-				width: '16px',
+				width: this.computeFixedLeftColumnsWidth()
+			};
+			var tableStyle = {
+				width: "100%"
+			};
+			return (React.createElement("div", {className: "n-table-fix-left", style: divStyle}, 
+				React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border"), 
+				       style: tableStyle}, 
+					this.renderTableHeading(false, true), 
+					this.renderTableBody(false, true)
+				)
+			));
+		},
+		/**
+		 * render fixed left columns
+		 * @returns {XML}
+		 */
+		renderFixedLeftColumns: function () {
+			if (!this.hasFixedLeftColumns() && this.hasDataToDisplay()) {
+				return null;
+			}
+			if (this.hasVerticalScrollBar()) {
+				return this.renderFixedLeftColumnsScrollY();
+			} else {
+				return this.renderFixedLeftColumnsNoScrollY();
+			}
+		},
+		/**
+		 * render fixed right columns with no scroll Y
+		 * @returns {XML}
+		 */
+		renderFixedRightColumnsNoScrollY: function () {
+			var divStyle = {
+				width: this.computeFixedRightColumnsWidth()
+			};
+			var tableStyle = {
+				width: "100%"
+			};
+			return (React.createElement("div", {className: "n-table-fix-right", style: divStyle}, 
+				React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border"), 
+				       style: tableStyle}, 
+					this.renderTableHeading(false, false, true), 
+					this.renderTableBody(false, false, true)
+				)
+			));
+		},
+		/**
+		 * render fixed right columns with scroll Y
+		 * @returns {XML}
+		 */
+		renderFixedRightColumnsScrollY: function () {
+			var divStyle = {
+				width: this.computeFixedRightColumnsWidth(),
 				right: "16px"
 			};
 			var bodyDivStyle = {
@@ -10257,787 +10592,863 @@ var NTable = React.createClass($pt.defineCellComponent({
 				// ie>8 or chrome, scrollbar is in height.
 				bodyDivStyle.maxHeight = this.getComponentOption("scrollY") - ((this.isIE8()) ? 0 : 18);
 			}
-			rightCorner = (React.createElement("div", {className: "n-table-fix-right", style: divStyle}, 
-				React.createElement("div", {className: "n-table-fix-right-head-wrapper"}, 
-					React.createElement("div", {className: "n-table-fix-right-top-corner"})
+			var tableStyle = {
+				width: "100%"
+			};
+			return (
+				React.createElement("div", {className: "n-table-fix-right", style: divStyle}, 
+					React.createElement("div", {className: "n-table-fix-right-head-wrapper"}, 
+						React.createElement("div", {className: "n-table-fix-right-top-corner"}), 
+						React.createElement("table", {cellSpacing: "0", style: tableStyle, 
+						       className: this.getAdditionalCSS("table", "n-table cell-border")}, 
+							this.renderTableHeading(false, false, true)
+						)
+					), 
+					React.createElement("div", {ref: this.getFixedRightBodyDivId(), style: bodyDivStyle}, 
+						React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border")}, 
+							this.renderTableBody(false, false, true)
+						)
+					)
+				)
+			);
+		},
+		/**
+		 * render fixed right columns
+		 * @returns {XML}
+		 */
+		renderFixedRightColumns: function () {
+			if (!this.hasFixedRightColumns() && this.hasDataToDisplay()) {
+				return null;
+			}
+			if (this.hasVerticalScrollBar()) {
+				return this.renderFixedRightColumnsScrollY();
+			} else {
+				return this.renderFixedRightColumnsNoScrollY();
+			}
+		},
+		/**
+		 * render not data reminder label
+		 * @returns {XML}
+		 */
+		renderNoDataReminder: function () {
+			if (this.hasDataToDisplay()) {
+				return null;
+			} else {
+				return (React.createElement("div", {className: "n-table-no-data"}, React.createElement("span", null, NTable.NO_DATA_LABEL)));
+			}
+		},
+		/**
+		 * render pagination
+		 * @returns {XML}
+		 */
+		renderPagination: function () {
+			if (this.isPageable() && this.hasDataToDisplay()) {
+				// only show when pageable and has data to display
+				return (React.createElement(NPagination, {className: "n-table-pagination", pageCount: this.state.pageCount, 
+				                     currentPageIndex: this.state.currentPageIndex, toPage: this.toPage.bind(this)}));
+			} else {
+				return null;
+			}
+		},
+		renderRightTopCorner: function () {
+			var rightCorner = null;
+			if (this.hasVerticalScrollBar() && !this.hasFixedRightColumns()) {
+				var divStyle = {
+					width: '16px',
+					right: "16px"
+				};
+				var bodyDivStyle = {
+					width: "100%",
+					overflow: "hidden"
+				};
+				if (this.hasHorizontalScrollBar()) {
+					// ie8 box mode, scrollbar is not in height.
+					// ie>8 or chrome, scrollbar is in height.
+					bodyDivStyle.maxHeight = this.getComponentOption("scrollY") - ((this.isIE8()) ? 0 : 18);
+				}
+				rightCorner = (React.createElement("div", {className: "n-table-fix-right", style: divStyle}, 
+					React.createElement("div", {className: "n-table-fix-right-head-wrapper"}, 
+						React.createElement("div", {className: "n-table-fix-right-top-corner"})
+					)
+				));
+			}
+			return rightCorner;
+		},
+		/**
+		 * render
+		 * @returns {XML}
+		 */
+		render: function () {
+			this.prepareDisplayOptions();
+			/*{this.renderNoDataReminder()}*/
+			var css = {
+				'n-table-container panel': true
+			};
+			var style = this.getComponentOption('style');
+			if (style) {
+				css['panel-' + style] = true;
+			} else {
+				css['panel-default'] = true;
+			}
+			if (!this.isHeading()) {
+				css['n-table-no-header'] = true;
+			}
+			var expandedStyle = {
+				display: this.isExpanded() ? 'block' : 'none'
+			};
+			return (React.createElement("div", {className: this.getComponentCSS($pt.LayoutHelper.classSet(css)), ref: "div"}, 
+				this.renderPanelHeading(), 
+				React.createElement("div", {ref: "table-panel-body", style: expandedStyle}, 
+					React.createElement("div", {className: this.getAdditionalCSS("body", "n-table-body-container panel-body")}, 
+						this.renderTable(), 
+						this.renderFixedLeftColumns(), 
+						this.renderFixedRightColumns(), 
+						this.renderRightTopCorner()
+					), 
+					this.renderPagination()
 				)
 			));
-		}
-		return rightCorner;
-	},
-	/**
-	 * render
-	 * @returns {XML}
-	 */
-	render: function () {
-		this.prepareDisplayOptions();
-		/*{this.renderNoDataReminder()}*/
-		var css = {
-			'n-table-container panel': true
-		};
-		var style = this.getComponentOption('style');
-		if (style) {
-			css['panel-' + style] = true;
-		} else {
-			css['panel-default'] = true;
-		}
-		if (!this.isHeading()) {
-			css['n-table-no-header'] = true;
-		}
-		var expandedStyle = {
-			display: this.isExpanded() ? 'block' : 'none'
-		};
-		return (React.createElement("div", {className: this.getComponentCSS($pt.LayoutHelper.classSet(css)), ref: "div"}, 
-			this.renderPanelHeading(), 
-			React.createElement("div", {ref: "table-panel-body", style: expandedStyle}, 
-				React.createElement("div", {className: this.getAdditionalCSS("body", "n-table-body-container panel-body")}, 
-					this.renderTable(), 
-					this.renderFixedLeftColumns(), 
-					this.renderFixedRightColumns(), 
-					this.renderRightTopCorner()
-				), 
-				this.renderPagination()
-			)
-		));
-	},
-	/**
-	 * has vertical scroll bar
-	 * @returns {boolean}
-	 */
-	hasVerticalScrollBar: function () {
-		var scrollY = this.getComponentOption("scrollY");
-		return scrollY !== false;
-	},
-	/**
-	 * has horizontal scroll bar
-	 * @returns {boolean}
-	 */
-	hasHorizontalScrollBar: function () {
-		var hasVerticalBar = this.hasVerticalScrollBar();
-		if (hasVerticalBar) {
-			// if scrollY is set, force set scrollX to true, since the table will be
-			// splitted to head table and body table.
-			// for make sure the cell is aligned, width of columns must be set.
-			return true;
-		}
+		},
+		/**
+		 * has vertical scroll bar
+		 * @returns {boolean}
+		 */
+		hasVerticalScrollBar: function () {
+			var scrollY = this.getComponentOption("scrollY");
+			return scrollY !== false;
+		},
+		/**
+		 * has horizontal scroll bar
+		 * @returns {boolean}
+		 */
+		hasHorizontalScrollBar: function () {
+			var hasVerticalBar = this.hasVerticalScrollBar();
+			if (hasVerticalBar) {
+				// if scrollY is set, force set scrollX to true, since the table will be
+				// splitted to head table and body table.
+				// for make sure the cell is aligned, width of columns must be set.
+				return true;
+			}
 
-		var scrollX = this.getComponentOption("scrollX");
-		return scrollX === true;
-	},
-	/**
-	 * compute table style
-	 * @returns {{width: number, maxWidth: number}}
-	 */
-	computeTableStyle: function () {
-		var width = 0;
-		if (this.hasHorizontalScrollBar()) {
-			width = 0;
-			// calculate width
-			this.columns.forEach(function (column) {
-				if (column.visible === undefined || column.visible === true) {
-					width += column.width;
+			var scrollX = this.getComponentOption("scrollX");
+			return scrollX === true;
+		},
+		/**
+		 * compute table style
+		 * @returns {{width: number, maxWidth: number}}
+		 */
+		computeTableStyle: function () {
+			var width = 0;
+			if (this.hasHorizontalScrollBar()) {
+				width = 0;
+				// calculate width
+				this.columns.forEach(function (column) {
+					if (column.visible === undefined || column.visible === true) {
+						width += column.width;
+					}
+				});
+			} else {
+				width = "100%";
+			}
+			return {
+				width: width,
+				maxWidth: width
+			};
+		},
+		/**
+		 * compute fixed left columns width
+		 * @returns {number}
+		 */
+		computeFixedLeftColumnsWidth: function () {
+			var width = 0;
+			var fixedLeftColumns = this.getMaxFixedLeftColumnIndex();
+			var columnIndex = 0;
+			this.columns.forEach(function (element) {
+				if (columnIndex <= fixedLeftColumns && (element.visible === undefined || element.visible === true)) {
+					// column is fixed.
+					width += element.width;
 				}
+				columnIndex++;
 			});
-		} else {
-			width = "100%";
-		}
-		return {
-			width: width,
-			maxWidth: width
-		};
-	},
-	/**
-	 * compute fixed left columns width
-	 * @returns {number}
-	 */
-	computeFixedLeftColumnsWidth: function () {
-		var width = 0;
-		var fixedLeftColumns = this.getMaxFixedLeftColumnIndex();
-		var columnIndex = 0;
-		this.columns.forEach(function (element) {
-			if (columnIndex <= fixedLeftColumns && (element.visible === undefined || element.visible === true)) {
-				// column is fixed.
-				width += element.width;
-			}
-			columnIndex++;
-		});
-		return width + 1;
-	},
-	/**
-	 * compute fixed right columns width
-	 * @returns {number}
-	 */
-	computeFixedRightColumnsWidth: function () {
-		var width = 0;
-		var fixedRightColumns = this.getMinFixedRightColumnIndex();
-		var columnIndex = 0;
-		this.columns.forEach(function (element) {
-			if (columnIndex >= fixedRightColumns && (element.visible === undefined || element.visible === true)) {
-				// column is fixed
-				width += element.width;
-			}
-			columnIndex++;
-		});
-		return width + (this.isFirefox() ? 3 : 1);
-	},
+			return width + 1;
+		},
+		/**
+		 * compute fixed right columns width
+		 * @returns {number}
+		 */
+		computeFixedRightColumnsWidth: function () {
+			var width = 0;
+			var fixedRightColumns = this.getMinFixedRightColumnIndex();
+			var columnIndex = 0;
+			this.columns.forEach(function (element) {
+				if (columnIndex >= fixedRightColumns && (element.visible === undefined || element.visible === true)) {
+					// column is fixed
+					width += element.width;
+				}
+				columnIndex++;
+			});
+			return width + (this.isFirefox() ? 3 : 1);
+		},
 
-	/**
-	 * get column index range for rendering
-	 * at least and only one parameter can be true.
-	 * if more than one parameter is true, priority as all > leftFixed > rightFixed
-	 * @param all
-	 * @param leftFixed
-	 * @param rightFixed
-	 * @returns {{min, max}}
-	 */
-	getRenderColumnIndexRange: function (all, leftFixed, rightFixed) {
-		var index = {};
-		if (all) {
-			index.min = 0;
-			index.max = 10000;
-		} else if (leftFixed) {
-			index.min = 0;
-			index.max = this.getMaxFixedLeftColumnIndex();
-		} else if (rightFixed) {
-			index.min = this.getMinFixedRightColumnIndex();
-			index.max = 10000;
-		}
-		return index;
-	},
-	/**
-	 * get max fixed left column index. if no column is fixed in left, return -1
-	 * @returns {number}
-	 */
-	getMaxFixedLeftColumnIndex: function () {
-		return this.fixedLeftColumns - 1;
-	},
-	/**
-	 * get min fixed right column index. if no column is fixed in right, return
-	 * max column index.
-	 * eg. there are 3 columns in table, if no fixed right column, return 3. if
-	 * 1 fixed right column, return 2.
-	 * @returns {number}
-	 */
-	getMinFixedRightColumnIndex: function () {
-		return this.columns.length() - this.fixedRightColumns;
-	},
-	/**
-	 * get query settings
-	 * @returns {*}
-	 */
-	getQuerySettings: function () {
-		return this.getComponentOption("criteria");
-	},
-	/**
-	 * compute pagination
-	 * @param data array of data
-	 * @returns {{min, max}}
-	 */
-	computePagination: function (data) {
-		var minRowIndex = 0;
-		var maxRowIndex = 999999;
-		if (this.isPageable()) {
-			var queryCriteria = this.getQuerySettings();
-			if (queryCriteria === null) {
-				// no query criteria
-				this.state.countPerPage = this.getComponentOption("countPerPage");
-				var pageCount = data.length == 0 ? 1 : data.length / this.state.countPerPage;
-				this.state.pageCount = (Math.floor(pageCount) == pageCount) ? pageCount : (Math.floor(pageCount) + 1);
-				this.state.currentPageIndex = this.state.currentPageIndex > this.state.pageCount ? this.state.pageCount : this.state.currentPageIndex;
-				this.state.currentPageIndex = this.state.currentPageIndex <= 0 ? 1 : this.state.currentPageIndex;
-				minRowIndex = (this.state.currentPageIndex - 1) * this.state.countPerPage + 1;
-				maxRowIndex = minRowIndex + this.state.countPerPage - 1;
+		/**
+		 * get column index range for rendering
+		 * at least and only one parameter can be true.
+		 * if more than one parameter is true, priority as all > leftFixed > rightFixed
+		 * @param all
+		 * @param leftFixed
+		 * @param rightFixed
+		 * @returns {{min, max}}
+		 */
+		getRenderColumnIndexRange: function (all, leftFixed, rightFixed) {
+			var index = {};
+			if (all) {
+				index.min = 0;
+				index.max = 10000;
+			} else if (leftFixed) {
+				index.min = 0;
+				index.max = this.getMaxFixedLeftColumnIndex();
+			} else if (rightFixed) {
+				index.min = this.getMinFixedRightColumnIndex();
+				index.max = 10000;
+			}
+			return index;
+		},
+		/**
+		 * get max fixed left column index. if no column is fixed in left, return -1
+		 * @returns {number}
+		 */
+		getMaxFixedLeftColumnIndex: function () {
+			return this.fixedLeftColumns - 1;
+		},
+		/**
+		 * get min fixed right column index. if no column is fixed in right, return
+		 * max column index.
+		 * eg. there are 3 columns in table, if no fixed right column, return 3. if
+		 * 1 fixed right column, return 2.
+		 * @returns {number}
+		 */
+		getMinFixedRightColumnIndex: function () {
+			return this.columns.length() - this.fixedRightColumns;
+		},
+		/**
+		 * get query settings
+		 * @returns {*}
+		 */
+		getQuerySettings: function () {
+			return this.getComponentOption("criteria");
+		},
+		/**
+		 * compute pagination
+		 * @param data array of data
+		 * @returns {{min, max}}
+		 */
+		computePagination: function (data) {
+			var minRowIndex = 0;
+			var maxRowIndex = 999999;
+			if (this.isPageable()) {
+				var queryCriteria = this.getQuerySettings();
+				if (queryCriteria === null) {
+					// no query criteria
+					this.state.countPerPage = this.getComponentOption("countPerPage");
+					var pageCount = data.length == 0 ? 1 : data.length / this.state.countPerPage;
+					this.state.pageCount = (Math.floor(pageCount) == pageCount) ? pageCount : (Math.floor(pageCount) + 1);
+					this.state.currentPageIndex = this.state.currentPageIndex > this.state.pageCount ? this.state.pageCount : this.state.currentPageIndex;
+					this.state.currentPageIndex = this.state.currentPageIndex <= 0 ? 1 : this.state.currentPageIndex;
+					minRowIndex = (this.state.currentPageIndex - 1) * this.state.countPerPage + 1;
+					maxRowIndex = minRowIndex + this.state.countPerPage - 1;
+				} else {
+					var criteria = this.getModel().get(queryCriteria);
+					this.state.countPerPage = criteria.countPerPage;
+					this.state.pageCount = criteria.pageCount;
+					this.state.currentPageIndex = criteria.pageIndex;
+					minRowIndex = 1;
+					maxRowIndex = this.state.countPerPage;
+				}
+			}
+			return {
+				min: minRowIndex,
+				max: maxRowIndex
+			};
+		},
+		/**
+		 * has fixed left columns
+		 * @returns {boolean}
+		 */
+		hasFixedLeftColumns: function () {
+			return this.fixedLeftColumns > 0;
+		},
+		/**
+		 * has fixed right columns or not
+		 * @returns {boolean}
+		 */
+		hasFixedRightColumns: function () {
+			return this.fixedRightColumns > 0;
+		},
+		/**
+		 * check the table is addable or not
+		 * @returns {boolean}
+		 */
+		isAddable: function () {
+			return this.getComponentOption("addable");
+		},
+		/**
+		 * check the table is editable or not
+		 * @returns {boolean}
+		 */
+		isEditable: function () {
+			return this.getComponentOption("editable");
+		},
+		/**
+		 * check the table is removable or not
+		 * @returns {boolean}
+		 */
+		isRemovable: function () {
+			return this.getComponentOption("removable");
+		},
+		/**
+		 * check the table is searchable or not
+		 * @returns {boolean}
+		 */
+		isSearchable: function () {
+			return this.getComponentOption("searchable");
+		},
+		/**
+		 * check the table is indexable or not
+		 * @returns {boolean}
+		 */
+		isIndexable: function () {
+			return this.getComponentOption("indexable");
+		},
+		/**
+		 * check the row can be selectable or not
+		 * @returns {boolean}
+		 */
+		isRowSelectable: function () {
+			return this.getComponentOption('rowSelectable');
+		},
+		/**
+		 * check the table is pageable or not
+		 * @returns {boolean}
+		 */
+		isPageable: function () {
+			return this.getComponentOption("pageable");
+		},
+		/**
+		 * check the table heading is displayed or not
+		 * @returns {*}
+		 */
+		isHeading: function () {
+			return this.getComponentOption('header');
+		},
+		isCollapsible: function () {
+			return this.getComponentOption('collapsible');
+		},
+		isExpanded: function () {
+			if (this.state.expanded === undefined) {
+				this.state.expanded = this.getComponentOption('expanded');
+			}
+			return this.state.expanded;
+		},
+		/**
+		 * check the column is sortable or not
+		 * @param column if no passed, check the table
+		 * @returns {boolean}
+		 */
+		isSortable: function (column) {
+			if (column === undefined) {
+				return this.getComponentOption("sortable");
+			} else if (this.isSortable()) {
+				// check the table option
+				if (column.sort === false) {
+					// if column is defined as not sortable, return false
+					return false;
+				} else {
+					return !(column.editable || column.removable || column.indexable || column.rowSelectable || column.rowOperations != null);
+				}
 			} else {
-				var criteria = this.getModel().get(queryCriteria);
-				this.state.countPerPage = criteria.countPerPage;
-				this.state.pageCount = criteria.pageCount;
-				this.state.currentPageIndex = criteria.pageIndex;
-				minRowIndex = 1;
-				maxRowIndex = this.state.countPerPage;
+				// even table is not sortable, the special column can be sortable
+				return column.sort;
 			}
-		}
-		return {
-			min: minRowIndex,
-			max: maxRowIndex
-		};
-	},
-	/**
-	 * has fixed left columns
-	 * @returns {boolean}
-	 */
-	hasFixedLeftColumns: function () {
-		return this.fixedLeftColumns > 0;
-	},
-	/**
-	 * has fixed right columns or not
-	 * @returns {boolean}
-	 */
-	hasFixedRightColumns: function () {
-		return this.fixedRightColumns > 0;
-	},
-	/**
-	 * check the table is addable or not
-	 * @returns {boolean}
-	 */
-	isAddable: function () {
-		return this.getComponentOption("addable");
-	},
-	/**
-	 * check the table is editable or not
-	 * @returns {boolean}
-	 */
-	isEditable: function () {
-		return this.getComponentOption("editable");
-	},
-	/**
-	 * check the table is removable or not
-	 * @returns {boolean}
-	 */
-	isRemovable: function () {
-		return this.getComponentOption("removable");
-	},
-	/**
-	 * check the table is searchable or not
-	 * @returns {boolean}
-	 */
-	isSearchable: function () {
-		return this.getComponentOption("searchable");
-	},
-	/**
-	 * check the table is indexable or not
-	 * @returns {boolean}
-	 */
-	isIndexable: function () {
-		return this.getComponentOption("indexable");
-	},
-	/**
-	 * check the row can be selectable or not
-	 * @returns {boolean}
-	 */
-	isRowSelectable: function () {
-		return this.getComponentOption('rowSelectable');
-	},
-	/**
-	 * check the table is pageable or not
-	 * @returns {boolean}
-	 */
-	isPageable: function () {
-		return this.getComponentOption("pageable");
-	},
-	/**
-	 * check the table heading is displayed or not
-	 * @returns {*}
-	 */
-	isHeading: function () {
-		return this.getComponentOption('header');
-	},
-	isCollapsible: function () {
-		return this.getComponentOption('collapsible');
-	},
-	isExpanded: function () {
-		if (this.state.expanded === undefined) {
-			this.state.expanded = this.getComponentOption('expanded');
-		}
-		return this.state.expanded;
-	},
-	/**
-	 * check the column is sortable or not
-	 * @param column if no passed, check the table
-	 * @returns {boolean}
-	 */
-	isSortable: function (column) {
-		if (column === undefined) {
-			return this.getComponentOption("sortable");
-		} else if (this.isSortable()) {
-			// check the table option
-			if (column.sort === false) {
-				// if column is defined as not sortable, return false
-				return false;
+		},
+		/**
+		 * get sorter
+		 * @returns {function}
+		 */
+		getSorter: function () {
+			return this.getComponentOption('sorter');
+		},
+		/**
+		 * check has data to display or not
+		 * @returns {boolean}
+		 */
+		hasDataToDisplay: function () {
+			var data = this.getDataToDisplay();
+			return data != null && data.length > 0;
+		},
+		/**
+		 * get display text of given column configuration
+		 * @param column column configuration
+		 * @param data row data
+		 * @return display text
+		 */
+		getDisplayTextOfColumn: function (column, data) {
+			var text = null;
+			if (column.render) {
+				text = column.render(data);
+			} else if (column.codes) {
+				text = column.codes.getText($pt.getValueFromJSON(data, column.data));
 			} else {
-				return !(column.editable || column.removable || column.indexable || column.rowSelectable || column.rowOperations != null);
+				text = $pt.getValueFromJSON(data, column.data);
 			}
-		} else {
-			// even table is not sortable, the special column can be sortable
-			return column.sort;
-		}
-	},
-	/**
-	 * get sorter
-	 * @returns {function}
-	 */
-	getSorter: function() {
-		return this.getComponentOption('sorter');
-	},
-	/**
-	 * check has data to display or not
-	 * @returns {boolean}
-	 */
-	hasDataToDisplay: function () {
-		var data = this.getDataToDisplay();
-		return data != null && data.length > 0;
-	},
-	/**
-	 * get display text of given column configuration
-	 * @param column column configuration
-	 * @param data row data
-	 * @return display text
-	 */
-	getDisplayTextOfColumn: function (column, data) {
-		var text = null;
-		if (column.render) {
-			text = column.render(data);
-		} else if (column.codes) {
-			text = column.codes.getText($pt.getValueFromJSON(data, column.data));
-		} else {
-			text = $pt.getValueFromJSON(data, column.data);
-		}
-		if (typeof text === "boolean") {
-			if (text === true) {
-				return NTable.BOOLEAN_TRUE_DISPLAY_TEXT;
-			} else if (text === false) {
-				return NTable.BOOLEAN_FALSE_DISPLAY_TEXT;
+			if (typeof text === "boolean") {
+				if (text === true) {
+					return NTable.BOOLEAN_TRUE_DISPLAY_TEXT;
+				} else if (text === false) {
+					return NTable.BOOLEAN_FALSE_DISPLAY_TEXT;
+				}
 			}
-		}
-		return text == null ? null : text.toString();
-	},
-	/**
-	 * filter data to display
-	 * @param row
-	 * @param rowIndex
-	 * @param all
-	 * @returns {boolean} true means data of row can match the search text
-	 */
-	filterData: function (row, rowIndex, all) {
-		var text = this.state.searchText.toUpperCase();
-		// do not use this.column, it maybe add index or operation columns
-		var columns = this.getComponentOption("columns");
-		var _this = this;
-		return columns.some(function (column) {
-			var data = _this.getDisplayTextOfColumn(column, row);
+			return text == null ? null : text.toString();
+		},
+		/**
+		 * filter data to display
+		 * @param row
+		 * @param rowIndex
+		 * @param all
+		 * @returns {boolean} true means data of row can match the search text
+		 */
+		filterData: function (row, rowIndex, all) {
+			var text = this.state.searchText.toUpperCase();
+			// do not use this.column, it maybe add index or operation columns
+			var columns = this.getComponentOption("columns");
+			var _this = this;
+			return columns.some(function (column) {
+				var data = _this.getDisplayTextOfColumn(column, row);
+				if (data == null) {
+					return false;
+				}
+				return data.toString().toUpperCase().indexOf(text) != -1;
+			});
+		},
+		/**
+		 * get data to display
+		 * @returns {[*]}
+		 */
+		getDataToDisplay: function () {
+			var data = this.getValueFromModel();
 			if (data == null) {
-				return false;
+				return data;
 			}
-			return data.toString().toUpperCase().indexOf(text) != -1;
-		});
-	},
-	/**
-	 * get data to display
-	 * @returns {[*]}
-	 */
-	getDataToDisplay: function () {
-		var data = this.getValueFromModel();
-		if (data == null) {
-			return data;
-		}
-		return this.isSearching() ? data.filter(this.filterData) : data;
-	},
-	/**
-	 * is searching
-	 * @returns {boolean}
-	 */
-	isSearching: function () {
-		return this.isSearchable() && this.state.searchText != null && this.state.searchText.length != 0;
-	},
-	/**
-	 * is current page all selected
-	 * @param column {{rowSelectable: string}}
-	 * @param data {{}[]}
-	 * @param range {{min: number, max: number}}
-	 * @returns {boolean}
-	 */
-	isCurrentPageAllSelected: function (column, data, range) {
-		var rowIndex = 1;
-		return data == null ? false : (!data.some(function (row) {
-			if (rowIndex >= range.min && rowIndex <= range.max) {
-				rowIndex++;
-				return row[column.rowSelectable] !== true;
+			return this.isSearching() ? data.filter(this.filterData) : data;
+		},
+		/**
+		 * is searching
+		 * @returns {boolean}
+		 */
+		isSearching: function () {
+			return this.isSearchable() && this.state.searchText != null && this.state.searchText.length != 0;
+		},
+		/**
+		 * is current page all selected
+		 * @param column {{rowSelectable: string}}
+		 * @param data {{}[]}
+		 * @param range {{min: number, max: number}}
+		 * @returns {boolean}
+		 */
+		isCurrentPageAllSelected: function (column, data, range) {
+			var rowIndex = 1;
+			return data == null ? false : (!data.some(function (row) {
+				if (rowIndex >= range.min && rowIndex <= range.max) {
+					rowIndex++;
+					return row[column.rowSelectable] !== true;
+				} else {
+					rowIndex++;
+					return false;
+				}
+			}));
+		},
+		onTitleClicked: function () {
+			this.state.expanded = !this.state.expanded;
+			if (this.state.expanded) {
+				$(React.findDOMNode(this.refs['table-panel-body'])).slideDown(300);
+				$(React.findDOMNode(this.refs['add-button'])).show();
 			} else {
-				rowIndex++;
-				return false;
+				$(React.findDOMNode(this.refs['table-panel-body'])).slideUp(300);
+				$(React.findDOMNode(this.refs['add-button'])).hide();
 			}
-		}));
-	},
-	onTitleClicked: function () {
-		this.state.expanded = !this.state.expanded;
-		if (this.state.expanded) {
-			$(React.findDOMNode(this.refs['table-panel-body'])).slideDown(300);
-			$(React.findDOMNode(this.refs['add-button'])).show();
-		} else {
-			$(React.findDOMNode(this.refs['table-panel-body'])).slideUp(300);
-			$(React.findDOMNode(this.refs['add-button'])).hide();
-		}
-	},
-	/**
-	 * on add button clicked
-	 */
-	onAddClicked: function () {
-		var data = $pt.cloneJSON(this.getComponentOption("modelTemplate"));
-		var itemModel = this.createEditingModel(data);
-		var layout = this.getComponentOption("editLayout");
+		},
+		/**
+		 * on add button clicked
+		 */
+		onAddClicked: function () {
+			var data = $pt.cloneJSON(this.getComponentOption("modelTemplate"));
+			var itemModel = this.createEditingModel(data);
+			var layout = this.getComponentOption("editLayout");
 
-		var addClick = this.getComponentOption('addClick');
-		if (addClick) {
-			addClick.call(this, this.getModel(), itemModel, layout);
-		} else {
-			this.getEditDialog().show({
-				model: itemModel,
-				layout: $pt.createFormLayout(layout),
-				buttons: {
-					right: [{
-						icon: NTable.EDIT_DIALOG_SAVE_BUTTON_ICON,
-						text: NTable.EDIT_DIALOG_SAVE_BUTTON_TEXT,
-						style: "primary",
-						click: this.onAddCompleted.bind(this)
-					}],
-					reset: this.getComponentOption('dialogResetVisible'),
-					validate: this.getComponentOption('dialogValidateVisible')
-				}
-			});
-		}
-	},
-	/**
-	 * on add completed
-	 */
-	onAddCompleted: function () {
-		var hasError = false;
-		var editDialog = this.getEditDialog();
-		if (this.getComponentOption('onAddSave')) {
-			hasError = this.getComponentOption('onAddSave').call(this, editDialog.getModel(), editDialog) === false;
-		} else {
-			hasError = editDialog.validate();
-		}
-		if (!hasError) {
-			var data = editDialog.hide();
-			this.getModel().add(this.getDataId(), data.getCurrentModel());
-		}
-	},
-	/**
-	 * on edit button clicked
-	 * @param data {*} data of row
-	 */
-	onEditClicked: function (data) {
-		var itemModel = this.createEditingModel(data);
-		var layout = this.getComponentOption("editLayout");
-
-		var editClick = this.getComponentOption('editClick');
-		if (editClick) {
-			editClick.call(this, this.getModel(), itemModel, layout);
-		} else {
-			this.getEditDialog().show({
-				model: itemModel,
-				layout: $pt.createFormLayout(layout),
-				buttons: {
-					right: [{
-						icon: NTable.EDIT_DIALOG_SAVE_BUTTON_ICON,
-						text: NTable.EDIT_DIALOG_SAVE_BUTTON_TEXT,
-						style: "primary",
-						click: this.onEditCompleted.bind(this)
-					}],
-					reset: this.getComponentOption('dialogResetVisible'),
-					validate: this.getComponentOption('dialogValidateVisible')
-				}
-			});
-		}
-	},
-	/**
-	 * on edit completed
-	 */
-	onEditCompleted: function () {
-		var hasError = false;
-		var editDialog = this.getEditDialog();
-		if (this.getComponentOption('onEditSave')) {
-			hasError = this.getComponentOption('onEditSave').call(this, editDialog.getModel(), editDialog) === false;
-		} else {
-			hasError = editDialog.validate();
-		}
-		if (!hasError) {
-			var data = this.getEditDialog().hide();
-			var original = data.getOriginalModel();
-			var current = data.getCurrentModel();
-			this.getModel().update(this.getDataId(), original, current);
-		}
-	},
-	/**
-	 * on remove button clicked
-	 * @param data {*} data of row
-	 */
-	onRemoveClicked: function (data) {
-		var removeRow = function (data) {
-			var canRemove = this.getComponentOption('canRemove');
-			if (!canRemove || canRemove.call(this, this.getModel(), data)) {
-				this.getModel().remove(this.getDataId(), data);
+			var addClick = this.getComponentOption('addClick');
+			if (addClick) {
+				addClick.call(this, this.getModel(), itemModel, layout);
+			} else {
+				this.getEditDialog().show({
+					model: itemModel,
+					layout: $pt.createFormLayout(layout),
+					buttons: {
+						right: [{
+							icon: NTable.EDIT_DIALOG_SAVE_BUTTON_ICON,
+							text: NTable.EDIT_DIALOG_SAVE_BUTTON_TEXT,
+							style: "primary",
+							click: this.onAddCompleted.bind(this)
+						}],
+						reset: this.getComponentOption('dialogResetVisible'),
+						validate: this.getComponentOption('dialogValidateVisible')
+					}
+				});
 			}
-			NConfirm.getConfirmModal().hide();
-		};
-		NConfirm.getConfirmModal().show(NTable.REMOVE_CONFIRM_TITLE,
-			NTable.REMOVE_CONFIRM_MESSAGE,
-			removeRow.bind(this, data));
-	},
-	/**
-	 * on row user defined operation clicked
-	 * @param callback
-	 * @param data
-	 */
-	onRowOperationClicked: function (callback, data) {
-		callback.call(this, data);
-	},
-	/**
-	 * on search box changed
-	 */
-	onSearchBoxChanged: function () {
-		var value = this.state.searchModel.get('text');
-		console.debug('Searching [text=' + value + '].');
-		if (value == null || value == "") {
-			this.setState({
-				searchText: null
-			});
-		} else {
-			this.setState({
-				searchText: value
-			});
-		}
-	},
-	/**
-	 * on sort icon clicked
-	 * @param column
-	 */
-	onSortClicked: function (column) {
-		var valueArray = this.getValueFromModel();
-		if (valueArray == null) {
-			return;
-		}
+		},
+		/**
+		 * on add completed
+		 */
+		onAddCompleted: function () {
+			var hasError = false;
+			var editDialog = this.getEditDialog();
+			if (this.getComponentOption('onAddSave')) {
+				hasError = this.getComponentOption('onAddSave').call(this, editDialog.getModel(), editDialog) === false;
+			} else {
+				hasError = editDialog.validate();
+			}
+			if (!hasError) {
+				var data = editDialog.hide();
+				this.getModel().add(this.getDataId(), data.getCurrentModel());
+			}
+		},
+		/**
+		 * on edit button clicked
+		 * @param data {*} data of row
+		 */
+		onEditClicked: function (data) {
+			var itemModel = this.createEditingModel(data);
+			var layout = this.getComponentOption("editLayout");
 
-		var sortWay = "asc";
-		if (this.state.sortColumn == column) {
-			// the column is sorted, so set sortWay as another
-			sortWay = this.state.sortWay == "asc" ? "desc" : "asc";
-		}
-		// if global sorter defined
-		var sorter = this.getSorter();
-		if (sorter) {
-			sorter.call(this, {
-				mode: sortWay,
-				column: column,
-				data: valueArray,
-				criteria: this.getQuerySettings()
-			});
+			var editClick = this.getComponentOption('editClick');
+			if (editClick) {
+				editClick.call(this, this.getModel(), itemModel, layout);
+			} else {
+				this.getEditDialog().show({
+					model: itemModel,
+					layout: $pt.createFormLayout(layout),
+					buttons: {
+						right: [{
+							icon: NTable.EDIT_DIALOG_SAVE_BUTTON_ICON,
+							text: NTable.EDIT_DIALOG_SAVE_BUTTON_TEXT,
+							style: "primary",
+							click: this.onEditCompleted.bind(this)
+						}],
+						reset: this.getComponentOption('dialogResetVisible'),
+						validate: this.getComponentOption('dialogValidateVisible')
+					}
+				});
+			}
+		},
+		/**
+		 * on edit completed
+		 */
+		onEditCompleted: function () {
+			var hasError = false;
+			var editDialog = this.getEditDialog();
+			if (this.getComponentOption('onEditSave')) {
+				hasError = this.getComponentOption('onEditSave').call(this, editDialog.getModel(), editDialog) === false;
+			} else {
+				hasError = editDialog.validate();
+			}
+			if (!hasError) {
+				var data = this.getEditDialog().hide();
+				var original = data.getOriginalModel();
+				var current = data.getCurrentModel();
+				this.getModel().update(this.getDataId(), original, current);
+			}
+		},
+		/**
+		 * on remove button clicked
+		 * @param data {*} data of row
+		 */
+		onRemoveClicked: function (data) {
+			var removeRow = function (data) {
+				var canRemove = this.getComponentOption('canRemove');
+				if (!canRemove || canRemove.call(this, this.getModel(), data)) {
+					this.getModel().remove(this.getDataId(), data);
+				}
+				NConfirm.getConfirmModal().hide();
+			};
+			NConfirm.getConfirmModal().show(NTable.REMOVE_CONFIRM_TITLE,
+				NTable.REMOVE_CONFIRM_MESSAGE,
+				removeRow.bind(this, data));
+		},
+		/**
+		 * on row user defined operation clicked
+		 * @param callback
+		 * @param data
+		 */
+		onRowOperationClicked: function (callback, data) {
+			callback.call(this, data);
+		},
+		/**
+		 * on search box changed
+		 */
+		onSearchBoxChanged: function () {
+			var value = this.state.searchModel.get('text');
+			console.debug('Searching [text=' + value + '].');
+			if (value == null || value == "") {
+				this.setState({
+					searchText: null
+				});
+			} else {
+				this.setState({
+					searchText: value
+				});
+			}
+		},
+		/**
+		 * on sort icon clicked
+		 * @param column
+		 */
+		onSortClicked: function (column) {
+			var valueArray = this.getValueFromModel();
+			if (valueArray == null) {
+				return;
+			}
+
+			var sortWay = "asc";
+			if (this.state.sortColumn == column) {
+				// the column is sorted, so set sortWay as another
+				sortWay = this.state.sortWay == "asc" ? "desc" : "asc";
+			}
+			// if global sorter defined
+			var sorter = this.getSorter();
+			if (sorter) {
+				sorter.call(this, {
+					mode: sortWay,
+					column: column,
+					data: valueArray,
+					criteria: this.getQuerySettings()
+				});
+				this.setState({
+					sortColumn: column,
+					sortWay: sortWay
+				});
+				return;
+			}
+
+			var isNumberValue = false;
+			// specific sort
+			if (column.sort !== undefined && column.sort != null) {
+				if (typeof column.sort === "function") {
+					sorter = column.sort;
+				} else if (column.sort === "number") {
+					isNumberValue = true;
+				} else if (typeof column.sort === 'boolean') {
+					// do nothing, use default sorter
+				} else {
+					throw $pt.createComponentException($pt.ComponentConstants.Err_Unuspported_Column_Sort,
+						"Column sort [" + column.sort + "] is not supported yet.");
+				}
+			}
+			var _this = this;
+			// if no sorter specific in column
+			sorter = sorter == null ? (function (a, b) {
+				var v1 = _this.getDisplayTextOfColumn(column, a);
+				var v2 = _this.getDisplayTextOfColumn(column, b);
+				if (v1 == null) {
+					return v2 == null ? 0 : -1;
+				} else if (v2 == null) {
+					return 1;
+				} else {
+					if (isNumberValue) {
+						// parse to number value
+						v1 *= 1;
+						v2 *= 1;
+					}
+					if (v1 > v2) {
+						return 1;
+					} else if (v1 < v2) {
+						return -1;
+					} else {
+						return 0;
+					}
+				}
+			}) : sorter;
+
+			if (sortWay == "asc") {
+				valueArray.sort(sorter);
+			} else {
+				valueArray.sort(function (a, b) {
+					return 0 - sorter(a, b);
+				});
+			}
 			this.setState({
 				sortColumn: column,
 				sortWay: sortWay
 			});
-			return;
-		}
-
-		var isNumberValue = false;
-		// specific sort
-		if (column.sort !== undefined && column.sort != null) {
-			if (typeof column.sort === "function") {
-				sorter = column.sort;
-			} else if (column.sort === "number") {
-				isNumberValue = true;
-			} else if (typeof column.sort === 'boolean') {
-				// do nothing, use default sorter
-			} else {
-				throw $pt.createComponentException($pt.ComponentConstants.Err_Unuspported_Column_Sort,
-					"Column sort [" + column.sort + "] is not supported yet.");
+		},
+		/**
+		 * create edit dialog
+		 * @returns {*}
+		 */
+		getEditDialog: function () {
+			if (this.state.editDialog === undefined || this.state.editDialog === null) {
+				this.state.editDialog = NModalForm.createFormModal(this.getLayout().getLabel());
 			}
-		}
-		var _this = this;
-		// if no sorter specific in column
-		sorter = sorter == null ? (function (a, b) {
-			var v1 = _this.getDisplayTextOfColumn(column, a);
-			var v2 = _this.getDisplayTextOfColumn(column, b);
-			if (v1 == null) {
-				return v2 == null ? 0 : -1;
-			} else if (v2 == null) {
-				return 1;
-			} else {
-				if (isNumberValue) {
-					// parse to number value
-					v1 *= 1;
-					v2 *= 1;
-				}
-				if (v1 > v2) {
-					return 1;
-				} else if (v1 < v2) {
-					return -1;
-				} else {
-					return 0;
-				}
+			return this.state.editDialog;
+		},
+		/**
+		 * create editing model
+		 * @param item
+		 */
+		createEditingModel: function (item) {
+			var modelValidator = this.getModel().getValidator();
+			var tableValidator = modelValidator ? modelValidator.getConfig()[this.getDataId()] : null;
+			var itemValidator = tableValidator ? $pt.createModelValidator(tableValidator.table) : null;
+			var editModel = $pt.createModel(item, itemValidator);
+			editModel.parent(this.getModel());
+			return editModel;
+		},
+		/**
+		 * on model change
+		 * @param evt
+		 */
+		onModelChanged: function (evt) {
+			if (evt.type == "add") {
+				this.computePagination(this.getDataToDisplay());
+				this.state.currentPageIndex = this.state.pageCount;
+			} else if (evt.type == "remove") {
+				// do nothing
+			} else if (evt.type == "change") {
+				// do nothing
+				console.log('Table[' + this.getDataId() + '] data changed.');
 			}
-		}) : sorter;
 
-		if (sortWay == "asc") {
-			valueArray.sort(sorter);
-		} else {
-			valueArray.sort(function (a, b) {
-				return 0 - sorter(a, b);
-			});
-		}
-		this.setState({
-			sortColumn: column,
-			sortWay: sortWay
-		});
-	},
-	/**
-	 * create edit dialog
-	 * @returns {*}
-	 */
-	getEditDialog: function () {
-		if (this.state.editDialog === undefined || this.state.editDialog === null) {
-			this.state.editDialog = NModalForm.createFormModal(this.getLayout().getLabel());
-		}
-		return this.state.editDialog;
-	},
-	/**
-	 * create editing model
-	 * @param item
-	 */
-	createEditingModel: function (item) {
-		var modelValidator = this.getModel().getValidator();
-		var tableValidator = modelValidator ? modelValidator.getConfig()[this.getDataId()] : null;
-		var itemValidator = tableValidator ? $pt.createModelValidator(tableValidator.table) : null;
-		var editModel = $pt.createModel(item, itemValidator);
-		editModel.parent(this.getModel());
-		return editModel;
-	},
-	/**
-	 * on model change
-	 * @param evt
-	 */
-	onModelChanged: function (evt) {
-		if (evt.type == "add") {
-			this.computePagination(this.getDataToDisplay());
-			this.state.currentPageIndex = this.state.pageCount;
-		} else if (evt.type == "remove") {
-			// do nothing
-		} else if (evt.type == "change") {
-			// do nothing
-			console.log('Table[' + this.getDataId() + '] data changed.');
-		}
-
-		if (this.getModel().getValidator() != null) {
-			this.getModel().validate(this.getDataId());
-		} else {
+			if (this.getModel().getValidator() != null) {
+				this.getModel().validate(this.getDataId());
+			} else {
+				this.forceUpdate();
+			}
+		},
+		/**
+		 * on model validate change
+		 * @param evt
+		 */
+		onModelValidateChanged: function (evt) {
+			// maybe will introduce performance issue, cannot sure now.
 			this.forceUpdate();
-		}
-	},
-	/**
-	 * on model validate change
-	 * @param evt
-	 */
-	onModelValidateChanged: function (evt) {
-		// maybe will introduce performance issue, cannot sure now.
-		this.forceUpdate();
-	},
-	/**
-	 * jump to page by given page index
-	 * @param pageIndex
-	 */
-	toPage: function (pageIndex) {
-		if (this.state.currentPageIndex == pageIndex) {
-			// do nothing
-			return;
-		}
-		var queryCriteria = this.getQuerySettings();
-		if (queryCriteria === null) {
-			// no query criteria
-			this.setState({
-				currentPageIndex: pageIndex
-			});
-		} else {
-			var _this = this;
-			var model = this.getModel();
-			var criteria = model.get(queryCriteria);
-			criteria = $.extend({}, criteria);
-			var url = criteria.url;
-			delete criteria.url;
-			delete criteria.pageCount;
-			criteria.pageIndex = pageIndex;
-			if (NTable.PAGE_JUMPING_PROXY) {
-				criteria = NTable.PAGE_JUMPING_PROXY.call(this, criteria);
+		},
+		/**
+		 * jump to page by given page index
+		 * @param pageIndex
+		 */
+		toPage: function (pageIndex) {
+			if (this.state.currentPageIndex == pageIndex) {
+				// do nothing
+				return;
 			}
-			$pt.doPost(url, criteria).done(function (data) {
-				if (typeof data === 'string') {
-					data = JSON.parse(data);
+			var queryCriteria = this.getQuerySettings();
+			if (queryCriteria === null) {
+				// no query criteria
+				this.setState({
+					currentPageIndex: pageIndex
+				});
+			} else {
+				var _this = this;
+				var model = this.getModel();
+				var criteria = model.get(queryCriteria);
+				criteria = $.extend({}, criteria);
+				var url = criteria.url;
+				delete criteria.url;
+				delete criteria.pageCount;
+				criteria.pageIndex = pageIndex;
+				if (NTable.PAGE_JUMPING_PROXY) {
+					criteria = NTable.PAGE_JUMPING_PROXY.call(this, criteria);
 				}
-				model.mergeCurrentModel(data);
-				// refresh
-				_this.forceUpdate();
-			});
-			// todo how to handle failure?
+				$pt.doPost(url, criteria).done(function (data) {
+					if (typeof data === 'string') {
+						data = JSON.parse(data);
+					}
+					model.mergeCurrentModel(data);
+					// refresh
+					_this.forceUpdate();
+				});
+				// todo how to handle failure?
+			}
+		},
+		getDivComponent: function () {
+			return $(React.findDOMNode(this.refs.div));
+		},
+		getComponent: function () {
+			return $(React.findDOMNode(this.refs.table));
+		},
+		/**
+		 * get header label id
+		 * @returns {string}
+		 */
+		getHeaderLabelId: function () {
+			return "n-table-header-label";
+		},
+		getScrollHeaderComponent: function () {
+			if (this.refs[this.getScrolledHeaderDivId()]) {
+				return $(React.findDOMNode(this.refs[this.getScrolledHeaderDivId()]));
+			} else {
+				return $("#___");
+			}
+		},
+		/**
+		 * get scrolled header div id
+		 * @returns {string}
+		 */
+		getScrolledHeaderDivId: function () {
+			return "n-table-scrolled-head";
+		},
+		getScrollBodyComponent: function () {
+			if (this.refs[this.getScrolledBodyDivId()]) {
+				return $(React.findDOMNode(this.refs[this.getScrolledBodyDivId()]));
+			} else {
+				return $("#___");
+			}
+		},
+		/**
+		 * get scrolled body div id
+		 * @returns {string}
+		 */
+		getScrolledBodyDivId: function () {
+			return "n-table-scrolled-body";
+		},
+		getFixedLeftBodyComponent: function () {
+			if (this.refs[this.getFixedLeftBodyDivId()]) {
+				return $(React.findDOMNode(this.refs[this.getFixedLeftBodyDivId()]));
+			} else {
+				return $("#___");
+			}
+		},
+		/**
+		 * get scrolled fixed left body div id
+		 * @returns {string}
+		 */
+		getFixedLeftBodyDivId: function () {
+			return "n-table-scrolled-left-body";
+		},
+		getFixedRightBodyComponent: function () {
+			if (this.refs[this.getFixedRightBodyDivId()]) {
+				return $(React.findDOMNode(this.refs[this.getFixedRightBodyDivId()]));
+			} else {
+				return $("#___");
+			}
+		},
+		/**
+		 * get scrolled fixed right body div id
+		 * @returns {string}
+		 */
+		getFixedRightBodyDivId: function () {
+			return "n-table-scrolled-right-body";
 		}
-	},
-	getDivComponent: function () {
-		return $(React.findDOMNode(this.refs.div));
-	},
-	getComponent: function () {
-		return $(React.findDOMNode(this.refs.table));
-	},
-	/**
-	 * get header label id
-	 * @returns {string}
-	 */
-	getHeaderLabelId: function () {
-		return "n-table-header-label";
-	},
-	getScrollHeaderComponent: function () {
-		if (this.refs[this.getScrolledHeaderDivId()]) {
-			return $(React.findDOMNode(this.refs[this.getScrolledHeaderDivId()]));
-		} else {
-			return $("#___");
-		}
-	},
-	/**
-	 * get scrolled header div id
-	 * @returns {string}
-	 */
-	getScrolledHeaderDivId: function () {
-		return "n-table-scrolled-head";
-	},
-	getScrollBodyComponent: function () {
-		if (this.refs[this.getScrolledBodyDivId()]) {
-			return $(React.findDOMNode(this.refs[this.getScrolledBodyDivId()]));
-		} else {
-			return $("#___");
-		}
-	},
-	/**
-	 * get scrolled body div id
-	 * @returns {string}
-	 */
-	getScrolledBodyDivId: function () {
-		return "n-table-scrolled-body";
-	},
-	getFixedLeftBodyComponent: function () {
-		if (this.refs[this.getFixedLeftBodyDivId()]) {
-			return $(React.findDOMNode(this.refs[this.getFixedLeftBodyDivId()]));
-		} else {
-			return $("#___");
-		}
-	},
-	/**
-	 * get scrolled fixed left body div id
-	 * @returns {string}
-	 */
-	getFixedLeftBodyDivId: function () {
-		return "n-table-scrolled-left-body";
-	},
-	getFixedRightBodyComponent: function () {
-		if (this.refs[this.getFixedRightBodyDivId()]) {
-			return $(React.findDOMNode(this.refs[this.getFixedRightBodyDivId()]));
-		} else {
-			return $("#___");
-		}
-	},
-	/**
-	 * get scrolled fixed right body div id
-	 * @returns {string}
-	 */
-	getFixedRightBodyDivId: function () {
-		return "n-table-scrolled-right-body";
-	}
-}));
+	}));
+	context.NTable = NTable;
+}(this, jQuery, $pt));
 
 /**
  * text input
@@ -11087,221 +11498,225 @@ var NTable = React.createClass($pt.defineCellComponent({
  *      }
  * }
  */
-var NText = React.createClass($pt.defineCellComponent({
-	propTypes: {
-		// model
-		model: React.PropTypes.object,
-		// CellLayout
-		layout: React.PropTypes.object
-	},
-	getDefaultProps: function () {
-		return {
-			defaultOptions: {}
-		};
-	},
-	getInitialState: function () {
-		return {};
-	},
-	/**
-	 * will update
-	 * @param nextProps
-	 */
-	componentWillUpdate: function (nextProps) {
-		// remove post change listener to handle model change
-		this.removePostChangeListener(this.onModelChanged);
-		this.removeEnableDependencyMonitor();
-		this.getComponent().off('change', this.onComponentChanged);
-	},
-	/**
-	 * did update
-	 * @param prevProps
-	 * @param prevState
-	 */
-	componentDidUpdate: function (prevProps, prevState) {
-		if (this.getComponent().val() != this.getValueFromModel()) {
+(function (context, $, $pt) {
+	var NText = React.createClass($pt.defineCellComponent({
+		propTypes: {
+			// model
+			model: React.PropTypes.object,
+			// CellLayout
+			layout: React.PropTypes.object
+		},
+		getDefaultProps: function () {
+			return {
+				defaultOptions: {}
+			};
+		},
+		getInitialState: function () {
+			return {};
+		},
+		/**
+		 * will update
+		 * @param nextProps
+		 */
+		componentWillUpdate: function (nextProps) {
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.onModelChanged);
+			this.removeEnableDependencyMonitor();
+			this.getComponent().off('change', this.onComponentChanged);
+		},
+		/**
+		 * did update
+		 * @param prevProps
+		 * @param prevState
+		 */
+		componentDidUpdate: function (prevProps, prevState) {
+			if (this.getComponent().val() != this.getValueFromModel()) {
+				this.getComponent().val(this.getValueFromModel());
+			}
+			// add post change listener to handle model change
+			this.addPostChangeListener(this.onModelChanged);
+			this.addEnableDependencyMonitor();
+			this.getComponent().on('change', this.onComponentChanged);
+		},
+		/**
+		 * did mount
+		 */
+		componentDidMount: function () {
+			// set model value to component
 			this.getComponent().val(this.getValueFromModel());
-		}
-		// add post change listener to handle model change
-		this.addPostChangeListener(this.onModelChanged);
-		this.addEnableDependencyMonitor();
-		this.getComponent().on('change', this.onComponentChanged);
-	},
-	/**
-	 * did mount
-	 */
-	componentDidMount: function () {
-		// set model value to component
-		this.getComponent().val(this.getValueFromModel());
-		// add post change listener to handle model change
-		this.addPostChangeListener(this.onModelChanged);
-		this.addEnableDependencyMonitor();
-		this.getComponent().on('change', this.onComponentChanged);
-	},
-	/**
-	 * will unmount
-	 */
-	componentWillUnmount: function () {
-		// remove post change listener to handle model change
-		this.removePostChangeListener(this.onModelChanged);
-		this.removeEnableDependencyMonitor();
-		this.getComponent().off('change', this.onComponentChanged);
-	},
-	/**
-	 * render left add-on
-	 * @returns {XML}
-	 */
-	renderLeftAddon: function () {
-		return this.renderAddon(this.getComponentOption('leftAddon'));
-	},
-	/**
-	 * render text
-	 * @returns {XML}
-	 */
-	renderText: function () {
-		// TODO needs to handle the control keys
-		return (React.createElement("input", {type: this.getComponentOption('pwd', false) ? 'password' : 'text', 
-		               className: "form-control", 
-		               disabled: !this.isEnabled(), 
-		               placeholder: this.getComponentOption('placeholder'), 
+			// add post change listener to handle model change
+			this.addPostChangeListener(this.onModelChanged);
+			this.addEnableDependencyMonitor();
+			this.getComponent().on('change', this.onComponentChanged);
+		},
+		/**
+		 * will unmount
+		 */
+		componentWillUnmount: function () {
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.onModelChanged);
+			this.removeEnableDependencyMonitor();
+			this.getComponent().off('change', this.onComponentChanged);
+		},
+		/**
+		 * render left add-on
+		 * @returns {XML}
+		 */
+		renderLeftAddon: function () {
+			return this.renderAddon(this.getComponentOption('leftAddon'));
+		},
+		/**
+		 * render text
+		 * @returns {XML}
+		 */
+		renderText: function () {
+			// TODO needs to handle the control keys
+			return (React.createElement("input", {type: this.getComponentOption('pwd', false) ? 'password' : 'text', 
+			               className: "form-control", 
+			               disabled: !this.isEnabled(), 
+			               placeholder: this.getComponentOption('placeholder'), 
 
-		               onKeyPress: this.onComponentChanged, 
-		               onChange: this.onComponentChanged, 
-		               onFocus: this.onComponentFocused, 
-		               onBlur: this.onComponentBlurred, 
-		               onKeyUp: this.onKeyUp, 
+			               onKeyPress: this.onComponentChanged, 
+			               onChange: this.onComponentChanged, 
+			               onFocus: this.onComponentFocused, 
+			               onBlur: this.onComponentBlurred, 
+			               onKeyUp: this.onKeyUp, 
 
-		               ref: "txt"}));
-	},
-	/**
-	 * render right add-on
-	 * @returns {XML}
-	 */
-	renderRightAddon: function () {
-		return this.renderAddon(this.getComponentOption('rightAddon'));
-	},
-	/**
-	 * render add-on
-	 * @param addon {{
+			               ref: "txt"}));
+		},
+		/**
+		 * render right add-on
+		 * @returns {XML}
+		 */
+		renderRightAddon: function () {
+			return this.renderAddon(this.getComponentOption('rightAddon'));
+		},
+		/**
+		 * render add-on
+		 * @param addon {{
 	 *              icon: string,
 	 *              text: string,
 	 *              iconFirst: boolean,
 	 *              click: function(model: object, value: object)
 	 *              }}
-	 * @returns {XML}
-	 */
-	renderAddon: function (addon) {
-		if (addon == null) {
-			return null;
-		}
+		 * @returns {XML}
+		 */
+		renderAddon: function (addon) {
+			if (addon == null) {
+				return null;
+			}
 
-		var spanCss = {
-			'input-group-addon': true,
-			link: addon.click != null,
-			disabled: !this.isEnabled()
-		};
+			var spanCss = {
+				'input-group-addon': true,
+				link: addon.click != null,
+				disabled: !this.isEnabled()
+			};
 
-		var iconCss = {
-			fa: true,
-			'fa-fw': true
-		};
-		var icon = addon.icon;
-		if (icon != null) {
-			iconCss['fa-' + icon] = true;
-		}
-		var iconPart = icon == null ? null : (React.createElement("span", {className: $pt.LayoutHelper.classSet(iconCss)}));
-		var textPart = addon.text;
-		var innerParts = addon.iconFirst === false ? [textPart, iconPart] : [iconPart, textPart];
-		return (React.createElement("span", {className: $pt.LayoutHelper.classSet(spanCss), 
-		              onClick: this.onAddonClicked.bind(this, addon.click)}, 
+			var iconCss = {
+				fa: true,
+				'fa-fw': true
+			};
+			var icon = addon.icon;
+			if (icon != null) {
+				iconCss['fa-' + icon] = true;
+			}
+			var iconPart = icon == null ? null : (React.createElement("span", {className: $pt.LayoutHelper.classSet(iconCss)}));
+			var textPart = addon.text;
+			var innerParts = addon.iconFirst === false ? [textPart, iconPart] : [iconPart, textPart];
+			return (React.createElement("span", {className: $pt.LayoutHelper.classSet(spanCss), 
+			              onClick: this.onAddonClicked.bind(this, addon.click)}, 
 			innerParts.map(function (part) {
 				return part;
 			})
 		));
-	},
-	/**
-	 * render
-	 * @returns {XML}
-	 */
-	render: function () {
-		var css = {
-			'n-disabled': !this.isEnabled()
-		};
-		css[this.getComponentCSS('n-text')] = true;
-		return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
-			React.createElement("div", {className: "input-group"}, 
-				this.renderLeftAddon(), 
-				this.renderText(), 
-				this.renderRightAddon()
-			), 
-			this.renderNormalLine(), 
-			this.renderFocusLine()
-		));
-	},
-	onComponentFocused: function () {
-		$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-		$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
-	},
-	onComponentBlurred: function (evt) {
-		$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-		$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+		},
+		/**
+		 * render
+		 * @returns {XML}
+		 */
+		render: function () {
+			var css = {
+				'n-disabled': !this.isEnabled()
+			};
+			css[this.getComponentCSS('n-text')] = true;
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
+				React.createElement("div", {className: "input-group"}, 
+					this.renderLeftAddon(), 
+					this.renderText(), 
+					this.renderRightAddon()
+				), 
+				this.renderNormalLine(), 
+				this.renderFocusLine()
+			));
+		},
+		onComponentFocused: function () {
+			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+		},
+		onComponentBlurred: function (evt) {
+			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 
-		if (this.state.componentChanged) {
-			clearTimeout(this.state.componentChanged);
+			if (this.state.componentChanged) {
+				clearTimeout(this.state.componentChanged);
+			}
+			this.setValueToModel(evt.target.value);
+		},
+		/**
+		 * on component change
+		 * @param evt
+		 */
+		onComponentChanged: function (evt) {
+			console.debug('Text component changed[modelValue=' + this.getValueFromModel() + ', compValue=' + evt.target.value + '].');
+			this.setValueToModel(evt.target.value);
+		},
+		/**
+		 * on model change
+		 * @param evt
+		 */
+		onModelChanged: function (evt) {
+			var value = evt.new;
+			if (value == this.getComponent().val()) {
+				return;
+			}
+			console.debug('Text model changed[modelValue=' + evt.new + ', compValue=' + this.getComponent().val() + '].');
+			this.getComponent().val(evt.new);
+		},
+		onKeyUp: function (evt) {
+			var monitor = this.getEventMonitor('keyUp');
+			if (monitor) {
+				monitor.call(evt.target, evt);
+			}
+		},
+		/**
+		 * on addon clicked
+		 * @param userDefinedClickFunc
+		 */
+		onAddonClicked: function (userDefinedClickFunc) {
+			if (this.isAddonClickable(userDefinedClickFunc)) {
+				userDefinedClickFunc.call(this, this.getModel(), this.getValueFromModel());
+			}
+		},
+		/**
+		 * get component
+		 * @returns {jQuery}
+		 * @override
+		 */
+		getComponent: function () {
+			return $(React.findDOMNode(this.refs.txt));
+		},
+		/**
+		 * is add-on clickable
+		 * @param userDefinedClickFunc
+		 * @returns {*}
+		 */
+		isAddonClickable: function (userDefinedClickFunc) {
+			return this.isEnabled() && userDefinedClickFunc;
 		}
-		this.setValueToModel(evt.target.value);
-	},
-	/**
-	 * on component change
-	 * @param evt
-	 */
-	onComponentChanged: function (evt) {
-		console.debug('Text component changed[modelValue=' + this.getValueFromModel() + ', compValue=' + evt.target.value + '].');
-		this.setValueToModel(evt.target.value);
-	},
-	/**
-	 * on model change
-	 * @param evt
-	 */
-	onModelChanged: function (evt) {
-		var value = evt.new;
-		if (value == this.getComponent().val()) {
-			return;
-		}
-		console.debug('Text model changed[modelValue=' + evt.new + ', compValue=' + this.getComponent().val() + '].');
-		this.getComponent().val(evt.new);
-	},
-	onKeyUp: function (evt) {
-		var monitor = this.getEventMonitor('keyUp');
-		if (monitor) {
-			monitor.call(evt.target, evt);
-		}
-	},
-	/**
-	 * on addon clicked
-	 * @param userDefinedClickFunc
-	 */
-	onAddonClicked: function (userDefinedClickFunc) {
-		if (this.isAddonClickable(userDefinedClickFunc)) {
-			userDefinedClickFunc.call(this, this.getModel(), this.getValueFromModel());
-		}
-	},
-	/**
-	 * get component
-	 * @returns {jQuery}
-	 * @override
-	 */
-	getComponent: function () {
-		return $(React.findDOMNode(this.refs.txt));
-	},
-	/**
-	 * is add-on clickable
-	 * @param userDefinedClickFunc
-	 * @returns {*}
-	 */
-	isAddonClickable: function (userDefinedClickFunc) {
-		return this.isEnabled() && userDefinedClickFunc;
-	}
-}));
+	}));
+	context.NText = NText;
+}(this, jQuery, $pt));
+
 /**
  * text input
  * onKeyUp listener makes sure the keyboard operation monitored.
@@ -11338,297 +11753,305 @@ var NText = React.createClass($pt.defineCellComponent({
  *      }
  * }
  */
-var NTextArea = React.createClass($pt.defineCellComponent({
-	propTypes: {
-		// model
-		model: React.PropTypes.object,
-		// CellLayout
-		layout: React.PropTypes.object
-	},
-	getDefaultProps: function () {
-		return {
-			defaultOptions: {
-				lines: 1
+(function (context, $, $pt) {
+	var NTextArea = React.createClass($pt.defineCellComponent({
+		propTypes: {
+			// model
+			model: React.PropTypes.object,
+			// CellLayout
+			layout: React.PropTypes.object
+		},
+		getDefaultProps: function () {
+			return {
+				defaultOptions: {
+					lines: 1
+				}
+			};
+		},
+		/**
+		 * will update
+		 * @param nextProps
+		 */
+		componentWillUpdate: function (nextProps) {
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.onModelChanged);
+			this.removeEnableDependencyMonitor();
+			this.getComponent().off('change', this.onComponentChanged);
+		},
+		/**
+		 * did update
+		 * @param prevProps
+		 * @param prevState
+		 */
+		componentDidUpdate: function (prevProps, prevState) {
+			if (this.getComponent().val() != this.getValueFromModel()) {
+				this.getComponent().val(this.getValueFromModel());
 			}
-		};
-	},
-	/**
-	 * will update
-	 * @param nextProps
-	 */
-	componentWillUpdate: function (nextProps) {
-		// remove post change listener to handle model change
-		this.removePostChangeListener(this.onModelChanged);
-		this.removeEnableDependencyMonitor();
-		this.getComponent().off('change', this.onComponentChanged);
-	},
-	/**
-	 * did update
-	 * @param prevProps
-	 * @param prevState
-	 */
-	componentDidUpdate: function (prevProps, prevState) {
-		if (this.getComponent().val() != this.getValueFromModel()) {
+			// add post change listener to handle model change
+			this.addPostChangeListener(this.onModelChanged);
+			this.addEnableDependencyMonitor();
+			this.getComponent().on('change', this.onComponentChanged);
+		},
+		/**
+		 * did mount
+		 */
+		componentDidMount: function () {
+			// set model value to component
 			this.getComponent().val(this.getValueFromModel());
-		}
-		// add post change listener to handle model change
-		this.addPostChangeListener(this.onModelChanged);
-		this.addEnableDependencyMonitor();
-		this.getComponent().on('change', this.onComponentChanged);
-	},
-	/**
-	 * did mount
-	 */
-	componentDidMount: function () {
-		// set model value to component
-		this.getComponent().val(this.getValueFromModel());
-		// add post change listener to handle model change
-		this.addPostChangeListener(this.onModelChanged);
-		this.addEnableDependencyMonitor();
-		this.getComponent().on('change', this.onComponentChanged);
-	},
-	/**
-	 * will unmount
-	 */
-	componentWillUnmount: function () {
-		// remove post change listener to handle model change
-		this.removePostChangeListener(this.onModelChanged);
-		this.removeEnableDependencyMonitor();
-		this.getComponent().off('change', this.onComponentChanged);
-	},
-	/**
-	 * render text
-	 * @returns {XML}
-	 */
-	renderText: function () {
-		var css = {
-			'form-control': true
-		};
-		css['l' + this.getComponentOption('lines')] = true;
-		return (React.createElement("textarea", {className: $pt.LayoutHelper.classSet(css), 
-		                  disabled: !this.isEnabled(), 
-		                  placeholder: this.getComponentOption('placeholder'), 
+			// add post change listener to handle model change
+			this.addPostChangeListener(this.onModelChanged);
+			this.addEnableDependencyMonitor();
+			this.getComponent().on('change', this.onComponentChanged);
+		},
+		/**
+		 * will unmount
+		 */
+		componentWillUnmount: function () {
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.onModelChanged);
+			this.removeEnableDependencyMonitor();
+			this.getComponent().off('change', this.onComponentChanged);
+		},
+		/**
+		 * render text
+		 * @returns {XML}
+		 */
+		renderText: function () {
+			var css = {
+				'form-control': true
+			};
+			css['l' + this.getComponentOption('lines')] = true;
+			return (React.createElement("textarea", {className: $pt.LayoutHelper.classSet(css), 
+			                  disabled: !this.isEnabled(), 
+			                  placeholder: this.getComponentOption('placeholder'), 
 
-		                  onKeyPress: this.onComponentChanged, 
-		                  onChange: this.onComponentChanged, 
-		                  onFocus: this.onComponentFocused, 
-		                  onBlur: this.onComponentBlurred, 
+			                  onKeyPress: this.onComponentChanged, 
+			                  onChange: this.onComponentChanged, 
+			                  onFocus: this.onComponentFocused, 
+			                  onBlur: this.onComponentBlurred, 
 
-		                  ref: "txt"}));
-	},
-	/**
-	 * render
-	 * @returns {XML}
-	 */
-	render: function () {
-		var css = {
-			'n-disabled': !this.isEnabled()
-		};
-		css[this.getComponentCSS('n-textarea')] = true;
-		return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
-			this.renderText(), 
-			this.renderNormalLine(), 
-			this.renderFocusLine()
-		));
-	},
-	onComponentFocused: function () {
-		$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-		$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
-	},
-	onComponentBlurred: function () {
-		$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-		$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
-	},
-	/**
-	 * on component change
-	 * @param evt
-	 */
-	onComponentChanged: function (evt) {
-		this.setValueToModel(evt.target.value);
-	},
-	/**
-	 * on model change
-	 * @param evt
-	 */
-	onModelChanged: function (evt) {
-		var value = evt.new;
-		if (value == this.getComponent().val()) {
-			return;
+			                  ref: "txt"}));
+		},
+		/**
+		 * render
+		 * @returns {XML}
+		 */
+		render: function () {
+			var css = {
+				'n-disabled': !this.isEnabled()
+			};
+			css[this.getComponentCSS('n-textarea')] = true;
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
+				this.renderText(), 
+				this.renderNormalLine(), 
+				this.renderFocusLine()
+			));
+		},
+		onComponentFocused: function () {
+			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+		},
+		onComponentBlurred: function () {
+			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+		},
+		/**
+		 * on component change
+		 * @param evt
+		 */
+		onComponentChanged: function (evt) {
+			this.setValueToModel(evt.target.value);
+		},
+		/**
+		 * on model change
+		 * @param evt
+		 */
+		onModelChanged: function (evt) {
+			var value = evt.new;
+			if (value == this.getComponent().val()) {
+				return;
+			}
+			this.getComponent().val(evt.new);
+		},
+		/**
+		 * on addon clicked
+		 * @param userDefinedClickFunc
+		 */
+		onAddonClicked: function (userDefinedClickFunc) {
+			if (userDefinedClickFunc) {
+				userDefinedClickFunc.call(this, this.getModel(), this.getValueFromModel());
+			}
+		},
+		/**
+		 * get component
+		 * @returns {jQuery}
+		 * @override
+		 */
+		getComponent: function () {
+			return $(React.findDOMNode(this.refs.txt));
 		}
-		this.getComponent().val(evt.new);
-	},
-	/**
-	 * on addon clicked
-	 * @param userDefinedClickFunc
-	 */
-	onAddonClicked: function (userDefinedClickFunc) {
-		if (userDefinedClickFunc) {
-			userDefinedClickFunc.call(this, this.getModel(), this.getValueFromModel());
-		}
-	},
-	/**
-	 * get component
-	 * @returns {jQuery}
-	 * @override
-	 */
-	getComponent: function () {
-		return $(React.findDOMNode(this.refs.txt));
-	}
-}));
+	}));
+	context.NTextArea = NTextArea;
+}(this, jQuery, $pt));
+
 /**
  * Created by brad.wu on 8/21/2015.
  */
-var NToggle = React.createClass($pt.defineCellComponent({
-	propTypes: {
-		// model
-		model: React.PropTypes.object,
-		// CellLayout
-		layout: React.PropTypes.object
-	},
-	/**
-	 * will update
-	 * @param nextProps
-	 */
-	componentWillUpdate: function (nextProps) {
-		// remove post change listener to handle model change
-		this.removePostChangeListener(this.onModelChanged);
-		this.removeEnableDependencyMonitor();
-	},
-	/**
-	 * did update
-	 * @param prevProps
-	 * @param prevState
-	 */
-	componentDidUpdate: function (prevProps, prevState) {
-		// set model value to component
-		this.getComponent().prop("checked", this.getValueFromModel());
-		// add post change listener to handle model change
-		this.addPostChangeListener(this.onModelChanged);
-		this.addEnableDependencyMonitor();
-	},
-	/**
-	 * did mount
-	 */
-	componentDidMount: function () {
-		// set model value to component
-		this.getComponent().prop("checked", this.getValueFromModel());
-		// add post change listener to handle model change
-		this.addPostChangeListener(this.onModelChanged);
-		this.addEnableDependencyMonitor();
-	},
-	/**
-	 * will unmount
-	 */
-	componentWillUnmount: function () {
-		// remove post change listener to handle model change
-		this.removePostChangeListener(this.onModelChanged);
-		this.removeEnableDependencyMonitor();
-	},
-	/**
-	 * render label
-	 * @returns {XML}
-	 */
-	renderLabel: function (label, className) {
-		var css = {
-			'toggle-label': true,
-			disabled: !this.isEnabled()
-		};
-		css[className] = true;
-		return React.createElement("span", {className: $pt.LayoutHelper.classSet(css)}, 
+(function (context, $, $pt) {
+	var NToggle = React.createClass($pt.defineCellComponent({
+		propTypes: {
+			// model
+			model: React.PropTypes.object,
+			// CellLayout
+			layout: React.PropTypes.object
+		},
+		/**
+		 * will update
+		 * @param nextProps
+		 */
+		componentWillUpdate: function (nextProps) {
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.onModelChanged);
+			this.removeEnableDependencyMonitor();
+		},
+		/**
+		 * did update
+		 * @param prevProps
+		 * @param prevState
+		 */
+		componentDidUpdate: function (prevProps, prevState) {
+			// set model value to component
+			this.getComponent().prop("checked", this.getValueFromModel());
+			// add post change listener to handle model change
+			this.addPostChangeListener(this.onModelChanged);
+			this.addEnableDependencyMonitor();
+		},
+		/**
+		 * did mount
+		 */
+		componentDidMount: function () {
+			// set model value to component
+			this.getComponent().prop("checked", this.getValueFromModel());
+			// add post change listener to handle model change
+			this.addPostChangeListener(this.onModelChanged);
+			this.addEnableDependencyMonitor();
+		},
+		/**
+		 * will unmount
+		 */
+		componentWillUnmount: function () {
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.onModelChanged);
+			this.removeEnableDependencyMonitor();
+		},
+		/**
+		 * render label
+		 * @returns {XML}
+		 */
+		renderLabel: function (label, className) {
+			var css = {
+				'toggle-label': true,
+				disabled: !this.isEnabled()
+			};
+			css[className] = true;
+			return React.createElement("span", {className: $pt.LayoutHelper.classSet(css)}, 
             label
         );
-	},
-	renderLeftLabel: function () {
-		var labelAttached = this.getComponentOption('labelAttached');
-		if (labelAttached && labelAttached.left) {
-			return this.renderLabel(labelAttached.left, 'toggle-label-left');
-		}
-	},
-	renderRightLabel: function () {
-		var labelAttached = this.getComponentOption('labelAttached');
-		if (labelAttached && labelAttached.right) {
-			return this.renderLabel(labelAttached.right, 'toggle-label-right');
-		}
-	},
-	/**
-	 * render check box, using font awesome instead
-	 * @returns {XML}
-	 */
-	renderToggleButton: function () {
-		var checked = this.isChecked();
-		var css = {
-			disabled: !this.isEnabled(),
-			checked: checked,
-			unchecked: !checked,
-			'toggle-container': true
-		};
-		return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
-			React.createElement("span", {className: "n-toggle-line"}), 
+		},
+		renderLeftLabel: function () {
+			var labelAttached = this.getComponentOption('labelAttached');
+			if (labelAttached && labelAttached.left) {
+				return this.renderLabel(labelAttached.left, 'toggle-label-left');
+			}
+		},
+		renderRightLabel: function () {
+			var labelAttached = this.getComponentOption('labelAttached');
+			if (labelAttached && labelAttached.right) {
+				return this.renderLabel(labelAttached.right, 'toggle-label-right');
+			}
+		},
+		/**
+		 * render check box, using font awesome instead
+		 * @returns {XML}
+		 */
+		renderToggleButton: function () {
+			var checked = this.isChecked();
+			var css = {
+				disabled: !this.isEnabled(),
+				checked: checked,
+				unchecked: !checked,
+				'toggle-container': true
+			};
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
+				React.createElement("span", {className: "n-toggle-line"}), 
             React.createElement("span", {className: "n-toggle-true", 
                   tabIndex: "-1", 
                   onClick: this.onButtonClicked.bind(this, true)}), 
             React.createElement("span", {className: "n-toggle-false", 
                   tabIndex: "-1", 
                   onClick: this.onButtonClicked.bind(this, false)})
-		));
-	},
-	/**
-	 * render
-	 * @returns {XML}
-	 */
-	render: function () {
-		var css = {
-			'n-disabled': !this.isEnabled()
-		};
-		css[this.getComponentCSS('n-toggle')] = true;
+			));
+		},
+		/**
+		 * render
+		 * @returns {XML}
+		 */
+		render: function () {
+			var css = {
+				'n-disabled': !this.isEnabled()
+			};
+			css[this.getComponentCSS('n-toggle')] = true;
 
-		return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
-			React.createElement("input", {type: "checkbox", style: {display: "none"}, 
-			       onChange: this.onComponentChanged, ref: "txt"}), 
-			this.renderLeftLabel(), 
-			this.renderToggleButton(), 
-			this.renderRightLabel()
-		));
-	},
-	/**
-	 * handle button clicked event
-	 */
-	onButtonClicked: function (value) {
-		if (this.isEnabled()) {
-			this.setValueToModel(value);
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
+				React.createElement("input", {type: "checkbox", style: {display: "none"}, 
+				       onChange: this.onComponentChanged, ref: "txt"}), 
+				this.renderLeftLabel(), 
+				this.renderToggleButton(), 
+				this.renderRightLabel()
+			));
+		},
+		/**
+		 * handle button clicked event
+		 */
+		onButtonClicked: function (value) {
+			if (this.isEnabled()) {
+				this.setValueToModel(value);
+			}
+		},
+		/**
+		 * on component change
+		 * @param evt
+		 */
+		onComponentChanged: function (evt) {
+			// synchronize value to model
+			this.setValueToModel(evt.target.checked);
+		},
+		/**
+		 * on model change
+		 * @param evt
+		 */
+		onModelChanged: function (evt) {
+			this.getComponent().prop("checked", evt.new === true);
+			this.forceUpdate();
+		},
+		/**
+		 * is checked or not
+		 * @returns {boolean}
+		 */
+		isChecked: function () {
+			return this.getValueFromModel() === true;
+		},
+		/**
+		 * get component
+		 * @returns {jQuery}
+		 */
+		getComponent: function () {
+			return $(React.findDOMNode(this.refs.txt));
 		}
-	},
-	/**
-	 * on component change
-	 * @param evt
-	 */
-	onComponentChanged: function (evt) {
-		// synchronize value to model
-		this.setValueToModel(evt.target.checked);
-	},
-	/**
-	 * on model change
-	 * @param evt
-	 */
-	onModelChanged: function (evt) {
-		this.getComponent().prop("checked", evt.new === true);
-		this.forceUpdate();
-	},
-	/**
-	 * is checked or not
-	 * @returns {boolean}
-	 */
-	isChecked: function () {
-		return this.getValueFromModel() === true;
-	},
-	/**
-	 * get component
-	 * @returns {jQuery}
-	 */
-	getComponent: function () {
-		return $(React.findDOMNode(this.refs.txt));
-	}
-}));
+	}));
+	context.NToggle = NToggle;
+}(this, jQuery, $pt));
+
 (function(context, $, $pt) {
     var NTree = React.createClass($pt.defineCellComponent({
         statics: {
@@ -11744,7 +12167,7 @@ var NToggle = React.createClass($pt.defineCellComponent({
                     React.createElement("a", {
                         href: "javascript:void(0);", 
                         onClick: this.onNodeClicked.bind(this, node, nodeId)}, 
-                        React.createElement("span", {className: "node-text"}, node.text)
+                        React.createElement("span", {className: "node-text"}, this.getNodeText(node))
                     ), 
                     this.renderNodes(node, nodeId)
                 )
@@ -11923,6 +12346,14 @@ var NToggle = React.createClass($pt.defineCellComponent({
                     folder: false,
                     leaf: true
                 }, NTree.FILE_ICON);
+            }
+        },
+        getNodeText: function(node) {
+            var render = this.getComponentOption('textRender');
+            if (render) {
+                return render.call(this, node);
+            } else {
+                return node.text;
             }
         },
         /**
