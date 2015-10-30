@@ -389,7 +389,10 @@
 					buttons: buttons,
 					direction: direction,
 					footer: footer,
-					title: title
+					title: title,
+					draggable: false,
+					expanded: true,
+					collapsible: false
 				});
 			}
 		}

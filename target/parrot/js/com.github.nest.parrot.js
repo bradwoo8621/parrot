@@ -1,4 +1,4 @@
-/** com.github.nest.parrot.V0.0.4 2015-10-30 */
+/** com.github.nest.parrot.V0.0.4 2015-10-31 */
 (function ($) {
 	var patches = {
 		console: function () {
@@ -7024,7 +7024,10 @@
 					buttons: buttons,
 					direction: direction,
 					footer: footer,
-					title: title
+					title: title,
+					draggable: false,
+					expanded: true,
+					collapsible: false
 				});
 			}
 		}
@@ -7227,9 +7230,9 @@
 	var NPageFooter = React.createClass({displayName: "NPageFooter",
 		statics: {
 			TECH_BASE: 'Parrot',
-			TECH_URL: 'https://oss.ebaotech.com/nest/parrot',
-			COMPANY: 'eBaoTech',
-			COMPANY_URL: 'https://www.ebaotech.com',
+			TECH_URL: 'https://github.com/bradwoo8621/parrot',
+			COMPANY: 'NEST',
+			COMPANY_URL: 'https://github.com/bradwoo8621/nest',
 			LEFT_TEXT: 'For best viewing, we recommend using the latest Chrome version.'
 		},
 		propTypes: {

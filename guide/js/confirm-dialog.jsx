@@ -28,7 +28,7 @@
 						id: 'confirm-dialog-show',
 						title: '#show',
 						pattern: '#show(options)',
-						desc: <span>Show dialog. Options as below,<br/>
+						desc: <span>Show dialog. Options is a JSON object, properties as below,<br/>
 						1. <code>title</code>: string. title of dialog.<br/>
 						2. <code>disableButtons</code>: boolean. false to hide buttons.<br/>
 						3. <code>disableConfirm</code>: boolean. false to hide confirm button.<br/>
