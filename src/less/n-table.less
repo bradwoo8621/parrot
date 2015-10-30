@@ -48,7 +48,7 @@ div.n-table-container {
 		position: relative;
 		border-top: solid 1px @border-color;
 		div.n-table-panel-body {
-			overflow: auto;
+			overflow-y: hidden;
 			.n-table-scroll-head {
 				overflow: hidden;
 			}
@@ -140,15 +140,15 @@ div.n-table-container {
 		span.check-container {
 			top: 4px;
 			&:focus:before {
-				-webkit-animation: none;
-				animation: none;
-				-o-animation: none;
+				// -webkit-animation: none;
+				// animation: none;
+				// -o-animation: none;
 			}
 			&.checked {
 				&:focus:before {
-					-webkit-animation: none;
-					animation: none;
-					-o-animation: none;
+					// -webkit-animation: none;
+					// animation: none;
+					// -o-animation: none;
 				}
 			}
 			span.check {
@@ -215,7 +215,6 @@ table.n-table {
 				border-right: 0;
 			}
 		}
-
 	}
 	tbody tr {
 		transition: all .2s;
@@ -255,6 +254,37 @@ table.n-table {
 			height: 20px;
 			overflow: hidden;
 			outline: 0;
+		}
+	}
+}
+
+div.n-table-container.inline-editor {
+	table.n-table {
+		// thead tr {
+		// 	height: @table-row-editor-height;
+		// 	td {
+		// 		height: @table-row-editor-height;
+		// 	}
+		// }
+		tbody tr {
+			td {
+				height: @table-row-editor-height;
+				.inline-editor {
+					padding: 0;
+				}
+				.n-form .n-form-cell {
+					padding-top: 0;
+					padding-bottom: 0;
+					padding-right: 3px;
+					padding-left: 2px;
+					&:first-child {
+						padding-left: 15px;
+					}
+					&:last-child {
+						padding-right: 15px;
+					}
+				}
+			}
 		}
 	}
 }

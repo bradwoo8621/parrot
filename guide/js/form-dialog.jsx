@@ -33,7 +33,7 @@
 						id: 'form-dialog-show',
 						title: '#show',
 						pattern: '#show()',
-						desc: <span>Show dialog. Options as below,
+						desc: <span>Show dialog. Options as below,<br/>
 						1. <code>model</code>: Model Interface. data model.<br/>
 						2. <code>layout</code>: Form Layout. create by <code>$pt.createFormLayout()</code>.<br/>
 						3. <code>buttons</code>: JSON. properties as below,
@@ -43,9 +43,14 @@
 						3.d <code>save</code>: function. invoke when save clicked, parameter is data model. Hide save button if not defined.<br/>
 						3.e <code>left</code>: JSON|JSON[]. left buttons. Refers to Panel Footer. All click function will be passed data model as parameter.<br/>
 						3.f <code>right</code>: JSON|JSON[]. right buttons. Refers to Panel Footer. All click function will be passed data model as parameter.<br/>
+						3.g <code>dialogCloseShown</code> boolean. Show the dialog close button or not.<br/>
 						4. <code>direction</code>: label direction. <code>vertical</code> or <code>horizontal</code>.<br/>
 						5. <code>footer</code>: boolean. false to hide button footer.<br/>
 						6. <code>title</code>: string. title of dialog.<br/>
+						7. <code>draggable</code>: boolean. true to let the dialog floating and draggable.<br/>
+						8. <code>collapsible</code>: boolean. true to let the dialog collapsible.<br/>
+						9. <code>expanded</code>: boolean. false to collapse the dialog body and footer when first show.<br/>
+						10. <code>pos</code>: JSON. has <code>top</code>, <code>right</code>, <code>bottom</code> and <code>left</code>, all are numeric.
 						</span>
 					}
 				]
@@ -54,12 +59,10 @@
 				id: 'confirm-dialog-constants',
 				title: 'Constants',
 				desc: <span>
-						<code>NModalForm.RESET_CONFIRM_TITLE: "Reset Data";</code><br/>
-						<code>NModalForm.RESET_CONFIRM_MESSAGE: ["Are you sure to reset data?", "All data will be lost
-							and cannot be recovered."];</code><br/>
-						<code>NModalForm.CANCEL_CONFIRM_TITLE: "Cancel Editing";</code><br/>
-						<code>NModalForm.CANCEL_CONFIRM_MESSAGE: ["Are you sure to cancel current operating?", "All data
-							will be lost and cannot be recovered."];</code>
+						<code>NModalForm.RESET_CONFIRM_TITLE: {NModalForm.RESET_CONFIRM_TITLE};</code><br/>
+						<code>NModalForm.RESET_CONFIRM_MESSAGE: {NModalForm.RESET_CONFIRM_MESSAGE};</code><br/>
+						<code>NModalForm.CANCEL_CONFIRM_TITLE: {NModalForm.CANCEL_CONFIRM_TITLE};</code><br/>
+						<code>NModalForm.CANCEL_CONFIRM_MESSAGE: {NModalForm.CANCEL_CONFIRM_MESSAGE};</code>
 				</span>
 			}
 		]
@@ -67,37 +70,64 @@
 
 	var renderer = $pt.getService($demo, 'renderer');
 	renderer.formDialog = function () {
+		var floatDialog = NModalForm.createFormModal();
 		var dialog = NModalForm.createFormModal();
-		var form = {
+		var model = $pt.createModel({});
+		var layout = $pt.createFormLayout({
 			any: {
-				label: 'Show',
+				label: 'A Text'
+			}
+		});
+		var buttons = {
+			save: function () {
+			},
+			left: {
+				icon: 'search'
+			},
+			right: [{
+				icon: 'play'
+			}, {
+				icon: 'stop'
+			}]
+		};
+		var form = {
+			normal: {
+				label: 'Normal',
 				comp: {
 					type: $pt.ComponentConstants.Button,
 					icon: 'play',
 					click: function () {
 						dialog.show({
 							title: 'A Sample Form Dialog',
-							model: $pt.createModel({}),
-							layout: $pt.createFormLayout({
-								any: {
-									label: 'A Text'
-								}
-							}),
-							buttons: {
-								save: function () {
-								},
-								left: {
-									icon: 'search'
-								},
-								right: [{
-									icon: 'play'
-								}, {
-									icon: 'stop'
-								}]
-							}
+							model: model,
+							layout: layout,
+							buttons: buttons
 						});
 					},
 					style: 'success'
+				}
+			},
+			floating: {
+				label: 'Floating',
+				comp: {
+					type: $pt.ComponentConstants.Button,
+					icon: 'play',
+					click: function () {
+						floatDialog.show({
+							title: 'A Floating Form Dialog',
+							model: model,
+							layout: layout,
+							buttons: buttons,
+							draggable: true,
+							collapsible: true,
+							expanded: false,
+							pos: {
+								top: 50,
+								right: 0
+							}
+						});
+					},
+					style: 'primary'
 				}
 			}
 		};

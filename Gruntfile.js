@@ -7,7 +7,7 @@ module.exports = function(grunt) {
 			middlePath: 'intermediate',
 			bowerPath: 'bower_components',
 			clean: {
-				all: ['<%= targetPath %>', '<%= middlePath %>'],
+				all: ['<%= targetPath %>/parrot/', '<%= middlePath %>'],
 				mid: ['<%= middlePath %>'],
 				compile: ['<%= targetPath %>/parrot/']
 			},

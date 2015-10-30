@@ -36,8 +36,7 @@
 				id: 'confirm-dialog-constants',
 				title: 'Constants',
 				desc: <span>
-						<code>NOnRequestModal.WAITING_MESSAGE = 'Send request to server and waiting for
-							response...';</code>
+						<code>NOnRequestModal.WAITING_MESSAGE = {NOnRequestModal.WAITING_MESSAGE};</code>
 				</span>
 			}
 		]

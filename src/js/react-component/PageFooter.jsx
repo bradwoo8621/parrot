@@ -1,46 +1,51 @@
 /**
  * page footer.<br>
  */
-var NPageFooter = React.createClass({
-	statics: {
-		TECH_BASE: 'Parrot',
-		TECH_URL: 'https://oss.ebaotech.com/nest/parrot',
-		COMPANY: 'eBaoTech',
-		COMPANY_URL: 'https://www.ebaotech.com',
-		LEFT_TEXT: 'For best viewing, we recommend using the latest Chrome version.'
-	},
-	propTypes: {
-		name: React.PropTypes.string.isRequired
-	},
-	getDefaultProps: function () {
-		return {};
-	},
-	renderTech: function () {
-		if (NPageFooter.TECH_BASE != null && !NPageFooter.TECH_BASE.isBlank()) {
-			return (<span>, on <a href={NPageFooter.TECH_URL} target='_blank' tabIndex='-1'>{NPageFooter.TECH_BASE}</a></span>);
-		}
-		return null;
-	},
-	renderCompany: function () {
-		if (NPageFooter.COMPANY != null && !NPageFooter.COMPANY.isBlank()) {
-			return (<span>, by <a href={NPageFooter.COMPANY_URL} target="_blank" tabIndex='-1'>{NPageFooter.COMPANY}</a></span>);
-		}
-		return null;
-	},
-	render: function () {
-		return (
-			<footer className="footer">
-				<div className="container">
-					<p className='text-muted' style={{display: 'inline-block'}}>
-						<span>{NPageFooter.LEFT_TEXT}</span>
-					</p>
+(function (context, $, $pt) {
+	var NPageFooter = React.createClass({
+		statics: {
+			TECH_BASE: 'Parrot',
+			TECH_URL: 'https://oss.ebaotech.com/nest/parrot',
+			COMPANY: 'eBaoTech',
+			COMPANY_URL: 'https://www.ebaotech.com',
+			LEFT_TEXT: 'For best viewing, we recommend using the latest Chrome version.'
+		},
+		propTypes: {
+			name: React.PropTypes.string.isRequired
+		},
+		getDefaultProps: function () {
+			return {};
+		},
+		renderTech: function () {
+			if (NPageFooter.TECH_BASE != null && !NPageFooter.TECH_BASE.isBlank()) {
+				return (
+					<span>, on <a href={NPageFooter.TECH_URL} target='_blank' tabIndex='-1'>{NPageFooter.TECH_BASE}</a></span>);
+			}
+			return null;
+		},
+		renderCompany: function () {
+			if (NPageFooter.COMPANY != null && !NPageFooter.COMPANY.isBlank()) {
+				return (
+					<span>, by <a href={NPageFooter.COMPANY_URL} target="_blank" tabIndex='-1'>{NPageFooter.COMPANY}</a></span>);
+			}
+			return null;
+		},
+		render: function () {
+			return (
+				<footer className="footer">
+					<div className="container">
+						<p className='text-muted' style={{display: 'inline-block'}}>
+							<span>{NPageFooter.LEFT_TEXT}</span>
+						</p>
 
-					<p className="text-muted pull-right" style={{display: 'inline-block'}}>
-						{this.props.name}
-						{this.renderTech()}
-						{this.renderCompany()}.
-					</p>
-				</div>
-			</footer>);
-	}
-});
+						<p className="text-muted pull-right" style={{display: 'inline-block'}}>
+							{this.props.name}
+							{this.renderTech()}
+							{this.renderCompany()}.
+						</p>
+					</div>
+				</footer>);
+		}
+	});
+	context.NPageFooter = NPageFooter;
+}(this, jQuery, $pt));

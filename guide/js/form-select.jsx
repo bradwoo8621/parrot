@@ -160,7 +160,7 @@
 						variable: 'NSelect',
 						json: {
 							statics: {
-								PLACEHOLDER: 'Please Select...'
+								PLACEHOLDER: NSelect.PLACEHOLDER
 							}
 						}
 					})

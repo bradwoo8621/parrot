@@ -113,7 +113,7 @@
                     <a
                         href='javascript:void(0);'
                         onClick={this.onNodeClicked.bind(this, node, nodeId)}>
-                        <span className='node-text'>{node.text}</span>
+                        <span className='node-text'>{this.getNodeText(node)}</span>
                     </a>
                     {this.renderNodes(node, nodeId)}
                 </li>
@@ -292,6 +292,14 @@
                     folder: false,
                     leaf: true
                 }, NTree.FILE_ICON);
+            }
+        },
+        getNodeText: function(node) {
+            var render = this.getComponentOption('textRender');
+            if (render) {
+                return render.call(this, node);
+            } else {
+                return node.text;
             }
         },
         /**

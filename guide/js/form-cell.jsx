@@ -552,9 +552,9 @@
 						variable: 'NFormCell',
 						json: {
 							statics: {
-								REQUIRED_ICON: 'asterisk',
-								TOOLTIP_ICON: 'question-circle',
-								LABEL_WIDTH: 4
+								REQUIRED_ICON: NFormCell.REQUIRED_ICON,
+								TOOLTIP_ICON: NFormCell.TOOLTIP_ICON,
+								LABEL_WIDTH: NFormCell.LABEL_WIDTH
 							}
 						}
 					})
