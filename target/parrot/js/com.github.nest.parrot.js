@@ -1,4 +1,4 @@
-/** com.github.nest.parrot.V0.0.4 2015-10-29 */
+/** com.github.nest.parrot.V0.0.4 2015-10-30 */
 (function ($) {
 	var patches = {
 		console: function () {
@@ -4414,7 +4414,12 @@
 				}
 				// console.log("Input Offset: " + JSON.stringify(inputOffset));
 				// console.log("Widget Offset: " + JSON.stringify(widgetOffset));
-				widget.css({top: widgetOffset.top, left: widgetOffset.left, bottom: "auto", right: "auto", height: 'auto'});
+				var css = {top: widgetOffset.top, left: widgetOffset.left, bottom: "auto", right: "auto", height: 'auto'};
+				var modalForm = $(target).closest('.n-modal-form');
+				if (modalForm.length != 0) {
+					css["z-index"] = modalForm.css("z-index") + 1;
+				}
+				widget.css(css);
 				widget.detach().appendTo($('body'));
 				// console.log(widget.css("top") + "," + widget.css("left") + "," + widget.css("bottom") + "," + widget.css("right") + "," + widget.outerHeight(true));
 				tableBodyContainer.hide().show(0);
