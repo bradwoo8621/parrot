@@ -367,6 +367,62 @@
             comp: 'inline-editor'
         }
     }));
+    var dialog = NModalForm.createFormModal("Test");
+    dialog.show({
+        model: model,
+        layout: $pt.createFormLayout({
+            table: $.extend(true, {}, layoutTemplate, {
+                comp: {
+                    scrollY: 200,
+                    columns: [{
+                        title: 'Name',
+                        data: 'name',
+                        inline: 'text',
+                        width: 150
+                    }, {
+                        title: 'Code',
+                        data: 'code',
+                        width: 150,
+                        inline: {
+                            inlineType: 'cell',
+                            comp: {
+                                type: {type: $pt.ComponentConstants.Text, label: false}
+                            }
+                        }
+                    }, {
+                        data: 'gender',
+                        title: 'Gender',
+                        codes: Gender,
+                        inline: 'select',
+                        width: 150
+                    }, {
+                        data: 'object_age',
+                        title: 'Age',
+                        width: 150
+                    }, {
+                        title: 'Selected',
+                        data: 'selected',
+                        inline: 'check',
+                        width: 150
+                    }, {
+                        data: 'gender',
+                        title: 'Radio',
+                        codes: Gender,
+                        inline: 'radio',
+                        width: 300
+                    }, {
+                        data: 'birth',
+                        title: 'Date of Birth',
+                        inline: 'date',
+                        width: 200
+                    }]
+                },
+                css: {
+                    comp: 'inline-editor'
+                }
+            })
+        })
+    });
 
     var panel = (<div>
         <div className='row'>
