@@ -132,7 +132,7 @@
 			</p>
 
 			<p className="lead">
-				<a href="https://oss.ebaotech.com/nest/parrot" className="btn btn-outline-inverse btn-lg">Download
+				<a href="https://github.com/bradwoo8621/parrot" className="btn btn-outline-inverse btn-lg">Download
 					Parrot</a>
 			</p>
 
