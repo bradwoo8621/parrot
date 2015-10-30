@@ -382,6 +382,7 @@
 					pos: model.pos
 				});
 			} else {
+				console.warn("Properties [draggable, expanded, collapsible, pos] are not supported in parameters, use JSON parameter instead.");
 				this.setState({
 					visible: true,
 					model: model,
