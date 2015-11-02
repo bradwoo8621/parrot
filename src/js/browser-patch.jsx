@@ -82,6 +82,82 @@
 					return value.toFixed(fraction).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
 				};
 			}
+			if (String.prototype.padLeft === undefined) {
+				String.prototype.padLeft = function(nSize, ch){
+				    var len = 0;
+				    var s = this ? this : "";
+				    ch = ch ? ch : '0';//默认补0
+				    len = s.length;
+				    while(len<nSize){
+				        s = ch + s;
+				        len++;
+				    }
+				    return s;
+				};
+			}
+			if (String.prototype.padRight === undefined) {
+				String.prototype.padRight = function(nSize, ch){
+				    var len = 0 ;
+				    var s = this ? this : "";
+				    ch = ch ? ch : '0';//默认补0
+				    len = s.length;
+				    while(len<nSize){
+				        s = s + ch;
+				        len++;
+				    }
+				    return s;
+				};
+			}
+			if (String.prototype.movePointLeft === undefined) {
+				String.prototype.movePointLeft = function(scale){
+				    var s,s1,s2,ch,ps,sign;
+				    ch = ".";
+				    sign = '';
+				    s = this ? this : "";
+				    if(scale <= 0){
+				        return s;
+				    }
+				    ps = s.split('.');
+				    s1 = ps[0] ? ps[0] : "";
+				    s2 = ps[1] ? ps[1] : "";
+				    if(s1.slice(0, 1) == '-'){
+				        s1 = s1.slice(1);
+				        sign = '-';
+				    }
+				    if(s1.length <= scale){
+				        ch = "0.";
+				        s1 = s1.padLeft(scale);
+				    }
+				    return sign + s1.slice(0, -scale) + ch + s1.slice(-scale) + s2;
+				};
+			}
+			if (String.prototype.movePointRight === undefined) {
+				String.prototype.movePointRight = function(scale){
+				    var s,s1,s2,ch,ps,sign;
+				    ch = '.';
+				    s = this ? this : "";
+				    if(scale <= 0){
+				        return s;
+				    }
+				    ps = s.split('.');
+				    s1 = ps[0] ? ps[0] : "";
+				    s2 = ps[1] ? ps[1] : "";
+				    if(s2.length <= scale) {
+				        ch = '';
+				        s2 = s2.padRight(scale);
+				    }
+					if(s1.slice(0, 1) == '-'){
+						s1 = s1.slice(1);
+						sign = '-';
+					} else {
+						sign = '';
+					}
+					if (s1 == 0) {
+						s1 = '';
+					}
+				    return sign + s1 + s2.slice(0, scale) + ch + s2.slice(scale, s2.length);
+				};
+			}
 		},
 		number: function () {
 			if (Number.prototype.currencyFormat === undefined) {

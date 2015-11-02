@@ -184,7 +184,31 @@
         },
         pos: {row: 2, col: 1}
     });
+    var numberText = $pt.createCellLayout('numeric', {
+        label: 'Number Text',
+        comp: {
+            format: NText.NUMBER_FORMAT,
+            convertor: NText.PERCENTAGE
+        },
+        pos: {row: 1, col: 1}
+    });
+    var button = $pt.createCellLayout('button', {
+        label: 'Numeric Value',
+        comp: {
+            click: function(model) {
+                var value = model.get('numeric');
+                console.log('numeric value: [' + value + ']');
+                if (value) {
+                    model.set('numeric', value * 2);
+                    console.log(model.get('numeric'));
+                } else {
+                    model.set('numeric', '1234567890.001');
+                }
+            }
+        }
+    });
 
+    model.set('numeric', -0.65);
     var panel = (<div className='row'>
         <div className='col-md-3 col-lg-3 col-sm-3'>
             <span>Plain Text</span>
@@ -193,6 +217,9 @@
             <NText model={model} layout={placeholder}/>
             <span>Password</span>
             <NText model={model} layout={password}/>
+            <span>Numeric</span>
+            <NText model={model} layout={numberText}/>
+            <NFormButton model={model} layout={button}/>
             <span>Custom CSS</span>
             <NText model={model} layout={css}/>
             <span>Left Add-on Text</span>
