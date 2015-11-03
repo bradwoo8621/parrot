@@ -32,8 +32,8 @@
 					{
 						id: 'form-dialog-show',
 						title: '#show',
-						pattern: '#show()',
-						desc: <span>Show dialog. Options as below,<br/>
+						pattern: '#show(options)',
+						desc: <span>Show dialog. Parameter is a JSON object, and properties as below,<br/>
 						1. <code>model</code>: Model Interface. data model.<br/>
 						2. <code>layout</code>: Form Layout. create by <code>$pt.createFormLayout()</code>.<br/>
 						3. <code>buttons</code>: JSON. properties as below,

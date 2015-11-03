@@ -216,6 +216,55 @@
 				};
 			}
 		};
+		var format = {
+			text: function () {
+				var layoutTemplate = {
+					comp: {
+						format: NText.NUMBER_FORMAT
+					}
+				};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'value',
+					template: layoutTemplate
+				});
+				return {
+					id: 'text-format-text',
+					title: 'Text Format',
+					desc: <span>Text in input can be formatted via define <code>format</code>.
+					It is a function, component calls function to get the formatted text.<br/>
+					Component show original value when focus gained, and show formatted value when focus lost.</span>,
+					xml: <NText model={model} layout={$pt.createCellLayout('value', layoutTemplate)}/>,
+					code: [modelCode, layoutCode, compCode],
+					index: 10
+				};
+			},
+			convertor: function () {
+				var layoutTemplate = {
+					comp: {
+						convertor: NText.PERCENTAGE
+					}
+				};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'value',
+					template: layoutTemplate
+				});
+				return {
+					id: 'text-format-convertor',
+					title: 'Convertor',
+					desc: <span>Value in model can be converted when display in text input.<br/>
+					Define <code>convertor</code> to convert between value in model and display text in input.<br/>
+					<code>convertor</code> is a JSON object with two properties: <code>model</code> and <code>view</code>.
+					Both of properties need to be defined as a function, component calls function to convert value.<br/>
+					<code>NText.PERCENTAGE</code> is pre-defined to convert percentage value.
+					</span>,
+					xml: <NText model={model} layout={$pt.createCellLayout('value', layoutTemplate)}/>,
+					code: [modelCode, layoutCode, compCode],
+					index: 20
+				};
+			}
+		};
 		var all = {
 			defaultOptions: function () {
 				var layoutCode = $demo.convertCellLayoutCreatorToString({
@@ -280,6 +329,15 @@
 					desc: 'Icon, text can be added as right add-on on text.',
 					index: 50,
 					children: $demo.convertToExampleList(rightAddon)
+				};
+			},
+			format: function() {
+				return {
+					id: 'text-format',
+					title: 'Format',
+					desc: 'Text Format.',
+					index: 55,
+					children: $demo.convertToExampleList(format)
 				};
 			},
 			event: function () {

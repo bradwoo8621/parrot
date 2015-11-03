@@ -1,4 +1,4 @@
-/** com.github.nest.parrot.V0.0.4 2015-10-30 */
+/** com.github.nest.parrot.V0.0.4 2015-11-03 */
 (function ($) {
 	var patches = {
 		console: function () {
@@ -81,6 +81,87 @@
 					fraction = fraction ? fraction : 0;
 					var value = this * 1;
 					return value.toFixed(fraction).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+				};
+			}
+			if (String.prototype.padLeft === undefined) {
+				String.prototype.padLeft = function(nSize, ch){
+				    var len = 0;
+				    var s = this ? this : "";
+				    ch = ch ? ch : '0';//默认补0
+				    len = s.length;
+				    while(len<nSize){
+				        s = ch + s;
+				        len++;
+				    }
+				    return s;
+				};
+			}
+			if (String.prototype.padRight === undefined) {
+				String.prototype.padRight = function(nSize, ch){
+				    var len = 0 ;
+				    var s = this ? this : "";
+				    ch = ch ? ch : '0';//默认补0
+				    len = s.length;
+				    while(len<nSize){
+				        s = s + ch;
+				        len++;
+				    }
+				    return s;
+				};
+			}
+			if (String.prototype.movePointLeft === undefined) {
+				String.prototype.movePointLeft = function(scale){
+				    var s,s1,s2,ch,ps,sign;
+				    ch = ".";
+				    sign = '';
+				    s = this ? this : "";
+				    if(scale <= 0){
+				        return s;
+				    }
+				    ps = s.split('.');
+				    s1 = ps[0] ? ps[0] : "";
+				    s2 = ps[1] ? ps[1] : "";
+				    if(s1.slice(0, 1) == '-'){
+				        s1 = s1.slice(1);
+				        sign = '-';
+				    }
+				    if(s1.length <= scale){
+				        ch = "0.";
+				        s1 = s1.padLeft(scale);
+				    }
+				    return sign + s1.slice(0, -scale) + ch + s1.slice(-scale) + s2;
+				};
+			}
+			if (String.prototype.movePointRight === undefined) {
+				String.prototype.movePointRight = function(scale){
+				    var s,s1,s2,ch,ps,sign;
+				    ch = '.';
+				    s = this ? this : "";
+				    if(scale <= 0){
+				        return s;
+				    }
+				    ps = s.split('.');
+				    s1 = ps[0] ? ps[0] : "";
+				    s2 = ps[1] ? ps[1] : "";
+				    if(s2.length <= scale) {
+				        ch = '';
+				        s2 = s2.padRight(scale);
+				    }
+					if(s1.slice(0, 1) == '-'){
+						s1 = s1.slice(1);
+						sign = '-';
+					} else {
+						sign = '';
+					}
+					if (s1 == 0) {
+						s1 = '';
+					}
+					// console.log('Return[sign=' + sign + ', s1=' + s1 + ', s2-1=' + s2.slice(0, scale) + ', ch=' + ch + ', s2-2=' + s2.slice(scale, s2.length) + ']');
+					var integral = (s1 + s2.slice(0, scale)).replace(/^0+/, '');
+					if (integral.isEmpty()) {
+						integral = '0';
+					}
+				    return sign + integral + ch + s2.slice(scale, s2.length);
 				};
 			}
 		},
@@ -6680,7 +6761,10 @@
 		},
 		getInitialState: function () {
 			return {
-				visible: false
+				visible: false,
+				expanded: true,
+				collapsible: false,
+				draggable: true
 			};
 		},
 		/**
@@ -7017,6 +7101,7 @@
 					pos: model.pos
 				});
 			} else {
+				console.warn("Properties [draggable, expanded, collapsible, pos] are not supported in parameters, use JSON parameter instead.");
 				this.setState({
 					visible: true,
 					model: model,
@@ -7024,7 +7109,10 @@
 					buttons: buttons,
 					direction: direction,
 					footer: footer,
-					title: title
+					title: title,
+					draggable: false,
+					expanded: true,
+					collapsible: false
 				});
 			}
 		}
@@ -7227,9 +7315,9 @@
 	var NPageFooter = React.createClass({displayName: "NPageFooter",
 		statics: {
 			TECH_BASE: 'Parrot',
-			TECH_URL: 'https://oss.ebaotech.com/nest/parrot',
-			COMPANY: 'eBaoTech',
-			COMPANY_URL: 'https://www.ebaotech.com',
+			TECH_URL: 'https://github.com/bradwoo8621/parrot',
+			COMPANY: 'NEST',
+			COMPANY_URL: 'https://github.com/bradwoo8621/nest',
 			LEFT_TEXT: 'For best viewing, we recommend using the latest Chrome version.'
 		},
 		propTypes: {
@@ -11505,6 +11593,26 @@
  */
 (function (context, $, $pt) {
 	var NText = React.createClass($pt.defineCellComponent({
+		statics: {
+			NUMBER_FORMAT: function(value) {
+				var parts = (value + '').split('.');
+				var integral = parts[0];
+				var fraction = parts.length > 1 ? '.' + parts[1] : '';
+				var rgx = /(\d+)(\d{3})/;
+				while (rgx.test(integral)) {
+					integral = integral.replace(rgx, '$1' + ',' + '$2');
+				}
+				return integral + fraction;
+			},
+			PERCENTAGE: {
+				model: function(value) {
+					return isNaN(value) ? value : ((value + '').movePointLeft(2));
+				},
+				view: function(value) {
+					return isNaN(value) ? value : ((value + '').movePointRight(2));
+				}
+			}
+		},
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
@@ -11535,8 +11643,9 @@
 		 * @param prevState
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
-			if (this.getComponent().val() != this.getValueFromModel()) {
-				this.getComponent().val(this.getValueFromModel());
+			var formattedValue = this.getFormattedValue(this.getValueFromModel());
+			if (this.getComponent().val() != formattedValue) {
+				this.getComponent().val(formattedValue);
 			}
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
@@ -11548,7 +11657,7 @@
 		 */
 		componentDidMount: function () {
 			// set model value to component
-			this.getComponent().val(this.getValueFromModel());
+			this.getComponent().val(this.getFormattedValue(this.getValueFromModel()));
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
@@ -11576,8 +11685,11 @@
 		 */
 		renderText: function () {
 			// TODO needs to handle the control keys
+			var css = {
+				'form-control': true
+			};
 			return (React.createElement("input", {type: this.getComponentOption('pwd', false) ? 'password' : 'text', 
-			               className: "form-control", 
+			               className: $pt.LayoutHelper.classSet(css), 
 			               disabled: !this.isEnabled(), 
 			               placeholder: this.getComponentOption('placeholder'), 
 
@@ -11657,22 +11769,37 @@
 		onComponentFocused: function () {
 			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
 			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+
+			var value = this.getValueFromModel();
+			if (value == this.getComponent().val()) {
+				return;
+			}
+			this.getComponent().val(value);
+			// console.log("focused: " + this.getValueFromModel());
 		},
 		onComponentBlurred: function (evt) {
 			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
 			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 
-			if (this.state.componentChanged) {
-				clearTimeout(this.state.componentChanged);
+			// if (this.state.componentChanged) {
+			// 	clearTimeout(this.state.componentChanged);
+			// }
+			var value = evt.target.value;
+			if (value && !value.isBlank()) {
+				var formattedValue = this.getFormattedValue(value);
+				if (formattedValue != value) {
+					// console.debug('Change component display formatted value when onBlur.');
+					this.getComponent().val(formattedValue);
+				}
 			}
-			this.setValueToModel(evt.target.value);
+			this.setValueToModel(value);
 		},
 		/**
 		 * on component change
 		 * @param evt
 		 */
 		onComponentChanged: function (evt) {
-			console.debug('Text component changed[modelValue=' + this.getValueFromModel() + ', compValue=' + evt.target.value + '].');
+			// console.debug('Text component changed[modelValue=' + this.getValueFromModel() + ', compValue=' + evt.target.value + '].');
 			this.setValueToModel(evt.target.value);
 		},
 		/**
@@ -11680,12 +11807,15 @@
 		 * @param evt
 		 */
 		onModelChanged: function (evt) {
-			var value = evt.new;
-			if (value == this.getComponent().val()) {
+			var formattedValue = this.getValueFromModel();
+			if (!$(React.findDOMNode(this.refs.focusLine)).hasClass('focus')) {
+				formattedValue = this.getFormattedValue(formattedValue);
+			}
+			if (formattedValue == this.getComponent().val()) {
 				return;
 			}
-			console.debug('Text model changed[modelValue=' + evt.new + ', compValue=' + this.getComponent().val() + '].');
-			this.getComponent().val(evt.new);
+			// console.debug('Text model changed[modelValue=' + evt.new + ', compValue=' + this.getComponent().val() + '].');
+			this.getComponent().val(formattedValue);
 		},
 		onKeyUp: function (evt) {
 			var monitor = this.getEventMonitor('keyUp');
@@ -11717,6 +11847,49 @@
 		 */
 		isAddonClickable: function (userDefinedClickFunc) {
 			return this.isEnabled() && userDefinedClickFunc;
+		},
+		getTextFormat: function() {
+			return this.getComponentOption('format');
+		},
+		getFormattedValue: function(value) {
+			if (value) {
+				if (typeof value === 'number') {
+					value = value + '';
+				}
+				if (!value.isBlank()) {
+					var format = this.getTextFormat();
+					if (format) {
+						var formatValue = value;
+						if (format == 'currency') {
+							formatValue = value.currencyFormat();
+						} else {
+							formatValue = format.call(this, value);
+						}
+						return formatValue;
+					}
+				}
+			}
+			return value;
+		},
+		getTextConvertor: function() {
+			return this.getComponentOption('convertor');
+		},
+		getValueFromModel: function() {
+			var value = this.getModel().get(this.getDataId());
+			var convertor = this.getTextConvertor();
+			if (convertor) {
+				return convertor.view.call(this, value);
+			} else {
+				return value;
+			}
+		},
+		setValueToModel: function (value) {
+			var convertor = this.getTextConvertor();
+			if (convertor) {
+				this.getModel().set(this.getDataId(), convertor.model.call(this, value));
+			} else {
+				this.getModel().set(this.getDataId(), value);
+			}
 		}
 	}));
 	context.NText = NText;
