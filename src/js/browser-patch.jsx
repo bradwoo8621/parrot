@@ -155,7 +155,12 @@
 					if (s1 == 0) {
 						s1 = '';
 					}
-				    return sign + s1 + s2.slice(0, scale) + ch + s2.slice(scale, s2.length);
+					// console.log('Return[sign=' + sign + ', s1=' + s1 + ', s2-1=' + s2.slice(0, scale) + ', ch=' + ch + ', s2-2=' + s2.slice(scale, s2.length) + ']');
+					var integral = (s1 + s2.slice(0, scale)).replace(/^0+/, '');
+					if (integral.isEmpty()) {
+						integral = '0';
+					}
+				    return sign + integral + ch + s2.slice(scale, s2.length);
 				};
 			}
 		},
