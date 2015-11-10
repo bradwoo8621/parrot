@@ -92,10 +92,10 @@
 					disabled: !this.isEnabled(),
 					'check-label-left': labelInLeft
 				};
-				return <span className={$pt.LayoutHelper.classSet(css)}
+				return (<span className={$pt.LayoutHelper.classSet(css)}
 				             onClick={this.isEnabled() ? this.onButtonClicked : null}>
-                {this.getLayout().getLabel()}
-            </span>;
+                	{this.getLayout().getLabel()}
+            	</span>);
 			}
 			return null;
 		},

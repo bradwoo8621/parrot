@@ -92,10 +92,10 @@
 				disabled: !this.isEnabled(),
 				'radio-label-left': labelInLeft
 			};
-			return <span className={$pt.LayoutHelper.classSet(css)}
+			return (<span className={$pt.LayoutHelper.classSet(css)}
 			             onClick={this.isEnabled() ? this.onButtonClicked.bind(this, option) : null}>
-            {option.text}
-        </span>;
+            	{option.text}
+        	</span>);
 		},
 		/**
 		 * render radio button, using font awesome instead

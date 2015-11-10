@@ -57,6 +57,7 @@
 		TextArea: 'textarea',
 		Select: "select",
 		Check: "check",
+		ArrayCheck: 'acheck',
 		Toggle: 'toggle',
 		Radio: "radio",
 		Table: {type: "table", label: false, popover: false},

@@ -17,6 +17,8 @@ Parrot is part of [NEST](https://github.com/bradwoo8621/nest), and separate repo
 * NText  
   Format support.  
   Value converter support.  
+* NArrayCheck  
+  Check box group for array values.
 
 # License
 MIT

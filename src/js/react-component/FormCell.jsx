@@ -71,6 +71,9 @@
 			__check: function (model, layout) {
 				return <NCheck model={model} layout={layout} ref={layout.getId()}/>;
 			},
+			__acheck: function(model, layout) {
+				return <NArrayCheck model={model} layout={layout} ref={layout.getId()} />;
+			},
 			/**
 			 * render toggle button
 			 * @returns {XML}

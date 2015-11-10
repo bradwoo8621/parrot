@@ -2215,6 +2215,14 @@ div.n-file .file-input div.btn.btn-file {
 .n-tree div.n-checkbox span.check-container {
   top: 2px;
 }
+div.n-array-check div.n-checkbox {
+  display: inline-block;
+  margin-right: 12px;
+}
+div.n-array-check.vertical div.n-checkbox {
+  display: block;
+  margin-right: 0;
+}
 div.has-error > span,
 div.has-error.horizontal-label > div.row > div:first-child > span {
   color: #f44336;
