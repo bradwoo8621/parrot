@@ -50,10 +50,17 @@
                     model: model,
                     layout: layout,
                     draggable: true,
+                    modal: true,
                     pos: {
                         right: 20,
                         left: 30,
                         bottom: 0
+                    },
+                    buttons: {
+                        cancel: function(model, hide) {
+                            console.log(model);
+                            hide.call(this);
+                        }
                     }
                 });
             }

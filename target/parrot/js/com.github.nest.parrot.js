@@ -6800,7 +6800,10 @@
 			dialog.css({
 				height: 0
 			});
-			top.find('.modal-backdrop').hide();
+
+			if (!this.state.modal) {
+				top.find('.modal-backdrop').hide();
+			}
 
 			// the initial position
 			if (this.state.pos) {
@@ -6943,9 +6946,13 @@
 		 * on cancel clicked
 		 */
 		onCancelClicked: function () {
-			NConfirm.getConfirmModal().show(NModalForm.CANCEL_CONFIRM_TITLE,
-				NModalForm.CANCEL_CONFIRM_MESSAGE,
-				this.hide.bind(this));
+			if (this.state.buttons && (typeof this.state.buttons.cancel === 'function')) {
+				this.hide();
+			} else {
+				NConfirm.getConfirmModal().show(NModalForm.CANCEL_CONFIRM_TITLE,
+					NModalForm.CANCEL_CONFIRM_MESSAGE,
+					this.hide.bind(this));
+			}
 		},
 		/**
 		 * get model
@@ -7034,7 +7041,7 @@
 		 * @returns boolean
 		 */
 		isDraggable: function() {
-			return this.state.draggable;
+			return this.state.draggable || !this.state.modal;
 		},
 		/**
 		 * is collapsible
@@ -7065,12 +7072,23 @@
 		 */
 		hide: function () {
 			var model = this.state.model;
-			this.setState({
-				visible: false,
-				model: null,
-				layout: null,
-				buttons: null
-			});
+			if (this.state.buttons && (typeof this.state.buttons.cancel === 'function')) {
+				this.state.buttons.cancel.call(this, model, function() {
+					this.setState({
+						visible: false,
+						model: null,
+						layout: null,
+						buttons: null
+					});
+				}.bind(this));
+			} else {
+				this.setState({
+					visible: false,
+					model: null,
+					layout: null,
+					buttons: null
+				});
+			}
 			return model;
 		},
 		/**
@@ -7096,6 +7114,7 @@
 					footer: model.footer,
 					title: model.title,
 					draggable: model.draggable,
+					modal: model.modal == null ? (model.draggable ? false : true) : true,
 					collapsible: model.collapsible,
 					expanded: model.expanded == null ? true : model.expanded,
 					pos: model.pos
@@ -7111,6 +7130,7 @@
 					footer: footer,
 					title: title,
 					draggable: false,
+					modal: true,
 					expanded: true,
 					collapsible: false
 				});
