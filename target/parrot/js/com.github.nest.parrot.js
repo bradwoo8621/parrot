@@ -1,4 +1,4 @@
-/** com.github.nest.parrot.V0.0.4 2015-11-03 */
+/** com.github.nest.parrot.V0.0.4 2015-11-10 */
 (function ($) {
 	var patches = {
 		console: function () {
@@ -12280,6 +12280,30 @@
     		// add post change listener to handle model change
     		this.addPostChangeListener(this.__forceUpdate);
     	},
+        componentWillMount: function() {
+            var expandLevel = this.getComponentOption('expandLevel');
+            if (expandLevel == null) {
+                // default expand root
+                expandLevel = 0;
+            }
+            if (expandLevel === 'all') {
+                expandLevel = 9999;
+            }
+            var _this = this;
+            var expand = function(parentId, node, level) {
+                if (level <= expandLevel) {
+                    var nodeId = _this.getNodeId(parentId, node);
+                    _this.state.activeNodes[nodeId] = node;
+                    if (node.children) {
+                        node.children.forEach(function(child) {
+                            expand(nodeId, child, level + 1);
+                        });
+                    }
+                }
+            };
+            this.state.root.children = this.getValueFromModel();
+            expand(null, this.state.root, 0);
+        },
     	/**
     	 * did mount
     	 */
@@ -12369,17 +12393,14 @@
             }
         },
         renderRoot: function() {
-            var root = this.state.root;
-            root.children = this.getValueFromModel();
             return (React.createElement("ul", {className: "nav"}, 
-                this.renderNode(null, root)
+                this.renderNode(null, this.state.root)
             ));
         },
         renderTopLevel: function() {
-            if (this.isRootPaint()) {
-                return this.renderRoot();
-            }
-            return this.renderNodes({children: this.getValueFromModel()});
+            var root = this.state.root;
+            root.children = this.getValueFromModel();
+            return this.isRootPaint() ? this.renderRoot() : this.renderNodes(root);
         },
         render: function() {
             return (

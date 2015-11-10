@@ -31,15 +31,27 @@
 			type: $pt.ComponentConstants.Tree,
 			root: 'Hello',
 			check: 'selected',
-			hierarchyCheck: true
+			hierarchyCheck: true,
+			expandLevel: 1
 		},
 		pos: {row: 1, col: 1}
 	});
 
+	var button = $pt.createCellLayout('button', {
+		label: 'Click',
+		comp: {
+			click: function(model) {
+				model.set('nodes', model.getOriginalModel().nodes.slice(0));
+			}
+		}
+	});
 	var panel = (<div className='row'>
 		<div className='col-md-3 col-lg-3 col-sm-3'>
 			<span>Tree</span>
 			<NTree model={model} layout={tree}/>
+		</div>
+		<div className='col-md-3 col-lg-3 col-sm-3'>
+			<NFormButton model={model} layout={button} />
 		</div>
 	</div>);
 	React.render(panel, document.getElementById('main'));
