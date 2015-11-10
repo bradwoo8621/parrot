@@ -302,6 +302,7 @@
 		TextArea: 'textarea',
 		Select: "select",
 		Check: "check",
+		ArrayCheck: 'acheck',
 		Toggle: 'toggle',
 		Radio: "radio",
 		Table: {type: "table", label: false, popover: false},
@@ -3339,6 +3340,137 @@
 	$pt.LayoutHelper = new LayoutHelper();
 })(this, jQuery);
 
+(function (context, $, $pt) {
+	var NArrayCheck = React.createClass($pt.defineCellComponent({
+		statics: {
+		},
+		propTypes: {
+			// model
+			model: React.PropTypes.object,
+			// CellLayout
+			layout: React.PropTypes.object
+		},
+		getDefaultProps: function () {
+			return {
+				defaultOptions: {
+					direction: 'horizontal',
+					labelAttached: 'right'
+				}
+			};
+		},
+		getInitialState: function () {
+			return {};
+		},
+		/**
+		 * will update
+		 * @param nextProps
+		 */
+		componentWillUpdate: function (nextProps) {
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.onModelChanged);
+			this.removeEnableDependencyMonitor();
+		},
+		/**
+		 * did update
+		 * @param prevProps
+		 * @param prevState
+		 */
+		componentDidUpdate: function (prevProps, prevState) {
+			// add post change listener to handle model change
+			this.addPostChangeListener(this.onModelChanged);
+			this.addEnableDependencyMonitor();
+		},
+		/**
+		 * did mount
+		 */
+		componentDidMount: function () {
+			// add post change listener to handle model change
+			this.addPostChangeListener(this.onModelChanged);
+			this.addEnableDependencyMonitor();
+		},
+		/**
+		 * will unmount
+		 */
+		componentWillUnmount: function () {
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.onModelChanged);
+			this.removeEnableDependencyMonitor();
+		},
+		renderItem: function(enabled, item) {
+			var model = $pt.createModel({
+				id: item.id,
+				checked: this.isCodeChecked(item)
+			});
+			var layout = $pt.createCellLayout('checked', {
+				label: item.text,
+				comp: {
+					labelAttached: this.getComponentOption('labelAttached'),
+					enabled: enabled
+				}
+			});
+			model.addPostChangeListener('checked', this.onCodeItemCheckedChanged.bind(this, item));
+			return React.createElement(NCheck, {model: model, layout: layout});
+		},
+		render: function() {
+			var enabled = this.isEnabled();
+			var css = {
+				'n-disabled': !enabled,
+				vertical: this.getComponentOption('direction') === 'vertical'
+			};
+			css[this.getComponentCSS('n-array-check')] = true;
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
+				this.getCodeTable().list().map(this.renderItem.bind(this, enabled))
+			));
+		},
+		onModelChanged: function() {
+			this.forceUpdate();
+		},
+		onCodeItemCheckedChanged: function(codeTableItem, evt) {
+			if (evt.new) {
+				// checked
+				this.onCodeItemChecked(codeTableItem);
+			} else {
+				// unchecked
+				this.onCodeTableUnchecked(codeTableItem);
+			}
+		},
+		onCodeTableUnchecked: function(codeTableItem) {
+			var values = this.getValueFromModel();
+			if (values == null) {
+				return;
+			}
+			this.setValueToModel(values.filter(function(value) {
+				return value != codeTableItem.id;
+			}).slice(0));
+		},
+		onCodeItemChecked: function(codeTableItem) {
+			// checked
+			var values = this.getValueFromModel();
+			if (values == null) {
+				values = [codeTableItem.id];
+			} else {
+				var index = values.findIndex(function(value) {
+					return value == codeTableItem.id;
+				});
+				if (index == -1) {
+					values.push(codeTableItem.id);
+				}
+			}
+			this.setValueToModel(values.slice(0));
+		},
+		getCodeTable: function() {
+			return this.getComponentOption('data');
+		},
+		isCodeChecked: function(codeTableItem) {
+			var values = this.getValueFromModel();
+			return values != null && values.some(function(value) {
+				return value == codeTableItem.id;
+			});
+		}
+	}));
+	context.NArrayCheck = NArrayCheck;
+}(this, jQuery, $pt));
+
 /**
  * Array Panel, for array property
  * TODO add & remove are not supported yet
@@ -4187,10 +4319,10 @@
 					disabled: !this.isEnabled(),
 					'check-label-left': labelInLeft
 				};
-				return React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
+				return (React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
 				             onClick: this.isEnabled() ? this.onButtonClicked : null}, 
-                this.getLayout().getLabel()
-            );
+                	this.getLayout().getLabel()
+            	));
 			}
 			return null;
 		},
@@ -5608,6 +5740,9 @@
 			 */
 			__check: function (model, layout) {
 				return React.createElement(NCheck, {model: model, layout: layout, ref: layout.getId()});
+			},
+			__acheck: function(model, layout) {
+				return React.createElement(NArrayCheck, {model: model, layout: layout, ref: layout.getId()});
 			},
 			/**
 			 * render toggle button
@@ -8549,10 +8684,10 @@
 				disabled: !this.isEnabled(),
 				'radio-label-left': labelInLeft
 			};
-			return React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
+			return (React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
 			             onClick: this.isEnabled() ? this.onButtonClicked.bind(this, option) : null}, 
-            option.text
-        );
+            	option.text
+        	));
 		},
 		/**
 		 * render radio button, using font awesome instead

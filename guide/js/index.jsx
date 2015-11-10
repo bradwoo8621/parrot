@@ -58,6 +58,7 @@
 				{text: 'Button', func: $demo.renderer.formButton},
 				{divider: true},
 				{text: 'CheckBox', func: $demo.renderer.formCheck},
+				{text: 'Array CheckBox', func: $demo.renderer.formArrayCheck},
 				{text: 'Radio Button', func: $demo.renderer.formRadio},
 				{text: 'Toggle', func: $demo.renderer.formToggle},
 				{divider: true},
