@@ -163,6 +163,25 @@
 					code: [modelCode, layoutCode, compCode],
 					index: 50
 				};
+			},
+			expand: function () {
+				var layoutTemplate = {comp: {inactiveSlibing: false, expandLevel: 1}};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'nodes',
+					template: layoutTemplate
+				});
+				return {
+					id: 'tree-style-expand',
+					title: 'Expand',
+					desc: <span>Set initial expanded level via <code>expandLevel</code>, usually used with <code>inactiveSlibing: false</code>.<br/>
+					Level is a number from zero, zero means expanding root node (whether root is painted or not).
+					Default expands root node, set <code>expandLevel: -1</code> if want to collapse the root node.
+					Set <code>expandLevel: 'all'</code> to expand all levels.</span>,
+					xml: <NTree model={model} layout={$pt.createCellLayout('nodes', layoutTemplate)}/>,
+					code: [modelCode, layoutCode, compCode],
+					index: 60
+				};
 			}
 		};
 

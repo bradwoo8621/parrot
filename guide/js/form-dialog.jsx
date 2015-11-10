@@ -36,8 +36,10 @@
 						desc: <span>Show dialog. Parameter is a JSON object, and properties as below,<br/>
 						1. <code>model</code>: Model Interface. data model.<br/>
 						2. <code>layout</code>: Form Layout. create by <code>$pt.createFormLayout()</code>.<br/>
-						3. <code>buttons</code>: JSON. properties as below,
-						3.a <code>cancel</code>: boolean. false to hide cancel button.<br/>
+						3. <code>buttons</code>: JSON. properties as below,<br/>
+						3.a <code>cancel</code>: boolean. false to hide cancel button.
+						or set as a function to replace the default behavior, two parameters <code>model</code> and <code>hide</code>(it is a callback function) are passed to this function.
+						do customized logic and use <code>hide()</code> to close dialog if you want.<br/>
 						3.b <code>validate</code>: boolean. false to hide validate button.<br/>
 						3.c <code>reset</code>: boolean. false to hide reset button.<br/>
 						3.d <code>save</code>: function. invoke when save clicked, parameter is data model. Hide save button if not defined.<br/>
@@ -50,7 +52,8 @@
 						7. <code>draggable</code>: boolean. true to let the dialog floating and draggable.<br/>
 						8. <code>collapsible</code>: boolean. true to let the dialog collapsible.<br/>
 						9. <code>expanded</code>: boolean. false to collapse the dialog body and footer when first show.<br/>
-						10. <code>pos</code>: JSON. has <code>top</code>, <code>right</code>, <code>bottom</code> and <code>left</code>, all are numeric.
+						10. <code>pos</code>: JSON. has <code>top</code>, <code>right</code>, <code>bottom</code> and <code>left</code>, all are numeric.<br/>
+						11. <code>modal</code>: boolean. true to let the dialog view in modal mode. if <code>draggable</code> is true, default is false; otherwise default is true.<br/>
 						</span>
 					}
 				]
