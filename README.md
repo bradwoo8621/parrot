@@ -9,5 +9,14 @@ Parrot is part of [NEST](https://github.com/bradwoo8621/nest), and separate repo
 # Development Guide
 [Guide](http://bradwoo8621.github.io/parrot/guide/index.html)
 
+# Release Log
+## 0.0.5
+* NModalFrom  
+  Show as floating and modal mode.  
+  Accept function for `buttons.cancel`.  
+* NText  
+  Format support.  
+  Value converter support.  
+
 # License
 MIT
