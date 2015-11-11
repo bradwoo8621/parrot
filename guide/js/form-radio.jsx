@@ -71,8 +71,8 @@
 					template: layoutTemplate
 				});
 				return {
-					id: 'radio-label',
-					title: 'Label',
+					id: 'radio-vertical',
+					title: 'Vertical',
 					desc: 'Alignment of radio buttons can be vertical.',
 					xml: <NRadio model={model} layout={$pt.createCellLayout('value', layoutTemplate)}/>,
 					code: [codesCode, modelCode, layoutCode, compCode],

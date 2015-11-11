@@ -659,6 +659,13 @@
 			return this;
 		},
 		/**
+		 * apply current data to base model.
+		 */
+		applyCurrentToBase: function() {
+			this.__base = $.extend(true, {}, this.__model);
+			return this;
+		},
+		/**
 		 * get validator
 		 * @returns {ModelValidator}
 		 */

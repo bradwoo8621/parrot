@@ -1,4 +1,4 @@
-/** com.github.nest.parrot.V0.0.4 2015-11-10 */
+/** com.github.nest.parrot.V0.0.4 2015-11-11 */
 (function ($) {
 	var patches = {
 		console: function () {
@@ -1532,6 +1532,13 @@
 			return this;
 		},
 		/**
+		 * apply current data to base model.
+		 */
+		applyCurrentToBase: function() {
+			this.__base = $.extend(true, {}, this.__model);
+			return this;
+		},
+		/**
 		 * get validator
 		 * @returns {ModelValidator}
 		 */
@@ -1965,6 +1972,7 @@
 		return new ModelClass(inputModel, validator);
 	};
 })(this, jQuery);
+
 (function (context, $) {
 	var $pt = context.$pt;
 	if ($pt == null) {

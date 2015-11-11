@@ -187,6 +187,11 @@
 								pattern: '#mergeCurrentModel(newModel: JSON) : ModelInterface',
 								desc: 'Merge data from give model to current model. Deep copy by call jQuery.'
 							}, {
+								id: 'data-applyCurrentToBase',
+								title: '#applyCurrentToBase',
+								pattern: '#applyCurrentToBase() : ModelInterface',
+								desc: 'Apply current model data to base model.'
+							}, {
 								id: 'data-name',
 								title: '#name',
 								pattern: '#name(name: string) : ModelInterface|string',
