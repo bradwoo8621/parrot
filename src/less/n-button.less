@@ -65,6 +65,18 @@ div.n-button {
 	&.n-disabled {
 		cursor: @disabled-cursor;
 	}
+	a.btn.dropdown-toggle {
+		&:focus:before {
+			-webkit-animation: none;
+			animation: none;
+			-o-animation: none;
+		}
+		&.effect:focus:before {
+			-webkit-animation: none;
+			animation: none;
+			-o-animation: none;
+		}
+	}
 }
 
 @keyframes buttonRippleOn {
@@ -96,12 +108,19 @@ div.n-button {
 		top: -10%;
 		left: -10%;
 	}
-	100% {
+	99% {
 		opacity: 0;
 		height: 150%;
 		width: 150%;
 		top: -25%;
 		left: -25%;
+	}
+	100% {
+		opacity: 0;
+		height: 0;
+		width: 0;
+		top: 35%;
+		left: 35%;
 	}
 }
 
@@ -134,11 +153,18 @@ div.n-button {
 		top: -10%;
 		left: -10%;
 	}
-	100% {
+	99% {
 		opacity: 0;
 		height: 150%;
 		width: 150%;
 		top: -25%;
 		left: -25%;
+	}
+	100% {
+		opacity: 0;
+		height: 0;
+		width: 0;
+		top: 35%;
+		left: 35%;
 	}
 }

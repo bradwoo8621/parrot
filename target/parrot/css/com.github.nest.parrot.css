@@ -492,6 +492,9 @@ input[type=tel].form-control[disabled] {
 .dropdown-submenu:hover > a:after {
   border-left-color: #ffffff;
 }
+.dropdown-menu .divider {
+  margin: 5px 0;
+}
 .bootstrap-datetimepicker-widget a[data-action] {
   -webkit-box-shadow: none;
   box-shadow: none;
@@ -1700,6 +1703,16 @@ div.n-button a.btn.btn-default:focus {
 div.n-button.n-disabled {
   cursor: not-allowed;
 }
+div.n-button a.btn.dropdown-toggle:focus:before {
+  -webkit-animation: none;
+  animation: none;
+  -o-animation: none;
+}
+div.n-button a.btn.dropdown-toggle.effect:focus:before {
+  -webkit-animation: none;
+  animation: none;
+  -o-animation: none;
+}
 @keyframes buttonRippleOn {
   0% {
     opacity: 0;
@@ -1729,12 +1742,19 @@ div.n-button.n-disabled {
     top: -10%;
     left: -10%;
   }
-  100% {
+  99% {
     opacity: 0;
     height: 150%;
     width: 150%;
     top: -25%;
     left: -25%;
+  }
+  100% {
+    opacity: 0;
+    height: 0;
+    width: 0;
+    top: 35%;
+    left: 35%;
   }
 }
 @keyframes buttonRippleOff {
@@ -1766,12 +1786,19 @@ div.n-button.n-disabled {
     top: -10%;
     left: -10%;
   }
-  100% {
+  99% {
     opacity: 0;
     height: 150%;
     width: 150%;
     top: -25%;
     left: -25%;
+  }
+  100% {
+    opacity: 0;
+    height: 0;
+    width: 0;
+    top: 35%;
+    left: 35%;
   }
 }
 div.n-checkbox {

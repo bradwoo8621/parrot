@@ -48,7 +48,6 @@
         pos: {row: 1, col: 1}
     });
     var infoIconButton = $pt.createCellLayout('name', {
-        label: 'Click me',
         comp: {
             type: $pt.ComponentConstants.Button,
             icon: 'pencil',
@@ -57,11 +56,15 @@
         pos: {row: 1, col: 1}
     });
     var successIconButton = $pt.createCellLayout('name', {
-        label: 'Click me',
         comp: {
             type: $pt.ComponentConstants.Button,
             icon: 'pencil',
-            style: 'success'
+            style: 'success',
+            more: [
+                {icon: 'commenting-o', text: 'commenting', click: function(model) {alert('Commenting');}},
+                {divider: true},
+                {icon: 'balance-scale', text: 'Balance', click: function(model) {alert('Balance');}}
+            ]
         },
         pos: {row: 1, col: 1}
     });
@@ -138,7 +141,6 @@
         pos: {row: 1, col: 1}
     });
     var disabledInfoIconButton = $pt.createCellLayout('name', {
-        label: 'Click me',
         comp: {
             type: $pt.ComponentConstants.Button,
             enabled: {
@@ -153,7 +155,6 @@
         pos: {row: 1, col: 1}
     });
     var disabledSuccessIconButton = $pt.createCellLayout('name', {
-        label: 'Click me',
         comp: {
             type: $pt.ComponentConstants.Button,
             enabled: {
@@ -163,7 +164,12 @@
                 depends: 'name'
             },
             icon: 'pencil',
-            style: 'success'
+            style: 'success',
+            more: [
+                {icon: 'commenting-o', text: 'commenting', click: function(model) {alert('Commenting');}},
+                {divider: true},
+                {icon: 'balance-scale', text: 'Balance', click: function(model) {alert('Balance');}}
+            ]
         },
         pos: {row: 1, col: 1}
     });

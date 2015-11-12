@@ -4252,12 +4252,7 @@
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
-		/**
-		 * render icon
-		 * @returns {*}
-		 */
-		renderIcon: function () {
-			var icon = this.getIcon();
+		renderIcon: function(icon) {
 			if (icon == null) {
 				return null;
 			} else {
@@ -4267,6 +4262,51 @@
 				};
 				css['fa-' + icon] = true;
 				return React.createElement("span", {className: $pt.LayoutHelper.classSet(css)});
+			}
+		},
+		/**
+		 * render icon
+		 * @returns {*}
+		 */
+		renderButtonIcon: function () {
+			return this.renderIcon(this.getIcon());
+		},
+		renderMoreButtons: function(css) {
+			var more = this.getComponentOption('more');
+			if (more) {
+				var dropdown = (React.createElement("a", {href: "javascript:void(0);", 
+					className: $pt.LayoutHelper.classSet(css) + ' dropdown-toggle', 
+					onClick: this.onClicked, 
+					disabled: !this.isEnabled(), 
+					"data-toggle": "dropdown", 
+					"aria-haspopup": "true", 
+					"aria-expanded": "false"}, 
+				   	React.createElement("span", {className: "caret"})
+				));
+				var emptyFunction = function(){};
+				var _this = this;
+				var menus = (React.createElement("ul", {className: "dropdown-menu"}, 
+					more.map(function(menu) {
+						if (menu.divider) {
+							return (React.createElement("li", {role: "separator", className: "divider"}));
+						} else {
+							var click = menu.click ? menu.click : emptyFunction;
+							var label = menu.text;
+							var icon = _this.renderIcon(menu.icon);
+							if (label && icon) {
+								label = ' ' + label;
+							}
+							return (React.createElement("li", null, 
+								React.createElement("a", {href: "javascript:void(0);", onClick: click.bind(_this, _this.getModel())}, 
+									icon, label
+								)
+							));
+						}
+					})
+				));
+				return [dropdown, menus];
+			} else {
+				return null;
 			}
 		},
 		render: function () {
@@ -4281,26 +4321,40 @@
 				disabled: !this.isEnabled()
 			};
 			css['btn-' + this.getStyle()] = true;
+			var label = this.getLayout().getLabel();
+			var icon = this.renderButtonIcon();
 			if (this.getLabelPosition() === 'left') {
+				if (label && icon) {
+					label = label + ' ';
+				}
 				// label in left
 				return (React.createElement("div", {className: $pt.LayoutHelper.classSet(compCSS)}, 
-					React.createElement("a", {href: "javascript:void(0);", 
-					   className: $pt.LayoutHelper.classSet(css), 
-					   onClick: this.onClicked, 
-					   disabled: !this.isEnabled(), 
-					   ref: "a"}, 
-						this.getLayout().getLabel(), " ", this.renderIcon()
+					React.createElement("div", {className: "btn-group"}, 
+						React.createElement("a", {href: "javascript:void(0);", 
+						   className: $pt.LayoutHelper.classSet(css), 
+						   onClick: this.onClicked, 
+						   disabled: !this.isEnabled(), 
+						   ref: "a"}, 
+							label, icon
+						), 
+						this.renderMoreButtons(css)
 					)
 				));
 			} else {
+				if (label && icon) {
+					label = ' ' + label;
+				}
 				// default label in right
 				return (React.createElement("div", {className: $pt.LayoutHelper.classSet(compCSS)}, 
-					React.createElement("a", {href: "javascript:void(0);", 
-					   className: $pt.LayoutHelper.classSet(css), 
-					   onClick: this.onClicked, 
-					   disabled: !this.isEnabled(), 
-					   ref: "a"}, 
-						this.renderIcon(), " ", this.getLayout().getLabel()
+					React.createElement("div", {className: "btn-group"}, 
+						React.createElement("a", {href: "javascript:void(0);", 
+						   className: $pt.LayoutHelper.classSet(css), 
+						   onClick: this.onClicked, 
+						   disabled: !this.isEnabled(), 
+						   ref: "a"}, 
+							icon, label
+						), 
+						this.renderMoreButtons(css)
 					)
 				));
 			}
