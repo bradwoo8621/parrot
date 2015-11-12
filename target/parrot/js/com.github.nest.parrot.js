@@ -5937,8 +5937,8 @@
 			 * @returns {XML}
 			 * @private
 			 */
-			__search: function (model, layout) {
-				return React.createElement(NSearchText, {model: model, layout: layout, ref: layout.getId()});
+			__search: function (model, layout, direction) {
+				return React.createElement(NSearchText, {model: model, layout: layout, direction: direction, ref: layout.getId()});
 			},
 			/**
 			 * render table
@@ -8989,7 +8989,9 @@
 			// model
 			model: React.PropTypes.object,
 			// CellLayout
-			layout: React.PropTypes.object
+			layout: React.PropTypes.object,
+			// label direction
+			direction: React.PropTypes.string,
 		},
 		getDefaultProps: function () {
 			return {
@@ -9203,6 +9205,15 @@
 			var _this = this;
 			var layout = this.getComponentOption('searchDialogLayout');
 			if (layout == null) {
+				var direction = this.props.direction;
+				if (!direction) {
+					direction = NForm.LABEL_DIRECTION;
+				}
+				var buttonCSS = {
+					'pull-right': true,
+					'pull-down': direction == 'vertical'
+				};
+
 				layout = {
 					name: {
 						label: NSearchText.ADVANCED_SEARCH_DIALOG_NAME_LABEL,
@@ -9222,7 +9233,7 @@
 							style: 'primary',
 							click: function (model) {
 								var currentModel = $.extend({}, model.getCurrentModel());
-								// 移除查询结果和翻页查询条件JSON, 只留下当前需要查询的条件数据
+								// remove query result and pagination criteria JSON, only remain the criteria data.
 								delete currentModel.items;
 								delete currentModel.criteria;
 
@@ -9240,7 +9251,7 @@
 							}
 						},
 						css: {
-							comp: 'pull-right pull-down'
+							comp: $pt.LayoutHelper.classSet(buttonCSS)
 						},
 						pos: {
 							row: 10,

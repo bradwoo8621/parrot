@@ -705,6 +705,7 @@ div.n-search-text > div.input-group .form-control.search-label[disabled] {
 }
 div.n-search-text > div.input-group > span.input-group-addon {
   border: 0;
+  background-color: transparent;
 }
 div.n-search-text > div.input-group > span.input-group-addon.advanced-search-btn {
   border-left: 0;

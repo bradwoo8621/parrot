@@ -501,7 +501,8 @@
 					title: 'Central ID',
 					desc: <span>Register react component to component central, get component via <code>$pt.LayoutHelper.getComponent(id)</code>.
 					Parameter <code>id</code> is declared by <code>centralId</code>; meanwhile, form cell of component is registered as <code>id + '@cell'</code>.
-					In this case, cell component id is <code>myCentralId@cell</code>.</span>,
+					In this case, cell component id is <code>myCentralId@cell</code>.<br/>
+					Purpose of registration is let component can be visited in runtime, sometimes force update or visit the APIs of component.</span>,
 					index: 95,
 					xml: {
 						width: 12,

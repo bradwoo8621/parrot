@@ -111,8 +111,8 @@
 			 * @returns {XML}
 			 * @private
 			 */
-			__search: function (model, layout) {
-				return <NSearchText model={model} layout={layout} ref={layout.getId()}/>;
+			__search: function (model, layout, direction) {
+				return <NSearchText model={model} layout={layout} direction={direction} ref={layout.getId()}/>;
 			},
 			/**
 			 * render table
