@@ -54,6 +54,7 @@
 			}
 			this.removeDependencyMonitor(this.getDependencies("collapsedLabel"));
 			this.removeDependencyMonitor(this.getDependencies("expandedLabel"));
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * did update
@@ -66,6 +67,7 @@
 			}
 			this.addDependencyMonitor(this.getDependencies("collapsedLabel"));
 			this.addDependencyMonitor(this.getDependencies("expandedLabel"));
+			this.registerToComponentCentral();
 		},
 		/**
 		 * did mount
@@ -76,6 +78,7 @@
 			}
 			this.addDependencyMonitor(this.getDependencies("collapsedLabel"));
 			this.addDependencyMonitor(this.getDependencies("expandedLabel"));
+			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
@@ -84,8 +87,9 @@
 			if (this.hasCheckInTitle()) {
 				this.getModel().removeListener(this.getCheckInTitleDataId(), 'post', 'change', this.onTitleCheckChanged);
 			}
-			this.addDependencyMonitor(this.getDependencies("collapsedLabel"));
-			this.addDependencyMonitor(this.getDependencies("expandedLabel"));
+			this.removeDependencyMonitor(this.getDependencies("collapsedLabel"));
+			this.removeDependencyMonitor(this.getDependencies("expandedLabel"));
+			this.unregisterFromComponentCentral();
 		},
 		getDefaultProps: function () {
 			return {

@@ -1155,6 +1155,30 @@
 			return option === undefined ? null : option;
 		},
 		/**
+		 * get id of component central.
+		 */
+		getComponentCentralId: function() {
+			return this.getComponentOption('centralId');
+		},
+		/**
+		 * register to component central
+		 */
+		registerToComponentCentral: function() {
+			var id = this.getComponentCentralId();
+			if (id) {
+				$pt.LayoutHelper.registerComponent(id, this);
+			}
+		},
+		/**
+		 * unregsiter from component central
+		 */
+		unregisterFromComponentCentral: function() {
+			var id = this.getComponentCentralId();
+			if (id) {
+				$pt.LayoutHelper.unregisterComponent(id, this);
+			}
+		},
+		/**
 		 * get event monitor
 		 * @param key {string} event name, if not passed, return whole event definition
 		 * @returns {*}
@@ -1368,6 +1392,86 @@
 		},
 		setDefaultSectionWidth : function(width) {
 			SectionLayout.DEFAULT_WIDTH = width * 1;
+		},
+		/**
+		 * register react component to central
+		 */
+		registerComponent: function(id, component) {
+			if (this.__comp[id]) {
+				// already some components use this id
+				var exists = this.__comp[id];
+				if (Array.isArray(exists)) {
+					// push to array if not exists
+					var found = exists.find(function(existed) {
+						return existed === component;
+					});
+					if (!found) {
+						exists.push(component);
+					}
+				} else {
+					// set as array if not equals
+					if (exists !== component) {
+						this.__comp[id] = [exists, component];
+					}
+				}
+			} else {
+				// set new component
+				this.__comp[id] = component;
+			}
+			return this;
+		},
+		/**
+		 * unregister component from central
+		 */
+		unregisterComponent: function(id, component) {
+			if (component) {
+				// delete key, unregister all components with given id
+				delete this.__comp[id];
+			} else {
+				// find all existed component with given id
+				var exists = this.__comp[id];
+				if (exists) {
+					if (Array.isArray(exists)) {
+						var index = exists.findIndex(function(existed) {
+							return existed === component;
+						});
+						if (index != -1) {
+							// unregister the found component
+							exists.splice(index, 1);
+						}
+					} else if (exists === component) {
+						// only one, equals, delete key
+						delete this.__comp[id];
+					}
+				}
+			}
+			return this;
+		},
+		/**
+		 * get component by given id
+		 */
+		getComponent: function(id) {
+			return this.__comp[id];
+		},
+		__forceUpdate: function(component) {
+			if (component.forceUpdate) {
+				component.forceUpdate();
+			}
+			return this;
+		},
+		/**
+		 * force update components which has give id
+		 */
+		forceUpdate: function(id) {
+			var components = this.getComponent(id);
+			if (components) {
+				if (Array.isArray(components)) {
+					components.forEach(this.__forceUpdate);
+				} else {
+					this.__forceUpdate(components);
+				}
+			}
+			return this;
 		}
 	});
 	$pt.LayoutHelper = new LayoutHelper();

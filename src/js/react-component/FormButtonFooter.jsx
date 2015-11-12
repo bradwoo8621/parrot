@@ -9,6 +9,18 @@
 			// layout, FormLayout
 			layout: React.PropTypes.object
 		},
+		componentWillUpdate: function() {
+			this.unregisterFromComponentCentral();
+		},
+		componentDidUpdate: function() {
+			this.registerToComponentCentral();
+		},
+		componentDidMount: function() {
+			this.registerToComponentCentral();
+		},
+		componentWillUnmount: function() {
+			this.unregisterFromComponentCentral();
+		},
 		render: function () {
 			var buttonLayout = this.getButtonLayout();
 			return <NPanelFooter model={this.props.model}

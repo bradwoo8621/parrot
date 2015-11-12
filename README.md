@@ -10,15 +10,13 @@ Parrot is part of [NEST](https://github.com/bradwoo8621/nest), and separate repo
 [Guide](http://bradwoo8621.github.io/parrot/guide/index.html)
 
 # Release Log
-## 0.0.5
-* NModalFrom  
-  Show as floating and modal mode.  
-  Accept function for `buttons.cancel`.  
-* NText  
-  Format support.  
-  Value converter support.  
-* NArrayCheck  
-  Check box group for array values.
+#### 0.0.5
+1. Model: New API #applyCurrentToBase.  
+1. ComponentBase: New API #registerToComponentCentral, #unregisterFromComponentCentral.  
+1. LayoutHelper: New API #registerComponent, #unregisterComponent, #getComponent, #forceUpdate.  
+1. NModalFrom: Show as floating and modal mode. Accept function for `buttons.cancel`.  
+1. NText: Support format and value converter.    
+1. NArrayCheck  New Component.
 
 # License
 MIT

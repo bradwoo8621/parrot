@@ -38,6 +38,7 @@
     	componentWillUpdate: function (nextProps) {
     		// remove post change listener to handle model change
     		this.removePostChangeListener(this.__forceUpdate);
+            this.unregisterFromComponentCentral();
     	},
     	/**
     	 * did update
@@ -47,6 +48,7 @@
     	componentDidUpdate: function (prevProps, prevState) {
     		// add post change listener to handle model change
     		this.addPostChangeListener(this.__forceUpdate);
+            this.registerToComponentCentral();
     	},
         componentWillMount: function() {
             var expandLevel = this.getComponentOption('expandLevel');
@@ -78,6 +80,7 @@
     	componentDidMount: function () {
     		// add post change listener to handle model change
     		this.addPostChangeListener(this.__forceUpdate);
+            this.registerToComponentCentral();
     	},
     	/**
     	 * will unmount
@@ -85,6 +88,7 @@
     	componentWillUnmount: function () {
     		// remove post change listener to handle model change
     		this.removePostChangeListener(this.__forceUpdate);
+            this.unregisterFromComponentCentral();
     	},
         renderCheck: function(node, nodeId) {
             var checkId = this.getCheckBoxId(node);

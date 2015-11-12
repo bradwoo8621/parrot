@@ -54,6 +54,7 @@
 		 */
 		componentWillUpdate: function (nextProps) {
 			this.removeEnableDependencyMonitor();
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * did update
@@ -62,18 +63,21 @@
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * did mount
 		 */
 		componentDidMount: function () {
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
 		 */
 		componentWillUnmount: function () {
 			this.removeEnableDependencyMonitor();
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * render icon

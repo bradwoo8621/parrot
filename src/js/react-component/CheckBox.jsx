@@ -45,6 +45,7 @@
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
 			this.removeEnableDependencyMonitor();
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * did update
@@ -57,6 +58,7 @@
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * did mount
@@ -67,6 +69,7 @@
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
@@ -75,6 +78,7 @@
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
 			this.removeEnableDependencyMonitor();
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * render label

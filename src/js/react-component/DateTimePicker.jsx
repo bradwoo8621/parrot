@@ -111,6 +111,7 @@
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChange);
 			this.removeEnableDependencyMonitor();
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * overrride react method
@@ -123,6 +124,7 @@
 			// add post change listener
 			this.addPostChangeListener(this.onModelChange);
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * override react method
@@ -134,6 +136,7 @@
 			// add post change listener
 			this.addPostChangeListener(this.onModelChange);
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * override react method
@@ -143,6 +146,7 @@
 			// remove post change listener
 			this.removePostChangeListener(this.onModelChange);
 			this.removeEnableDependencyMonitor();
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * create component

@@ -28,6 +28,12 @@
 		getInitialState: function () {
 			return {};
 		},
+		componentWillUpdate: function() {
+			this.unregisterFromComponentCentral();
+		},
+		componentDidUpdate: function() {
+			this.registerToComponentCentral();
+		},
 		componentDidMount: function () {
 			var input = $(React.findDOMNode(this.refs.file));
 			input.fileinput(this.createDisplayOptions({
@@ -137,6 +143,7 @@
 			comp.find('.input-group-btn>.btn')
 				.focus(this.onComponentFocused)
 				.blur(this.onComponentBlurred);
+			this.registerToComponentCentral();
 		},
 		componentWillUnmount: function () {
 			var input = $(React.findDOMNode(this.refs.file));
@@ -147,6 +154,7 @@
 			});
 			// destroy the component
 			input.fileinput('destroy');
+			this.unregisterFromComponentCentral();
 		},
 		render: function () {
 			var css = {};

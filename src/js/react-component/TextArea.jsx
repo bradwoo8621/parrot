@@ -58,6 +58,7 @@
 			this.removePostChangeListener(this.onModelChanged);
 			this.removeEnableDependencyMonitor();
 			this.getComponent().off('change', this.onComponentChanged);
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * did update
@@ -72,6 +73,7 @@
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
 			this.getComponent().on('change', this.onComponentChanged);
+			this.registerToComponentCentral();
 		},
 		/**
 		 * did mount
@@ -83,6 +85,7 @@
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
 			this.getComponent().on('change', this.onComponentChanged);
+			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
@@ -92,6 +95,7 @@
 			this.removePostChangeListener(this.onModelChanged);
 			this.removeEnableDependencyMonitor();
 			this.getComponent().off('change', this.onComponentChanged);
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * render text

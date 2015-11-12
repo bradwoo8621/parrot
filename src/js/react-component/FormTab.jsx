@@ -69,6 +69,7 @@
 					_this.removeDependencyMonitor([tab.badgeId]);
 				}
 			});
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * did update
@@ -82,6 +83,7 @@
 					_this.addDependencyMonitor([tab.badgeId]);
 				}
 			});
+			this.registerToComponentCentral();
 		},
 		/**
 		 * did mount
@@ -93,6 +95,7 @@
 					_this.addDependencyMonitor([tab.badgeId]);
 				}
 			});
+			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
@@ -104,6 +107,7 @@
 					_this.removeDependencyMonitor([tab.badgeId]);
 				}
 			});
+			this.unregisterFromComponentCentral();
 		},
 		renderTabContent: function (layout, index) {
 			var activeIndex = this.getActiveTabIndex();

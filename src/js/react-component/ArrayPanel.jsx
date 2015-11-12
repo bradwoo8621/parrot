@@ -67,6 +67,7 @@
 			this.removePostAddListener(this.onModelChanged);
 			this.removePostRemoveListener(this.onModelChanged);
 			this.removePostValidateListener(this.onModelValidateChanged);
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * did update
@@ -79,6 +80,7 @@
 			this.addPostAddListener(this.onModelChanged);
 			this.addPostRemoveListener(this.onModelChanged);
 			this.addPostValidateListener(this.onModelValidateChanged);
+			this.registerToComponentCentral();
 		},
 		/**
 		 * did mount
@@ -89,6 +91,7 @@
 			this.addPostAddListener(this.onModelChanged);
 			this.addPostRemoveListener(this.onModelChanged);
 			this.addPostValidateListener(this.onModelValidateChanged);
+			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
@@ -99,6 +102,7 @@
 			this.removePostAddListener(this.onModelChanged);
 			this.removePostRemoveListener(this.onModelChanged);
 			this.removePostValidateListener(this.onModelValidateChanged);
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * render item

@@ -83,6 +83,7 @@
 				// add post change listener into parent model
 				this.getParentModel().removeListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
 			}
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * did update
@@ -111,6 +112,7 @@
 			}
 
 			this.removeTooltip();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * did mount
@@ -125,6 +127,7 @@
 				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
 			}
 			this.removeTooltip();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
@@ -139,6 +142,7 @@
 			}
 			// remove the jquery dom element
 			this.getComponent().next("span").remove();
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * create component

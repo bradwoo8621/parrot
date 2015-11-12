@@ -202,6 +202,7 @@
 				// clear definition
 				this.columns = null;
 			}
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * did update
@@ -210,18 +211,21 @@
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
 			this.attachListeners();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * did mount
 		 */
 		componentDidMount: function () {
 			this.attachListeners();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
 		 */
 		componentWillUnmount: function () {
 			this.detachListeners();
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * render when IE8, fixed the height of table since IE8 doesn't support max-height
