@@ -309,11 +309,16 @@
 					rowOperations: rowOperations,
 					title: ""
 				};
-				config.width = (config.editable ? NTable.__operationButtonWidth : 0) + (config.removable ? NTable.__operationButtonWidth : 0);
-				if (hasUserDefinedRowOperations) {
-					config.width += NTable.__operationButtonWidth * config.rowOperations.length;
+				var maxButtonCount = this.getComponentOption('maxOperationButtonCount');
+				if (maxButtonCount) {
+					config.width = maxButtonCount * NTable.__operationButtonWidth;
+				} else {
+					config.width = (config.editable ? NTable.__operationButtonWidth : 0) + (config.removable ? NTable.__operationButtonWidth : 0);
+					if (hasUserDefinedRowOperations) {
+						config.width += NTable.__operationButtonWidth * config.rowOperations.length;
+					}
+					config.width = config.width < NTable.__minOperationButtonWidth ? NTable.__minOperationButtonWidth : config.width;
 				}
-				config.width = config.width < NTable.__minOperationButtonWidth ? NTable.__minOperationButtonWidth : config.width;
 				this.columns.push(config);
 				if (this.fixedRightColumns > 0 || this.getComponentOption("operationFixed") === true) {
 					this.fixedRightColumns++;

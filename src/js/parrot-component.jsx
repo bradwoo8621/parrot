@@ -1196,7 +1196,17 @@
 		 * @returns {*}
 		 */
 		getComponentRuleValue: function (key, defaultValue) {
-			var rule = this.getComponentOption(key);
+			return this.getRuleValue(this.getComponentOption(key), defaultValue);
+		},
+		/**
+		 * get rule value. return default value if not defined.
+		 * otherwise call when function and return.
+		 * rule must be defined as {when: func, depends: props}
+		 * @param rule {{when: func, depends: props}}
+		 * @param defaultValue
+		 * @returns {*}
+		 */
+		getRuleValue: function(rule, defaultValue) {
 			if (rule === null) {
 				return defaultValue;
 			} else if (rule === true || rule === false) {
@@ -1213,7 +1223,14 @@
 		 * @returns {[*]} always return an array, never return null or undefined.
 		 */
 		getComponentRuleDependencies: function (key) {
-			var dependencies = this.getComponentOption(key);
+			return this.getRuleDependencies(this.getComponentOption(key));
+		},
+		/**
+		 * get rule dependencies. rule must be defined as {when: func, depends: props}
+		 * @param dependencies {{when: func, depends: props}}
+		 * @returns {[*]} always return an array, never return null or undefined.
+		 */
+		getRuleDependencies: function(dependencies) {
 			if (dependencies === null || dependencies.depends === undefined || dependencies.depends === null) {
 				return [];
 			} else {
@@ -1297,7 +1314,7 @@
 		 * @param monitor func
 		 */
 		addDependencyMonitor: function (dependencies, monitor) {
-			monitor = monitor == null? this.__forceUpdate : monitor;
+			monitor = monitor == null ? this.__forceUpdate : monitor;
 			var _this = this;
 			dependencies.forEach(function (key) {
 				if (typeof key === 'object') {

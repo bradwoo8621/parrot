@@ -1822,6 +1822,7 @@ div.n-checkbox span.check-container.disabled.checked,
 div.n-checkbox span.check-container.disabled span.check,
 div.n-checkbox span.check-container.disabled.checked span.check,
 div.n-checkbox span.check-container.disabled.checked span.check:before {
+  pointer-events: none;
   cursor: not-allowed;
   color: #9f9f9f;
   user-select: none;
@@ -1911,6 +1912,9 @@ div.n-checkbox span.check-label.check-label-left {
 }
 div.n-checkbox span.check-label.disabled {
   color: #9f9f9f;
+  cursor: not-allowed;
+}
+div.n-checkbox.n-disabled div.check-container {
   cursor: not-allowed;
 }
 @keyframes checkbox-on {
@@ -2091,6 +2095,7 @@ div.n-radio span.radio-container.checked.disabled,
 div.n-radio span.radio-container.disabled span.check,
 div.n-radio span.radio-container.checked.disabled span.check,
 div.n-radio span.radio-container.checked.disabled span.check:before {
+  pointer-events: none;
   cursor: not-allowed;
   color: #9f9f9f;
   user-select: none;
@@ -2176,6 +2181,9 @@ div.n-radio span.radio-label.radio-label-left {
 }
 div.n-radio span.radio-label.disabled {
   color: #9f9f9f;
+  cursor: not-allowed;
+}
+div.n-radio.n-disabled div.radio-container {
   cursor: not-allowed;
 }
 div.n-file {

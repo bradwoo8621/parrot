@@ -17,6 +17,7 @@ div.n-checkbox {
 		&.disabled span.check,
 		&.disabled.checked span.check,
 		&.disabled.checked span.check:before {
+			pointer-events: none;
 			cursor: @disabled-cursor;
 			color: @disabled-color;
 			user-select: none;
@@ -114,6 +115,11 @@ div.n-checkbox {
 		}
 		&.disabled {
 			color: @disabled-color;
+			cursor: @disabled-cursor;
+		}
+	}
+	&.n-disabled {
+		div.check-container {
 			cursor: @disabled-cursor;
 		}
 	}
@@ -300,6 +306,7 @@ div.n-radio {
 		&.disabled span.check,
 		&.checked.disabled span.check,
 		&.checked.disabled span.check:before {
+			pointer-events: none;
 			cursor: @disabled-cursor;
 			color: @disabled-color;
 			user-select: none;
@@ -398,6 +405,11 @@ div.n-radio {
 		}
 		&.disabled {
 			color: @disabled-color;
+			cursor: @disabled-cursor;
+		}
+	}
+	&.n-disabled {
+		div.radio-container {
 			cursor: @disabled-cursor;
 		}
 	}

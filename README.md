@@ -16,7 +16,9 @@ Parrot is part of [NEST](https://github.com/bradwoo8621/nest), and separate repo
 1. LayoutHelper: New API #registerComponent, #unregisterComponent, #getComponent, #forceUpdate.  
 1. NModalFrom: Show as floating and modal mode. Accept function for `buttons.cancel`.  
 1. NText: Support format and value converter.    
-1. NArrayCheck  New Component.
+1. NArrayCheck: New Component.  
+1. NTree: Collapse and expand all nodes.   
+1. NFormButton: Support drop down style.  
 
 # License
 MIT
