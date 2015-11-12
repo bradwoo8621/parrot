@@ -16,7 +16,7 @@
 			// CellLayout
 			layout: React.PropTypes.object,
 			// label direction
-			direction: React.PropTypes.string,
+			direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
 		},
 		getDefaultProps: function () {
 			return {

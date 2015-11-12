@@ -29,10 +29,12 @@
 		label: 'Plain Text',
 		comp: {
 			type: $pt.ComponentConstants.Tree,
-			root: 'Hello',
+			root: false,
 			check: 'selected',
 			hierarchyCheck: true,
-			expandLevel: 1
+			expandLevel: 1,
+			inactiveSlibing: false,
+			border: true
 		},
 		pos: {row: 1, col: 1}
 	});

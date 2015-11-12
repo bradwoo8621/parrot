@@ -8991,7 +8991,7 @@
 			// CellLayout
 			layout: React.PropTypes.object,
 			// label direction
-			direction: React.PropTypes.string,
+			direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
 		},
 		getDefaultProps: function () {
 			return {
@@ -12637,14 +12637,42 @@
                 defaultOptions: {
                     root: true,
                     inactiveSlibing: true,
-                    opIconEnabled: false
+                    opIconEnabled: false,
+                    expandButton: {
+                        comp: {
+                            icon: 'plus-square-o',
+                            style: 'link'
+                        }
+                    },
+                    collapseButton: {
+                        comp: {
+                            icon: 'minus-square-o',
+                            style: 'link'
+                        }
+                    }
                 }
             };
         },
         getInitialState: function() {
+            var expandBtn = $.extend(true, {}, this.getComponentOption('expandButton'));
+            if (expandBtn) {
+                if (!expandBtn.comp.click) {
+                    expandBtn.comp.click = this.expandAll;
+                }
+                expandBtn = $pt.createCellLayout('expand', expandBtn);
+            }
+            var collapseBtn = $.extend(true, {}, this.getComponentOption('collapseButton'));
+            if (collapseBtn) {
+                if (!collapseBtn.comp.click) {
+                    collapseBtn.comp.click = this.collapseAll;
+                }
+                collapseBtn = $pt.createCellLayout('collapse', collapseBtn);
+            }
             return {
                 activeNodes: {},
-                root: {text: this.getRootLabel(), id: 0}
+                root: {text: this.getRootLabel(), id: 0},
+                expandButton: expandBtn,
+                collapseButton: collapseBtn,
             };
         },
         /**
@@ -12677,7 +12705,7 @@
             }
             var _this = this;
             var expand = function(parentId, node, level) {
-                if (level <= expandLevel) {
+                if (level < expandLevel) {
                     var nodeId = _this.getNodeId(parentId, node);
                     _this.state.activeNodes[nodeId] = node;
                     if (node.children) {
@@ -12788,16 +12816,42 @@
         renderTopLevel: function() {
             var root = this.state.root;
             root.children = this.getValueFromModel();
-            return this.isRootPaint() ? this.renderRoot() : this.renderNodes(root);
+            return this.isRootPaint() ? this.renderRoot() : this.renderNodes(root, this.getNodeId(null, root));
+        },
+        renderButtons: function() {
+            var expand = this.state.expandButton ? React.createElement(NFormButton, {model: this.getModel(), layout: this.state.expandButton}) : null;
+            var collapse = this.state.collapseButton ? React.createElement(NFormButton, {model: this.getModel(), layout: this.state.collapseButton}) : null;
+            if (expand || collapse) {
+                return (React.createElement("span", {className: "buttons"}, 
+                    expand, collapse
+                ));
+            } else {
+                return null;
+            }
         },
         render: function() {
+            var styles = {};
+            if (this.getComponentOption('height')) {
+                styles.height = this.getComponentOption('height');
+            }
+            if (this.getComponentOption('maxHeight')) {
+                styles.maxHeight = this.getComponentOption('maxHeight');
+            }
+            var css = this.getComponentCSS('n-tree');
+            if (this.getComponentOption('border')) {
+                css += ' border';
+            }
             return (
-                React.createElement("div", {className: this.getComponentCSS('n-tree')}, 
-                    this.renderTopLevel()
+                React.createElement("div", {className: css, style: styles}, 
+                    this.renderTopLevel(), 
+                    this.renderButtons()
                 )
             );
         },
         onNodeClicked: function(node, nodeId) {
+            if (this.isLeaf(node)) {
+                return;
+            }
             if (this.state.activeNodes[nodeId]) {
                 this.inactiveNode(node, nodeId);
             } else {
@@ -12845,6 +12899,35 @@
                 }
                 // move to ancestors
                 this.hierarchyCheckToAncestors(parentNodeId);
+            }
+        },
+        expandAll: function() {
+            var activeNodes = this.state.activeNodes;
+            var root = this.state.root;
+            var expand = function(node, parentNodeId) {
+                if (!this.isLeaf(node)) {
+                    var nodeId = this.getNodeId(parentNodeId, node);
+                    activeNodes[nodeId] = node;
+                    var _this = this;
+                    node.children.forEach(function(child) {
+                        expand.call(_this, child, nodeId);
+                    });
+                }
+            };
+            expand.call(this, root, null);
+            this.setState({activeNodes: activeNodes});
+        },
+        collapseAll: function() {
+            var root = this.state.root;
+            if (this.isRootPaint()) {
+                this.inactiveNode(root, this.getNodeId(null, root));
+            } else {
+                var rootNodeId = this.getNodeId(null, root);
+                if (root.children) {
+                    root.children.forEach(function(node) {
+                        this.inactiveNode(node, this.getNodeId(rootNodeId, node));
+                    }.bind(this));
+                }
             }
         },
         isRootPaint: function() {

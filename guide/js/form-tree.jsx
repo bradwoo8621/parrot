@@ -182,6 +182,54 @@
 					code: [modelCode, layoutCode, compCode],
 					index: 60
 				};
+			},
+			border: function () {
+				var layoutTemplate = {comp: {inactiveSlibing: false, expandLevel: 1, border: true}};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'nodes',
+					template: layoutTemplate
+				});
+				return {
+					id: 'tree-style-border',
+					title: 'Border',
+					desc: <span>Set <code>border</code> as true to render border.</span>,
+					xml: <NTree model={model} layout={$pt.createCellLayout('nodes', layoutTemplate)}/>,
+					code: [modelCode, layoutCode, compCode],
+					index: 70
+				};
+			},
+			height: function () {
+				var layoutTemplate = {comp: {inactiveSlibing: false, expandLevel: 1, border: true, height: 200}};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'nodes',
+					template: layoutTemplate
+				});
+				return {
+					id: 'tree-style-height',
+					title: 'Height',
+					desc: <span>Set <code>height</code> to fix tree height.</span>,
+					xml: <NTree model={model} layout={$pt.createCellLayout('nodes', layoutTemplate)}/>,
+					code: [modelCode, layoutCode, compCode],
+					index: 80
+				};
+			},
+			maxHeight: function () {
+				var layoutTemplate = {comp: {inactiveSlibing: false, expandLevel: 1, border: true, maxHeight: 200}};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'nodes',
+					template: layoutTemplate
+				});
+				return {
+					id: 'tree-style-maxHeight',
+					title: 'Max Height',
+					desc: <span>Set <code>maxHeight</code> to fix tree max height.</span>,
+					xml: <NTree model={model} layout={$pt.createCellLayout('nodes', layoutTemplate)}/>,
+					code: [modelCode, layoutCode, compCode],
+					index: 90
+				};
 			}
 		};
 
