@@ -367,6 +367,61 @@
             comp: 'inline-editor'
         }
     }));
+    var dropdown = $pt.createCellLayout('table', $.extend(true, {}, layoutTemplate, {
+        comp: {
+            maxOperationButtonCount: 1,
+            rowOperations: [{
+                icon: 'cart-plus',
+                click: function(row) {
+                    alert('Row Clicked, add [' + row.name + '] to cart.');
+                }
+            }, {
+                icon: 'hand-paper-o',
+                click: function(row) {
+                    alert('Row Clicked, [' + row.name + '] by hand.');
+                }
+            }, {
+                icon: 'clone',
+                click: function(row) {
+                    alert('Row Clicked, [' + row.name + '] by clone.');
+                }
+            }],
+            columns: [{
+                title: 'Name',
+                data: 'name',
+                width: 150
+            }, {
+                title: 'Code',
+                data: 'code',
+                width: 150
+            }, {
+                data: 'gender',
+                title: 'Gender',
+                codes: Gender,
+                width: 150
+            }, {
+                data: 'object_age',
+                title: 'Age',
+                width: 150
+            }, {
+                title: 'Selected',
+                data: 'selected',
+                width: 150
+            }, {
+                data: 'gender',
+                title: 'Radio',
+                codes: Gender,
+                width: 300
+            }, {
+                data: 'birth',
+                title: 'Date of Birth',
+                width: 200
+            }]
+        },
+        css: {
+            comp: 'inline-editor'
+        }
+    }));
     var dialog = NModalForm.createFormModal("Test");
     dialog.show({
         model: model,
@@ -517,6 +572,10 @@
             <div className='col-sm-12 col-md-12 col-lg-12'>
                 <span>InlineText</span>
                 <NTable model={model} layout={inlineText}/>
+            </div>
+            <div className='col-sm-12 col-md-12 col-lg-12'>
+                <span>Dropdown Button</span>
+                <NTable model={model} layout={dropdown}/>
             </div>
         </div>
         <div style={{height: "500px"}}/>

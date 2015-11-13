@@ -1,4 +1,4 @@
-/** com.github.nest.parrot.V0.0.4 2015-11-12 */
+/** com.github.nest.parrot.V0.0.4 2015-11-13 */
 (function ($) {
 	var patches = {
 		console: function () {
@@ -238,6 +238,8 @@
 	context.Glyphicon = ReactBootstrap.Glyphicon;
 	context.Modal = ReactBootstrap.Modal;
 	context.Panel = ReactBootstrap.Panel;
+	context.OverlayTrigger = ReactBootstrap.OverlayTrigger;
+	context.Popover = ReactBootstrap.Popover;
 })(this);
 
 (function () {
@@ -10255,6 +10257,7 @@
 			ROW_HEIGHT: 32,
 			TOOLTIP_EDIT: null,
 			TOOLTIP_REMOVE: null,
+			TOOLTIP_MORE: 'More Operations...',
 			/**
 			 * set operation button width
 			 * @param width {number}
@@ -10267,6 +10270,7 @@
 			SEARCH_PLACE_HOLDER: "Search...",
 			ROW_EDIT_BUTTON_ICON: "pencil",
 			ROW_REMOVE_BUTTON_ICON: "trash-o",
+			ROW_MORE_BUTTON_ICON: 'sort-down',
 			EDIT_DIALOG_SAVE_BUTTON_TEXT: "Save",
 			EDIT_DIALOG_SAVE_BUTTON_ICON: 'floppy-o',
 			SORT_ICON: "sort",
@@ -10555,7 +10559,7 @@
 				};
 				var maxButtonCount = this.getComponentOption('maxOperationButtonCount');
 				if (maxButtonCount) {
-					config.width = maxButtonCount * NTable.__operationButtonWidth;
+					config.width = (maxButtonCount + 1) * NTable.__operationButtonWidth;
 				} else {
 					config.width = (config.editable ? NTable.__operationButtonWidth : 0) + (config.removable ? NTable.__operationButtonWidth : 0);
 					if (hasUserDefinedRowOperations) {
@@ -10792,40 +10796,99 @@
 			)
 			));
 		},
-		/**
-		 * render operation cell
-		 * @param column
-		 * @param data
-		 * @returns {XML}
-		 */
-		renderOperationCell: function (column, data) {
-			var editButton = column.editable ?
-				(React.createElement(Button, {bsSize: "xsmall", bsStyle: "link", onClick: this.onEditClicked.bind(this, data), 
-				         className: "n-table-op-btn"}, 
-					React.createElement(NIcon, {icon: NTable.ROW_EDIT_BUTTON_ICON, size: "lg", tooltip: NTable.TOOLTIP_EDIT})
-				)) : null;
-			var removeButton = column.removable ?
-				(React.createElement(Button, {bsSize: "xsmall", bsStyle: "link", onClick: this.onRemoveClicked.bind(this, data), 
-				         className: "n-table-op-btn"}, 
-					React.createElement(NIcon, {icon: NTable.ROW_REMOVE_BUTTON_ICON, size: "lg", tooltip: NTable.TOOLTIP_REMOVE})
-				)) : null;
+		renderRowEditButton: function(data) {
+			return (React.createElement(Button, {bsSize: "xsmall", bsStyle: "link", onClick: this.onEditClicked.bind(this, data), 
+					 className: "n-table-op-btn"}, 
+				React.createElement(NIcon, {icon: NTable.ROW_EDIT_BUTTON_ICON, size: "lg", tooltip: NTable.TOOLTIP_EDIT})
+			));
+		},
+		renderRowRemoveButton: function(data) {
+			return (React.createElement(Button, {bsSize: "xsmall", bsStyle: "link", onClick: this.onRemoveClicked.bind(this, data), 
+					 className: "n-table-op-btn"}, 
+				React.createElement(NIcon, {icon: NTable.ROW_REMOVE_BUTTON_ICON, size: "lg", tooltip: NTable.TOOLTIP_REMOVE})
+			));
+		},
+		renderRowOperationButton: function(operation, data) {
+			return (React.createElement(Button, {bsSize: "xsmall", bsStyle: "link", className: "n-table-op-btn", 
+							onClick: this.onRowOperationClicked.bind(this, operation.click, data)}, 
+				React.createElement(NIcon, {icon: operation.icon, size: "lg", tooltip: operation.tooltip})
+			));
+		},
+		getRowOperations: function(column) {
 			var rowOperations = column.rowOperations;
 			if (rowOperations === undefined || rowOperations === null) {
 				rowOperations = [];
 			}
+			return rowOperations;
+		},
+		renderFlatOperationCell: function(column, data) {
+			var editButton = column.editable ? this.renderRowEditButton(data) : null;
+			var removeButton = column.removable ? this.renderRowRemoveButton(data) : null;
+			var rowOperations = this.getRowOperations(column);
 			var _this = this;
 			return (React.createElement(ButtonGroup, {className: "n-table-op-btn-group"}, 
-				rowOperations.map(function (opt) {
-					// for compatibility, keep the key 'func', offically is key 'click'
-					var click = opt.click || opt.func;
-					return (React.createElement(Button, {bsSize: "xsmall", bsStyle: "link", className: "n-table-op-btn", 
-					                onClick: _this.onRowOperationClicked.bind(_this, click, data)}, 
-						React.createElement(NIcon, {icon: opt.icon, size: "lg", tooltip: opt.tooltip})
-					));
+				rowOperations.map(function (operation) {
+					return _this.renderRowOperationButton(operation, data);
 				}), 
 				editButton, 
 				removeButton
 			));
+		},
+		renderDropDownOperationCell: function(column, data, maxButtonCount) {
+			var rowOperations = this.getRowOperations(column);
+			if (column.editable) {
+				rowOperations.push({editButton: true});
+			}
+			if (column.removable) {
+				rowOperations.push({removeButton: true});
+			}
+
+			var _this = this;
+			var used = -1;
+			var buttons = [];
+			rowOperations.some(function(operation) {
+				if (operation.editButton) {
+					buttons.push(_this.renderRowEditButton(data));
+				} else if (operation.removeButton) {
+					buttons.push(_this.renderRowRemoveButton(data));
+				} else {
+					buttons.push(_this.renderRowOperationButton(operation, data));
+				}
+				used++;
+				return maxButtonCount - used == 1;
+			});
+			var hasDropdown = (rowOperations.length - used) > 1;
+			var dropdown = null;
+			if (hasDropdown) {
+				var menus = rowOperations.slice(used + 1).map(function(operation) {
+					return _this.renderRowOperationButton(operation, data);
+				});
+				dropdown = (React.createElement(OverlayTrigger, {trigger: "click", rootClose: true, placement: "bottom", 
+					overlay: React.createElement(Popover, {className: "n-table-op-btn-popover"}, menus)}, 
+					React.createElement("a", {href: "javascript:void(0);", 
+						className: "n-table-op-btn btn btn-xs btn-link dropdown-toggle"}, 
+						React.createElement(NIcon, {icon: NTable.ROW_MORE_BUTTON_ICON, size: "lg", tooltip: NTable.TOOLTIP_MORE})
+					)
+				));
+			}
+
+			return (React.createElement(ButtonGroup, {className: "n-table-op-btn-group"}, 
+				buttons, dropdown
+			));
+		},
+		/**
+		 * render operation cell
+		 * @param column
+		 * @param data row data
+		 * @returns {XML}
+		 */
+		renderOperationCell: function (column, data) {
+			var maxButtonCount = this.getComponentOption('maxOperationButtonCount');
+			if (!maxButtonCount) {
+				return this.renderFlatOperationCell(column, data);
+			} else {
+				return this.renderDropDownOperationCell(column, data, maxButtonCount);
+			}
 		},
 		/**
 		 * render row select cell
