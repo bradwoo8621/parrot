@@ -375,12 +375,24 @@
                 tooltip: 'Cart',
                 click: function(row) {
                     alert('Row Clicked, add [' + row.name + '] to cart.');
+                },
+                enabled: {
+                    depends: 'name',
+                    when: function(row) {
+                        return row.get('name') != 'abc';
+                    }
                 }
             }, {
                 icon: 'hand-paper-o',
                 tooltip: 'Hand',
                 click: function(row) {
                     alert('Row Clicked, [' + row.name + '] by hand.');
+                },
+                enabled: {
+                    depends: 'name',
+                    when: function(row) {
+                        return row.get('name') != 'abc';
+                    }
                 }
             }, {
                 icon: 'clone',
@@ -391,6 +403,7 @@
             }],
             columns: [{
                 title: 'Name',
+                inline: 'text',
                 data: 'name',
                 width: 150
             }, {

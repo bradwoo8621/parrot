@@ -1326,6 +1326,12 @@ table.n-table div.n-table-op-btn-group .n-button.n-table-op-btn .btn {
   padding-left: 3px;
   padding-right: 3px;
 }
+table.n-table div.n-table-op-btn-group .n-button.n-table-op-btn .btn.disabled {
+  box-shadow: none;
+  -webkit-box-shadow: none;
+  -o-box-shadow: none;
+  color: #9f9f9f;
+}
 div.n-table-container.inline-editor table.n-table tbody tr td {
   height: 36px;
 }
@@ -1375,6 +1381,12 @@ table.n-table tbody tr.even.has-error {
 .n-table-op-btn-popover .popover-content .n-button.n-table-op-btn .btn {
   padding-left: 3px;
   padding-right: 3px;
+}
+.n-table-op-btn-popover .popover-content .n-button.n-table-op-btn .btn.disabled {
+  box-shadow: none;
+  -webkit-box-shadow: none;
+  -o-box-shadow: none;
+  color: #9f9f9f;
 }
 div.n-text {
   position: relative;

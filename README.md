@@ -19,6 +19,7 @@ Parrot is part of [NEST](https://github.com/bradwoo8621/nest), and separate repo
 1. NArrayCheck: New Component.  
 1. NTree: Collapse and expand all nodes.   
 1. NFormButton: Support drop down style.  
+1. NTable. Support row operation buttons hide in popover of more operation button. Support operation enabled monitor.
 
 # License
 MIT
