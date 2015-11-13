@@ -1203,17 +1203,17 @@
 		 * otherwise call when function and return.
 		 * rule must be defined as {when: func, depends: props}
 		 * @param rule {{when: func, depends: props}}
-		 * @param defaultValue
+		 * @param defaultValue {*}
+		 * @param model {ModelInterface} given model, optional
 		 * @returns {*}
 		 */
-		getRuleValue: function(rule, defaultValue) {
+		getRuleValue: function(rule, defaultValue, model) {
 			if (rule === null) {
 				return defaultValue;
 			} else if (rule === true || rule === false) {
 				return rule;
 			} else {
-				var when = rule.when;
-				return when.call(this, this.getModel(), this.getValueFromModel());
+				return rule.when.call(this, model ? model : this.getModel(), this.getValueFromModel());
 			}
 		},
 		/**
@@ -1311,48 +1311,64 @@
 		/**
 		 * add dependencies monitor
 		 * @param dependencies {[]}
-		 * @param monitor func
+		 * @param monitor {function} optional
+		 * @param model {ModelInterface} monitored model, optional
 		 */
-		addDependencyMonitor: function (dependencies, monitor) {
+		addDependencyMonitor: function (dependencies, monitor, model) {
 			monitor = monitor == null ? this.__forceUpdate : monitor;
 			var _this = this;
-			dependencies.forEach(function (key) {
-				if (typeof key === 'object') {
-					var id = key.id;
-					if (key.on === 'form') {
-						_this.getFormModel().addListener(id, 'post', 'change', monitor);
-					} else if (key.on === 'inner') {
-						_this.getInnerModel().addListener(id, 'post', 'change', monitor);
+			if (model) {
+				dependencies.forEach(function(key) {
+					model.addListener(key, 'post', 'change', monitor);
+				});
+			} else {
+				dependencies.forEach(function (key) {
+					if (typeof key === 'object') {
+						var id = key.id;
+						if (key.on === 'form') {
+							_this.getFormModel().addListener(id, 'post', 'change', monitor);
+						} else if (key.on === 'inner') {
+							_this.getInnerModel().addListener(id, 'post', 'change', monitor);
+						} else {
+							_this.getModel().addListener(id, "post", "change", monitor);
+						}
 					} else {
-						_this.getModel().addListener(id, "post", "change", monitor);
+						_this.getModel().addListener(key, "post", "change", monitor);
 					}
-				} else {
-					_this.getModel().addListener(key, "post", "change", monitor);
-				}
-			});
+				});
+			}
+			return this;
 		},
 		/**
 		 * remove dependencies monitor
 		 * @param dependencies {[]}
-		 * @param monitor func
+		 * @param monitor {function} optional
+		 * @param model {ModelInterface} monitored model, optional
 		 */
-		removeDependencyMonitor: function (dependencies, monitor) {
+		removeDependencyMonitor: function (dependencies, monitor, model) {
 			monitor = monitor == null? this.__forceUpdate : monitor;
 			var _this = this;
-			dependencies.forEach(function (key) {
-				if (typeof key === 'object') {
-					var id = key.id;
-					if (key.on === 'form') {
-						_this.getFormModel().removeListener(id, 'post', 'change', monitor);
-					} else if (key.on === 'inner') {
-						_this.getInnerModel().removeListener(id, 'post', 'change', monitor);
+			if (model) {
+				dependencies.forEach(function(key) {
+					model.addListener(key, 'post', 'change', monitor);
+				});
+			} else {
+				dependencies.forEach(function (key) {
+					if (typeof key === 'object') {
+						var id = key.id;
+						if (key.on === 'form') {
+							_this.getFormModel().removeListener(id, 'post', 'change', monitor);
+						} else if (key.on === 'inner') {
+							_this.getInnerModel().removeListener(id, 'post', 'change', monitor);
+						} else {
+							_this.getModel().removeListener(id, "post", "change", monitor);
+						}
 					} else {
-						_this.getModel().removeListener(id, "post", "change", monitor);
+						_this.getModel().removeListener(key, "post", "change", monitor);
 					}
-				} else {
-					_this.getModel().removeListener(key, "post", "change", monitor);
-				}
-			});
+				});
+			}
+			return this;
 		},
 		// event
 		addPostChangeListener: function (listener) {

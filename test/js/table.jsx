@@ -372,16 +372,19 @@
             maxOperationButtonCount: 1,
             rowOperations: [{
                 icon: 'cart-plus',
+                tooltip: 'Cart',
                 click: function(row) {
                     alert('Row Clicked, add [' + row.name + '] to cart.');
                 }
             }, {
                 icon: 'hand-paper-o',
+                tooltip: 'Hand',
                 click: function(row) {
                     alert('Row Clicked, [' + row.name + '] by hand.');
                 }
             }, {
                 icon: 'clone',
+                tooltip: 'Clone',
                 click: function(row) {
                     alert('Row Clicked, [' + row.name + '] by clone.');
                 }

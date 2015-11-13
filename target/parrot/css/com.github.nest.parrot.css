@@ -1313,25 +1313,18 @@ table.n-table tbody tr:last-child {
 table.n-table div.n-table-op-btn-group.btn-group {
   margin-top: -3px;
 }
-table.n-table div.n-table-op-btn-group button.n-table-op-btn {
+table.n-table div.n-table-op-btn-group .n-button.n-table-op-btn {
   font-size: 10px;
   padding-top: 0;
   padding-bottom: 0;
   height: 20px;
   overflow: hidden;
   outline: 0;
+  display: inline-block;
 }
-table.n-table div.n-table-op-btn-group a.n-table-op-btn {
-  font-size: 10px;
-  margin-top: -2px;
-  padding-left: 5px;
-  padding-right: 5px;
-  outline: 0;
-  height: 20px;
-  overflow: hidden;
-}
-table.n-table div.n-table-op-btn-group a.n-table-op-btn span.fa-lg {
-  font-size: 1.5em;
+table.n-table div.n-table-op-btn-group .n-button.n-table-op-btn .btn {
+  padding-left: 3px;
+  padding-right: 3px;
 }
 div.n-table-container.inline-editor table.n-table tbody tr td {
   height: 36px;
@@ -1368,17 +1361,20 @@ table.n-table tbody tr.even.has-error {
   background-color: #f2dede;
 }
 .n-table-op-btn-popover .popover-content {
-  padding: 5px;
+  padding: 5px 5px 0;
+  margin-bottom: -5px;
 }
-.n-table-op-btn-popover .popover-content button.n-table-op-btn,
-.n-table-op-btn-popover .popover-content a.n-table-op-btn {
-  display: inline-block;
+.n-table-op-btn-popover .popover-content .n-button.n-table-op-btn {
   font-size: 10px;
   padding-top: 0;
   padding-bottom: 0;
-  height: 20px;
   overflow: hidden;
   outline: 0;
+  display: inline-block;
+}
+.n-table-op-btn-popover .popover-content .n-button.n-table-op-btn .btn {
+  padding-left: 3px;
+  padding-right: 3px;
 }
 div.n-text {
   position: relative;

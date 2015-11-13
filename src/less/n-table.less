@@ -247,25 +247,17 @@ table.n-table {
 		&.btn-group {
 			margin-top: -3px;
 		}
-		button.n-table-op-btn {
+		.n-button.n-table-op-btn {
 			font-size: 10px;
 			padding-top: 0;
 			padding-bottom: 0;
 			height: 20px;
 			overflow: hidden;
 			outline: 0;
-		}
-		a.n-table-op-btn {
-			font-size: 10px;
-			// padding-top: 2px;
-			margin-top: -2px;
-			padding-left: 5px;
-			padding-right: 5px;
-			outline: 0;
-			height: 20px;
-			overflow: hidden;
-			span.fa-lg {
-				font-size: 1.5em;
+			display: inline-block;
+			.btn {
+				padding-left: 3px;
+				padding-right: 3px;
 			}
 		}
 	}
@@ -325,21 +317,19 @@ table.n-table tbody tr {
 
 .n-table-op-btn-popover {
 	.popover-content {
-		padding: 5px;
-		// div.n-table-op-btn-group {
-		// 	&.btn-group {
-		// 		margin-top: -3px;
-		// 	}
-			button.n-table-op-btn,
-			a.n-table-op-btn {
-				display: inline-block;
-				font-size: 10px;
-				padding-top: 0;
-				padding-bottom: 0;
-				height: 20px;
-				overflow: hidden;
-				outline: 0;
+		padding: 5px 5px 0;
+		margin-bottom: -5px;
+		.n-button.n-table-op-btn {
+			font-size: 10px;
+			padding-top: 0;
+			padding-bottom: 0;
+			overflow: hidden;
+			outline: 0;
+			display: inline-block;
+			.btn {
+				padding-left: 3px;
+				padding-right: 3px;
 			}
-		// }
+		}
 	}
 }

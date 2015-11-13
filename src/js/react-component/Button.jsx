@@ -161,6 +161,7 @@
 						   className={$pt.LayoutHelper.classSet(css)}
 						   onClick={this.onClicked}
 						   disabled={!this.isEnabled()}
+						   title={this.getComponentOption('tooltip')}
 						   ref='a'>
 							{label}{icon}
 						</a>
@@ -178,6 +179,7 @@
 						   className={$pt.LayoutHelper.classSet(css)}
 						   onClick={this.onClicked}
 						   disabled={!this.isEnabled()}
+						   title={this.getComponentOption('tooltip')}
 						   ref='a'>
 							{icon}{label}
 						</a>
