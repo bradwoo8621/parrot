@@ -131,6 +131,14 @@
 				return <NTree model={model} layout={layout} ref={layout.getId()}/>;
 			},
 			/**
+			 * render select tree
+			 * @returns {XML}
+			 * @private
+			 */
+			__seltree: function(model, layout) {
+				return <NSelectTree model={model} layout={layout} ref={layout.getId()} />;
+			},
+			/**
 			 * render file
 			 * @return {XML}
 			 * @private

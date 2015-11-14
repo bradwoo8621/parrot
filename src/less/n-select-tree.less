@@ -1,0 +1,42 @@
+.n-select-tree {
+	position: relative;
+	outline: none;
+	.form-control {
+		cursor: pointer;
+		padding: 2px 2px 2px 0;
+		box-shadow: none;
+		-webkit-box-shadow: none;
+		-o-box-shadow: none;
+		.fa {
+			padding-top: 5px;
+		}
+	}
+	&:focus hr.focus-line {
+		transform: scaleX(1);
+		-o-transform: scaleX(1);
+		-webkit-transform: scaleX(1);
+	}
+
+	&.n-disabled {
+		.form-control {
+			cursor: not-allowed;
+			// pointer-events: none;
+			color: @disabled-color;
+		}
+		&:focus hr.focus-line {
+			transform: scaleX(0);
+			-o-transform: scaleX(0);
+			-webkit-transform: scaleX(0);
+		}
+	}
+}
+
+.n-select-tree-popover.popover.bottom {
+	margin-top: 2px;
+	.arrow {
+		margin-left: -8px;
+		top: -8px;
+		border-width: 8px;
+		border-top-width: 0;
+	}
+}

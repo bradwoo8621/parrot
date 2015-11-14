@@ -270,19 +270,22 @@
             if (index > 0) {
                 var parentNodeId = nodeId.substring(0, index);
                 var parentNode = this.state.activeNodes[parentNodeId];
-                var notAllChecked = parentNode.children.some(function(child) {
-                    var checkId = _this.getCheckBoxId(child);
+                if (parentNode) {
+                    // check parent node is found or not, root is not paint and not in activeNodes
+                    var notAllChecked = parentNode.children.some(function(child) {
+                        var checkId = _this.getCheckBoxId(child);
+                        if (checkId) {
+                            return !child[checkId];
+                        }
+                    });
+                    var checkId = this.getCheckBoxId(parentNode);
                     if (checkId) {
-                        return !child[checkId];
+                        // if chlidren are not all checked, set as false
+                        parentNode[checkId] = !notAllChecked;
                     }
-                });
-                var checkId = this.getCheckBoxId(parentNode);
-                if (checkId) {
-                    // if chlidren are not all checked, set as false
-                    parentNode[checkId] = !notAllChecked;
+                    // move to ancestors
+                    this.hierarchyCheckToAncestors(parentNodeId);
                 }
-                // move to ancestors
-                this.hierarchyCheckToAncestors(parentNodeId);
             }
         },
         expandAll: function() {

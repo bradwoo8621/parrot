@@ -1,4 +1,4 @@
-/** com.github.nest.parrot.V0.0.4 2015-11-13 */
+/** com.github.nest.parrot.V0.0.4 2015-11-14 */
 (function ($) {
 	var patches = {
 		console: function () {
@@ -309,6 +309,7 @@
 		Radio: "radio",
 		Table: {type: "table", label: false, popover: false},
 		Tree: {type: "tree", label: false, popover: false},
+		SelectTree: "seltree",
 		Date: "date",
 		Search: "search",
 		Button: {type: "button", label: false},
@@ -6048,6 +6049,14 @@
 				return React.createElement(NTree, {model: model, layout: layout, ref: layout.getId()});
 			},
 			/**
+			 * render select tree
+			 * @returns {XML}
+			 * @private
+			 */
+			__seltree: function(model, layout) {
+				return React.createElement(NSelectTree, {model: model, layout: layout, ref: layout.getId()});
+			},
+			/**
 			 * render file
 			 * @return {XML}
 			 * @private
@@ -9614,12 +9623,12 @@
 				'n-disabled': !this.isEnabled()
 			};
 			css[this.getComponentCSS('n-select')] = true;
-			return React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
 			            ref: "div"}, 
 				React.createElement("select", {style: {width: this.getComponentOption("width")}, 
 				        disabled: !this.isEnabled(), 
 				        ref: "select"})
-			);
+			));
 		},
 		/**
 		 * on component change
@@ -9827,6 +9836,128 @@
 		};
 	})(jQuery);
 	context.NSelect = NSelect;
+}(this, jQuery, $pt));
+
+(function(context, $, $pt) {
+	var NSelectTree = React.createClass($pt.defineCellComponent({
+		statics: {
+		},
+		propTypes: {
+			// model
+			model: React.PropTypes.object,
+			// CellLayout
+			layout: React.PropTypes.object
+		},
+		getDefaultProps: function() {
+			return {
+				defaultOptions: {
+				},
+				treeLayout: {
+					comp: {
+						root: false,
+						check: 'selected',
+						hierarchyCheck: true,
+						inactiveSlibing: false,
+					}
+				}
+			};
+		},
+		getInitialState: function() {
+			return {};
+		},
+		/**
+		 * will update
+		 * @param nextProps
+		 */
+		componentWillUpdate: function (nextProps) {
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.__forceUpdate);
+			this.removeEnableDependencyMonitor();
+			this.unregisterFromComponentCentral();
+		},
+		/**
+		 * did update
+		 * @param prevProps
+		 * @param prevState
+		 */
+		componentDidUpdate: function (prevProps, prevState) {
+			// add post change listener to handle model change
+			this.addPostChangeListener(this.__forceUpdate);
+			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
+		},
+		/**
+		 * did mount
+		 */
+		componentDidMount: function () {
+			// add post change listener to handle model change
+			this.addPostChangeListener(this.__forceUpdate);
+			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
+		},
+		/**
+		 * will unmount
+		 */
+		componentWillUnmount: function () {
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.__forceUpdate);
+			this.removeEnableDependencyMonitor();
+			this.unregisterFromComponentCentral();
+		},
+		renderTree: function() {
+			var layout = $pt.createCellLayout('tree', this.getTreeLayout());
+			var model = $pt.createModel({tree: this.getAvailableTreeModel()});
+			return React.createElement(NTree, {model: model, layout: layout});
+		},
+		renderText: function() {
+			if (this.isEnabled()) {
+				return (React.createElement(OverlayTrigger, {trigger: "click", rootClose: true, placement: "bottom", 
+					overlay: React.createElement(Popover, {className: "n-select-tree-popover"}, this.renderTree())}, 
+					React.createElement("div", {className: "input-group form-control"}, 
+						React.createElement("span", {className: "text"}, "Yes"), 
+						React.createElement("span", {className: "fa fa-fw fa-sort-down pull-right"})
+					)
+				));
+			} else {
+				return (React.createElement("div", {className: "input-group form-control"}, 
+					React.createElement("span", {className: "text"}, "Yes"), 
+					React.createElement("span", {className: "fa fa-fw fa-sort-down pull-right"})
+				));
+			}
+		},
+		render: function() {
+			var css = {
+				'n-disabled': !this.isEnabled()
+			};
+			css[this.getComponentCSS('n-select-tree')] = true;
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), tabIndex: "0"}, 
+				this.renderText(), 
+				this.renderNormalLine(), 
+				this.renderFocusLine()
+			));
+		},
+		getTreeModel: function() {
+			return this.getComponentOption('data');
+		},
+		getAvailableTreeModel: function() {
+			var filter = this.getComponentOption('parentFilter');
+			var tree = this.getTreeModel();
+			if (filter) {
+				return filter.call(this, tree);
+			} else {
+				return tree;
+			}
+		},
+		getTreeLayout: function() {
+			var treeLayout = this.getComponentOption('treeLayout');
+			if (treeLayout) {
+				return $.extend(true, this.props.treeLayout, treeLayout);
+			} else {
+				return this.props.treeLayout;
+			}
+		}
+	}));
+	context.NSelectTree = NSelectTree;
 }(this, jQuery, $pt));
 
 (function (context, $, $pt) {
@@ -13084,19 +13215,22 @@
             if (index > 0) {
                 var parentNodeId = nodeId.substring(0, index);
                 var parentNode = this.state.activeNodes[parentNodeId];
-                var notAllChecked = parentNode.children.some(function(child) {
-                    var checkId = _this.getCheckBoxId(child);
+                if (parentNode) {
+                    // check parent node is found or not, root is not paint and not in activeNodes
+                    var notAllChecked = parentNode.children.some(function(child) {
+                        var checkId = _this.getCheckBoxId(child);
+                        if (checkId) {
+                            return !child[checkId];
+                        }
+                    });
+                    var checkId = this.getCheckBoxId(parentNode);
                     if (checkId) {
-                        return !child[checkId];
+                        // if chlidren are not all checked, set as false
+                        parentNode[checkId] = !notAllChecked;
                     }
-                });
-                var checkId = this.getCheckBoxId(parentNode);
-                if (checkId) {
-                    // if chlidren are not all checked, set as false
-                    parentNode[checkId] = !notAllChecked;
+                    // move to ancestors
+                    this.hierarchyCheckToAncestors(parentNodeId);
                 }
-                // move to ancestors
-                this.hierarchyCheckToAncestors(parentNodeId);
             }
         },
         expandAll: function() {

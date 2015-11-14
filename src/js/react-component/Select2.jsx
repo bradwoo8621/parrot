@@ -221,12 +221,12 @@
 				'n-disabled': !this.isEnabled()
 			};
 			css[this.getComponentCSS('n-select')] = true;
-			return <div className={$pt.LayoutHelper.classSet(css)}
+			return (<div className={$pt.LayoutHelper.classSet(css)}
 			            ref='div'>
 				<select style={{width: this.getComponentOption("width")}}
 				        disabled={!this.isEnabled()}
 				        ref='select'/>
-			</div>;
+			</div>);
 		},
 		/**
 		 * on component change

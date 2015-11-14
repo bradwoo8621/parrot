@@ -1,0 +1,62 @@
+/**
+ * Created by brad.wu on 8/16/2015.
+ */
+(function () {
+	var tree = [
+		{
+			id: 1,
+			text: 'Languages',
+			children: [
+				{id: 2, text:'Java'},
+				{id: 3, text:'C#'}
+			]
+		}, {
+			id: 4,
+			text: 'Costing',
+			children: [
+				{id: 5, text: '1,000'},
+				{id: 6, text: '2,000'}
+			]
+		}, {
+			id: 7,
+			text: 'Others',
+			folder: true
+		}
+	];
+	var model = $pt.createModel({});
+	var selectTree = $pt.createCellLayout('value', {
+		comp: {
+			type: $pt.ComponentConstants.SelectTree,
+			data: tree
+		},
+		pos: {row: 1, col: 1}
+	});
+	var disabledSelectTree = $pt.createCellLayout('value', {
+		comp: {
+			type: $pt.ComponentConstants.SelectTree,
+			data: tree,
+			enabled: false
+		},
+		pos: {row: 1, col: 1}
+	});
+
+	var panel = (<div className='row'>
+		<div className='col-md-3 col-lg-3 col-sm-3'>
+			<span>Select Tree</span>
+			<NSelectTree model={model} layout={selectTree}/>
+		</div>
+		<div className='col-md-3 col-lg-3 col-sm-3'>
+			<span>Disabled Select Tree</span>
+			<NSelectTree model={model} layout={disabledSelectTree}/>
+		</div>
+		<div className='col-md-3 col-lg-3 col-sm-3 has-error'>
+			<span>Error Select Tree</span>
+			<NSelectTree model={model} layout={selectTree}/>
+		</div>
+		<div className='col-md-3 col-lg-3 col-sm-3 has-error'>
+			<span>Error and Disabled Select Tree</span>
+			<NSelectTree model={model} layout={disabledSelectTree}/>
+		</div>
+	</div>);
+	React.render(panel, document.getElementById('main'));
+})();
