@@ -138,6 +138,11 @@ div.has-error {
 			color: @error-color;
 			background-color: transparent;
 			border: 0;
+			.selection {
+				> li {
+					border-color: @error-color;
+				}
+			}
 		}
 		&:focus hr.focus-line {
 			transform: scaleX(1);

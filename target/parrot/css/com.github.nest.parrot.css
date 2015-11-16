@@ -2249,7 +2249,7 @@ div.n-file .file-input div.btn.btn-file {
 }
 .n-tree {
   position: relative;
-  overflow: auto;
+  overflow-y: hidden;
 }
 .n-tree.border {
   padding: 8px;
@@ -2357,12 +2357,33 @@ div.n-array-check.vertical div.n-checkbox {
 .n-select-tree .form-control {
   cursor: pointer;
   padding: 2px 2px 2px 0;
+  border: 0;
   box-shadow: none;
   -webkit-box-shadow: none;
   -o-box-shadow: none;
 }
-.n-select-tree .form-control .fa {
-  padding-top: 5px;
+.n-select-tree .form-control .selection {
+  box-sizing: border-box;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+.n-select-tree .form-control .selection > li {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 1px 3px;
+  margin: 1px 0 1px 3px;
+  float: left;
+  line-height: 1.5;
+}
+.n-select-tree .form-control .selection > li:first-child {
+  margin-left: 0;
+}
+.n-select-tree .form-control > .fa {
+  position: absolute;
+  right: 0;
+  bottom: 10px;
 }
 .n-select-tree:focus hr.focus-line {
   transform: scaleX(1);
@@ -2380,12 +2401,18 @@ div.n-array-check.vertical div.n-checkbox {
 }
 .n-select-tree-popover.popover.bottom {
   margin-top: 2px;
+  max-width: 9999px;
 }
 .n-select-tree-popover.popover.bottom .arrow {
   margin-left: -8px;
   top: -8px;
   border-width: 8px;
   border-top-width: 0;
+}
+.n-select-tree-popover.popover.bottom .popover-content {
+  padding: 5px 5px 0;
+  overflow: auto;
+  max-height: 300px;
 }
 div.has-error > span,
 div.has-error.horizontal-label > div.row > div:first-child > span {
@@ -2511,6 +2538,9 @@ div.has-error div.n-select-tree .form-control {
   color: #f44336;
   background-color: transparent;
   border: 0;
+}
+div.has-error div.n-select-tree .form-control .selection > li {
+  border-color: #f44336;
 }
 div.has-error div.n-select-tree:focus hr.focus-line {
   transform: scaleX(1);

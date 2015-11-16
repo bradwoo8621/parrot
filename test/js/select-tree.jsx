@@ -2,7 +2,7 @@
  * Created by brad.wu on 8/16/2015.
  */
 (function () {
-	var tree = [
+	var tree = $pt.createCodeTable([
 		{
 			id: 1,
 			text: 'Languages',
@@ -22,12 +22,18 @@
 			text: 'Others',
 			folder: true
 		}
-	];
+	]);
 	var model = $pt.createModel({});
 	var selectTree = $pt.createCellLayout('value', {
 		comp: {
 			type: $pt.ComponentConstants.SelectTree,
-			data: tree
+			data: tree,
+			treeLayout: {
+				comp: {
+					hierarchyCheck: true,
+					valueAsArray: true
+				}
+			}
 		},
 		pos: {row: 1, col: 1}
 	});
@@ -35,7 +41,13 @@
 		comp: {
 			type: $pt.ComponentConstants.SelectTree,
 			data: tree,
-			enabled: false
+			enabled: false,
+			treeLayout: {
+				comp: {
+					hierarchyCheck: true,
+					valueAsArray: true
+				}
+			}
 		},
 		pos: {row: 1, col: 1}
 	});

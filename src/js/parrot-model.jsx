@@ -11,6 +11,7 @@
 	}
 
 	$pt.BUILD_PROPERTY_VISITOR = true;
+	$pt.PROPERTY_SEPARATOR = '_';
 
 	/**
 	 * clone json object
@@ -26,9 +27,9 @@
 	 * @returns {*}
 	 */
 	$pt.getValueFromJSON = function (jsonObject, id) {
-		if (id.indexOf('_') != -1) {
+		if (id.indexOf($pt.PROPERTY_SEPARATOR) != -1) {
 			// hierarchy id
-			var ids = id.split('_');
+			var ids = id.split($pt.PROPERTY_SEPARATOR);
 			var parent = jsonObject;
 			var value = null;
 			var values = ids.map(function (id) {
@@ -46,10 +47,10 @@
 		}
 	};
 	$pt.setValueIntoJSON = function (jsonObject, id, value) {
-		if (id.indexOf('_') == -1) {
+		if (id.indexOf($pt.PROPERTY_SEPARATOR) == -1) {
 			jsonObject[id] = value;
 		} else {
-			var ids = id.split('_');
+			var ids = id.split($pt.PROPERTY_SEPARATOR);
 			var parent = jsonObject;
 			for (var index = 0, count = ids.length - 1; index < count; index++) {
 				if (parent[ids[index]] == null) {
@@ -812,6 +813,16 @@
 		},
 		removePostChangeListener: function (id, listener) {
 			this.removeListener(id, 'post', 'change', listener);
+		},
+		firePostChangeEvent: function(id, _old, _new) {
+			this.fireEvent({
+				model: this,
+				id: id,
+				old: _old,
+				"new": _new,
+				time: "post",
+				type: "change"
+			});
 		},
 		/**
 		 * fire event

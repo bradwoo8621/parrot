@@ -1,4 +1,4 @@
-/** com.github.nest.parrot.V0.0.4 2015-11-14 */
+/** com.github.nest.parrot.V0.0.4 2015-11-16 */
 (function ($) {
 	var patches = {
 		console: function () {
@@ -239,6 +239,7 @@
 	context.Modal = ReactBootstrap.Modal;
 	context.Panel = ReactBootstrap.Panel;
 	context.OverlayTrigger = ReactBootstrap.OverlayTrigger;
+	context.Overlay = ReactBootstrap.Overlay;
 	context.Popover = ReactBootstrap.Popover;
 })(this);
 
@@ -666,6 +667,12 @@
 			this._sorter = sorter;
 		},
 		/**
+		 * get renderer of code table
+		 */
+		getRenderer: function() {
+			return this._renderer;
+		},
+		/**
 		 * initialize code table element array
 		 * @param codeTableArray {{id:string, text:string}[]}
 		 *          array of json object, eg: {id:"1", text:"text"}.
@@ -684,16 +691,30 @@
 			}
 			var map = {};
 			// render element
-			this._codes.forEach(function (code) {
-				map[code.id] = code;
+			var render = function(code) {
 				if (renderer) {
 					code.text = renderer(code);
+					if (code.children) {
+						code.children.forEach(render);
+					}
 				}
+			};
+			this._codes.forEach(function (code) {
+				map[code.id] = code;
+				render(code);
 			});
 			this._map = map;
 			// sort elements
 			if (sorter) {
-				sorter.sort(this._codes);
+				var sort = function(codes) {
+					sorter.sort(codes);
+					codes.forEach(function(code) {
+						if (code.children) {
+							sort(code.children);
+						}
+					});
+				};
+				sort(this._codes);
 			}
 		},
 		/**
@@ -826,6 +847,48 @@
 			return this.__getCodes();
 		},
 		/**
+		 * get code table element array, with hierarchy keys.
+		 * no duplicate id allowed when call this method.
+		 * @returns {{codeId: codeItem}};
+		 */
+		listAllChildren: function() {
+			var items = {};
+			var fetchItem = function(item) {
+				items[item.id] = item;
+				if (item.children) {
+					item.children.forEach(function(child) {
+						fetchItem(child);
+					});
+				}
+			};
+			this.list().forEach(function(item) {
+				fetchItem(item);
+			});
+			return items;
+		},
+		/**
+		 * get code table element array, with hierarchy keys
+		 * @param {rootId: string, separtor: string}
+		 * @returns {{codeId: codeItem}};
+		 */
+		listWithHierarchyKeys: function(options) {
+			var separator = (options && options.separator) ? options.separator : '|';
+			var rootId = (options && options.rootId != null) ? options.rootId : '0';
+			var items = {};
+			var fetchItem = function(item, parentId) {
+				items[parentId + separator + item.id] = item;
+				if (item.children) {
+					item.children.forEach(function(child) {
+						fetchItem(child, parentId + separator + item.id);
+					});
+				}
+			};
+			this.list().forEach(function(item) {
+				fetchItem(item, rootId);
+			});
+			return items;
+		},
+		/**
 		 * check code table element by given function
 		 * @param func {function} same as function definition Array.some()
 		 * @returns {boolean}
@@ -887,6 +950,7 @@
 	}
 
 	$pt.BUILD_PROPERTY_VISITOR = true;
+	$pt.PROPERTY_SEPARATOR = '_';
 
 	/**
 	 * clone json object
@@ -902,9 +966,9 @@
 	 * @returns {*}
 	 */
 	$pt.getValueFromJSON = function (jsonObject, id) {
-		if (id.indexOf('_') != -1) {
+		if (id.indexOf($pt.PROPERTY_SEPARATOR) != -1) {
 			// hierarchy id
-			var ids = id.split('_');
+			var ids = id.split($pt.PROPERTY_SEPARATOR);
 			var parent = jsonObject;
 			var value = null;
 			var values = ids.map(function (id) {
@@ -922,10 +986,10 @@
 		}
 	};
 	$pt.setValueIntoJSON = function (jsonObject, id, value) {
-		if (id.indexOf('_') == -1) {
+		if (id.indexOf($pt.PROPERTY_SEPARATOR) == -1) {
 			jsonObject[id] = value;
 		} else {
-			var ids = id.split('_');
+			var ids = id.split($pt.PROPERTY_SEPARATOR);
 			var parent = jsonObject;
 			for (var index = 0, count = ids.length - 1; index < count; index++) {
 				if (parent[ids[index]] == null) {
@@ -1688,6 +1752,16 @@
 		},
 		removePostChangeListener: function (id, listener) {
 			this.removeListener(id, 'post', 'change', listener);
+		},
+		firePostChangeEvent: function(id, _old, _new) {
+			this.fireEvent({
+				model: this,
+				id: id,
+				old: _old,
+				"new": _new,
+				time: "post",
+				type: "change"
+			});
 		},
 		/**
 		 * fire event
@@ -9855,9 +9929,9 @@
 				treeLayout: {
 					comp: {
 						root: false,
-						check: 'selected',
-						hierarchyCheck: true,
-						inactiveSlibing: false,
+						check: true,
+						multiple: true,
+						hierarchyCheck: false
 					}
 				}
 			};
@@ -9873,6 +9947,10 @@
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.__forceUpdate);
 			this.removeEnableDependencyMonitor();
+			if (this.hasParent()) {
+				// add post change listener into parent model
+				this.getParentModel().removeListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+			}
 			this.unregisterFromComponentCentral();
 		},
 		/**
@@ -9884,7 +9962,15 @@
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.__forceUpdate);
 			this.addEnableDependencyMonitor();
+			if (this.hasParent()) {
+				// add post change listener into parent model
+				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+			}
 			this.registerToComponentCentral();
+
+			if (this.state.popoverDiv && this.state.popoverDiv.is(':visible')) {
+				this.showPopover();
+			}
 		},
 		/**
 		 * did mount
@@ -9893,37 +9979,80 @@
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.__forceUpdate);
 			this.addEnableDependencyMonitor();
+			if (this.hasParent()) {
+				// add post change listener into parent model
+				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+			}
 			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
 		 */
 		componentWillUnmount: function () {
+			this.destroyPopover();
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.__forceUpdate);
 			this.removeEnableDependencyMonitor();
+			if (this.hasParent()) {
+				// add post change listener into parent model
+				this.getParentModel().removeListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+			}
 			this.unregisterFromComponentCentral();
 		},
 		renderTree: function() {
-			var layout = $pt.createCellLayout('tree', this.getTreeLayout());
-			var model = $pt.createModel({tree: this.getAvailableTreeModel()});
+			var layout = $pt.createCellLayout('values', this.getTreeLayout());
+			var model = $pt.createModel({values: this.getValueFromModel()});
+			model.addPostChangeListener('values', this.onTreeValueChanged);
 			return React.createElement(NTree, {model: model, layout: layout});
 		},
-		renderText: function() {
-			if (this.isEnabled()) {
-				return (React.createElement(OverlayTrigger, {trigger: "click", rootClose: true, placement: "bottom", 
-					overlay: React.createElement(Popover, {className: "n-select-tree-popover"}, this.renderTree())}, 
-					React.createElement("div", {className: "input-group form-control"}, 
-						React.createElement("span", {className: "text"}, "Yes"), 
-						React.createElement("span", {className: "fa fa-fw fa-sort-down pull-right"})
-					)
-				));
+		renderSelectionItem: function(codeItem, nodeId) {
+			return (React.createElement("li", null, 
+				React.createElement("span", {className: "fa fa-fw fa-remove", onClick: this.onSelectionItemRemove.bind(this, nodeId)}), 
+				codeItem.text
+			));
+		},
+		renderSelection: function() {
+			var values = this.getValueFromModel();
+			var codes = null;
+			var _this = this;
+			if (values == null) {
+				return null;
+			} else if (this.getTreeLayout().comp.valueAsArray) {
+				// value as an array
+				codes = this.getAvailableTreeModel().listAllChildren();
+				return values.map(function(value) {
+					return _this.renderSelectionItem(codes[value], value);
+				});
 			} else {
-				return (React.createElement("div", {className: "input-group form-control"}, 
-					React.createElement("span", {className: "text"}, "Yes"), 
-					React.createElement("span", {className: "fa fa-fw fa-sort-down pull-right"})
-				));
+				// value as a hierarchy json object
+				codes = this.getAvailableTreeModel().listWithHierarchyKeys({separator: NTree.NODE_SEPARATOR, rootId: NTree.ROOT_ID});
+				var render = function(node, currentId, parentId) {
+					var nodeId = parentId + NTree.NODE_SEPARATOR + currentId;
+					var spans = [];
+					if (node.selected) {
+						spans.push(_this.renderSelectionItem(codes[nodeId], nodeId));
+					}
+					spans.push.apply(spans, Object.keys(node).filter(function(key) {
+						return key != 'selected';
+					}).map(function(key) {
+						return render(node[key], key, nodeId);
+					}));
+					return spans;
+				};
+				return Object.keys(values).filter(function(key) {
+					return key != 'selected';
+				}).map(function(key) {
+					return render(values[key], key, NTree.ROOT_ID);
+				});
 			}
+		},
+		renderText: function() {
+			return (React.createElement("div", {className: "input-group form-control", onClick: this.onComponentClicked, ref: "comp"}, 
+				React.createElement("ul", {className: "selection"}, 
+					this.renderSelection()
+				), 
+				React.createElement("span", {className: "fa fa-fw fa-sort-down pull-right"})
+			));
 		},
 		render: function() {
 			var css = {
@@ -9936,14 +10065,165 @@
 				this.renderFocusLine()
 			));
 		},
+		renderPopoverContainer: function() {
+			if (this.state.popoverDiv == null) {
+				this.state.popoverDiv = $('<div>');
+				this.state.popoverDiv.appendTo($('body'));
+				$(document).on('click', this.onDocumentClicked).on('keyup', this.onDocumentKeyUp);
+			}
+			this.state.popoverDiv.hide();
+		},
+		renderPopover: function() {
+			var styles = {display: 'block'};
+			var component = this.getComponent();
+			styles.width = component.outerWidth();
+			var offset = component.offset();
+			styles.top = offset.top + component.outerHeight();
+			styles.left = offset.left;
+			var popover = (React.createElement("div", {role: "tooltip", className: "n-select-tree-popover popover bottom in", style: styles}, 
+				React.createElement("div", {className: "arrow", style: {left: '20px'}}), 
+				React.createElement("div", {className: "popover-content"}, 
+					this.renderTree()
+				)
+			));
+			React.render(popover, this.state.popoverDiv.get(0));
+		},
+		showPopover: function() {
+			this.renderPopoverContainer();
+			this.renderPopover();
+			this.state.popoverDiv.show();
+		},
+		hidePopover: function() {
+			if (this.state.popoverDiv && this.state.popoverDiv.is(':visible')) {
+				this.state.popoverDiv.hide();
+				React.render(React.createElement("noscript", null), this.state.popoverDiv.get(0));
+			}
+		},
+		destroyPopover: function() {
+			if (this.state.popoverDiv) {
+				$(document).off('click', this.onDocumentClicked).off('keyup', this.onDocumentKeyUp);
+				this.state.popoverDiv.remove();
+				delete this.state.popoverDiv;
+			}
+		},
+		onComponentClicked: function() {
+			if (!this.isEnabled()) {
+				// do nothing
+				return;
+			}
+			this.showPopover();
+		},
+		onDocumentClicked: function(evt) {
+			var target = $(evt.target);
+			if (target.closest(this.getComponent()).length == 0 && target.closest(this.state.popoverDiv).length == 0) {
+				this.hidePopover();
+			}
+		},
+		onDocumentKeyUp: function(evt) {
+			if (evt.keyCode === 27) {
+				this.hidePopover();
+			}
+		},
+		/**
+		 * on parent model changed
+		 */
+		onParentModelChanged: function() {
+			this.forceUpdate();
+		},
+		/**
+		 * on tree value changed
+		 */
+		onTreeValueChanged: function(evt) {
+			var values = evt.new;
+			if (values == null) {
+				this.setValueToModel(values);
+			} else if (Array.isArray(values)) {
+				this.setValueToModel(values.slice(0));
+			} else {
+				this.setValueToModel($.extend(true, {}, values));
+			}
+		},
+		onSelectionItemRemove: function(nodeId) {
+			if (!this.isEnabled()) {
+				// do nothing
+				return;
+			}
+			var values = this.getValueFromModel();
+			var hierarchyCheck = this.getTreeLayout().comp.hierarchyCheck;
+			if (values == null) {
+				// do nothing
+			} else if (this.getTreeLayout().comp.valueAsArray) {
+				if (hierarchyCheck) {
+					var codes = this.getAvailableTreeModel().listWithHierarchyKeys({separator: NTree.NODE_SEPARATOR, rootId: NTree.ROOT_ID});
+					var codeHierarchyIds = Object.keys(codes);
+					// find all children
+					var childrenIds = codeHierarchyIds.filter(function(key) {
+						return key.indexOf(nodeId + NTree.NODE_SEPARATOR) != -1;
+					}).map(function(id) {
+						return id.split(NTree.NODE_SEPARATOR).pop();
+					});
+					var hierarchyId = codeHierarchyIds.find(function(id) {
+						return id.endsWith(NTree.NODE_SEPARATOR + nodeId);
+					});
+					// find itself and its ancestor ids
+					var ancestorIds = codeHierarchyIds.filter(function(id) {
+						return hierarchyId.startsWith(id);
+					}).map(function(id) {
+						return id.split(NTree.NODE_SEPARATOR).pop();
+					});
+					// combine
+					var ids = childrenIds.concat(ancestorIds);
+					// filter found ids
+					this.setValueToModel(values.filter(function(id) {
+						return -1 == ids.findIndex(function(idNeedRemove) {
+							return id == idNeedRemove;
+						});
+					}));
+				} else {
+					// remove itself
+					this.setValueToModel(values.filter(function(id) {
+						return id != nodeId;
+					}));
+				}
+			} else {
+				var effectiveNodes = nodeId.split(NTree.NODE_SEPARATOR).slice(1);
+				var node = $pt.getValueFromJSON(values, effectiveNodes.join($pt.PROPERTY_SEPARATOR));
+				if (hierarchyCheck) {
+					// set itself and its children to unselected
+					Object.keys(node).forEach(function(key) {
+						delete node[key];
+					});
+					// set its ancestors to unselected
+					effectiveNodes.splice(effectiveNodes.length - 1, 1);
+					effectiveNodes.forEach(function(id, index, array) {
+						$pt.setValueIntoJSON(values, array.slice(0, index + 1).join($pt.PROPERTY_SEPARATOR) + $pt.PROPERTY_SEPARATOR + 'selected', false);
+					});
+				} else {
+					// set itself to unselected
+					delete node.selected;
+				}
+				this.getModel().firePostChangeEvent(this.getDataId(), values, values);
+			}
+		},
+		getComponent: function() {
+			return $(React.findDOMNode(this.refs.comp));
+		},
+		/**
+		 * get tree model
+		 * @returns {CodeTable}
+		 */
 		getTreeModel: function() {
 			return this.getComponentOption('data');
 		},
+		/**
+		 * get available tree model
+		 * @returns {CodeTable}
+		 */
 		getAvailableTreeModel: function() {
 			var filter = this.getComponentOption('parentFilter');
 			var tree = this.getTreeModel();
 			if (filter) {
-				return filter.call(this, tree);
+				return filter.call(this, tree, this.getParentPropertyValue());
 			} else {
 				return tree;
 			}
@@ -9951,10 +10231,42 @@
 		getTreeLayout: function() {
 			var treeLayout = this.getComponentOption('treeLayout');
 			if (treeLayout) {
-				return $.extend(true, this.props.treeLayout, treeLayout);
+				treeLayout = $.extend(true, {}, this.props.treeLayout, treeLayout);
 			} else {
-				return this.props.treeLayout;
+				treeLayout = $.extend(true, {}, this.props.treeLayout);
 			}
+			treeLayout.comp.data = this.getAvailableTreeModel();
+			treeLayout.comp.valueAsArray = treeLayout.comp.valueAsArray ? treeLayout.comp.valueAsArray : false;
+			return treeLayout;
+		},
+		/**
+		 * has parent or not
+		 * @returns {boolean}
+		 */
+		hasParent: function() {
+			return this.getParentPropertyId() != null;
+		},
+		/**
+		 * get parent property id
+		 * @returns {string}
+		 */
+		getParentPropertyId: function() {
+			return this.getComponentOption("parentPropId");
+		},
+		/**
+		 * get parent model
+		 * @returns {ModelInterface}
+		 */
+		getParentModel: function () {
+			var parentModel = this.getComponentOption("parentModel");
+			return parentModel == null ? this.getModel() : parentModel;
+		},
+		/**
+		 * get parent property value
+		 * @returns {*}
+		 */
+		getParentPropertyValue: function () {
+			return this.getParentModel().get(this.getParentPropertyId());
 		}
 	}));
 	context.NSelectTree = NSelectTree;
@@ -12953,7 +13265,27 @@
             OP_FOLDER_LEAF_ICON: 'angle-right',
             OP_FOLDER_ICON: 'angle-double-right',
             OP_FOLDER_OPEN_ICON: 'angle-double-down',
-            OP_FILE_ICON: ''
+            OP_FILE_ICON: '',
+            NODE_SEPARATOR : '|',
+            ROOT_ID : '0',
+            convertValueTreeToArray: function(nodeValues, id) {
+                var array = [];
+                var push = function(node, id) {
+                    Object.keys(node).forEach(function(key) {
+                        if (key == 'selected' && node[key]) {
+                            if (id != NTree.ROOT_ID) {
+                                array.push(id);
+                            } else {
+                                array.selected = node.selected ? true : undefined;
+                            }
+                        } else {
+                            push(node[key], key);
+                        }
+                    });
+                };
+                push(nodeValues, id);
+                return array;
+            }
         },
         propTypes: {
             // model
@@ -12965,8 +13297,14 @@
             return {
                 defaultOptions: {
                     root: true,
+                    check: false,
                     inactiveSlibing: true,
                     opIconEnabled: false,
+                    multiple: true,
+                    valueAsArray: false,
+                    hierarchyCheck: false,
+                    expandLevel: 1,
+                    border: false,
                     expandButton: {
                         comp: {
                             icon: 'plus-square-o',
@@ -12999,7 +13337,7 @@
             }
             return {
                 activeNodes: {},
-                root: {text: this.getRootLabel(), id: 0},
+                root: {text: this.getRootLabel(), id: NTree.ROOT_ID},
                 expandButton: expandBtn,
                 collapseButton: collapseBtn,
             };
@@ -13044,7 +13382,7 @@
                     }
                 }
             };
-            this.state.root.children = this.getValueFromModel();
+            this.state.root.children = this.getTopLevelNodes();
             expand(null, this.state.root, 0);
         },
     	/**
@@ -13064,20 +13402,20 @@
             this.unregisterFromComponentCentral();
     	},
         renderCheck: function(node, nodeId) {
-            var checkId = this.getCheckBoxId(node);
-            if (!checkId) {
+            var canSelected = this.isNodeCanSelect(node);
+            if (!canSelected) {
                 return null;
             }
-            var model = $pt.createModel(node);
+            var modelValue = this.getValueFromModel();
+            modelValue = modelValue ? modelValue : {};
+            var model = $pt.createModel({selected: this.isNodeChecked(nodeId)});
             model.useBaseAsCurrent();
-            var layout = $pt.createCellLayout(checkId, {
+            var layout = $pt.createCellLayout('selected', {
                 comp: {
                     type: $pt.ComponentConstants.Check
                 }
             });
-            if (this.getComponentOption('hierarchyCheck')) {
-                model.addPostChangeListener(checkId, this.onHierarchyCheck.bind(this, node, nodeId));
-            }
+            model.addPostChangeListener('selected', this.onNodeCheckChanged.bind(this, node, nodeId));
             return React.createElement(NCheck, {model: model, layout: layout});
         },
         renderNode: function(parentNodeId, node) {
@@ -13121,12 +13459,7 @@
             );
         },
         renderNodes: function(parent, parentNodeId) {
-            var children = null;
-            if (parent) {
-                children = parent.children;
-            } else {
-                children = this.getValueFromModel();
-            }
+            var children =  parent.children;
             if (children && children.length > 0) {
                 return (
                     React.createElement("ul", {className: "nav"}, 
@@ -13144,7 +13477,7 @@
         },
         renderTopLevel: function() {
             var root = this.state.root;
-            root.children = this.getValueFromModel();
+            root.children = this.getTopLevelNodes();
             return this.isRootPaint() ? this.renderRoot() : this.renderNodes(root, this.getNodeId(null, root));
         },
         renderButtons: function() {
@@ -13182,56 +13515,153 @@
                 return;
             }
             if (this.state.activeNodes[nodeId]) {
-                this.inactiveNode(node, nodeId);
+                this.collapseNode(node, nodeId);
             } else {
-                this.activeNode(node, nodeId);
+                this.expandNode(node, nodeId);
+            }
+            var nodeClick = this.getComponentOption('nodeClick');
+            if (nodeClick) {
+                nodeClick.call(this, node);
             }
         },
-        onHierarchyCheck: function(node, nodeId, evt, toChildOnly) {
-            var _this = this;
+        onNodeCheckChanged: function(node, nodeId, evt, toChildOnly) {
+            var hierarchyCheck = this.isHierarchyCheck();
+            var modelValue = this.getValueFromModel();
+            if (this.isValueAsArray()) {
+                modelValue = modelValue ? modelValue : [];
+                if (hierarchyCheck) {
+                    this.checkNodeHierarchy(node, nodeId, evt.new, modelValue);
+                    this.hierarchyCheckToAncestors(nodeId, modelValue);
+                } else {
+                    this.checkNode(nodeId, evt.new, modelValue);
+                }
+                if (this.getValueFromModel() != modelValue) {
+                    // simply set to model
+                    this.setValueToModel(modelValue);
+                } else {
+                    // fire event manually
+                    this.getModel().firePostChangeEvent(this.getDataId(), modelValue, modelValue);
+                }
+            } else {
+                if (!modelValue) {
+                    modelValue = {};
+                }
 
-            var value = evt.new;
-            // to child
-            var checkId = this.getCheckBoxId(node);
-            if (checkId) {
-                node[checkId] = value;
-            }
-            if (node.children) {
-                node.children.forEach(function(child) {
-                    _this.onHierarchyCheck(child, _this.getNodeId(nodeId, child), evt, true);
-                });
-            }
-            // to parent
-            if (!toChildOnly) {
-                this.hierarchyCheckToAncestors(nodeId);
-            }
+                if (hierarchyCheck) {
+                    this.checkNodeHierarchy(node, nodeId, evt.new, modelValue);
+                    this.hierarchyCheckToAncestors(nodeId, modelValue);
+                } else {
+                    this.checkNode(nodeId, evt.new, modelValue);
+                }
 
-            this.forceUpdate();
-        },
-        hierarchyCheckToAncestors: function(nodeId) {
-            var _this = this;
-
-            var index = nodeId.lastIndexOf('-');
-            if (index > 0) {
-                var parentNodeId = nodeId.substring(0, index);
-                var parentNode = this.state.activeNodes[parentNodeId];
-                if (parentNode) {
-                    // check parent node is found or not, root is not paint and not in activeNodes
-                    var notAllChecked = parentNode.children.some(function(child) {
-                        var checkId = _this.getCheckBoxId(child);
-                        if (checkId) {
-                            return !child[checkId];
-                        }
-                    });
-                    var checkId = this.getCheckBoxId(parentNode);
-                    if (checkId) {
-                        // if chlidren are not all checked, set as false
-                        parentNode[checkId] = !notAllChecked;
-                    }
-                    // move to ancestors
-                    this.hierarchyCheckToAncestors(parentNodeId);
+                if (this.getValueFromModel() != modelValue) {
+                    // simply set to model
+                    this.setValueToModel(modelValue);
+                } else {
+                    // fire event manually
+                    this.getModel().firePostChangeEvent(this.getDataId(), modelValue, modelValue);
                 }
             }
+        },
+        isValueAsArray: function() {
+            return this.getComponentOption('valueAsArray');
+        },
+        /**
+         * check or uncheck node. will not fire post change event.
+         */
+        checkNode: function(nodeId, value, modelValue) {
+            if (this.isValueAsArray()) {
+                if (!this.isMultipleSelection()) {
+                    // no multiple selection
+                    modelValue.length = 0;
+                }
+                if (nodeId == this.state.root.id) {
+                    modelValue.selected = value;
+                } else {
+                    var ids = nodeId.split(NTree.NODE_SEPARATOR);
+                    var id = ids[ids.length - 1];
+                    var index = modelValue.findIndex(function(value) {
+                        return value == id;
+                    });
+                    if (value && index == -1) {
+                        modelValue.push(id);
+                    } else if (!value && index != -1) {
+                        modelValue.splice(index, 1);
+                    }
+                }
+            } else {
+                if (!this.isMultipleSelection()) {
+                    // no multiple selection
+                    Object.keys(modelValue).forEach(function(key) {
+                        delete modelValue[key];
+                    });
+                }
+                if (nodeId == this.state.root.id) {
+                    $pt.setValueIntoJSON(modelValue, 'selected', value);
+                } else {
+                    var segments = nodeId.split(NTree.NODE_SEPARATOR);
+                    $pt.setValueIntoJSON(modelValue, segments.slice(1).join($pt.PROPERTY_SEPARATOR) + $pt.PROPERTY_SEPARATOR + 'selected', value);
+                }
+            }
+            return modelValue;
+        },
+        /**
+         * check or uncheck node hierarchy. will not fire post change event.
+         */
+        checkNodeHierarchy: function(node, nodeId, value, modelValue) {
+            modelValue = this.checkNode(nodeId, value, modelValue);
+            if (node.children) {
+                var _this = this;
+                node.children.forEach(function(child) {
+                    var childId = _this.getNodeId(nodeId, child);
+                    _this.checkNodeHierarchy(child, childId, value, modelValue);
+                });
+            }
+            return modelValue;
+        },
+        isNodeChecked: function(nodeId, modelValue) {
+            modelValue = modelValue ? modelValue : this.getValueFromModel();
+            modelValue = modelValue ? modelValue : {};
+            if (Array.isArray(modelValue)) {
+                if (nodeId == this.state.root.id) {
+                    return modelValue.selected;
+                } else {
+                    var ids = nodeId.split(NTree.NODE_SEPARATOR);
+                    var id = ids[ids.length - 1];
+                    return -1 != modelValue.findIndex(function(value) {
+                        return value == id;
+                    });
+                }
+            } else {
+                if (nodeId == this.state.root.id) {
+                    return $pt.getValueFromJSON(modelValue, 'selected');
+                } else {
+                    return $pt.getValueFromJSON(modelValue, nodeId.split(NTree.NODE_SEPARATOR).slice(1).join($pt.PROPERTY_SEPARATOR) + $pt.PROPERTY_SEPARATOR + 'selected');
+                }
+            }
+        },
+        hierarchyCheckToAncestors: function(nodeId, modelValue) {
+            var _this = this;
+            var checkNodeOnChildren = function(node, nodeId) {
+                if (node.children) {
+                    var hasUncheckedChild = false;
+                    node.children.forEach(function(child) {
+                        var checked = checkNodeOnChildren(child, _this.getNodeId(nodeId, child));
+                        if (!checked) {
+                            hasUncheckedChild = true;
+                        }
+                    });
+                    // console.log(nodeId);
+                    _this.checkNode(nodeId, !hasUncheckedChild, modelValue);
+                    return !hasUncheckedChild;
+                } else {
+                    // no children, return checked of myself
+                    // console.log(nodeId);
+                    return _this.isNodeChecked(nodeId, modelValue);
+                }
+            };
+            checkNodeOnChildren(this.state.root, this.getNodeId(null, this.state.root));
+            // console.log(modelValue);
         },
         expandAll: function() {
             var activeNodes = this.state.activeNodes;
@@ -13252,12 +13682,12 @@
         collapseAll: function() {
             var root = this.state.root;
             if (this.isRootPaint()) {
-                this.inactiveNode(root, this.getNodeId(null, root));
+                this.collapseNode(root, this.getNodeId(null, root));
             } else {
                 var rootNodeId = this.getNodeId(null, root);
                 if (root.children) {
                     root.children.forEach(function(node) {
-                        this.inactiveNode(node, this.getNodeId(rootNodeId, node));
+                        this.collapseNode(node, this.getNodeId(rootNodeId, node));
                     }.bind(this));
                 }
             }
@@ -13282,7 +13712,7 @@
         isInactiveSlibingWhenActive: function() {
             return this.getComponentOption('inactiveSlibing');
         },
-        inactiveNode: function(node, nodeId) {
+        collapseNode: function(node, nodeId) {
             var regexp = new RegExp(nodeId);
             var activeNodes = this.state.activeNodes;
             Object.keys(activeNodes).forEach(function(key) {
@@ -13292,11 +13722,11 @@
             });
             this.setState({activeNodes: activeNodes});
         },
-        activeNode: function(node, nodeId) {
+        expandNode: function(node, nodeId) {
             var activeNodes = this.state.activeNodes;
             if (this.isInactiveSlibingWhenActive() && !this.isLeaf(node)) {
                 // remove all slibings and their children from active list
-                var lastHyphen = nodeId.lastIndexOf('-');
+                var lastHyphen = nodeId.lastIndexOf(NTree.NODE_SEPARATOR);
                 if (lastHyphen > 0) {
                     var regexp = new RegExp(nodeId.substring(0, lastHyphen + 1));
                     Object.keys(activeNodes).forEach(function(key) {
@@ -13312,6 +13742,20 @@
             }
             activeNodes[nodeId] = node;
             this.setState({activeNodes: activeNodes});
+        },
+        /**
+         * get top level nodes
+         * @returns {{}[]}
+         */
+        getTopLevelNodes: function() {
+            return this.getAvailableNodes().list();
+        },
+        /**
+         * get avaiable top level nodes
+         * @returns {CodeTable}
+         */
+        getAvailableNodes: function() {
+            return this.getComponentOption('data');
         },
         getNodeIcon: function(node, nodeId) {
             var isLeaf = this.isLeaf(node);
@@ -13351,12 +13795,7 @@
             }
         },
         getNodeText: function(node) {
-            var render = this.getComponentOption('textRender');
-            if (render) {
-                return render.call(this, node);
-            } else {
-                return node.text;
-            }
+            return node.text;
         },
         /**
          * get customized node icon
@@ -13425,20 +13864,34 @@
                 return defaultIcon;
             }
         },
-        getCheckBoxId: function(node) {
+        isNodeCanSelect: function(node) {
             var check = this.getComponentOption('check');
             if (typeof check === 'function') {
                 return check.call(this, node);
             } else if (check) {
                 return check;
             } else {
-                return null;
+                return false;
             }
+        },
+        /**
+         * is multiple selection allowed
+         * @returns {boolean}
+         */
+        isMultipleSelection: function() {
+            return this.getComponentOption('multiple');
+        },
+        /**
+         * is hierarchy check, effective only when multiple is true
+         * @returns {boolean}
+         */
+        isHierarchyCheck: function() {
+            return this.getComponentOption('hierarchyCheck') && this.isMultipleSelection();
         },
         getNodeId: function(parentNodeId, node) {
             var nodeId = null;
             if (parentNodeId) {
-                nodeId = parentNodeId + '-' + node.id;
+                nodeId = parentNodeId + NTree.NODE_SEPARATOR + node.id;
             } else {
                 nodeId = '' + node.id;
             }

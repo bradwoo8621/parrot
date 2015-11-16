@@ -8,7 +8,27 @@
             OP_FOLDER_LEAF_ICON: 'angle-right',
             OP_FOLDER_ICON: 'angle-double-right',
             OP_FOLDER_OPEN_ICON: 'angle-double-down',
-            OP_FILE_ICON: ''
+            OP_FILE_ICON: '',
+            NODE_SEPARATOR : '|',
+            ROOT_ID : '0',
+            convertValueTreeToArray: function(nodeValues, id) {
+                var array = [];
+                var push = function(node, id) {
+                    Object.keys(node).forEach(function(key) {
+                        if (key == 'selected' && node[key]) {
+                            if (id != NTree.ROOT_ID) {
+                                array.push(id);
+                            } else {
+                                array.selected = node.selected ? true : undefined;
+                            }
+                        } else {
+                            push(node[key], key);
+                        }
+                    });
+                };
+                push(nodeValues, id);
+                return array;
+            }
         },
         propTypes: {
             // model
@@ -20,8 +40,14 @@
             return {
                 defaultOptions: {
                     root: true,
+                    check: false,
                     inactiveSlibing: true,
                     opIconEnabled: false,
+                    multiple: true,
+                    valueAsArray: false,
+                    hierarchyCheck: false,
+                    expandLevel: 1,
+                    border: false,
                     expandButton: {
                         comp: {
                             icon: 'plus-square-o',
@@ -54,7 +80,7 @@
             }
             return {
                 activeNodes: {},
-                root: {text: this.getRootLabel(), id: 0},
+                root: {text: this.getRootLabel(), id: NTree.ROOT_ID},
                 expandButton: expandBtn,
                 collapseButton: collapseBtn,
             };
@@ -99,7 +125,7 @@
                     }
                 }
             };
-            this.state.root.children = this.getValueFromModel();
+            this.state.root.children = this.getTopLevelNodes();
             expand(null, this.state.root, 0);
         },
     	/**
@@ -119,20 +145,20 @@
             this.unregisterFromComponentCentral();
     	},
         renderCheck: function(node, nodeId) {
-            var checkId = this.getCheckBoxId(node);
-            if (!checkId) {
+            var canSelected = this.isNodeCanSelect(node);
+            if (!canSelected) {
                 return null;
             }
-            var model = $pt.createModel(node);
+            var modelValue = this.getValueFromModel();
+            modelValue = modelValue ? modelValue : {};
+            var model = $pt.createModel({selected: this.isNodeChecked(nodeId)});
             model.useBaseAsCurrent();
-            var layout = $pt.createCellLayout(checkId, {
+            var layout = $pt.createCellLayout('selected', {
                 comp: {
                     type: $pt.ComponentConstants.Check
                 }
             });
-            if (this.getComponentOption('hierarchyCheck')) {
-                model.addPostChangeListener(checkId, this.onHierarchyCheck.bind(this, node, nodeId));
-            }
+            model.addPostChangeListener('selected', this.onNodeCheckChanged.bind(this, node, nodeId));
             return <NCheck model={model} layout={layout} />;
         },
         renderNode: function(parentNodeId, node) {
@@ -176,12 +202,7 @@
             );
         },
         renderNodes: function(parent, parentNodeId) {
-            var children = null;
-            if (parent) {
-                children = parent.children;
-            } else {
-                children = this.getValueFromModel();
-            }
+            var children =  parent.children;
             if (children && children.length > 0) {
                 return (
                     <ul className='nav'>
@@ -199,7 +220,7 @@
         },
         renderTopLevel: function() {
             var root = this.state.root;
-            root.children = this.getValueFromModel();
+            root.children = this.getTopLevelNodes();
             return this.isRootPaint() ? this.renderRoot() : this.renderNodes(root, this.getNodeId(null, root));
         },
         renderButtons: function() {
@@ -237,56 +258,153 @@
                 return;
             }
             if (this.state.activeNodes[nodeId]) {
-                this.inactiveNode(node, nodeId);
+                this.collapseNode(node, nodeId);
             } else {
-                this.activeNode(node, nodeId);
+                this.expandNode(node, nodeId);
+            }
+            var nodeClick = this.getComponentOption('nodeClick');
+            if (nodeClick) {
+                nodeClick.call(this, node);
             }
         },
-        onHierarchyCheck: function(node, nodeId, evt, toChildOnly) {
-            var _this = this;
+        onNodeCheckChanged: function(node, nodeId, evt, toChildOnly) {
+            var hierarchyCheck = this.isHierarchyCheck();
+            var modelValue = this.getValueFromModel();
+            if (this.isValueAsArray()) {
+                modelValue = modelValue ? modelValue : [];
+                if (hierarchyCheck) {
+                    this.checkNodeHierarchy(node, nodeId, evt.new, modelValue);
+                    this.hierarchyCheckToAncestors(nodeId, modelValue);
+                } else {
+                    this.checkNode(nodeId, evt.new, modelValue);
+                }
+                if (this.getValueFromModel() != modelValue) {
+                    // simply set to model
+                    this.setValueToModel(modelValue);
+                } else {
+                    // fire event manually
+                    this.getModel().firePostChangeEvent(this.getDataId(), modelValue, modelValue);
+                }
+            } else {
+                if (!modelValue) {
+                    modelValue = {};
+                }
 
-            var value = evt.new;
-            // to child
-            var checkId = this.getCheckBoxId(node);
-            if (checkId) {
-                node[checkId] = value;
-            }
-            if (node.children) {
-                node.children.forEach(function(child) {
-                    _this.onHierarchyCheck(child, _this.getNodeId(nodeId, child), evt, true);
-                });
-            }
-            // to parent
-            if (!toChildOnly) {
-                this.hierarchyCheckToAncestors(nodeId);
-            }
+                if (hierarchyCheck) {
+                    this.checkNodeHierarchy(node, nodeId, evt.new, modelValue);
+                    this.hierarchyCheckToAncestors(nodeId, modelValue);
+                } else {
+                    this.checkNode(nodeId, evt.new, modelValue);
+                }
 
-            this.forceUpdate();
-        },
-        hierarchyCheckToAncestors: function(nodeId) {
-            var _this = this;
-
-            var index = nodeId.lastIndexOf('-');
-            if (index > 0) {
-                var parentNodeId = nodeId.substring(0, index);
-                var parentNode = this.state.activeNodes[parentNodeId];
-                if (parentNode) {
-                    // check parent node is found or not, root is not paint and not in activeNodes
-                    var notAllChecked = parentNode.children.some(function(child) {
-                        var checkId = _this.getCheckBoxId(child);
-                        if (checkId) {
-                            return !child[checkId];
-                        }
-                    });
-                    var checkId = this.getCheckBoxId(parentNode);
-                    if (checkId) {
-                        // if chlidren are not all checked, set as false
-                        parentNode[checkId] = !notAllChecked;
-                    }
-                    // move to ancestors
-                    this.hierarchyCheckToAncestors(parentNodeId);
+                if (this.getValueFromModel() != modelValue) {
+                    // simply set to model
+                    this.setValueToModel(modelValue);
+                } else {
+                    // fire event manually
+                    this.getModel().firePostChangeEvent(this.getDataId(), modelValue, modelValue);
                 }
             }
+        },
+        isValueAsArray: function() {
+            return this.getComponentOption('valueAsArray');
+        },
+        /**
+         * check or uncheck node. will not fire post change event.
+         */
+        checkNode: function(nodeId, value, modelValue) {
+            if (this.isValueAsArray()) {
+                if (!this.isMultipleSelection()) {
+                    // no multiple selection
+                    modelValue.length = 0;
+                }
+                if (nodeId == this.state.root.id) {
+                    modelValue.selected = value;
+                } else {
+                    var ids = nodeId.split(NTree.NODE_SEPARATOR);
+                    var id = ids[ids.length - 1];
+                    var index = modelValue.findIndex(function(value) {
+                        return value == id;
+                    });
+                    if (value && index == -1) {
+                        modelValue.push(id);
+                    } else if (!value && index != -1) {
+                        modelValue.splice(index, 1);
+                    }
+                }
+            } else {
+                if (!this.isMultipleSelection()) {
+                    // no multiple selection
+                    Object.keys(modelValue).forEach(function(key) {
+                        delete modelValue[key];
+                    });
+                }
+                if (nodeId == this.state.root.id) {
+                    $pt.setValueIntoJSON(modelValue, 'selected', value);
+                } else {
+                    var segments = nodeId.split(NTree.NODE_SEPARATOR);
+                    $pt.setValueIntoJSON(modelValue, segments.slice(1).join($pt.PROPERTY_SEPARATOR) + $pt.PROPERTY_SEPARATOR + 'selected', value);
+                }
+            }
+            return modelValue;
+        },
+        /**
+         * check or uncheck node hierarchy. will not fire post change event.
+         */
+        checkNodeHierarchy: function(node, nodeId, value, modelValue) {
+            modelValue = this.checkNode(nodeId, value, modelValue);
+            if (node.children) {
+                var _this = this;
+                node.children.forEach(function(child) {
+                    var childId = _this.getNodeId(nodeId, child);
+                    _this.checkNodeHierarchy(child, childId, value, modelValue);
+                });
+            }
+            return modelValue;
+        },
+        isNodeChecked: function(nodeId, modelValue) {
+            modelValue = modelValue ? modelValue : this.getValueFromModel();
+            modelValue = modelValue ? modelValue : {};
+            if (Array.isArray(modelValue)) {
+                if (nodeId == this.state.root.id) {
+                    return modelValue.selected;
+                } else {
+                    var ids = nodeId.split(NTree.NODE_SEPARATOR);
+                    var id = ids[ids.length - 1];
+                    return -1 != modelValue.findIndex(function(value) {
+                        return value == id;
+                    });
+                }
+            } else {
+                if (nodeId == this.state.root.id) {
+                    return $pt.getValueFromJSON(modelValue, 'selected');
+                } else {
+                    return $pt.getValueFromJSON(modelValue, nodeId.split(NTree.NODE_SEPARATOR).slice(1).join($pt.PROPERTY_SEPARATOR) + $pt.PROPERTY_SEPARATOR + 'selected');
+                }
+            }
+        },
+        hierarchyCheckToAncestors: function(nodeId, modelValue) {
+            var _this = this;
+            var checkNodeOnChildren = function(node, nodeId) {
+                if (node.children) {
+                    var hasUncheckedChild = false;
+                    node.children.forEach(function(child) {
+                        var checked = checkNodeOnChildren(child, _this.getNodeId(nodeId, child));
+                        if (!checked) {
+                            hasUncheckedChild = true;
+                        }
+                    });
+                    // console.log(nodeId);
+                    _this.checkNode(nodeId, !hasUncheckedChild, modelValue);
+                    return !hasUncheckedChild;
+                } else {
+                    // no children, return checked of myself
+                    // console.log(nodeId);
+                    return _this.isNodeChecked(nodeId, modelValue);
+                }
+            };
+            checkNodeOnChildren(this.state.root, this.getNodeId(null, this.state.root));
+            // console.log(modelValue);
         },
         expandAll: function() {
             var activeNodes = this.state.activeNodes;
@@ -307,12 +425,12 @@
         collapseAll: function() {
             var root = this.state.root;
             if (this.isRootPaint()) {
-                this.inactiveNode(root, this.getNodeId(null, root));
+                this.collapseNode(root, this.getNodeId(null, root));
             } else {
                 var rootNodeId = this.getNodeId(null, root);
                 if (root.children) {
                     root.children.forEach(function(node) {
-                        this.inactiveNode(node, this.getNodeId(rootNodeId, node));
+                        this.collapseNode(node, this.getNodeId(rootNodeId, node));
                     }.bind(this));
                 }
             }
@@ -337,7 +455,7 @@
         isInactiveSlibingWhenActive: function() {
             return this.getComponentOption('inactiveSlibing');
         },
-        inactiveNode: function(node, nodeId) {
+        collapseNode: function(node, nodeId) {
             var regexp = new RegExp(nodeId);
             var activeNodes = this.state.activeNodes;
             Object.keys(activeNodes).forEach(function(key) {
@@ -347,11 +465,11 @@
             });
             this.setState({activeNodes: activeNodes});
         },
-        activeNode: function(node, nodeId) {
+        expandNode: function(node, nodeId) {
             var activeNodes = this.state.activeNodes;
             if (this.isInactiveSlibingWhenActive() && !this.isLeaf(node)) {
                 // remove all slibings and their children from active list
-                var lastHyphen = nodeId.lastIndexOf('-');
+                var lastHyphen = nodeId.lastIndexOf(NTree.NODE_SEPARATOR);
                 if (lastHyphen > 0) {
                     var regexp = new RegExp(nodeId.substring(0, lastHyphen + 1));
                     Object.keys(activeNodes).forEach(function(key) {
@@ -367,6 +485,20 @@
             }
             activeNodes[nodeId] = node;
             this.setState({activeNodes: activeNodes});
+        },
+        /**
+         * get top level nodes
+         * @returns {{}[]}
+         */
+        getTopLevelNodes: function() {
+            return this.getAvailableNodes().list();
+        },
+        /**
+         * get avaiable top level nodes
+         * @returns {CodeTable}
+         */
+        getAvailableNodes: function() {
+            return this.getComponentOption('data');
         },
         getNodeIcon: function(node, nodeId) {
             var isLeaf = this.isLeaf(node);
@@ -406,12 +538,7 @@
             }
         },
         getNodeText: function(node) {
-            var render = this.getComponentOption('textRender');
-            if (render) {
-                return render.call(this, node);
-            } else {
-                return node.text;
-            }
+            return node.text;
         },
         /**
          * get customized node icon
@@ -480,20 +607,34 @@
                 return defaultIcon;
             }
         },
-        getCheckBoxId: function(node) {
+        isNodeCanSelect: function(node) {
             var check = this.getComponentOption('check');
             if (typeof check === 'function') {
                 return check.call(this, node);
             } else if (check) {
                 return check;
             } else {
-                return null;
+                return false;
             }
+        },
+        /**
+         * is multiple selection allowed
+         * @returns {boolean}
+         */
+        isMultipleSelection: function() {
+            return this.getComponentOption('multiple');
+        },
+        /**
+         * is hierarchy check, effective only when multiple is true
+         * @returns {boolean}
+         */
+        isHierarchyCheck: function() {
+            return this.getComponentOption('hierarchyCheck') && this.isMultipleSelection();
         },
         getNodeId: function(parentNodeId, node) {
             var nodeId = null;
             if (parentNodeId) {
-                nodeId = parentNodeId + '-' + node.id;
+                nodeId = parentNodeId + NTree.NODE_SEPARATOR + node.id;
             } else {
                 nodeId = '' + node.id;
             }

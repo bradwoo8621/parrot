@@ -67,6 +67,12 @@
 			this._sorter = sorter;
 		},
 		/**
+		 * get renderer of code table
+		 */
+		getRenderer: function() {
+			return this._renderer;
+		},
+		/**
 		 * initialize code table element array
 		 * @param codeTableArray {{id:string, text:string}[]}
 		 *          array of json object, eg: {id:"1", text:"text"}.
@@ -85,16 +91,30 @@
 			}
 			var map = {};
 			// render element
-			this._codes.forEach(function (code) {
-				map[code.id] = code;
+			var render = function(code) {
 				if (renderer) {
 					code.text = renderer(code);
+					if (code.children) {
+						code.children.forEach(render);
+					}
 				}
+			};
+			this._codes.forEach(function (code) {
+				map[code.id] = code;
+				render(code);
 			});
 			this._map = map;
 			// sort elements
 			if (sorter) {
-				sorter.sort(this._codes);
+				var sort = function(codes) {
+					sorter.sort(codes);
+					codes.forEach(function(code) {
+						if (code.children) {
+							sort(code.children);
+						}
+					});
+				};
+				sort(this._codes);
 			}
 		},
 		/**
@@ -225,6 +245,48 @@
 		 */
 		list: function () {
 			return this.__getCodes();
+		},
+		/**
+		 * get code table element array, with hierarchy keys.
+		 * no duplicate id allowed when call this method.
+		 * @returns {{codeId: codeItem}};
+		 */
+		listAllChildren: function() {
+			var items = {};
+			var fetchItem = function(item) {
+				items[item.id] = item;
+				if (item.children) {
+					item.children.forEach(function(child) {
+						fetchItem(child);
+					});
+				}
+			};
+			this.list().forEach(function(item) {
+				fetchItem(item);
+			});
+			return items;
+		},
+		/**
+		 * get code table element array, with hierarchy keys
+		 * @param {rootId: string, separtor: string}
+		 * @returns {{codeId: codeItem}};
+		 */
+		listWithHierarchyKeys: function(options) {
+			var separator = (options && options.separator) ? options.separator : '|';
+			var rootId = (options && options.rootId != null) ? options.rootId : '0';
+			var items = {};
+			var fetchItem = function(item, parentId) {
+				items[parentId + separator + item.id] = item;
+				if (item.children) {
+					item.children.forEach(function(child) {
+						fetchItem(child, parentId + separator + item.id);
+					});
+				}
+			};
+			this.list().forEach(function(item) {
+				fetchItem(item, rootId);
+			});
+			return items;
 		},
 		/**
 		 * check code table element by given function
