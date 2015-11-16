@@ -106,8 +106,13 @@
 			} else if (this.getTreeLayout().comp.valueAsArray) {
 				// value as an array
 				codes = this.getAvailableTreeModel().listAllChildren();
-				return values.map(function(value) {
-					return _this.renderSelectionItem(codes[value], value);
+				return Object.keys(codes).map(function(id) {
+					var value = values.find(function(value) {
+						return value == id;
+					});
+					if (value != null) {
+						return _this.renderSelectionItem(codes[value], value);
+					}
 				});
 			} else {
 				// value as a hierarchy json object
@@ -214,6 +219,13 @@
 		 * on parent model changed
 		 */
 		onParentModelChanged: function() {
+			var parentChanged = this.getComponentOption('parentChanged');
+			if (parentChanged) {
+				this.setValueToModel(parentChanged.call(this, this.getModel(), this.getParentPropertyValue()));
+			} else {
+				// clear values
+				this.setValueToModel(null);
+			}
 			this.forceUpdate();
 		},
 		/**
