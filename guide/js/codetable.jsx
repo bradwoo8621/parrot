@@ -16,7 +16,10 @@
 				<code>url</code>is the servcie location, must return a JSON array follow the option one.
 				<code>data</code> is optional, will send to server side if exists.<br/>
 				<code>renderer</code>: only one parameter, is item of items, a JSON object. Returns string to be text of code.<br/>
-				<code>sorter</code>: object which has sort function, pass items array to this function.</span>,
+				<code>sorter</code>: object which has sort function, pass items array to this function.<br/>
+				<code>children</code> of code table item is default recognized,
+				<code>renderer</code> and <code>sorter</code> are applied to children automatically.
+				See <code>listAllChildren</code> and <code>#listWithHierarchyKeys</code>.</span>,
 				children: [
 					{
 						id: 'codetable-filter',
@@ -50,6 +53,23 @@
 						pattern: '#list() : JSON[]',
 						desc:
 							<span>Get all code items. If code table is on remote, fetch from server by <code>url</code> and <code>data</code>.</span>
+					},
+					{
+						id: 'codetable-listAllChildren',
+						title: '#listAllChildren',
+						pattern: '#listAllChildren() : {}',
+						desc:
+							<span>
+								Get all code items including children as a map.
+								<span className='text-danger'>Note duplicated ids of item and children are not allowed.</span>
+							</span>
+					},
+					{
+						id: 'codetable-listWithHierarchyKeys',
+						title: '#listWithHierarchyKeys',
+						pattern: '#listWithHierarchyKeys({separtor: string, rootId: string}) : {}',
+						desc:
+							<span>Get all code items with hierarchy keys as a map.</span>
 					},
 					{
 						id: 'codetable-map',

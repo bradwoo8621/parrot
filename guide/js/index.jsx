@@ -70,6 +70,7 @@
 			children: [
 				{text: 'DateTime Picker', func: $demo.renderer.formDateTime},
 				{text: 'Select', func: $demo.renderer.formSelect},
+				{text: 'Tree Select', func: $demo.renderer.formSelectTree},
 				{text: 'Code Search', func: $demo.renderer.formCodeSearch},
 				{divider: true},
 				{text: 'Table', func: $demo.renderer.formTable},

@@ -82,6 +82,35 @@
 					index: 30
 				};
 			},
+			dropdown: function () {
+				var layoutTemplate = {
+					label: 'Click me',
+					comp: {
+						icon: 'commenting',
+						labelPosition: 'left',
+			            more: [
+			                {icon: 'commenting-o', text: 'commenting', click: function(model) {alert('Commenting');}},
+			                {divider: true},
+			                {icon: 'balance-scale', text: 'Balance', click: function(model) {alert('Balance');}}
+			            ]
+					}
+				};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'button',
+					template: layoutTemplate
+				});
+				return {
+					id: 'button-label-dropdown',
+					title: 'Dropdown',
+					desc: ['Dropdown buttons.',
+						<span>Dropdown item has <code>icon</code>, <code>text</code> and <code>click</code>.
+						Or declared as a divider via <code>divider: true</code>.</span>],
+					xml: <NFormButton model={model} layout={$pt.createCellLayout('button', layoutTemplate)}/>,
+					code: [modelCode, layoutCode, compCode],
+					index: 35
+				};
+			},
 			style: function () {
 				var layoutTemplate = {
 					label: 'Click me',

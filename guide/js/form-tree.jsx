@@ -3,28 +3,30 @@
 
 
 	var painter = function () {
+		var codes = $pt.createCodeTable([
+			{
+				id: 1,
+				text: 'Languages',
+				children: [
+					{id: 2, text:'Java'},
+					{id: 3, text:'C#'}
+				]
+			}, {
+				id: 4,
+				text: 'Costing',
+				children: [
+					{id: 5, text: '1,000'},
+					{id: 6, text: '2,000'}
+				]
+			}, {
+				id: 7,
+				text: 'Others',
+				folder: true
+			}
+		]);
+		var codesCode = $demo.convertCodeTableCreatorToString({variable: 'codes', codetable: codes});
 		var modelTemplate = {
-			nodes: [
-				{
-					id: 1,
-					text: 'Languages',
-					children: [
-						{id: 2, text:'Java'},
-						{id: 3, text:'C#'}
-					]
-				}, {
-					id: 4,
-					text: 'Costing',
-					children: [
-						{id: 5, text: '1,000'},
-						{id: 6, text: '2,000'}
-					]
-				}, {
-					id: 7,
-					text: 'Others',
-					folder: true
-				}
-			]
+			nodes: null
 		};
 		var model = $pt.createModel(modelTemplate);
 		var modelCode = $demo.convertModelCreatorToString({
@@ -39,7 +41,7 @@
 
 		var style = {
 			root: function () {
-				var layoutTemplate = {comp: {root: false}};
+				var layoutTemplate = {comp: {root: false, data: codes}};
 				var layoutCode = $demo.convertCellLayoutCreatorToString({
 					variable: 'layout',
 					cellKey: 'nodes',
@@ -50,12 +52,12 @@
 					title: 'Root',
 					desc: 'Hide root node.',
 					xml: <NTree model={model} layout={$pt.createCellLayout('nodes', layoutTemplate)}/>,
-					code: [modelCode, layoutCode, compCode],
+					code: [codesCode, modelCode, layoutCode, compCode],
 					index: 10
 				};
 			},
 			label: function () {
-				var layoutTemplate = {comp: {root: "Informations"}};
+				var layoutTemplate = {comp: {root: "Informations", data: codes}};
 				var layoutCode = $demo.convertCellLayoutCreatorToString({
 					variable: 'layout',
 					cellKey: 'nodes',
@@ -66,14 +68,36 @@
 					title: 'Root Label',
 					desc: 'Root label can be defined.',
 					xml: <NTree model={model} layout={$pt.createCellLayout('nodes', layoutTemplate)}/>,
-					code: [modelCode, layoutCode, compCode],
+					code: [codesCode, modelCode, layoutCode, compCode],
 					index: 20
 				};
 			},
 			nodeText: function() {
-				var layoutTemplate = {comp: {root: "Informations", textRender: function(node) {
-					return node.text + ' & something';
-				}}};
+				var codes = $pt.createCodeTable([
+					{
+						id: 1,
+						text: 'Languages',
+						children: [
+							{id: 2, text:'Java'},
+							{id: 3, text:'C#'}
+						]
+					}, {
+						id: 4,
+						text: 'Costing',
+						children: [
+							{id: 5, text: '1,000'},
+							{id: 6, text: '2,000'}
+						]
+					}, {
+						id: 7,
+						text: 'Others',
+						folder: true
+					}
+				], function(item) {
+					return item.text + ' and something';
+				});
+				var codesCode = $demo.convertCodeTableCreatorToString({variable: 'codes', codetable: codes});
+				var layoutTemplate = {comp: {root: "Informations", data: codes}};
 				var layoutCode = $demo.convertCellLayoutCreatorToString({
 					variable: 'layout',
 					cellKey: 'nodes',
@@ -82,14 +106,14 @@
 				return {
 					id: 'tree-style-root-nodeText',
 					title: 'Node Text',
-					desc: 'Node text can be defined.',
-					xml: <NTree model={model} layout={$pt.createCellLayout('nodes', layoutTemplate)}/>,
-					code: [modelCode, layoutCode, compCode],
+					desc: 'Node text can be renderred by code table renderer.',
+					xml: {width: 12, xml: <NTree model={model} layout={$pt.createCellLayout('nodes', layoutTemplate)}/>},
+					code: [codesCode, modelCode, layoutCode, compCode],
 					index: 25
 				};
 			},
 			op: function () {
-				var layoutTemplate = {comp: {opIconEnabled: true}};
+				var layoutTemplate = {comp: {opIconEnabled: true, data: codes}};
 				var layoutCode = $demo.convertCellLayoutCreatorToString({
 					variable: 'layout',
 					cellKey: 'nodes',
@@ -100,7 +124,7 @@
 					title: 'Operation Icon',
 					desc: 'Show operation icons.',
 					xml: <NTree model={model} layout={$pt.createCellLayout('nodes', layoutTemplate)}/>,
-					code: [modelCode, layoutCode, compCode],
+					code: [codesCode, modelCode, layoutCode, compCode],
 					index: 30
 				};
 			},
@@ -108,6 +132,7 @@
 				var layoutTemplate = {
 					comp: {
 						opIconEnabled: true,
+						data: codes,
 						opNodeIcon: function(options) {
 							console.log(options);
 							if (options.folder) {
@@ -144,12 +169,12 @@
 					title: 'Icons',
 					desc: 'Icons can be defined, see console for more information.',
 					xml: <NTree model={model} layout={$pt.createCellLayout('nodes', layoutTemplate)}/>,
-					code: [modelCode, layoutCode, compCode],
+					code: [codesCode, modelCode, layoutCode, compCode],
 					index: 40
 				};
 			},
 			slibing: function () {
-				var layoutTemplate = {comp: {inactiveSlibing: false}};
+				var layoutTemplate = {comp: {inactiveSlibing: false, data: codes}};
 				var layoutCode = $demo.convertCellLayoutCreatorToString({
 					variable: 'layout',
 					cellKey: 'nodes',
@@ -160,12 +185,12 @@
 					title: 'Slibing',
 					desc: 'To save pixels, collapse slibing nodes when expand one node. This feature can be disabled.',
 					xml: <NTree model={model} layout={$pt.createCellLayout('nodes', layoutTemplate)}/>,
-					code: [modelCode, layoutCode, compCode],
+					code: [codesCode, modelCode, layoutCode, compCode],
 					index: 50
 				};
 			},
 			expand: function () {
-				var layoutTemplate = {comp: {inactiveSlibing: false, expandLevel: 1}};
+				var layoutTemplate = {comp: {inactiveSlibing: false, expandLevel: 1, data: codes}};
 				var layoutCode = $demo.convertCellLayoutCreatorToString({
 					variable: 'layout',
 					cellKey: 'nodes',
@@ -179,15 +204,63 @@
 					Default expands root node, set <code>expandLevel: -1</code> if want to collapse the root node.
 					Set <code>expandLevel: 'all'</code> to expand all levels.</span>,
 					xml: <NTree model={model} layout={$pt.createCellLayout('nodes', layoutTemplate)}/>,
-					code: [modelCode, layoutCode, compCode],
+					code: [codesCode, modelCode, layoutCode, compCode],
 					index: 60
+				};
+			},
+			border: function () {
+				var layoutTemplate = {comp: {inactiveSlibing: false, expandLevel: 1, border: true, data: codes}};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'nodes',
+					template: layoutTemplate
+				});
+				return {
+					id: 'tree-style-border',
+					title: 'Border',
+					desc: <span>Set <code>border</code> as true to render border.</span>,
+					xml: <NTree model={model} layout={$pt.createCellLayout('nodes', layoutTemplate)}/>,
+					code: [codesCode, modelCode, layoutCode, compCode],
+					index: 70
+				};
+			},
+			height: function () {
+				var layoutTemplate = {comp: {inactiveSlibing: false, expandLevel: 1, border: true, height: 200, data: codes}};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'nodes',
+					template: layoutTemplate
+				});
+				return {
+					id: 'tree-style-height',
+					title: 'Height',
+					desc: <span>Set <code>height</code> to fix tree height.</span>,
+					xml: <NTree model={model} layout={$pt.createCellLayout('nodes', layoutTemplate)}/>,
+					code: [codesCode, modelCode, layoutCode, compCode],
+					index: 80
+				};
+			},
+			maxHeight: function () {
+				var layoutTemplate = {comp: {inactiveSlibing: false, expandLevel: 1, border: true, maxHeight: 200, data: codes}};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'nodes',
+					template: layoutTemplate
+				});
+				return {
+					id: 'tree-style-maxHeight',
+					title: 'Max Height',
+					desc: <span>Set <code>maxHeight</code> to fix tree max height.</span>,
+					xml: <NTree model={model} layout={$pt.createCellLayout('nodes', layoutTemplate)}/>,
+					code: [codesCode, modelCode, layoutCode, compCode],
+					index: 90
 				};
 			}
 		};
 
 		var check = {
 			normal: function() {
-				var layoutTemplate = {comp: {check: 'selected'}};
+				var layoutTemplate = {comp: {check: true, data: codes}};
 				var layoutCode = $demo.convertCellLayoutCreatorToString({
 					variable: 'layout',
 					cellKey: 'nodes',
@@ -196,14 +269,14 @@
 				return {
 					id: 'tree-style-check-normal',
 					title: 'Independent',
-					desc: <span>Use <code>check</code> to set the property name in each node which binds the check box value.</span>,
+					desc: <span>Set <code>check</code> as true to enable check box.</span>,
 					xml: <NTree model={model} layout={$pt.createCellLayout('nodes', layoutTemplate)}/>,
-					code: [modelCode, layoutCode, compCode],
+					code: [codesCode, modelCode, layoutCode, compCode],
 					index: 10
 				};
 			},
 			hierarchy: function() {
-				var layoutTemplate = {comp: {check: 'selected', hierarchyCheck: true}};
+				var layoutTemplate = {comp: {check: true, hierarchyCheck: true, data: codes}};
 				var layoutCode = $demo.convertCellLayoutCreatorToString({
 					variable: 'layout',
 					cellKey: 'nodes',
@@ -214,15 +287,32 @@
 					title: 'Hierarchy',
 					desc: <span>Check box can be hierarchy linked.</span>,
 					xml: <NTree model={model} layout={$pt.createCellLayout('nodes', layoutTemplate)}/>,
-					code: [modelCode, layoutCode, compCode],
-					index: 10
+					code: [codesCode, modelCode, layoutCode, compCode],
+					index: 20
+				};
+			},
+			multiple: function() {
+				var layoutTemplate = {comp: {check: true, multiple: false, data: codes}};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'nodes',
+					template: layoutTemplate
+				});
+				return {
+					id: 'tree-style-check-multiple',
+					title: 'Multiple',
+					desc: <span>Check can set as multiple or single by <code>multiple</code>, default is multiple.
+					<code>hierarchyCheck</code> will be ignored when <code>multiple: false</code>.</span>,
+					xml: <NTree model={model} layout={$pt.createCellLayout('nodes', layoutTemplate)}/>,
+					code: [codesCode, modelCode, layoutCode, compCode],
+					index: 30
 				};
 			}
 		};
 
 		var all = {
 			defaultOptions: function () {
-				var layoutTemplate = {};
+				var layoutTemplate = {comp: {data: codes}};
 				var layoutCode = $demo.convertCellLayoutCreatorToString({
 					variable: 'layout',
 					cellKey: 'nodes',
@@ -233,8 +323,24 @@
 					title: 'Default',
 					desc: 'A simple tree.',
 					xml: <NTree model={model} layout={$pt.createCellLayout('nodes', layoutTemplate)}/>,
-					code: [modelCode, layoutCode, compCode],
+					code: [codesCode, modelCode, layoutCode, compCode],
 					index: 10
+				};
+			},
+			click: function () {
+				var layoutTemplate = {comp: {data: codes, nodeClick: function(node) {alert(node.text + ' clicked.');}}};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'nodes',
+					template: layoutTemplate
+				});
+				return {
+					id: 'tree-click',
+					title: 'Click',
+					desc: <span>Handle node click by <code>nodeClick</code>.</span>,
+					xml: <NTree model={model} layout={$pt.createCellLayout('nodes', layoutTemplate)}/>,
+					code: [codesCode, modelCode, layoutCode, compCode],
+					index: 15
 				};
 			},
 			style: function () {
@@ -250,7 +356,9 @@
 				return {
 					id: 'tree-check',
 					title: 'Selection',
-					desc: 'Check box can be added.',
+					desc: <span>Check box can be added. Related model value can be hierarchy JSON object or array.
+					If declared as an array by <code>valueAsArray</code>, MUST make sure the id of code item cannot have duplicated values.
+					Default is hierarchy JSON.</span>,
 					index: 30,
 					children: $demo.convertToExampleList(check)
 				};

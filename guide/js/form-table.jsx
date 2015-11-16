@@ -546,6 +546,89 @@
 					index: 70
 				};
 			},
+			maxRowButton: function () {
+				var layout = $.extend(true, {}, layoutTemplate, {
+					comp: {
+						maxOperationButtonCount: 1,
+						rowOperations: [
+							{
+								icon: 'ban',
+								click: function (row) {
+									console.log(row);
+									alert('BAN clicked');
+								}
+							}, {
+								icon: 'search',
+								click: function (row) {
+									console.log(row);
+									alert('SEARCH clicked');
+								}
+							}
+						]
+					}
+				});
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'value',
+					template: layout
+				});
+				return {
+					id: 'table-edit-maxRowButton',
+					title: <span>Max Row Buttons</span>,
+					desc: <span>Set <code>maxOperationButtonCount</code> to fix row operation buttons,
+					more operation button automatically added and show more operation buttons in popover.</span>,
+					xml: {
+						width: 12,
+						xml: <NTable model={model} layout={$pt.createCellLayout('items', layout)}/>
+					},
+					code: [modelCode, layoutCode, compCode],
+					index: 75
+				};
+			},
+			buttonEnabled: function () {
+				var layout = $.extend(true, {}, layoutTemplate, {
+					comp: {
+						rowOperations: [
+							{
+								icon: 'ban',
+								click: function (row) {
+									console.log(row);
+									alert('BAN clicked');
+								},
+								enabled: {
+									depends: 'name',
+									when: function(model) {
+										return model.get('name') == 'Jack';
+									}
+								}
+							}, {
+								icon: 'search',
+								click: function (row) {
+									console.log(row);
+									alert('SEARCH clicked');
+								}
+							}
+						]
+					}
+				});
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'value',
+					template: layout
+				});
+				return {
+					id: 'table-edit-buttonEnabled',
+					title: <span>Button Enabled</span>,
+					desc: <span>Define <code>enabled</code> in rowOperations to monitor property value to change button enabled.
+					Default button edit and remove can be set by <code>rowEditEnabled</code> and <code>rowRemoveEnabled</code>.</span>,
+					xml: {
+						width: 12,
+						xml: <NTable model={model} layout={$pt.createCellLayout('items', layout)}/>
+					},
+					code: [modelCode, layoutCode, compCode],
+					index: 76
+				};
+			},
 			rowSelect: function () {
 				var layout = $.extend(true, {}, layoutTemplate, {
 					comp: {

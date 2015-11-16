@@ -550,6 +550,26 @@
 				title: '#setDefaultSectionWidth',
 				pattern: '#setDefaultSectionWidth(width: number) : string',
 				desc: <span>Set default section width. Default is 3, width must be 1 to 12, will not check the parameter.</span>
+			}, {
+				id: 'layout-helper-registerComponent',
+				title: '#registerComponent',
+				pattern: '#registerComponent(id: string, component: *) : LayoutHelper',
+				desc: <span>Register component to component central. If meet the duplicated <code>id</code>, register into an array.</span>
+			}, {
+				id: 'layout-helper-unregisterComponent',
+				title: '#unregisterComponent',
+				pattern: '#unregisterComponent(id: string, component: *) : LayoutHelper',
+				desc: <span>Unregister component from component central. If no <code>component</code> passed, unregister all components with give id.</span>
+			}, {
+				id: 'layout-helper-getComponent',
+				title: '#getComponent',
+				pattern: '#getComponent(id: string) : ReactComponent|ReactComponent[]',
+				desc: <span>Get component which was registered in central. Return array or single component.</span>
+			}, {
+				id: 'layout-helper-forceUpdate',
+				title: '#forceUpdate',
+				pattern: '#forceUpdate(id: string) : LayoutHelper',
+				desc: <span>Force update component which was registered in central if it has #forceUpdate() method.</span>
 			}
 		];
 

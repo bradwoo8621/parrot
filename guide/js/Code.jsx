@@ -410,6 +410,10 @@ var APIList = React.createClass({
 		var variableName = def.variable;
 		var codetable = def.codetable;
 		codetable.name(variableName);
+		var renderer = codetable.getRenderer();
+		if (renderer) {
+			return "var " + variableName + " = $pt.createCodeTable(" + stringify(codetable.list()) + ", " + renderer + ");\n"
+		}
 		return "var " + variableName + " = $pt.createCodeTable(" + stringify(codetable.list()) + ");\n";
 	};
 }(this, $pt));

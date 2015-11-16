@@ -486,6 +486,31 @@
 					index: 90
 				};
 			},
+			centralId: function() {
+				var layoutTemplate = {
+					label: 'Label of Cell',
+					centralId: 'myCentralId'
+				};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'value',
+					template: layoutTemplate
+				});
+				return {
+					id: 'form-cell-central-id',
+					title: 'Central ID',
+					desc: <span>Register react component to component central, get component via <code>$pt.LayoutHelper.getComponent(id)</code>.
+					Parameter <code>id</code> is declared by <code>centralId</code>; meanwhile, form cell of component is registered as <code>id + '@cell'</code>.
+					In this case, cell component id is <code>myCentralId@cell</code>.<br/>
+					Purpose of registration is let component can be visited in runtime, sometimes force update or visit the APIs of component.</span>,
+					index: 95,
+					xml: {
+						width: 12,
+						xml: <NFormCell model={model} layout={$pt.createCellLayout('value', layoutTemplate)}/>
+					},
+					code: [modelCode, layoutCode, compCode]
+				};
+			},
 			dataId: function () {
 				var layoutTemplate = {
 					label: 'Label of Cell',

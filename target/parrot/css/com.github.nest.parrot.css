@@ -492,6 +492,9 @@ input[type=tel].form-control[disabled] {
 .dropdown-submenu:hover > a:after {
   border-left-color: #ffffff;
 }
+.dropdown-menu .divider {
+  margin: 5px 0;
+}
 .bootstrap-datetimepicker-widget a[data-action] {
   -webkit-box-shadow: none;
   box-shadow: none;
@@ -705,6 +708,7 @@ div.n-search-text > div.input-group .form-control.search-label[disabled] {
 }
 div.n-search-text > div.input-group > span.input-group-addon {
   border: 0;
+  background-color: transparent;
 }
 div.n-search-text > div.input-group > span.input-group-addon.advanced-search-btn {
   border-left: 0;
@@ -1309,13 +1313,24 @@ table.n-table tbody tr:last-child {
 table.n-table div.n-table-op-btn-group.btn-group {
   margin-top: -3px;
 }
-table.n-table div.n-table-op-btn-group button.n-table-op-btn {
+table.n-table div.n-table-op-btn-group .n-button.n-table-op-btn {
   font-size: 10px;
   padding-top: 0;
   padding-bottom: 0;
   height: 20px;
   overflow: hidden;
   outline: 0;
+  display: inline-block;
+}
+table.n-table div.n-table-op-btn-group .n-button.n-table-op-btn .btn {
+  padding-left: 3px;
+  padding-right: 3px;
+}
+table.n-table div.n-table-op-btn-group .n-button.n-table-op-btn .btn.disabled {
+  box-shadow: none;
+  -webkit-box-shadow: none;
+  -o-box-shadow: none;
+  color: #9f9f9f;
 }
 div.n-table-container.inline-editor table.n-table tbody tr td {
   height: 36px;
@@ -1350,6 +1365,28 @@ table.n-table tbody tr.odd.has-error {
 }
 table.n-table tbody tr.even.has-error {
   background-color: #f2dede;
+}
+.n-table-op-btn-popover .popover-content {
+  padding: 5px 5px 0;
+  margin-bottom: -5px;
+}
+.n-table-op-btn-popover .popover-content .n-button.n-table-op-btn {
+  font-size: 10px;
+  padding-top: 0;
+  padding-bottom: 0;
+  overflow: hidden;
+  outline: 0;
+  display: inline-block;
+}
+.n-table-op-btn-popover .popover-content .n-button.n-table-op-btn .btn {
+  padding-left: 3px;
+  padding-right: 3px;
+}
+.n-table-op-btn-popover .popover-content .n-button.n-table-op-btn .btn.disabled {
+  box-shadow: none;
+  -webkit-box-shadow: none;
+  -o-box-shadow: none;
+  color: #9f9f9f;
 }
 div.n-text {
   position: relative;
@@ -1699,6 +1736,16 @@ div.n-button a.btn.btn-default:focus {
 div.n-button.n-disabled {
   cursor: not-allowed;
 }
+div.n-button a.btn.dropdown-toggle:focus:before {
+  -webkit-animation: none;
+  animation: none;
+  -o-animation: none;
+}
+div.n-button a.btn.dropdown-toggle.effect:focus:before {
+  -webkit-animation: none;
+  animation: none;
+  -o-animation: none;
+}
 @keyframes buttonRippleOn {
   0% {
     opacity: 0;
@@ -1728,12 +1775,19 @@ div.n-button.n-disabled {
     top: -10%;
     left: -10%;
   }
-  100% {
+  99% {
     opacity: 0;
     height: 150%;
     width: 150%;
     top: -25%;
     left: -25%;
+  }
+  100% {
+    opacity: 0;
+    height: 0;
+    width: 0;
+    top: 35%;
+    left: 35%;
   }
 }
 @keyframes buttonRippleOff {
@@ -1765,12 +1819,19 @@ div.n-button.n-disabled {
     top: -10%;
     left: -10%;
   }
-  100% {
+  99% {
     opacity: 0;
     height: 150%;
     width: 150%;
     top: -25%;
     left: -25%;
+  }
+  100% {
+    opacity: 0;
+    height: 0;
+    width: 0;
+    top: 35%;
+    left: 35%;
   }
 }
 div.n-checkbox {
@@ -1794,6 +1855,7 @@ div.n-checkbox span.check-container.disabled.checked,
 div.n-checkbox span.check-container.disabled span.check,
 div.n-checkbox span.check-container.disabled.checked span.check,
 div.n-checkbox span.check-container.disabled.checked span.check:before {
+  pointer-events: none;
   cursor: not-allowed;
   color: #9f9f9f;
   user-select: none;
@@ -1883,6 +1945,9 @@ div.n-checkbox span.check-label.check-label-left {
 }
 div.n-checkbox span.check-label.disabled {
   color: #9f9f9f;
+  cursor: not-allowed;
+}
+div.n-checkbox.n-disabled div.check-container {
   cursor: not-allowed;
 }
 @keyframes checkbox-on {
@@ -2063,6 +2128,7 @@ div.n-radio span.radio-container.checked.disabled,
 div.n-radio span.radio-container.disabled span.check,
 div.n-radio span.radio-container.checked.disabled span.check,
 div.n-radio span.radio-container.checked.disabled span.check:before {
+  pointer-events: none;
   cursor: not-allowed;
   color: #9f9f9f;
   user-select: none;
@@ -2150,6 +2216,9 @@ div.n-radio span.radio-label.disabled {
   color: #9f9f9f;
   cursor: not-allowed;
 }
+div.n-radio.n-disabled div.radio-container {
+  cursor: not-allowed;
+}
 div.n-file {
   position: relative;
 }
@@ -2177,6 +2246,26 @@ div.n-file .file-input div.btn.btn-file {
   color: #666666;
   outline: 0;
   outline-offset: 0;
+}
+.n-tree {
+  position: relative;
+  overflow-y: hidden;
+}
+.n-tree.border {
+  padding: 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  -o-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+.n-tree.border:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  -o-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+.n-tree .nav > li {
+  white-space: nowrap;
 }
 .n-tree li > ul.nav {
   display: none;
@@ -2215,6 +2304,44 @@ div.n-file .file-input div.btn.btn-file {
 .n-tree div.n-checkbox span.check-container {
   top: 2px;
 }
+.n-tree.border span.buttons {
+  padding-top: 8px;
+}
+.n-tree span.buttons {
+  position: absolute;
+  top: -5px;
+  right: 0;
+  display: none;
+  opacity: 0.5;
+}
+.n-tree span.buttons div.n-button {
+  display: inline-block;
+}
+.n-tree span.buttons div.n-button a {
+  padding-left: 5px;
+  color: #666666;
+}
+.n-tree span.buttons div.n-button a:focus:before {
+  -webkit-animation: none;
+  animation: none;
+  -o-animation: none;
+}
+.n-tree span.buttons div.n-button a.effect:focus:before {
+  -webkit-animation: none;
+  animation: none;
+  -o-animation: none;
+}
+.n-tree span.buttons div.n-button a:last-child {
+  padding-right: 5px;
+}
+.n-tree span.buttons div.n-button a:active,
+.n-tree span.buttons div.n-button a:visited,
+.n-tree span.buttons div.n-button a:hover {
+  color: #666666;
+}
+.n-tree:hover span.buttons {
+  display: block;
+}
 div.n-array-check div.n-checkbox {
   display: inline-block;
   margin-right: 12px;
@@ -2222,6 +2349,70 @@ div.n-array-check div.n-checkbox {
 div.n-array-check.vertical div.n-checkbox {
   display: block;
   margin-right: 0;
+}
+.n-select-tree {
+  position: relative;
+  outline: none;
+}
+.n-select-tree .form-control {
+  cursor: pointer;
+  padding: 2px 2px 2px 0;
+  border: 0;
+  box-shadow: none;
+  -webkit-box-shadow: none;
+  -o-box-shadow: none;
+}
+.n-select-tree .form-control .selection {
+  box-sizing: border-box;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+.n-select-tree .form-control .selection > li {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 1px 3px;
+  margin: 1px 0 1px 3px;
+  float: left;
+  line-height: 1.5;
+}
+.n-select-tree .form-control .selection > li:first-child {
+  margin-left: 0;
+}
+.n-select-tree .form-control > .fa {
+  position: absolute;
+  right: 0;
+  bottom: 10px;
+}
+.n-select-tree:focus hr.focus-line {
+  transform: scaleX(1);
+  -o-transform: scaleX(1);
+  -webkit-transform: scaleX(1);
+}
+.n-select-tree.n-disabled .form-control {
+  cursor: not-allowed;
+  color: #9f9f9f;
+}
+.n-select-tree.n-disabled:focus hr.focus-line {
+  transform: scaleX(0);
+  -o-transform: scaleX(0);
+  -webkit-transform: scaleX(0);
+}
+.n-select-tree-popover.popover.bottom {
+  margin-top: 2px;
+  max-width: 9999px;
+}
+.n-select-tree-popover.popover.bottom .arrow {
+  margin-left: -8px;
+  top: -8px;
+  border-width: 8px;
+  border-top-width: 0;
+}
+.n-select-tree-popover.popover.bottom .popover-content {
+  padding: 5px 5px 0;
+  overflow: auto;
+  max-height: 300px;
 }
 div.has-error > span,
 div.has-error.horizontal-label > div.row > div:first-child > span {
@@ -2342,6 +2533,19 @@ div.has-error div.n-toggle.n-disabled > div.toggle-container.checked > span.n-to
 }
 div.has-error div.n-toggle span.n-toggle-true:before {
   background-color: #d32f2f;
+}
+div.has-error div.n-select-tree .form-control {
+  color: #f44336;
+  background-color: transparent;
+  border: 0;
+}
+div.has-error div.n-select-tree .form-control .selection > li {
+  border-color: #f44336;
+}
+div.has-error div.n-select-tree:focus hr.focus-line {
+  transform: scaleX(1);
+  -o-transform: scaleX(1);
+  -webkit-transform: scaleX(1);
 }
 div.has-error hr.normal-line {
   border-top: solid 1px transparent;

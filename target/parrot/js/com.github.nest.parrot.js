@@ -1,4 +1,4 @@
-/** com.github.nest.parrot.V0.0.4 2015-11-10 */
+/** com.github.nest.parrot.V0.0.4 2015-11-16 */
 (function ($) {
 	var patches = {
 		console: function () {
@@ -238,6 +238,9 @@
 	context.Glyphicon = ReactBootstrap.Glyphicon;
 	context.Modal = ReactBootstrap.Modal;
 	context.Panel = ReactBootstrap.Panel;
+	context.OverlayTrigger = ReactBootstrap.OverlayTrigger;
+	context.Overlay = ReactBootstrap.Overlay;
+	context.Popover = ReactBootstrap.Popover;
 })(this);
 
 (function () {
@@ -307,6 +310,7 @@
 		Radio: "radio",
 		Table: {type: "table", label: false, popover: false},
 		Tree: {type: "tree", label: false, popover: false},
+		SelectTree: "seltree",
 		Date: "date",
 		Search: "search",
 		Button: {type: "button", label: false},
@@ -663,6 +667,12 @@
 			this._sorter = sorter;
 		},
 		/**
+		 * get renderer of code table
+		 */
+		getRenderer: function() {
+			return this._renderer;
+		},
+		/**
 		 * initialize code table element array
 		 * @param codeTableArray {{id:string, text:string}[]}
 		 *          array of json object, eg: {id:"1", text:"text"}.
@@ -681,16 +691,30 @@
 			}
 			var map = {};
 			// render element
-			this._codes.forEach(function (code) {
-				map[code.id] = code;
+			var render = function(code) {
 				if (renderer) {
 					code.text = renderer(code);
+					if (code.children) {
+						code.children.forEach(render);
+					}
 				}
+			};
+			this._codes.forEach(function (code) {
+				map[code.id] = code;
+				render(code);
 			});
 			this._map = map;
 			// sort elements
 			if (sorter) {
-				sorter.sort(this._codes);
+				var sort = function(codes) {
+					sorter.sort(codes);
+					codes.forEach(function(code) {
+						if (code.children) {
+							sort(code.children);
+						}
+					});
+				};
+				sort(this._codes);
 			}
 		},
 		/**
@@ -823,6 +847,48 @@
 			return this.__getCodes();
 		},
 		/**
+		 * get code table element array, with hierarchy keys.
+		 * no duplicate id allowed when call this method.
+		 * @returns {{codeId: codeItem}};
+		 */
+		listAllChildren: function() {
+			var items = {};
+			var fetchItem = function(item) {
+				items[item.id] = item;
+				if (item.children) {
+					item.children.forEach(function(child) {
+						fetchItem(child);
+					});
+				}
+			};
+			this.list().forEach(function(item) {
+				fetchItem(item);
+			});
+			return items;
+		},
+		/**
+		 * get code table element array, with hierarchy keys
+		 * @param {rootId: string, separtor: string}
+		 * @returns {{codeId: codeItem}};
+		 */
+		listWithHierarchyKeys: function(options) {
+			var separator = (options && options.separator) ? options.separator : '|';
+			var rootId = (options && options.rootId != null) ? options.rootId : '0';
+			var items = {};
+			var fetchItem = function(item, parentId) {
+				items[parentId + separator + item.id] = item;
+				if (item.children) {
+					item.children.forEach(function(child) {
+						fetchItem(child, parentId + separator + item.id);
+					});
+				}
+			};
+			this.list().forEach(function(item) {
+				fetchItem(item, rootId);
+			});
+			return items;
+		},
+		/**
 		 * check code table element by given function
 		 * @param func {function} same as function definition Array.some()
 		 * @returns {boolean}
@@ -884,6 +950,7 @@
 	}
 
 	$pt.BUILD_PROPERTY_VISITOR = true;
+	$pt.PROPERTY_SEPARATOR = '_';
 
 	/**
 	 * clone json object
@@ -899,9 +966,9 @@
 	 * @returns {*}
 	 */
 	$pt.getValueFromJSON = function (jsonObject, id) {
-		if (id.indexOf('_') != -1) {
+		if (id.indexOf($pt.PROPERTY_SEPARATOR) != -1) {
 			// hierarchy id
-			var ids = id.split('_');
+			var ids = id.split($pt.PROPERTY_SEPARATOR);
 			var parent = jsonObject;
 			var value = null;
 			var values = ids.map(function (id) {
@@ -919,10 +986,10 @@
 		}
 	};
 	$pt.setValueIntoJSON = function (jsonObject, id, value) {
-		if (id.indexOf('_') == -1) {
+		if (id.indexOf($pt.PROPERTY_SEPARATOR) == -1) {
 			jsonObject[id] = value;
 		} else {
-			var ids = id.split('_');
+			var ids = id.split($pt.PROPERTY_SEPARATOR);
 			var parent = jsonObject;
 			for (var index = 0, count = ids.length - 1; index < count; index++) {
 				if (parent[ids[index]] == null) {
@@ -1532,6 +1599,13 @@
 			return this;
 		},
 		/**
+		 * apply current data to base model.
+		 */
+		applyCurrentToBase: function() {
+			this.__base = $.extend(true, {}, this.__model);
+			return this;
+		},
+		/**
 		 * get validator
 		 * @returns {ModelValidator}
 		 */
@@ -1678,6 +1752,16 @@
 		},
 		removePostChangeListener: function (id, listener) {
 			this.removeListener(id, 'post', 'change', listener);
+		},
+		firePostChangeEvent: function(id, _old, _new) {
+			this.fireEvent({
+				model: this,
+				id: id,
+				old: _old,
+				"new": _new,
+				time: "post",
+				type: "change"
+			});
 		},
 		/**
 		 * fire event
@@ -1965,6 +2049,7 @@
 		return new ModelClass(inputModel, validator);
 	};
 })(this, jQuery);
+
 (function (context, $) {
 	var $pt = context.$pt;
 	if ($pt == null) {
@@ -3122,6 +3207,30 @@
 			return option === undefined ? null : option;
 		},
 		/**
+		 * get id of component central.
+		 */
+		getComponentCentralId: function() {
+			return this.getComponentOption('centralId');
+		},
+		/**
+		 * register to component central
+		 */
+		registerToComponentCentral: function() {
+			var id = this.getComponentCentralId();
+			if (id) {
+				$pt.LayoutHelper.registerComponent(id, this);
+			}
+		},
+		/**
+		 * unregsiter from component central
+		 */
+		unregisterFromComponentCentral: function() {
+			var id = this.getComponentCentralId();
+			if (id) {
+				$pt.LayoutHelper.unregisterComponent(id, this);
+			}
+		},
+		/**
 		 * get event monitor
 		 * @param key {string} event name, if not passed, return whole event definition
 		 * @returns {*}
@@ -3139,14 +3248,24 @@
 		 * @returns {*}
 		 */
 		getComponentRuleValue: function (key, defaultValue) {
-			var rule = this.getComponentOption(key);
+			return this.getRuleValue(this.getComponentOption(key), defaultValue);
+		},
+		/**
+		 * get rule value. return default value if not defined.
+		 * otherwise call when function and return.
+		 * rule must be defined as {when: func, depends: props}
+		 * @param rule {{when: func, depends: props}}
+		 * @param defaultValue {*}
+		 * @param model {ModelInterface} given model, optional
+		 * @returns {*}
+		 */
+		getRuleValue: function(rule, defaultValue, model) {
 			if (rule === null) {
 				return defaultValue;
 			} else if (rule === true || rule === false) {
 				return rule;
 			} else {
-				var when = rule.when;
-				return when.call(this, this.getModel(), this.getValueFromModel());
+				return rule.when.call(this, model ? model : this.getModel(), this.getValueFromModel());
 			}
 		},
 		/**
@@ -3156,7 +3275,14 @@
 		 * @returns {[*]} always return an array, never return null or undefined.
 		 */
 		getComponentRuleDependencies: function (key) {
-			var dependencies = this.getComponentOption(key);
+			return this.getRuleDependencies(this.getComponentOption(key));
+		},
+		/**
+		 * get rule dependencies. rule must be defined as {when: func, depends: props}
+		 * @param dependencies {{when: func, depends: props}}
+		 * @returns {[*]} always return an array, never return null or undefined.
+		 */
+		getRuleDependencies: function(dependencies) {
 			if (dependencies === null || dependencies.depends === undefined || dependencies.depends === null) {
 				return [];
 			} else {
@@ -3237,48 +3363,64 @@
 		/**
 		 * add dependencies monitor
 		 * @param dependencies {[]}
-		 * @param monitor func
+		 * @param monitor {function} optional
+		 * @param model {ModelInterface} monitored model, optional
 		 */
-		addDependencyMonitor: function (dependencies, monitor) {
-			monitor = monitor == null? this.__forceUpdate : monitor;
+		addDependencyMonitor: function (dependencies, monitor, model) {
+			monitor = monitor == null ? this.__forceUpdate : monitor;
 			var _this = this;
-			dependencies.forEach(function (key) {
-				if (typeof key === 'object') {
-					var id = key.id;
-					if (key.on === 'form') {
-						_this.getFormModel().addListener(id, 'post', 'change', monitor);
-					} else if (key.on === 'inner') {
-						_this.getInnerModel().addListener(id, 'post', 'change', monitor);
+			if (model) {
+				dependencies.forEach(function(key) {
+					model.addListener(key, 'post', 'change', monitor);
+				});
+			} else {
+				dependencies.forEach(function (key) {
+					if (typeof key === 'object') {
+						var id = key.id;
+						if (key.on === 'form') {
+							_this.getFormModel().addListener(id, 'post', 'change', monitor);
+						} else if (key.on === 'inner') {
+							_this.getInnerModel().addListener(id, 'post', 'change', monitor);
+						} else {
+							_this.getModel().addListener(id, "post", "change", monitor);
+						}
 					} else {
-						_this.getModel().addListener(id, "post", "change", monitor);
+						_this.getModel().addListener(key, "post", "change", monitor);
 					}
-				} else {
-					_this.getModel().addListener(key, "post", "change", monitor);
-				}
-			});
+				});
+			}
+			return this;
 		},
 		/**
 		 * remove dependencies monitor
 		 * @param dependencies {[]}
-		 * @param monitor func
+		 * @param monitor {function} optional
+		 * @param model {ModelInterface} monitored model, optional
 		 */
-		removeDependencyMonitor: function (dependencies, monitor) {
+		removeDependencyMonitor: function (dependencies, monitor, model) {
 			monitor = monitor == null? this.__forceUpdate : monitor;
 			var _this = this;
-			dependencies.forEach(function (key) {
-				if (typeof key === 'object') {
-					var id = key.id;
-					if (key.on === 'form') {
-						_this.getFormModel().removeListener(id, 'post', 'change', monitor);
-					} else if (key.on === 'inner') {
-						_this.getInnerModel().removeListener(id, 'post', 'change', monitor);
+			if (model) {
+				dependencies.forEach(function(key) {
+					model.addListener(key, 'post', 'change', monitor);
+				});
+			} else {
+				dependencies.forEach(function (key) {
+					if (typeof key === 'object') {
+						var id = key.id;
+						if (key.on === 'form') {
+							_this.getFormModel().removeListener(id, 'post', 'change', monitor);
+						} else if (key.on === 'inner') {
+							_this.getInnerModel().removeListener(id, 'post', 'change', monitor);
+						} else {
+							_this.getModel().removeListener(id, "post", "change", monitor);
+						}
 					} else {
-						_this.getModel().removeListener(id, "post", "change", monitor);
+						_this.getModel().removeListener(key, "post", "change", monitor);
 					}
-				} else {
-					_this.getModel().removeListener(key, "post", "change", monitor);
-				}
-			});
+				});
+			}
+			return this;
 		},
 		// event
 		addPostChangeListener: function (listener) {
@@ -3335,6 +3477,86 @@
 		},
 		setDefaultSectionWidth : function(width) {
 			SectionLayout.DEFAULT_WIDTH = width * 1;
+		},
+		/**
+		 * register react component to central
+		 */
+		registerComponent: function(id, component) {
+			if (this.__comp[id]) {
+				// already some components use this id
+				var exists = this.__comp[id];
+				if (Array.isArray(exists)) {
+					// push to array if not exists
+					var found = exists.find(function(existed) {
+						return existed === component;
+					});
+					if (!found) {
+						exists.push(component);
+					}
+				} else {
+					// set as array if not equals
+					if (exists !== component) {
+						this.__comp[id] = [exists, component];
+					}
+				}
+			} else {
+				// set new component
+				this.__comp[id] = component;
+			}
+			return this;
+		},
+		/**
+		 * unregister component from central
+		 */
+		unregisterComponent: function(id, component) {
+			if (component) {
+				// delete key, unregister all components with given id
+				delete this.__comp[id];
+			} else {
+				// find all existed component with given id
+				var exists = this.__comp[id];
+				if (exists) {
+					if (Array.isArray(exists)) {
+						var index = exists.findIndex(function(existed) {
+							return existed === component;
+						});
+						if (index != -1) {
+							// unregister the found component
+							exists.splice(index, 1);
+						}
+					} else if (exists === component) {
+						// only one, equals, delete key
+						delete this.__comp[id];
+					}
+				}
+			}
+			return this;
+		},
+		/**
+		 * get component by given id
+		 */
+		getComponent: function(id) {
+			return this.__comp[id];
+		},
+		__forceUpdate: function(component) {
+			if (component.forceUpdate) {
+				component.forceUpdate();
+			}
+			return this;
+		},
+		/**
+		 * force update components which has give id
+		 */
+		forceUpdate: function(id) {
+			var components = this.getComponent(id);
+			if (components) {
+				if (Array.isArray(components)) {
+					components.forEach(this.__forceUpdate);
+				} else {
+					this.__forceUpdate(components);
+				}
+			}
+			return this;
 		}
 	});
 	$pt.LayoutHelper = new LayoutHelper();
@@ -3369,6 +3591,7 @@
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
 			this.removeEnableDependencyMonitor();
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * did update
@@ -3379,6 +3602,7 @@
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * did mount
@@ -3387,6 +3611,7 @@
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
@@ -3395,6 +3620,7 @@
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
 			this.removeEnableDependencyMonitor();
+			this.unregisterFromComponentCentral();
 		},
 		renderItem: function(enabled, item) {
 			var model = $pt.createModel({
@@ -3540,6 +3766,7 @@
 			this.removePostAddListener(this.onModelChanged);
 			this.removePostRemoveListener(this.onModelChanged);
 			this.removePostValidateListener(this.onModelValidateChanged);
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * did update
@@ -3552,6 +3779,7 @@
 			this.addPostAddListener(this.onModelChanged);
 			this.addPostRemoveListener(this.onModelChanged);
 			this.addPostValidateListener(this.onModelValidateChanged);
+			this.registerToComponentCentral();
 		},
 		/**
 		 * did mount
@@ -3562,6 +3790,7 @@
 			this.addPostAddListener(this.onModelChanged);
 			this.addPostRemoveListener(this.onModelChanged);
 			this.addPostValidateListener(this.onModelValidateChanged);
+			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
@@ -3572,6 +3801,7 @@
 			this.removePostAddListener(this.onModelChanged);
 			this.removePostRemoveListener(this.onModelChanged);
 			this.removePostValidateListener(this.onModelValidateChanged);
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * render item
@@ -3786,6 +4016,7 @@
 			this.removePostAddListener(this.onModelChanged);
 			this.removePostRemoveListener(this.onModelChanged);
 			this.removePostValidateListener(this.onModelValidateChanged);
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * did update
@@ -3798,6 +4029,7 @@
 			this.addPostAddListener(this.onModelChanged);
 			this.addPostRemoveListener(this.onModelChanged);
 			this.addPostValidateListener(this.onModelValidateChanged);
+			this.registerToComponentCentral();
 		},
 		/**
 		 * did mount
@@ -3808,6 +4040,7 @@
 			this.addPostAddListener(this.onModelChanged);
 			this.addPostRemoveListener(this.onModelChanged);
 			this.addPostValidateListener(this.onModelValidateChanged);
+			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
@@ -3818,6 +4051,7 @@
 			this.removePostAddListener(this.onModelChanged);
 			this.removePostRemoveListener(this.onModelChanged);
 			this.removePostValidateListener(this.onModelValidateChanged);
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * render tab content
@@ -4103,6 +4337,7 @@
 		 */
 		componentWillUpdate: function (nextProps) {
 			this.removeEnableDependencyMonitor();
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * did update
@@ -4111,25 +4346,23 @@
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * did mount
 		 */
 		componentDidMount: function () {
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
 		 */
 		componentWillUnmount: function () {
 			this.removeEnableDependencyMonitor();
+			this.unregisterFromComponentCentral();
 		},
-		/**
-		 * render icon
-		 * @returns {*}
-		 */
-		renderIcon: function () {
-			var icon = this.getIcon();
+		renderIcon: function(icon) {
 			if (icon == null) {
 				return null;
 			} else {
@@ -4139,6 +4372,51 @@
 				};
 				css['fa-' + icon] = true;
 				return React.createElement("span", {className: $pt.LayoutHelper.classSet(css)});
+			}
+		},
+		/**
+		 * render icon
+		 * @returns {*}
+		 */
+		renderButtonIcon: function () {
+			return this.renderIcon(this.getIcon());
+		},
+		renderMoreButtons: function(css) {
+			var more = this.getComponentOption('more');
+			if (more) {
+				var dropdown = (React.createElement("a", {href: "javascript:void(0);", 
+					className: $pt.LayoutHelper.classSet(css) + ' dropdown-toggle', 
+					onClick: this.onClicked, 
+					disabled: !this.isEnabled(), 
+					"data-toggle": "dropdown", 
+					"aria-haspopup": "true", 
+					"aria-expanded": "false"}, 
+				   	React.createElement("span", {className: "caret"})
+				));
+				var emptyFunction = function(){};
+				var _this = this;
+				var menus = (React.createElement("ul", {className: "dropdown-menu"}, 
+					more.map(function(menu) {
+						if (menu.divider) {
+							return (React.createElement("li", {role: "separator", className: "divider"}));
+						} else {
+							var click = menu.click ? menu.click : emptyFunction;
+							var label = menu.text;
+							var icon = _this.renderIcon(menu.icon);
+							if (label && icon) {
+								label = ' ' + label;
+							}
+							return (React.createElement("li", null, 
+								React.createElement("a", {href: "javascript:void(0);", onClick: click.bind(_this, _this.getModel())}, 
+									icon, label
+								)
+							));
+						}
+					})
+				));
+				return [dropdown, menus];
+			} else {
+				return null;
 			}
 		},
 		render: function () {
@@ -4153,26 +4431,42 @@
 				disabled: !this.isEnabled()
 			};
 			css['btn-' + this.getStyle()] = true;
+			var label = this.getLayout().getLabel();
+			var icon = this.renderButtonIcon();
 			if (this.getLabelPosition() === 'left') {
+				if (label && icon) {
+					label = label + ' ';
+				}
 				// label in left
 				return (React.createElement("div", {className: $pt.LayoutHelper.classSet(compCSS)}, 
-					React.createElement("a", {href: "javascript:void(0);", 
-					   className: $pt.LayoutHelper.classSet(css), 
-					   onClick: this.onClicked, 
-					   disabled: !this.isEnabled(), 
-					   ref: "a"}, 
-						this.getLayout().getLabel(), " ", this.renderIcon()
+					React.createElement("div", {className: "btn-group"}, 
+						React.createElement("a", {href: "javascript:void(0);", 
+						   className: $pt.LayoutHelper.classSet(css), 
+						   onClick: this.onClicked, 
+						   disabled: !this.isEnabled(), 
+						   title: this.getComponentOption('tooltip'), 
+						   ref: "a"}, 
+							label, icon
+						), 
+						this.renderMoreButtons(css)
 					)
 				));
 			} else {
+				if (label && icon) {
+					label = ' ' + label;
+				}
 				// default label in right
 				return (React.createElement("div", {className: $pt.LayoutHelper.classSet(compCSS)}, 
-					React.createElement("a", {href: "javascript:void(0);", 
-					   className: $pt.LayoutHelper.classSet(css), 
-					   onClick: this.onClicked, 
-					   disabled: !this.isEnabled(), 
-					   ref: "a"}, 
-						this.renderIcon(), " ", this.getLayout().getLabel()
+					React.createElement("div", {className: "btn-group"}, 
+						React.createElement("a", {href: "javascript:void(0);", 
+						   className: $pt.LayoutHelper.classSet(css), 
+						   onClick: this.onClicked, 
+						   disabled: !this.isEnabled(), 
+						   title: this.getComponentOption('tooltip'), 
+						   ref: "a"}, 
+							icon, label
+						), 
+						this.renderMoreButtons(css)
 					)
 				));
 			}
@@ -4272,6 +4566,7 @@
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
 			this.removeEnableDependencyMonitor();
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * did update
@@ -4284,6 +4579,7 @@
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * did mount
@@ -4294,6 +4590,7 @@
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
@@ -4302,6 +4599,7 @@
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
 			this.removeEnableDependencyMonitor();
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * render label
@@ -4539,6 +4837,7 @@
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChange);
 			this.removeEnableDependencyMonitor();
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * overrride react method
@@ -4551,6 +4850,7 @@
 			// add post change listener
 			this.addPostChangeListener(this.onModelChange);
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * override react method
@@ -4562,6 +4862,7 @@
 			// add post change listener
 			this.addPostChangeListener(this.onModelChange);
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * override react method
@@ -4571,6 +4872,7 @@
 			// remove post change listener
 			this.removePostChangeListener(this.onModelChange);
 			this.removeEnableDependencyMonitor();
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * create component
@@ -4943,6 +5245,12 @@
 		getInitialState: function () {
 			return {};
 		},
+		componentWillUpdate: function() {
+			this.unregisterFromComponentCentral();
+		},
+		componentDidUpdate: function() {
+			this.registerToComponentCentral();
+		},
 		componentDidMount: function () {
 			var input = $(React.findDOMNode(this.refs.file));
 			input.fileinput(this.createDisplayOptions({
@@ -5052,6 +5360,7 @@
 			comp.find('.input-group-btn>.btn')
 				.focus(this.onComponentFocused)
 				.blur(this.onComponentBlurred);
+			this.registerToComponentCentral();
 		},
 		componentWillUnmount: function () {
 			var input = $(React.findDOMNode(this.refs.file));
@@ -5062,6 +5371,7 @@
 			});
 			// destroy the component
 			input.fileinput('destroy');
+			this.unregisterFromComponentCentral();
 		},
 		render: function () {
 			var css = {};
@@ -5651,6 +5961,18 @@
 			// layout, FormLayout
 			layout: React.PropTypes.object
 		},
+		componentWillUpdate: function() {
+			this.unregisterFromComponentCentral();
+		},
+		componentDidUpdate: function() {
+			this.registerToComponentCentral();
+		},
+		componentDidMount: function() {
+			this.registerToComponentCentral();
+		},
+		componentWillUnmount: function() {
+			this.unregisterFromComponentCentral();
+		},
 		render: function () {
 			var buttonLayout = this.getButtonLayout();
 			return React.createElement(NPanelFooter, {model: this.props.model, 
@@ -5781,8 +6103,8 @@
 			 * @returns {XML}
 			 * @private
 			 */
-			__search: function (model, layout) {
-				return React.createElement(NSearchText, {model: model, layout: layout, ref: layout.getId()});
+			__search: function (model, layout, direction) {
+				return React.createElement(NSearchText, {model: model, layout: layout, direction: direction, ref: layout.getId()});
 			},
 			/**
 			 * render table
@@ -5799,6 +6121,14 @@
 			 */
 			__tree: function (model, layout) {
 				return React.createElement(NTree, {model: model, layout: layout, ref: layout.getId()});
+			},
+			/**
+			 * render select tree
+			 * @returns {XML}
+			 * @private
+			 */
+			__seltree: function(model, layout) {
+				return React.createElement(NSelectTree, {model: model, layout: layout, ref: layout.getId()});
 			},
 			/**
 			 * render file
@@ -5900,6 +6230,7 @@
 			this.removePostValidateListener(this.onModelValidateChanged);
 			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * did update
@@ -5912,6 +6243,7 @@
 			this.addPostValidateListener(this.onModelValidateChanged);
 			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * did mount
@@ -5922,6 +6254,7 @@
 			this.addPostValidateListener(this.onModelValidateChanged);
 			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
@@ -5932,6 +6265,7 @@
 			this.removePostValidateListener(this.onModelValidateChanged);
 			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
+			this.unregisterFromComponentCentral();
 		},
 		destroyPopover: function () {
 			var comp = this.refs.comp;
@@ -6142,6 +6476,24 @@
 		getHorizontalLabelWidth: function () {
 			var width = this.getComponentOption('labelWidth');
 			return width ? width : NFormCell.LABEL_WIDTH;
+		},
+		/**
+		 * register to component central
+		 */
+		registerToComponentCentral: function() {
+			var id = this.getComponentCentralId();
+			if (id) {
+				$pt.LayoutHelper.registerComponent(id + '@cell', this);
+			}
+		},
+		/**
+		 * unregsiter from component central
+		 */
+		unregisterFromComponentCentral: function() {
+			var id = this.getComponentCentralId();
+			if (id) {
+				$pt.LayoutHelper.unregisterComponent(id + '@cell', this);
+			}
 		}
 	}));
 	context.NFormCell = NFormCell;
@@ -6218,6 +6570,7 @@
 					_this.removeDependencyMonitor([tab.badgeId]);
 				}
 			});
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * did update
@@ -6231,6 +6584,7 @@
 					_this.addDependencyMonitor([tab.badgeId]);
 				}
 			});
+			this.registerToComponentCentral();
 		},
 		/**
 		 * did mount
@@ -6242,6 +6596,7 @@
 					_this.addDependencyMonitor([tab.badgeId]);
 				}
 			});
+			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
@@ -6253,6 +6608,7 @@
 					_this.removeDependencyMonitor([tab.badgeId]);
 				}
 			});
+			this.unregisterFromComponentCentral();
 		},
 		renderTabContent: function (layout, index) {
 			var activeIndex = this.getActiveTabIndex();
@@ -6515,6 +6871,7 @@
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.__forceUpdate);
 			this.removeEnableDependencyMonitor();
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * did update
@@ -6525,6 +6882,7 @@
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.__forceUpdate);
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * did mount
@@ -6533,6 +6891,7 @@
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.__forceUpdate);
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
@@ -6541,6 +6900,7 @@
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
 			this.removeEnableDependencyMonitor();
+			this.unregisterFromComponentCentral();
 		},
 		render: function () {
 			var texts = this.getText();
@@ -8076,6 +8436,7 @@
 			}
 			this.removeDependencyMonitor(this.getDependencies("collapsedLabel"));
 			this.removeDependencyMonitor(this.getDependencies("expandedLabel"));
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * did update
@@ -8088,6 +8449,7 @@
 			}
 			this.addDependencyMonitor(this.getDependencies("collapsedLabel"));
 			this.addDependencyMonitor(this.getDependencies("expandedLabel"));
+			this.registerToComponentCentral();
 		},
 		/**
 		 * did mount
@@ -8098,6 +8460,7 @@
 			}
 			this.addDependencyMonitor(this.getDependencies("collapsedLabel"));
 			this.addDependencyMonitor(this.getDependencies("expandedLabel"));
+			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
@@ -8106,8 +8469,9 @@
 			if (this.hasCheckInTitle()) {
 				this.getModel().removeListener(this.getCheckInTitleDataId(), 'post', 'change', this.onTitleCheckChanged);
 			}
-			this.addDependencyMonitor(this.getDependencies("collapsedLabel"));
-			this.addDependencyMonitor(this.getDependencies("expandedLabel"));
+			this.removeDependencyMonitor(this.getDependencies("collapsedLabel"));
+			this.removeDependencyMonitor(this.getDependencies("expandedLabel"));
+			this.unregisterFromComponentCentral();
 		},
 		getDefaultProps: function () {
 			return {
@@ -8645,6 +9009,7 @@
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
 			this.removeEnableDependencyMonitor();
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * did update
@@ -8655,6 +9020,7 @@
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * did mount
@@ -8663,6 +9029,7 @@
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
@@ -8671,6 +9038,7 @@
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
 			this.removeEnableDependencyMonitor();
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * render label
@@ -8795,7 +9163,9 @@
 			// model
 			model: React.PropTypes.object,
 			// CellLayout
-			layout: React.PropTypes.object
+			layout: React.PropTypes.object,
+			// label direction
+			direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
 		},
 		getDefaultProps: function () {
 			return {
@@ -8813,6 +9183,7 @@
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChange);
 			this.removeEnableDependencyMonitor();
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * did update
@@ -8824,6 +9195,7 @@
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChange);
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * did mount
@@ -8834,6 +9206,7 @@
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChange);
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
@@ -8842,6 +9215,7 @@
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChange);
 			this.removeEnableDependencyMonitor();
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * render
@@ -9005,6 +9379,15 @@
 			var _this = this;
 			var layout = this.getComponentOption('searchDialogLayout');
 			if (layout == null) {
+				var direction = this.props.direction;
+				if (!direction) {
+					direction = NForm.LABEL_DIRECTION;
+				}
+				var buttonCSS = {
+					'pull-right': true,
+					'pull-down': direction == 'vertical'
+				};
+
 				layout = {
 					name: {
 						label: NSearchText.ADVANCED_SEARCH_DIALOG_NAME_LABEL,
@@ -9024,7 +9407,7 @@
 							style: 'primary',
 							click: function (model) {
 								var currentModel = $.extend({}, model.getCurrentModel());
-								// 移除查询结果和翻页查询条件JSON, 只留下当前需要查询的条件数据
+								// remove query result and pagination criteria JSON, only remain the criteria data.
 								delete currentModel.items;
 								delete currentModel.criteria;
 
@@ -9042,7 +9425,7 @@
 							}
 						},
 						css: {
-							comp: 'pull-right pull-down'
+							comp: $pt.LayoutHelper.classSet(buttonCSS)
 						},
 						pos: {
 							row: 10,
@@ -9176,6 +9559,7 @@
 				// add post change listener into parent model
 				this.getParentModel().removeListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
 			}
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * did update
@@ -9204,6 +9588,7 @@
 			}
 
 			this.removeTooltip();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * did mount
@@ -9218,6 +9603,7 @@
 				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
 			}
 			this.removeTooltip();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
@@ -9232,6 +9618,7 @@
 			}
 			// remove the jquery dom element
 			this.getComponent().next("span").remove();
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * create component
@@ -9310,12 +9697,12 @@
 				'n-disabled': !this.isEnabled()
 			};
 			css[this.getComponentCSS('n-select')] = true;
-			return React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
 			            ref: "div"}, 
 				React.createElement("select", {style: {width: this.getComponentOption("width")}, 
 				        disabled: !this.isEnabled(), 
 				        ref: "select"})
-			);
+			));
 		},
 		/**
 		 * on component change
@@ -9523,6 +9910,378 @@
 		};
 	})(jQuery);
 	context.NSelect = NSelect;
+}(this, jQuery, $pt));
+
+(function(context, $, $pt) {
+	var NSelectTree = React.createClass($pt.defineCellComponent({
+		statics: {
+		},
+		propTypes: {
+			// model
+			model: React.PropTypes.object,
+			// CellLayout
+			layout: React.PropTypes.object
+		},
+		getDefaultProps: function() {
+			return {
+				defaultOptions: {
+				},
+				treeLayout: {
+					comp: {
+						root: false,
+						check: true,
+						multiple: true,
+						hierarchyCheck: false
+					}
+				}
+			};
+		},
+		getInitialState: function() {
+			return {};
+		},
+		/**
+		 * will update
+		 * @param nextProps
+		 */
+		componentWillUpdate: function (nextProps) {
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.__forceUpdate);
+			this.removeEnableDependencyMonitor();
+			if (this.hasParent()) {
+				// add post change listener into parent model
+				this.getParentModel().removeListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+			}
+			this.unregisterFromComponentCentral();
+		},
+		/**
+		 * did update
+		 * @param prevProps
+		 * @param prevState
+		 */
+		componentDidUpdate: function (prevProps, prevState) {
+			// add post change listener to handle model change
+			this.addPostChangeListener(this.__forceUpdate);
+			this.addEnableDependencyMonitor();
+			if (this.hasParent()) {
+				// add post change listener into parent model
+				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+			}
+			this.registerToComponentCentral();
+
+			if (this.state.popoverDiv && this.state.popoverDiv.is(':visible')) {
+				this.showPopover();
+			}
+		},
+		/**
+		 * did mount
+		 */
+		componentDidMount: function () {
+			// add post change listener to handle model change
+			this.addPostChangeListener(this.__forceUpdate);
+			this.addEnableDependencyMonitor();
+			if (this.hasParent()) {
+				// add post change listener into parent model
+				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+			}
+			this.registerToComponentCentral();
+		},
+		/**
+		 * will unmount
+		 */
+		componentWillUnmount: function () {
+			this.destroyPopover();
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.__forceUpdate);
+			this.removeEnableDependencyMonitor();
+			if (this.hasParent()) {
+				// add post change listener into parent model
+				this.getParentModel().removeListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+			}
+			this.unregisterFromComponentCentral();
+		},
+		renderTree: function() {
+			var layout = $pt.createCellLayout('values', this.getTreeLayout());
+			var model = $pt.createModel({values: this.getValueFromModel()});
+			model.addPostChangeListener('values', this.onTreeValueChanged);
+			return React.createElement(NTree, {model: model, layout: layout});
+		},
+		renderSelectionItem: function(codeItem, nodeId) {
+			return (React.createElement("li", null, 
+				React.createElement("span", {className: "fa fa-fw fa-remove", onClick: this.onSelectionItemRemove.bind(this, nodeId)}), 
+				codeItem.text
+			));
+		},
+		renderSelection: function() {
+			var values = this.getValueFromModel();
+			var codes = null;
+			var _this = this;
+			if (values == null) {
+				return null;
+			} else if (this.getTreeLayout().comp.valueAsArray) {
+				// value as an array
+				codes = this.getAvailableTreeModel().listAllChildren();
+				return Object.keys(codes).map(function(id) {
+					var value = values.find(function(value) {
+						return value == id;
+					});
+					if (value != null) {
+						return _this.renderSelectionItem(codes[value], value);
+					}
+				});
+			} else {
+				// value as a hierarchy json object
+				codes = this.getAvailableTreeModel().listWithHierarchyKeys({separator: NTree.NODE_SEPARATOR, rootId: NTree.ROOT_ID});
+				var render = function(node, currentId, parentId) {
+					var nodeId = parentId + NTree.NODE_SEPARATOR + currentId;
+					var spans = [];
+					if (node.selected) {
+						spans.push(_this.renderSelectionItem(codes[nodeId], nodeId));
+					}
+					spans.push.apply(spans, Object.keys(node).filter(function(key) {
+						return key != 'selected';
+					}).map(function(key) {
+						return render(node[key], key, nodeId);
+					}));
+					return spans;
+				};
+				return Object.keys(values).filter(function(key) {
+					return key != 'selected';
+				}).map(function(key) {
+					return render(values[key], key, NTree.ROOT_ID);
+				});
+			}
+		},
+		renderText: function() {
+			return (React.createElement("div", {className: "input-group form-control", onClick: this.onComponentClicked, ref: "comp"}, 
+				React.createElement("ul", {className: "selection"}, 
+					this.renderSelection()
+				), 
+				React.createElement("span", {className: "fa fa-fw fa-sort-down pull-right"})
+			));
+		},
+		render: function() {
+			var css = {
+				'n-disabled': !this.isEnabled()
+			};
+			css[this.getComponentCSS('n-select-tree')] = true;
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), tabIndex: "0"}, 
+				this.renderText(), 
+				this.renderNormalLine(), 
+				this.renderFocusLine()
+			));
+		},
+		renderPopoverContainer: function() {
+			if (this.state.popoverDiv == null) {
+				this.state.popoverDiv = $('<div>');
+				this.state.popoverDiv.appendTo($('body'));
+				$(document).on('click', this.onDocumentClicked).on('keyup', this.onDocumentKeyUp);
+			}
+			this.state.popoverDiv.hide();
+		},
+		renderPopover: function() {
+			var styles = {display: 'block'};
+			var component = this.getComponent();
+			styles.width = component.outerWidth();
+			var offset = component.offset();
+			styles.top = offset.top + component.outerHeight();
+			styles.left = offset.left;
+			var popover = (React.createElement("div", {role: "tooltip", className: "n-select-tree-popover popover bottom in", style: styles}, 
+				React.createElement("div", {className: "arrow", style: {left: '20px'}}), 
+				React.createElement("div", {className: "popover-content"}, 
+					this.renderTree()
+				)
+			));
+			React.render(popover, this.state.popoverDiv.get(0));
+		},
+		showPopover: function() {
+			this.renderPopoverContainer();
+			this.renderPopover();
+			this.state.popoverDiv.show();
+		},
+		hidePopover: function() {
+			if (this.state.popoverDiv && this.state.popoverDiv.is(':visible')) {
+				this.state.popoverDiv.hide();
+				React.render(React.createElement("noscript", null), this.state.popoverDiv.get(0));
+			}
+		},
+		destroyPopover: function() {
+			if (this.state.popoverDiv) {
+				$(document).off('click', this.onDocumentClicked).off('keyup', this.onDocumentKeyUp);
+				this.state.popoverDiv.remove();
+				delete this.state.popoverDiv;
+			}
+		},
+		onComponentClicked: function() {
+			if (!this.isEnabled()) {
+				// do nothing
+				return;
+			}
+			this.showPopover();
+		},
+		onDocumentClicked: function(evt) {
+			var target = $(evt.target);
+			if (target.closest(this.getComponent()).length == 0 && target.closest(this.state.popoverDiv).length == 0) {
+				this.hidePopover();
+			}
+		},
+		onDocumentKeyUp: function(evt) {
+			if (evt.keyCode === 27) {
+				this.hidePopover();
+			}
+		},
+		/**
+		 * on parent model changed
+		 */
+		onParentModelChanged: function() {
+			var parentChanged = this.getComponentOption('parentChanged');
+			if (parentChanged) {
+				this.setValueToModel(parentChanged.call(this, this.getModel(), this.getParentPropertyValue()));
+			} else {
+				// clear values
+				this.setValueToModel(null);
+			}
+			this.forceUpdate();
+		},
+		/**
+		 * on tree value changed
+		 */
+		onTreeValueChanged: function(evt) {
+			var values = evt.new;
+			if (values == null) {
+				this.setValueToModel(values);
+			} else if (Array.isArray(values)) {
+				this.setValueToModel(values.slice(0));
+			} else {
+				this.setValueToModel($.extend(true, {}, values));
+			}
+		},
+		onSelectionItemRemove: function(nodeId) {
+			if (!this.isEnabled()) {
+				// do nothing
+				return;
+			}
+			var values = this.getValueFromModel();
+			var hierarchyCheck = this.getTreeLayout().comp.hierarchyCheck;
+			if (values == null) {
+				// do nothing
+			} else if (this.getTreeLayout().comp.valueAsArray) {
+				if (hierarchyCheck) {
+					var codes = this.getAvailableTreeModel().listWithHierarchyKeys({separator: NTree.NODE_SEPARATOR, rootId: NTree.ROOT_ID});
+					var codeHierarchyIds = Object.keys(codes);
+					// find all children
+					var childrenIds = codeHierarchyIds.filter(function(key) {
+						return key.indexOf(nodeId + NTree.NODE_SEPARATOR) != -1;
+					}).map(function(id) {
+						return id.split(NTree.NODE_SEPARATOR).pop();
+					});
+					var hierarchyId = codeHierarchyIds.find(function(id) {
+						return id.endsWith(NTree.NODE_SEPARATOR + nodeId);
+					});
+					// find itself and its ancestor ids
+					var ancestorIds = codeHierarchyIds.filter(function(id) {
+						return hierarchyId.startsWith(id);
+					}).map(function(id) {
+						return id.split(NTree.NODE_SEPARATOR).pop();
+					});
+					// combine
+					var ids = childrenIds.concat(ancestorIds);
+					// filter found ids
+					this.setValueToModel(values.filter(function(id) {
+						return -1 == ids.findIndex(function(idNeedRemove) {
+							return id == idNeedRemove;
+						});
+					}));
+				} else {
+					// remove itself
+					this.setValueToModel(values.filter(function(id) {
+						return id != nodeId;
+					}));
+				}
+			} else {
+				var effectiveNodes = nodeId.split(NTree.NODE_SEPARATOR).slice(1);
+				var node = $pt.getValueFromJSON(values, effectiveNodes.join($pt.PROPERTY_SEPARATOR));
+				if (hierarchyCheck) {
+					// set itself and its children to unselected
+					Object.keys(node).forEach(function(key) {
+						delete node[key];
+					});
+					// set its ancestors to unselected
+					effectiveNodes.splice(effectiveNodes.length - 1, 1);
+					effectiveNodes.forEach(function(id, index, array) {
+						$pt.setValueIntoJSON(values, array.slice(0, index + 1).join($pt.PROPERTY_SEPARATOR) + $pt.PROPERTY_SEPARATOR + 'selected', false);
+					});
+				} else {
+					// set itself to unselected
+					delete node.selected;
+				}
+				this.getModel().firePostChangeEvent(this.getDataId(), values, values);
+			}
+		},
+		getComponent: function() {
+			return $(React.findDOMNode(this.refs.comp));
+		},
+		/**
+		 * get tree model
+		 * @returns {CodeTable}
+		 */
+		getTreeModel: function() {
+			return this.getComponentOption('data');
+		},
+		/**
+		 * get available tree model
+		 * @returns {CodeTable}
+		 */
+		getAvailableTreeModel: function() {
+			var filter = this.getComponentOption('parentFilter');
+			var tree = this.getTreeModel();
+			if (filter) {
+				return filter.call(this, tree, this.getParentPropertyValue());
+			} else {
+				return tree;
+			}
+		},
+		getTreeLayout: function() {
+			var treeLayout = this.getComponentOption('treeLayout');
+			if (treeLayout) {
+				treeLayout = $.extend(true, {}, this.props.treeLayout, treeLayout);
+			} else {
+				treeLayout = $.extend(true, {}, this.props.treeLayout);
+			}
+			treeLayout.comp.data = this.getAvailableTreeModel();
+			treeLayout.comp.valueAsArray = treeLayout.comp.valueAsArray ? treeLayout.comp.valueAsArray : false;
+			return treeLayout;
+		},
+		/**
+		 * has parent or not
+		 * @returns {boolean}
+		 */
+		hasParent: function() {
+			return this.getParentPropertyId() != null;
+		},
+		/**
+		 * get parent property id
+		 * @returns {string}
+		 */
+		getParentPropertyId: function() {
+			return this.getComponentOption("parentPropId");
+		},
+		/**
+		 * get parent model
+		 * @returns {ModelInterface}
+		 */
+		getParentModel: function () {
+			var parentModel = this.getComponentOption("parentModel");
+			return parentModel == null ? this.getModel() : parentModel;
+		},
+		/**
+		 * get parent property value
+		 * @returns {*}
+		 */
+		getParentPropertyValue: function () {
+			return this.getParentModel().get(this.getParentPropertyId());
+		}
+	}));
+	context.NSelectTree = NSelectTree;
 }(this, jQuery, $pt));
 
 (function (context, $, $pt) {
@@ -9971,6 +10730,7 @@
 			ROW_HEIGHT: 32,
 			TOOLTIP_EDIT: null,
 			TOOLTIP_REMOVE: null,
+			TOOLTIP_MORE: 'More Operations...',
 			/**
 			 * set operation button width
 			 * @param width {number}
@@ -9983,6 +10743,7 @@
 			SEARCH_PLACE_HOLDER: "Search...",
 			ROW_EDIT_BUTTON_ICON: "pencil",
 			ROW_REMOVE_BUTTON_ICON: "trash-o",
+			ROW_MORE_BUTTON_ICON: 'sort-down',
 			EDIT_DIALOG_SAVE_BUTTON_TEXT: "Save",
 			EDIT_DIALOG_SAVE_BUTTON_ICON: 'floppy-o',
 			SORT_ICON: "sort",
@@ -10162,6 +10923,7 @@
 				// clear definition
 				this.columns = null;
 			}
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * did update
@@ -10170,18 +10932,21 @@
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
 			this.attachListeners();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * did mount
 		 */
 		componentDidMount: function () {
 			this.attachListeners();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
 		 */
 		componentWillUnmount: function () {
 			this.detachListeners();
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * render when IE8, fixed the height of table since IE8 doesn't support max-height
@@ -10265,11 +11030,16 @@
 					rowOperations: rowOperations,
 					title: ""
 				};
-				config.width = (config.editable ? NTable.__operationButtonWidth : 0) + (config.removable ? NTable.__operationButtonWidth : 0);
-				if (hasUserDefinedRowOperations) {
-					config.width += NTable.__operationButtonWidth * config.rowOperations.length;
+				var maxButtonCount = this.getComponentOption('maxOperationButtonCount');
+				if (maxButtonCount) {
+					config.width = (maxButtonCount + 1) * NTable.__operationButtonWidth;
+				} else {
+					config.width = (config.editable ? NTable.__operationButtonWidth : 0) + (config.removable ? NTable.__operationButtonWidth : 0);
+					if (hasUserDefinedRowOperations) {
+						config.width += NTable.__operationButtonWidth * config.rowOperations.length;
+					}
+					config.width = config.width < NTable.__minOperationButtonWidth ? NTable.__minOperationButtonWidth : config.width;
 				}
-				config.width = config.width < NTable.__minOperationButtonWidth ? NTable.__minOperationButtonWidth : config.width;
 				this.columns.push(config);
 				if (this.fixedRightColumns > 0 || this.getComponentOption("operationFixed") === true) {
 					this.fixedRightColumns++;
@@ -10499,40 +11269,133 @@
 			)
 			));
 		},
-		/**
-		 * render operation cell
-		 * @param column
-		 * @param data
-		 * @returns {XML}
-		 */
-		renderOperationCell: function (column, data) {
-			var editButton = column.editable ?
-				(React.createElement(Button, {bsSize: "xsmall", bsStyle: "link", onClick: this.onEditClicked.bind(this, data), 
-				         className: "n-table-op-btn"}, 
-					React.createElement(NIcon, {icon: NTable.ROW_EDIT_BUTTON_ICON, size: "lg", tooltip: NTable.TOOLTIP_EDIT})
-				)) : null;
-			var removeButton = column.removable ?
-				(React.createElement(Button, {bsSize: "xsmall", bsStyle: "link", onClick: this.onRemoveClicked.bind(this, data), 
-				         className: "n-table-op-btn"}, 
-					React.createElement(NIcon, {icon: NTable.ROW_REMOVE_BUTTON_ICON, size: "lg", tooltip: NTable.TOOLTIP_REMOVE})
-				)) : null;
+		renderRowEditButton: function(rowModel) {
+			var layout = $pt.createCellLayout('editButton', {
+				comp: {
+					style: 'link',
+					icon: NTable.ROW_EDIT_BUTTON_ICON,
+					enabled: this.getRowEditButtonEnabled(),
+					click: this.onEditClicked.bind(this, rowModel.getCurrentModel()),
+					tooltip: NTable.TOOLTIP_EDIT
+				},
+				css: {
+					comp: 'n-table-op-btn'
+				}
+			});
+			return React.createElement(NFormButton, {model: rowModel, layout: layout});
+		},
+		renderRowRemoveButton: function(rowModel) {
+			var layout = $pt.createCellLayout('removeButton', {
+				comp: {
+					style: 'link',
+					icon: NTable.ROW_REMOVE_BUTTON_ICON,
+					enabled: this.getRowRemoveButtonEnabled(),
+					click: this.onRemoveClicked.bind(this, rowModel.getCurrentModel()),
+					tooltip: NTable.TOOLTIP_REMOVE
+				},
+				css: {
+					comp: 'n-table-op-btn'
+				}
+			});
+			return React.createElement(NFormButton, {model: rowModel, layout: layout});
+		},
+		renderRowOperationButton: function(operation, rowModel) {
+			var layout = $pt.createCellLayout('rowButton', {
+				comp: {
+					style: 'link',
+					icon: operation.icon,
+					enabled: operation.enabled,
+					click: this.onRowOperationClicked.bind(this, operation.click, rowModel.getCurrentModel()),
+					tooltip: operation.tooltip
+				},
+				css: {
+					comp: 'n-table-op-btn'
+				}
+			});
+			return React.createElement(NFormButton, {model: rowModel, layout: layout});
+		},
+		getRowOperations: function(column) {
 			var rowOperations = column.rowOperations;
 			if (rowOperations === undefined || rowOperations === null) {
 				rowOperations = [];
 			}
+			return rowOperations;
+		},
+		/**
+		 * render flat operation cell, all operation button renderred as a line.
+		 */
+		renderFlatOperationCell: function(column, rowModel) {
+			var editButton = column.editable ? this.renderRowEditButton(rowModel) : null;
+			var removeButton = column.removable ? this.renderRowRemoveButton(rowModel) : null;
+			var rowOperations = this.getRowOperations(column);
 			var _this = this;
 			return (React.createElement(ButtonGroup, {className: "n-table-op-btn-group"}, 
-				rowOperations.map(function (opt) {
-					// for compatibility, keep the key 'func', offically is key 'click'
-					var click = opt.click || opt.func;
-					return (React.createElement(Button, {bsSize: "xsmall", bsStyle: "link", className: "n-table-op-btn", 
-					                onClick: _this.onRowOperationClicked.bind(_this, click, data)}, 
-						React.createElement(NIcon, {icon: opt.icon, size: "lg", tooltip: opt.tooltip})
-					));
+				rowOperations.map(function (operation) {
+					return _this.renderRowOperationButton(operation, rowModel);
 				}), 
 				editButton, 
 				removeButton
 			));
+		},
+		/**
+		 * render dropdown operation cell, only buttons which before maxButtonCount are renderred as a line,
+		 * a dropdown button is renderred in last, other buttons are renderred in popover of dropdown button.
+		 */
+		renderDropDownOperationCell: function(column, rowModel, maxButtonCount) {
+			var rowOperations = this.getRowOperations(column);
+			if (column.editable) {
+				rowOperations.push({editButton: true});
+			}
+			if (column.removable) {
+				rowOperations.push({removeButton: true});
+			}
+
+			var _this = this;
+			var used = -1;
+			var buttons = [];
+			rowOperations.some(function(operation) {
+				if (operation.editButton) {
+					buttons.push(_this.renderRowEditButton(rowModel));
+				} else if (operation.removeButton) {
+					buttons.push(_this.renderRowRemoveButton(rowModel));
+				} else {
+					buttons.push(_this.renderRowOperationButton(operation, rowModel));
+				}
+				used++;
+				return maxButtonCount - used == 1;
+			});
+			var hasDropdown = (rowOperations.length - used) > 1;
+			var dropdown = null;
+			if (hasDropdown) {
+				var menus = rowOperations.slice(used + 1).map(function(operation) {
+					return _this.renderRowOperationButton(operation, rowModel);
+				});
+				dropdown = (React.createElement(OverlayTrigger, {trigger: "click", rootClose: true, placement: "bottom", 
+					overlay: React.createElement(Popover, {className: "n-table-op-btn-popover"}, menus)}, 
+					React.createElement("a", {href: "javascript:void(0);", 
+						className: "n-table-op-btn btn btn-xs btn-link pull-right"}, 
+						React.createElement(NIcon, {icon: NTable.ROW_MORE_BUTTON_ICON, size: "lg", tooltip: NTable.TOOLTIP_MORE})
+					)
+				));
+			}
+
+			return (React.createElement(ButtonGroup, {className: "n-table-op-btn-group"}, 
+				buttons, dropdown
+			));
+		},
+		/**
+		 * render operation cell
+		 * @param column
+		 * @param rowModel {ModelInterface} row model
+		 * @returns {XML}
+		 */
+		renderOperationCell: function (column, rowModel) {
+			var maxButtonCount = this.getComponentOption('maxOperationButtonCount');
+			if (!maxButtonCount) {
+				return this.renderFlatOperationCell(column, rowModel);
+			} else {
+				return this.renderDropDownOperationCell(column, rowModel, maxButtonCount);
+			}
 		},
 		/**
 		 * render row select cell
@@ -10581,7 +11444,7 @@
 				}
 			}
 
-			var inlineModel = null;
+			var inlineModel = this.createInlineRowModel(row);
 			return (React.createElement("tr", {className: className}, 
 				this.columns.map(function (column) {
 					if (columnIndex >= indexToRender.min && columnIndex <= indexToRender.max) {
@@ -10596,7 +11459,7 @@
 						var data;
 						if (column.editable || column.removable || column.rowOperations != null) {
 							// operation column
-							data = _this.renderOperationCell(column, row);
+							data = _this.renderOperationCell(column, inlineModel);
 							style['text-align'] = "center";
 						} else if (column.indexable) {
 							// index column
@@ -10604,10 +11467,6 @@
 						} else if (column.rowSelectable) {
 							data = _this.renderRowSelectCell(column, row);
 						} else if (column.inline) {
-							if (inlineModel == null) {
-								inlineModel = _this.createEditingModel(row);
-								inlineModel.useBaseAsCurrent();
-							}
 							// inline editor or something, can be pre-defined or just declare as be constructed as a form layout
 							if (typeof column.inline === 'string') {
 								var layout = NTable.getInlineEditor(column.inline);
@@ -11146,12 +12005,18 @@
 		isEditable: function () {
 			return this.getComponentOption("editable");
 		},
+		getRowEditButtonEnabled: function() {
+			return this.getComponentOption('rowEditEnabled');
+		},
 		/**
 		 * check the table is removable or not
 		 * @returns {boolean}
 		 */
 		isRemovable: function () {
 			return this.getComponentOption("removable");
+		},
+		getRowRemoveButtonEnabled: function() {
+			return this.getComponentOption('rowRemoveEnabled');
 		},
 		/**
 		 * check the table is searchable or not
@@ -11558,6 +12423,11 @@
 			editModel.parent(this.getModel());
 			return editModel;
 		},
+		createInlineRowModel: function(item) {
+			var model = this.createEditingModel(item);
+			model.useBaseAsCurrent();
+			return model;
+		},
 		/**
 		 * on model change
 		 * @param evt
@@ -11791,6 +12661,7 @@
 			this.removePostChangeListener(this.onModelChanged);
 			this.removeEnableDependencyMonitor();
 			this.getComponent().off('change', this.onComponentChanged);
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * did update
@@ -11806,6 +12677,7 @@
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
 			this.getComponent().on('change', this.onComponentChanged);
+			this.registerToComponentCentral();
 		},
 		/**
 		 * did mount
@@ -11817,6 +12689,7 @@
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
 			this.getComponent().on('change', this.onComponentChanged);
+			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
@@ -11826,6 +12699,7 @@
 			this.removePostChangeListener(this.onModelChanged);
 			this.removeEnableDependencyMonitor();
 			this.getComponent().off('change', this.onComponentChanged);
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * render left add-on
@@ -12110,6 +12984,7 @@
 			this.removePostChangeListener(this.onModelChanged);
 			this.removeEnableDependencyMonitor();
 			this.getComponent().off('change', this.onComponentChanged);
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * did update
@@ -12124,6 +12999,7 @@
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
 			this.getComponent().on('change', this.onComponentChanged);
+			this.registerToComponentCentral();
 		},
 		/**
 		 * did mount
@@ -12135,6 +13011,7 @@
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
 			this.getComponent().on('change', this.onComponentChanged);
+			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
@@ -12144,6 +13021,7 @@
 			this.removePostChangeListener(this.onModelChanged);
 			this.removeEnableDependencyMonitor();
 			this.getComponent().off('change', this.onComponentChanged);
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * render text
@@ -12246,6 +13124,7 @@
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
 			this.removeEnableDependencyMonitor();
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * did update
@@ -12258,6 +13137,7 @@
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * did mount
@@ -12268,6 +13148,7 @@
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
@@ -12276,6 +13157,7 @@
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
 			this.removeEnableDependencyMonitor();
+			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * render label
@@ -12395,7 +13277,27 @@
             OP_FOLDER_LEAF_ICON: 'angle-right',
             OP_FOLDER_ICON: 'angle-double-right',
             OP_FOLDER_OPEN_ICON: 'angle-double-down',
-            OP_FILE_ICON: ''
+            OP_FILE_ICON: '',
+            NODE_SEPARATOR : '|',
+            ROOT_ID : '0',
+            convertValueTreeToArray: function(nodeValues, id) {
+                var array = [];
+                var push = function(node, id) {
+                    Object.keys(node).forEach(function(key) {
+                        if (key == 'selected' && node[key]) {
+                            if (id != NTree.ROOT_ID) {
+                                array.push(id);
+                            } else {
+                                array.selected = node.selected ? true : undefined;
+                            }
+                        } else {
+                            push(node[key], key);
+                        }
+                    });
+                };
+                push(nodeValues, id);
+                return array;
+            }
         },
         propTypes: {
             // model
@@ -12407,15 +13309,49 @@
             return {
                 defaultOptions: {
                     root: true,
+                    check: false,
                     inactiveSlibing: true,
-                    opIconEnabled: false
+                    opIconEnabled: false,
+                    multiple: true,
+                    valueAsArray: false,
+                    hierarchyCheck: false,
+                    expandLevel: 1,
+                    border: false,
+                    expandButton: {
+                        comp: {
+                            icon: 'plus-square-o',
+                            style: 'link'
+                        }
+                    },
+                    collapseButton: {
+                        comp: {
+                            icon: 'minus-square-o',
+                            style: 'link'
+                        }
+                    }
                 }
             };
         },
         getInitialState: function() {
+            var expandBtn = $.extend(true, {}, this.getComponentOption('expandButton'));
+            if (expandBtn) {
+                if (!expandBtn.comp.click) {
+                    expandBtn.comp.click = this.expandAll;
+                }
+                expandBtn = $pt.createCellLayout('expand', expandBtn);
+            }
+            var collapseBtn = $.extend(true, {}, this.getComponentOption('collapseButton'));
+            if (collapseBtn) {
+                if (!collapseBtn.comp.click) {
+                    collapseBtn.comp.click = this.collapseAll;
+                }
+                collapseBtn = $pt.createCellLayout('collapse', collapseBtn);
+            }
             return {
                 activeNodes: {},
-                root: {text: this.getRootLabel(), id: 0}
+                root: {text: this.getRootLabel(), id: NTree.ROOT_ID},
+                expandButton: expandBtn,
+                collapseButton: collapseBtn,
             };
         },
         /**
@@ -12425,6 +13361,7 @@
     	componentWillUpdate: function (nextProps) {
     		// remove post change listener to handle model change
     		this.removePostChangeListener(this.__forceUpdate);
+            this.unregisterFromComponentCentral();
     	},
     	/**
     	 * did update
@@ -12434,6 +13371,7 @@
     	componentDidUpdate: function (prevProps, prevState) {
     		// add post change listener to handle model change
     		this.addPostChangeListener(this.__forceUpdate);
+            this.registerToComponentCentral();
     	},
         componentWillMount: function() {
             var expandLevel = this.getComponentOption('expandLevel');
@@ -12446,7 +13384,7 @@
             }
             var _this = this;
             var expand = function(parentId, node, level) {
-                if (level <= expandLevel) {
+                if (level < expandLevel) {
                     var nodeId = _this.getNodeId(parentId, node);
                     _this.state.activeNodes[nodeId] = node;
                     if (node.children) {
@@ -12456,7 +13394,7 @@
                     }
                 }
             };
-            this.state.root.children = this.getValueFromModel();
+            this.state.root.children = this.getTopLevelNodes();
             expand(null, this.state.root, 0);
         },
     	/**
@@ -12465,6 +13403,7 @@
     	componentDidMount: function () {
     		// add post change listener to handle model change
     		this.addPostChangeListener(this.__forceUpdate);
+            this.registerToComponentCentral();
     	},
     	/**
     	 * will unmount
@@ -12472,22 +13411,23 @@
     	componentWillUnmount: function () {
     		// remove post change listener to handle model change
     		this.removePostChangeListener(this.__forceUpdate);
+            this.unregisterFromComponentCentral();
     	},
         renderCheck: function(node, nodeId) {
-            var checkId = this.getCheckBoxId(node);
-            if (!checkId) {
+            var canSelected = this.isNodeCanSelect(node);
+            if (!canSelected) {
                 return null;
             }
-            var model = $pt.createModel(node);
+            var modelValue = this.getValueFromModel();
+            modelValue = modelValue ? modelValue : {};
+            var model = $pt.createModel({selected: this.isNodeChecked(nodeId)});
             model.useBaseAsCurrent();
-            var layout = $pt.createCellLayout(checkId, {
+            var layout = $pt.createCellLayout('selected', {
                 comp: {
                     type: $pt.ComponentConstants.Check
                 }
             });
-            if (this.getComponentOption('hierarchyCheck')) {
-                model.addPostChangeListener(checkId, this.onHierarchyCheck.bind(this, node, nodeId));
-            }
+            model.addPostChangeListener('selected', this.onNodeCheckChanged.bind(this, node, nodeId));
             return React.createElement(NCheck, {model: model, layout: layout});
         },
         renderNode: function(parentNodeId, node) {
@@ -12531,12 +13471,7 @@
             );
         },
         renderNodes: function(parent, parentNodeId) {
-            var children = null;
-            if (parent) {
-                children = parent.children;
-            } else {
-                children = this.getValueFromModel();
-            }
+            var children =  parent.children;
             if (children && children.length > 0) {
                 return (
                     React.createElement("ul", {className: "nav"}, 
@@ -12554,64 +13489,219 @@
         },
         renderTopLevel: function() {
             var root = this.state.root;
-            root.children = this.getValueFromModel();
-            return this.isRootPaint() ? this.renderRoot() : this.renderNodes(root);
+            root.children = this.getTopLevelNodes();
+            return this.isRootPaint() ? this.renderRoot() : this.renderNodes(root, this.getNodeId(null, root));
+        },
+        renderButtons: function() {
+            var expand = this.state.expandButton ? React.createElement(NFormButton, {model: this.getModel(), layout: this.state.expandButton}) : null;
+            var collapse = this.state.collapseButton ? React.createElement(NFormButton, {model: this.getModel(), layout: this.state.collapseButton}) : null;
+            if (expand || collapse) {
+                return (React.createElement("span", {className: "buttons"}, 
+                    expand, collapse
+                ));
+            } else {
+                return null;
+            }
         },
         render: function() {
+            var styles = {};
+            if (this.getComponentOption('height')) {
+                styles.height = this.getComponentOption('height');
+            }
+            if (this.getComponentOption('maxHeight')) {
+                styles.maxHeight = this.getComponentOption('maxHeight');
+            }
+            var css = this.getComponentCSS('n-tree');
+            if (this.getComponentOption('border')) {
+                css += ' border';
+            }
             return (
-                React.createElement("div", {className: this.getComponentCSS('n-tree')}, 
-                    this.renderTopLevel()
+                React.createElement("div", {className: css, style: styles}, 
+                    this.renderTopLevel(), 
+                    this.renderButtons()
                 )
             );
         },
         onNodeClicked: function(node, nodeId) {
+            if (this.isLeaf(node)) {
+                return;
+            }
             if (this.state.activeNodes[nodeId]) {
-                this.inactiveNode(node, nodeId);
+                this.collapseNode(node, nodeId);
             } else {
-                this.activeNode(node, nodeId);
+                this.expandNode(node, nodeId);
+            }
+            var nodeClick = this.getComponentOption('nodeClick');
+            if (nodeClick) {
+                nodeClick.call(this, node);
             }
         },
-        onHierarchyCheck: function(node, nodeId, evt, toChildOnly) {
-            var _this = this;
-
-            var value = evt.new;
-            // to child
-            var checkId = this.getCheckBoxId(node);
-            if (checkId) {
-                node[checkId] = value;
-            }
-            if (node.children) {
-                node.children.forEach(function(child) {
-                    _this.onHierarchyCheck(child, _this.getNodeId(nodeId, child), evt, true);
-                });
-            }
-            // to parent
-            if (!toChildOnly) {
-                this.hierarchyCheckToAncestors(nodeId);
-            }
-
-            this.forceUpdate();
-        },
-        hierarchyCheckToAncestors: function(nodeId) {
-            var _this = this;
-
-            var index = nodeId.lastIndexOf('-');
-            if (index > 0) {
-                var parentNodeId = nodeId.substring(0, index);
-                var parentNode = this.state.activeNodes[parentNodeId];
-                var notAllChecked = parentNode.children.some(function(child) {
-                    var checkId = _this.getCheckBoxId(child);
-                    if (checkId) {
-                        return !child[checkId];
-                    }
-                });
-                var checkId = this.getCheckBoxId(parentNode);
-                if (checkId) {
-                    // if chlidren are not all checked, set as false
-                    parentNode[checkId] = !notAllChecked;
+        onNodeCheckChanged: function(node, nodeId, evt, toChildOnly) {
+            var hierarchyCheck = this.isHierarchyCheck();
+            var modelValue = this.getValueFromModel();
+            if (this.isValueAsArray()) {
+                modelValue = modelValue ? modelValue : [];
+                if (hierarchyCheck) {
+                    this.checkNodeHierarchy(node, nodeId, evt.new, modelValue);
+                    this.hierarchyCheckToAncestors(nodeId, modelValue);
+                } else {
+                    this.checkNode(nodeId, evt.new, modelValue);
                 }
-                // move to ancestors
-                this.hierarchyCheckToAncestors(parentNodeId);
+                if (this.getValueFromModel() != modelValue) {
+                    // simply set to model
+                    this.setValueToModel(modelValue);
+                } else {
+                    // fire event manually
+                    this.getModel().firePostChangeEvent(this.getDataId(), modelValue, modelValue);
+                }
+            } else {
+                if (!modelValue) {
+                    modelValue = {};
+                }
+
+                if (hierarchyCheck) {
+                    this.checkNodeHierarchy(node, nodeId, evt.new, modelValue);
+                    this.hierarchyCheckToAncestors(nodeId, modelValue);
+                } else {
+                    this.checkNode(nodeId, evt.new, modelValue);
+                }
+
+                if (this.getValueFromModel() != modelValue) {
+                    // simply set to model
+                    this.setValueToModel(modelValue);
+                } else {
+                    // fire event manually
+                    this.getModel().firePostChangeEvent(this.getDataId(), modelValue, modelValue);
+                }
+            }
+        },
+        isValueAsArray: function() {
+            return this.getComponentOption('valueAsArray');
+        },
+        /**
+         * check or uncheck node. will not fire post change event.
+         */
+        checkNode: function(nodeId, value, modelValue) {
+            if (this.isValueAsArray()) {
+                if (!this.isMultipleSelection()) {
+                    // no multiple selection
+                    modelValue.length = 0;
+                }
+                if (nodeId == this.state.root.id) {
+                    modelValue.selected = value;
+                } else {
+                    var ids = nodeId.split(NTree.NODE_SEPARATOR);
+                    var id = ids[ids.length - 1];
+                    var index = modelValue.findIndex(function(value) {
+                        return value == id;
+                    });
+                    if (value && index == -1) {
+                        modelValue.push(id);
+                    } else if (!value && index != -1) {
+                        modelValue.splice(index, 1);
+                    }
+                }
+            } else {
+                if (!this.isMultipleSelection()) {
+                    // no multiple selection
+                    Object.keys(modelValue).forEach(function(key) {
+                        delete modelValue[key];
+                    });
+                }
+                if (nodeId == this.state.root.id) {
+                    $pt.setValueIntoJSON(modelValue, 'selected', value);
+                } else {
+                    var segments = nodeId.split(NTree.NODE_SEPARATOR);
+                    $pt.setValueIntoJSON(modelValue, segments.slice(1).join($pt.PROPERTY_SEPARATOR) + $pt.PROPERTY_SEPARATOR + 'selected', value);
+                }
+            }
+            return modelValue;
+        },
+        /**
+         * check or uncheck node hierarchy. will not fire post change event.
+         */
+        checkNodeHierarchy: function(node, nodeId, value, modelValue) {
+            modelValue = this.checkNode(nodeId, value, modelValue);
+            if (node.children) {
+                var _this = this;
+                node.children.forEach(function(child) {
+                    var childId = _this.getNodeId(nodeId, child);
+                    _this.checkNodeHierarchy(child, childId, value, modelValue);
+                });
+            }
+            return modelValue;
+        },
+        isNodeChecked: function(nodeId, modelValue) {
+            modelValue = modelValue ? modelValue : this.getValueFromModel();
+            modelValue = modelValue ? modelValue : {};
+            if (Array.isArray(modelValue)) {
+                if (nodeId == this.state.root.id) {
+                    return modelValue.selected;
+                } else {
+                    var ids = nodeId.split(NTree.NODE_SEPARATOR);
+                    var id = ids[ids.length - 1];
+                    return -1 != modelValue.findIndex(function(value) {
+                        return value == id;
+                    });
+                }
+            } else {
+                if (nodeId == this.state.root.id) {
+                    return $pt.getValueFromJSON(modelValue, 'selected');
+                } else {
+                    return $pt.getValueFromJSON(modelValue, nodeId.split(NTree.NODE_SEPARATOR).slice(1).join($pt.PROPERTY_SEPARATOR) + $pt.PROPERTY_SEPARATOR + 'selected');
+                }
+            }
+        },
+        hierarchyCheckToAncestors: function(nodeId, modelValue) {
+            var _this = this;
+            var checkNodeOnChildren = function(node, nodeId) {
+                if (node.children) {
+                    var hasUncheckedChild = false;
+                    node.children.forEach(function(child) {
+                        var checked = checkNodeOnChildren(child, _this.getNodeId(nodeId, child));
+                        if (!checked) {
+                            hasUncheckedChild = true;
+                        }
+                    });
+                    // console.log(nodeId);
+                    _this.checkNode(nodeId, !hasUncheckedChild, modelValue);
+                    return !hasUncheckedChild;
+                } else {
+                    // no children, return checked of myself
+                    // console.log(nodeId);
+                    return _this.isNodeChecked(nodeId, modelValue);
+                }
+            };
+            checkNodeOnChildren(this.state.root, this.getNodeId(null, this.state.root));
+            // console.log(modelValue);
+        },
+        expandAll: function() {
+            var activeNodes = this.state.activeNodes;
+            var root = this.state.root;
+            var expand = function(node, parentNodeId) {
+                if (!this.isLeaf(node)) {
+                    var nodeId = this.getNodeId(parentNodeId, node);
+                    activeNodes[nodeId] = node;
+                    var _this = this;
+                    node.children.forEach(function(child) {
+                        expand.call(_this, child, nodeId);
+                    });
+                }
+            };
+            expand.call(this, root, null);
+            this.setState({activeNodes: activeNodes});
+        },
+        collapseAll: function() {
+            var root = this.state.root;
+            if (this.isRootPaint()) {
+                this.collapseNode(root, this.getNodeId(null, root));
+            } else {
+                var rootNodeId = this.getNodeId(null, root);
+                if (root.children) {
+                    root.children.forEach(function(node) {
+                        this.collapseNode(node, this.getNodeId(rootNodeId, node));
+                    }.bind(this));
+                }
             }
         },
         isRootPaint: function() {
@@ -12634,7 +13724,7 @@
         isInactiveSlibingWhenActive: function() {
             return this.getComponentOption('inactiveSlibing');
         },
-        inactiveNode: function(node, nodeId) {
+        collapseNode: function(node, nodeId) {
             var regexp = new RegExp(nodeId);
             var activeNodes = this.state.activeNodes;
             Object.keys(activeNodes).forEach(function(key) {
@@ -12644,11 +13734,11 @@
             });
             this.setState({activeNodes: activeNodes});
         },
-        activeNode: function(node, nodeId) {
+        expandNode: function(node, nodeId) {
             var activeNodes = this.state.activeNodes;
             if (this.isInactiveSlibingWhenActive() && !this.isLeaf(node)) {
                 // remove all slibings and their children from active list
-                var lastHyphen = nodeId.lastIndexOf('-');
+                var lastHyphen = nodeId.lastIndexOf(NTree.NODE_SEPARATOR);
                 if (lastHyphen > 0) {
                     var regexp = new RegExp(nodeId.substring(0, lastHyphen + 1));
                     Object.keys(activeNodes).forEach(function(key) {
@@ -12664,6 +13754,20 @@
             }
             activeNodes[nodeId] = node;
             this.setState({activeNodes: activeNodes});
+        },
+        /**
+         * get top level nodes
+         * @returns {{}[]}
+         */
+        getTopLevelNodes: function() {
+            return this.getAvailableNodes().list();
+        },
+        /**
+         * get avaiable top level nodes
+         * @returns {CodeTable}
+         */
+        getAvailableNodes: function() {
+            return this.getComponentOption('data');
         },
         getNodeIcon: function(node, nodeId) {
             var isLeaf = this.isLeaf(node);
@@ -12703,12 +13807,7 @@
             }
         },
         getNodeText: function(node) {
-            var render = this.getComponentOption('textRender');
-            if (render) {
-                return render.call(this, node);
-            } else {
-                return node.text;
-            }
+            return node.text;
         },
         /**
          * get customized node icon
@@ -12777,20 +13876,34 @@
                 return defaultIcon;
             }
         },
-        getCheckBoxId: function(node) {
+        isNodeCanSelect: function(node) {
             var check = this.getComponentOption('check');
             if (typeof check === 'function') {
                 return check.call(this, node);
             } else if (check) {
                 return check;
             } else {
-                return null;
+                return false;
             }
+        },
+        /**
+         * is multiple selection allowed
+         * @returns {boolean}
+         */
+        isMultipleSelection: function() {
+            return this.getComponentOption('multiple');
+        },
+        /**
+         * is hierarchy check, effective only when multiple is true
+         * @returns {boolean}
+         */
+        isHierarchyCheck: function() {
+            return this.getComponentOption('hierarchyCheck') && this.isMultipleSelection();
         },
         getNodeId: function(parentNodeId, node) {
             var nodeId = null;
             if (parentNodeId) {
-                nodeId = parentNodeId + '-' + node.id;
+                nodeId = parentNodeId + NTree.NODE_SEPARATOR + node.id;
             } else {
                 nodeId = '' + node.id;
             }
