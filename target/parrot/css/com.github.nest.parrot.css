@@ -2402,6 +2402,7 @@ div.n-array-check.vertical div.n-checkbox {
 .n-select-tree-popover.popover.bottom {
   margin-top: 2px;
   max-width: 9999px;
+  z-index: 10000;
 }
 .n-select-tree-popover.popover.bottom .arrow {
   margin-left: -8px;

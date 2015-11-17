@@ -1,4 +1,4 @@
-/** com.github.nest.parrot.V0.0.4 2015-11-16 */
+/** com.github.nest.parrot.V0.0.4 2015-11-17 */
 (function ($) {
 	var patches = {
 		console: function () {
@@ -9925,6 +9925,7 @@
 		getDefaultProps: function() {
 			return {
 				defaultOptions: {
+					hideChildWhenParentChecked: false
 				},
 				treeLayout: {
 					comp: {
@@ -10011,14 +10012,29 @@
 				codeItem.text
 			));
 		},
-		renderSelection: function() {
-			var values = this.getValueFromModel();
-			var codes = null;
+		renderSelectionWhenValueAsArray: function(values) {
 			var _this = this;
-			if (values == null) {
-				return null;
-			} else if (this.getTreeLayout().comp.valueAsArray) {
-				// value as an array
+			var codes = null;
+			if (this.isHideChildWhenParentChecked()) {
+				// only render parent selections
+				codes = this.getAvailableTreeModel().list();
+				var isChecked = function(code) {
+					return -1 != values.findIndex(function(value) {
+						return value == code.id;
+					});
+				};
+				var traverse = function(codes) {
+					return codes.map(function(code) {
+						if (isChecked(code)) {
+							return _this.renderSelectionItem(code, code.id);
+						} else if (code.children){
+							return traverse(code.children);
+						}
+					});
+				};
+				return traverse(codes);
+			} else {
+				// render all selections
 				codes = this.getAvailableTreeModel().listAllChildren();
 				return Object.keys(codes).map(function(id) {
 					var value = values.find(function(value) {
@@ -10028,9 +10044,30 @@
 						return _this.renderSelectionItem(codes[value], value);
 					}
 				});
+			}
+		},
+		renderSelectionWhenValueAsJSON: function(values) {
+			var _this = this;
+			var codes = this.getAvailableTreeModel().listWithHierarchyKeys({separator: NTree.NODE_SEPARATOR, rootId: NTree.ROOT_ID});
+			if (this.isHideChildWhenParentChecked()) {
+				var paintedNodes = [];
+				var isPainted = function(nodeId) {
+					// if nodeId starts with paintedNodeId, do not paint again
+					return -1 != paintedNodes.findIndex(function(paintedNodeId) {
+						return nodeId.startsWith(paintedNodeId);
+					});
+				};
+				return Object.keys(codes).map(function(nodeId) {
+					if (!isPainted(nodeId)) {
+						var valueId = nodeId.split(NTree.NODE_SEPARATOR).slice(1).join($pt.PROPERTY_SEPARATOR) + $pt.PROPERTY_SEPARATOR + 'selected';
+						var checked = $pt.getValueFromJSON(values, valueId);
+						if (checked) {
+							paintedNodes.push(nodeId + NTree.NODE_SEPARATOR);
+							return _this.renderSelectionItem(codes[nodeId], nodeId);
+						}
+					}
+				});
 			} else {
-				// value as a hierarchy json object
-				codes = this.getAvailableTreeModel().listWithHierarchyKeys({separator: NTree.NODE_SEPARATOR, rootId: NTree.ROOT_ID});
 				var render = function(node, currentId, parentId) {
 					var nodeId = parentId + NTree.NODE_SEPARATOR + currentId;
 					var spans = [];
@@ -10049,6 +10086,19 @@
 				}).map(function(key) {
 					return render(values[key], key, NTree.ROOT_ID);
 				});
+			}
+		},
+		renderSelection: function() {
+			var values = this.getValueFromModel();
+			if (values == null) {
+				// no selection
+				return null;
+			} else if (this.getTreeLayout().comp.valueAsArray) {
+				// value as an array
+				return this.renderSelectionWhenValueAsArray(values);
+			} else {
+				// value as a hierarchy json object
+				return this.renderSelectionWhenValueAsJSON(values);
 			}
 		},
 		renderText: function() {
@@ -10250,6 +10300,14 @@
 			treeLayout.comp.data = this.getAvailableTreeModel();
 			treeLayout.comp.valueAsArray = treeLayout.comp.valueAsArray ? treeLayout.comp.valueAsArray : false;
 			return treeLayout;
+		},
+		isHideChildWhenParentChecked: function() {
+			var hierarchyCheck = this.getTreeLayout().comp.hierarchyCheck;
+			if (hierarchyCheck) {
+				return this.getComponentOption('hideChildWhenParentChecked');
+			} else {
+				return false;
+			}
 		},
 		/**
 		 * has parent or not

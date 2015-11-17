@@ -28,10 +28,11 @@
 		comp: {
 			type: $pt.ComponentConstants.SelectTree,
 			data: tree,
+			hideChildWhenParentChecked: true,
 			treeLayout: {
 				comp: {
 					hierarchyCheck: true,
-					valueAsArray: true
+					// valueAsArray: true
 				}
 			}
 		},
@@ -45,11 +46,32 @@
 			treeLayout: {
 				comp: {
 					hierarchyCheck: true,
-					valueAsArray: true
+					// valueAsArray: true
 				}
 			}
 		},
 		pos: {row: 1, col: 1}
+	});
+
+	var dialog = NModalForm.createFormModal("Test");
+	dialog.show({
+		model: model,
+		layout: $pt.createFormLayout({
+			treeValue: {
+				label: 'Select Tree In Dialog',
+				comp: {
+					type: $pt.ComponentConstants.SelectTree,
+					data: tree,
+					treeLayout: {
+						comp: {
+							hierarchyCheck: true,
+							valueAsArray: true
+						}
+					}
+				},
+				pos: {row: 1, col: 1, width: 12}
+			}
+		})
 	});
 
 	var panel = (<div className='row'>
