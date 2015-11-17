@@ -82,7 +82,10 @@
 				return {
 					id: 'code-search-default',
 					title: 'Default',
-					desc: 'A simple code search box.',
+					desc: <span>A simple code search box.<br/>
+					Set <code>labelPropId</code> to initial label value by data model,
+					or send remote request to retrieve label by code value. <br/>
+					Remote request may cause the performance issue in some scenarios, so set <code>labelPropId</code> is recommended.</span>,
 					xml: {
 						width: 6,
 						xml: <NSearchText model={model} layout={$pt.createCellLayout('value', layoutTemplate)}/>
