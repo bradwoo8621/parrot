@@ -9173,7 +9173,9 @@
 			};
 		},
 		getInitialState: function () {
-			return {};
+			return {
+				stopRetrieveLabelFromRemote: false
+			};
 		},
 		/**
 		 * will update
@@ -9191,7 +9193,7 @@
 		 * @param prevState
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
-			this.getComponent().val(this.getValueFromModel());
+			this.initSetValues();
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChange);
 			this.addEnableDependencyMonitor();
@@ -9202,7 +9204,7 @@
 		 */
 		componentDidMount: function () {
 			// set model value to component
-			this.getComponent().val(this.getValueFromModel());
+			this.initSetValues();
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChange);
 			this.addEnableDependencyMonitor();
@@ -9266,43 +9268,17 @@
 		 * on component changed
 		 */
 		onComponentChange: function (evt) {
-			if (this.state.search != null) {
-				clearTimeout(this.state.search);
-			}
 			var value = evt.target.value;
-
-			var triggerDigits = this.getSearchTriggerDigits();
-			if (triggerDigits == null) {
-				throw new $pt.createComponentException(
-					$pt.ComponentConstants.Err_Search_Text_Trigger_Digits_Not_Defined,
-					"Trigger digits cannot be null in search text.");
-			}
-			this.setLabelText("");
-			if (value != null) {
-				if (triggerDigits == -1 || value.length == triggerDigits) {
-					var _this = this;
-					this.state.search = setTimeout(function () {
-						$pt.doPost(_this.getSearchUrl(), {
-							code: value
-						}, {
-							quiet: true
-						}).done(function (data) {
-							if (typeof data === 'string') {
-								data = JSON.parse(data);
-							}
-							_this.setLabelText(data.name);
-						});
-					}, 300);
-				}
-			}
-			this.setValueToModel(value);
+			this.setValueToModel(evt.target.value);
 		},
 		/**
 		 * on model change
 		 * @param evt
 		 */
 		onModelChange: function (evt) {
-			this.getComponent().val(evt.new);
+			var value = evt.new;
+			this.getComponent().val(value);
+			this.retrieveAndSetLabelTextFromRemote(value);
 		},
 		/**
 		 * show advanced search dialog
@@ -9326,11 +9302,67 @@
 		 * @param item
 		 */
 		pickupAdvancedResultItem: function (item) {
+			this.state.stopRetrieveLabelFromRemote = true;
 			this.setLabelText(item.name);
 			this.getModel().set(this.getDataId(), item.code);
+			this.state.stopRetrieveLabelFromRemote = false;
+		},
+		initSetValues: function() {
+			var value = this.getValueFromModel();
+			this.getComponent().val(value);
+			var labelPropertyId = this.getComponentOption('labelPropId');
+			if (labelPropertyId) {
+				this.setLabelText(this.getModel().get(labelPropertyId));
+			} else {
+				// send ajax request
+				this.retrieveAndSetLabelTextFromRemote(value);
+			}
 		},
 		setLabelText: function (text) {
 			$(React.findDOMNode(this.refs.label)).val(text);
+		},
+		/**
+		 * get label text from remote
+		 */
+		retrieveAndSetLabelTextFromRemote: function(value) {
+			if (this.state.search != null) {
+				clearTimeout(this.state.search);
+			}
+
+			if (this.state.stopRetrieveLabelFromRemote) {
+				return;
+			}
+
+			var triggerDigits = this.getSearchTriggerDigits();
+			if (triggerDigits == null) {
+				throw new $pt.createComponentException(
+					$pt.ComponentConstants.Err_Search_Text_Trigger_Digits_Not_Defined,
+					"Trigger digits cannot be null in search text.");
+			}
+
+			if (value == null || value.isBlank() || (value.length != triggerDigits && triggerDigits != -1)) {
+				this.setLabelText(null);
+				return;
+			}
+
+			var _this = this;
+			this.state.search = setTimeout(function() {
+				$pt.doPost(_this.getSearchUrl(), {
+					code: value
+				}, {
+					quiet: true
+				}).done(function (data) {
+					if (typeof data === 'string') {
+						data = JSON.parse(data);
+					}
+					_this.setLabelText(data.name);
+				}).fail(function() {
+					console.error('Error occured when retrieve label from remote in NSearch.');
+					arguments.slice(0).forEach(function(argu) {
+						console.error(argu);
+					});
+				});
+			}, 300);
 		},
 		/**
 		 * get search url
