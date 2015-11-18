@@ -1322,9 +1322,18 @@ table.n-table div.n-table-op-btn-group .n-button.n-table-op-btn {
   outline: 0;
   display: inline-block;
 }
+table.n-table div.n-table-op-btn-group .n-button.n-table-op-btn.more .btn {
+  margin-top: -2px;
+}
 table.n-table div.n-table-op-btn-group .n-button.n-table-op-btn .btn {
   padding-left: 3px;
   padding-right: 3px;
+}
+table.n-table div.n-table-op-btn-group .n-button.n-table-op-btn .btn:focus:before,
+table.n-table div.n-table-op-btn-group .n-button.n-table-op-btn .btn.effect:focus:before {
+  animation: none;
+  -webkit-animation: none;
+  -o-animation: none;
 }
 table.n-table div.n-table-op-btn-group .n-button.n-table-op-btn .btn.disabled {
   box-shadow: none;
@@ -1366,11 +1375,19 @@ table.n-table tbody tr.odd.has-error {
 table.n-table tbody tr.even.has-error {
   background-color: #f2dede;
 }
-.n-table-op-btn-popover .popover-content {
-  padding: 5px 5px 0;
+.n-table-op-btn-popover.popover.bottom .arrow {
+  margin-left: -8px;
+  top: -8px;
+  border-width: 8px;
+  border-top-width: 0;
+  left: initial;
+  right: 15px;
+}
+.n-table-op-btn-popover.popover.bottom .popover-content {
+  padding: 5px;
   margin-bottom: -5px;
 }
-.n-table-op-btn-popover .popover-content .n-button.n-table-op-btn {
+.n-table-op-btn-popover.popover.bottom .popover-content .n-button.n-table-op-btn {
   font-size: 10px;
   padding-top: 0;
   padding-bottom: 0;
@@ -1378,15 +1395,41 @@ table.n-table tbody tr.even.has-error {
   outline: 0;
   display: inline-block;
 }
-.n-table-op-btn-popover .popover-content .n-button.n-table-op-btn .btn {
+.n-table-op-btn-popover.popover.bottom .popover-content .n-button.n-table-op-btn .btn {
   padding-left: 3px;
   padding-right: 3px;
 }
-.n-table-op-btn-popover .popover-content .n-button.n-table-op-btn .btn.disabled {
+.n-table-op-btn-popover.popover.bottom .popover-content .n-button.n-table-op-btn .btn:focus:before {
+  -webkit-animation: none;
+  animation: none;
+  -o-animation: none;
+}
+.n-table-op-btn-popover.popover.bottom .popover-content .n-button.n-table-op-btn .btn.effect:focus:before {
+  -webkit-animation: none;
+  animation: none;
+  -o-animation: none;
+}
+.n-table-op-btn-popover.popover.bottom .popover-content .n-button.n-table-op-btn .btn.disabled {
   box-shadow: none;
   -webkit-box-shadow: none;
   -o-box-shadow: none;
   color: #9f9f9f;
+}
+.n-table-op-btn-popover.popover.bottom .popover-content ul.nav li {
+  line-height: 1.5;
+  height: 25px;
+  padding-right: 2px;
+}
+.n-table-op-btn-popover.popover.bottom .popover-content ul.nav .n-button.n-table-op-btn {
+  height: 25px;
+}
+.n-table-op-btn-popover.popover.bottom .popover-content ul.nav .n-button.n-table-op-btn a {
+  padding: 0;
+}
+.n-table-op-btn-popover.popover.bottom .popover-content ul.nav .n-button.n-table-op-btn a:hover {
+  box-shadow: none;
+  -webkit-box-shadow: none;
+  -o-box-shadow: none;
 }
 div.n-text {
   position: relative;
@@ -2402,12 +2445,14 @@ div.n-array-check.vertical div.n-checkbox {
 .n-select-tree-popover.popover.bottom {
   margin-top: 2px;
   max-width: 9999px;
+  z-index: 10000;
 }
 .n-select-tree-popover.popover.bottom .arrow {
   margin-left: -8px;
   top: -8px;
   border-width: 8px;
   border-top-width: 0;
+  left: 20px;
 }
 .n-select-tree-popover.popover.bottom .popover-content {
   padding: 5px 5px 0;

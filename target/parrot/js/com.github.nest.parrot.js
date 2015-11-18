@@ -1,4 +1,4 @@
-/** com.github.nest.parrot.V0.0.4 2015-11-16 */
+/** com.github.nest.parrot.V0.0.4 2015-11-18 */
 (function ($) {
 	var patches = {
 		console: function () {
@@ -4471,12 +4471,12 @@
 				));
 			}
 		},
-		onClicked: function () {
-			$(React.findDOMNode(this.refs.a)).toggleClass('effect');
+		onClicked: function (evt) {
 			if (this.isEnabled()) {
+				$(React.findDOMNode(this.refs.a)).toggleClass('effect');
 				var onclick = this.getComponentOption("click");
 				if (onclick) {
-					onclick.call(this, this.getModel());
+					onclick.call(this, this.getModel(), evt.target);
 				}
 			}
 		},
@@ -9173,7 +9173,9 @@
 			};
 		},
 		getInitialState: function () {
-			return {};
+			return {
+				stopRetrieveLabelFromRemote: false
+			};
 		},
 		/**
 		 * will update
@@ -9191,7 +9193,7 @@
 		 * @param prevState
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
-			this.getComponent().val(this.getValueFromModel());
+			this.initSetValues();
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChange);
 			this.addEnableDependencyMonitor();
@@ -9202,7 +9204,7 @@
 		 */
 		componentDidMount: function () {
 			// set model value to component
-			this.getComponent().val(this.getValueFromModel());
+			this.initSetValues();
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChange);
 			this.addEnableDependencyMonitor();
@@ -9266,43 +9268,17 @@
 		 * on component changed
 		 */
 		onComponentChange: function (evt) {
-			if (this.state.search != null) {
-				clearTimeout(this.state.search);
-			}
 			var value = evt.target.value;
-
-			var triggerDigits = this.getSearchTriggerDigits();
-			if (triggerDigits == null) {
-				throw new $pt.createComponentException(
-					$pt.ComponentConstants.Err_Search_Text_Trigger_Digits_Not_Defined,
-					"Trigger digits cannot be null in search text.");
-			}
-			this.setLabelText("");
-			if (value != null) {
-				if (triggerDigits == -1 || value.length == triggerDigits) {
-					var _this = this;
-					this.state.search = setTimeout(function () {
-						$pt.doPost(_this.getSearchUrl(), {
-							code: value
-						}, {
-							quiet: true
-						}).done(function (data) {
-							if (typeof data === 'string') {
-								data = JSON.parse(data);
-							}
-							_this.setLabelText(data.name);
-						});
-					}, 300);
-				}
-			}
-			this.setValueToModel(value);
+			this.setValueToModel(evt.target.value);
 		},
 		/**
 		 * on model change
 		 * @param evt
 		 */
 		onModelChange: function (evt) {
-			this.getComponent().val(evt.new);
+			var value = evt.new;
+			this.getComponent().val(value);
+			this.retrieveAndSetLabelTextFromRemote(value);
 		},
 		/**
 		 * show advanced search dialog
@@ -9326,11 +9302,67 @@
 		 * @param item
 		 */
 		pickupAdvancedResultItem: function (item) {
+			this.state.stopRetrieveLabelFromRemote = true;
 			this.setLabelText(item.name);
 			this.getModel().set(this.getDataId(), item.code);
+			this.state.stopRetrieveLabelFromRemote = false;
+		},
+		initSetValues: function() {
+			var value = this.getValueFromModel();
+			this.getComponent().val(value);
+			var labelPropertyId = this.getComponentOption('labelPropId');
+			if (labelPropertyId) {
+				this.setLabelText(this.getModel().get(labelPropertyId));
+			} else {
+				// send ajax request
+				this.retrieveAndSetLabelTextFromRemote(value);
+			}
 		},
 		setLabelText: function (text) {
 			$(React.findDOMNode(this.refs.label)).val(text);
+		},
+		/**
+		 * get label text from remote
+		 */
+		retrieveAndSetLabelTextFromRemote: function(value) {
+			if (this.state.search != null) {
+				clearTimeout(this.state.search);
+			}
+
+			if (this.state.stopRetrieveLabelFromRemote) {
+				return;
+			}
+
+			var triggerDigits = this.getSearchTriggerDigits();
+			if (triggerDigits == null) {
+				throw new $pt.createComponentException(
+					$pt.ComponentConstants.Err_Search_Text_Trigger_Digits_Not_Defined,
+					"Trigger digits cannot be null in search text.");
+			}
+
+			if (value == null || value.isBlank() || (value.length != triggerDigits && triggerDigits != -1)) {
+				this.setLabelText(null);
+				return;
+			}
+
+			var _this = this;
+			this.state.search = setTimeout(function() {
+				$pt.doPost(_this.getSearchUrl(), {
+					code: value
+				}, {
+					quiet: true
+				}).done(function (data) {
+					if (typeof data === 'string') {
+						data = JSON.parse(data);
+					}
+					_this.setLabelText(data.name);
+				}).fail(function() {
+					console.error('Error occured when retrieve label from remote in NSearch.');
+					arguments.slice(0).forEach(function(argu) {
+						console.error(argu);
+					});
+				});
+			}, 300);
 		},
 		/**
 		 * get search url
@@ -9925,6 +9957,7 @@
 		getDefaultProps: function() {
 			return {
 				defaultOptions: {
+					hideChildWhenParentChecked: false
 				},
 				treeLayout: {
 					comp: {
@@ -10011,14 +10044,29 @@
 				codeItem.text
 			));
 		},
-		renderSelection: function() {
-			var values = this.getValueFromModel();
-			var codes = null;
+		renderSelectionWhenValueAsArray: function(values) {
 			var _this = this;
-			if (values == null) {
-				return null;
-			} else if (this.getTreeLayout().comp.valueAsArray) {
-				// value as an array
+			var codes = null;
+			if (this.isHideChildWhenParentChecked()) {
+				// only render parent selections
+				codes = this.getAvailableTreeModel().list();
+				var isChecked = function(code) {
+					return -1 != values.findIndex(function(value) {
+						return value == code.id;
+					});
+				};
+				var traverse = function(codes) {
+					return codes.map(function(code) {
+						if (isChecked(code)) {
+							return _this.renderSelectionItem(code, code.id);
+						} else if (code.children){
+							return traverse(code.children);
+						}
+					});
+				};
+				return traverse(codes);
+			} else {
+				// render all selections
 				codes = this.getAvailableTreeModel().listAllChildren();
 				return Object.keys(codes).map(function(id) {
 					var value = values.find(function(value) {
@@ -10028,9 +10076,30 @@
 						return _this.renderSelectionItem(codes[value], value);
 					}
 				});
+			}
+		},
+		renderSelectionWhenValueAsJSON: function(values) {
+			var _this = this;
+			var codes = this.getAvailableTreeModel().listWithHierarchyKeys({separator: NTree.NODE_SEPARATOR, rootId: NTree.ROOT_ID});
+			if (this.isHideChildWhenParentChecked()) {
+				var paintedNodes = [];
+				var isPainted = function(nodeId) {
+					// if nodeId starts with paintedNodeId, do not paint again
+					return -1 != paintedNodes.findIndex(function(paintedNodeId) {
+						return nodeId.startsWith(paintedNodeId);
+					});
+				};
+				return Object.keys(codes).map(function(nodeId) {
+					if (!isPainted(nodeId)) {
+						var valueId = nodeId.split(NTree.NODE_SEPARATOR).slice(1).join($pt.PROPERTY_SEPARATOR) + $pt.PROPERTY_SEPARATOR + 'selected';
+						var checked = $pt.getValueFromJSON(values, valueId);
+						if (checked) {
+							paintedNodes.push(nodeId + NTree.NODE_SEPARATOR);
+							return _this.renderSelectionItem(codes[nodeId], nodeId);
+						}
+					}
+				});
 			} else {
-				// value as a hierarchy json object
-				codes = this.getAvailableTreeModel().listWithHierarchyKeys({separator: NTree.NODE_SEPARATOR, rootId: NTree.ROOT_ID});
 				var render = function(node, currentId, parentId) {
 					var nodeId = parentId + NTree.NODE_SEPARATOR + currentId;
 					var spans = [];
@@ -10049,6 +10118,19 @@
 				}).map(function(key) {
 					return render(values[key], key, NTree.ROOT_ID);
 				});
+			}
+		},
+		renderSelection: function() {
+			var values = this.getValueFromModel();
+			if (values == null) {
+				// no selection
+				return null;
+			} else if (this.getTreeLayout().comp.valueAsArray) {
+				// value as an array
+				return this.renderSelectionWhenValueAsArray(values);
+			} else {
+				// value as a hierarchy json object
+				return this.renderSelectionWhenValueAsJSON(values);
 			}
 		},
 		renderText: function() {
@@ -10086,7 +10168,7 @@
 			styles.top = offset.top + component.outerHeight();
 			styles.left = offset.left;
 			var popover = (React.createElement("div", {role: "tooltip", className: "n-select-tree-popover popover bottom in", style: styles}, 
-				React.createElement("div", {className: "arrow", style: {left: '20px'}}), 
+				React.createElement("div", {className: "arrow"}), 
 				React.createElement("div", {className: "popover-content"}, 
 					this.renderTree()
 				)
@@ -10250,6 +10332,14 @@
 			treeLayout.comp.data = this.getAvailableTreeModel();
 			treeLayout.comp.valueAsArray = treeLayout.comp.valueAsArray ? treeLayout.comp.valueAsArray : false;
 			return treeLayout;
+		},
+		isHideChildWhenParentChecked: function() {
+			var hierarchyCheck = this.getTreeLayout().comp.hierarchyCheck;
+			if (hierarchyCheck) {
+				return this.getComponentOption('hideChildWhenParentChecked');
+			} else {
+				return false;
+			}
 		},
 		/**
 		 * has parent or not
@@ -10947,6 +11037,7 @@
 		componentWillUnmount: function () {
 			this.detachListeners();
 			this.unregisterFromComponentCentral();
+			this.destroyPopover();
 		},
 		/**
 		 * render when IE8, fixed the height of table since IE8 doesn't support max-height
@@ -11337,6 +11428,131 @@
 				removeButton
 			));
 		},
+		renderPopoverContainer: function() {
+			if (this.state.popoverDiv == null) {
+				this.state.popoverDiv = $('<div>');
+				this.state.popoverDiv.appendTo($('body'));
+				$(document).on('click', this.onDocumentClicked).on('keyup', this.onDocumentKeyUp);
+			}
+			this.state.popoverDiv.hide();
+		},
+		/**
+		 * check all row operation buttons in more popover are renderred as icon and tooltip or menu?
+		 * if operation with no icon declared, return false (render as menu)
+		 */
+		isRenderMoreOperationButtonsAsIcon: function(moreOperations) {
+			if (this.getComponentOption('moreAsMenu')) {
+				return true;
+			} else {
+				return !moreOperations.some(function(operation) {
+					return operation.icon == null;
+				});
+			}
+		},
+		renderPopoverAsMenu: function(moreOperations, rowModel) {
+			var hasIcon = moreOperations.some(function(operation) {
+				return operation.icon != null;
+			});
+			var _this = this;
+			var renderOperation = function(operation) {
+				var layout = $pt.createCellLayout('rowButton', {
+					label: operation.tooltip,
+					comp: {
+						style: 'link',
+						icon: hasIcon ? (operation.icon ? operation.icon : 'placeholder') : null,
+						enabled: operation.enabled,
+						click: _this.onRowOperationClicked.bind(_this, operation.click, rowModel.getCurrentModel())
+					},
+					css: {
+						comp: 'n-table-op-btn'
+					}
+				});
+				return (React.createElement("li", null, 
+					React.createElement(NFormButton, {model: rowModel, layout: layout})
+				));
+			};
+			return (React.createElement("ul", {className: "nav"}, moreOperations.map(renderOperation)));
+		},
+		renderPopoverAsIcon: function(moreOperations, rowModel) {
+			return moreOperations.map(function(operation) {
+				return _this.renderRowOperationButton(operation, rowModel);
+			});
+		},
+		renderPopover: function(moreOperations, rowModel, eventTarget) {
+			var styles = {display: 'block'};
+			var target = $(eventTarget.closest('a'));
+			var offset = target.offset();
+			styles.top = offset.top + target.outerHeight() - 5;
+			styles.left = offset.left;
+
+			var _this = this;
+			React.render((React.createElement("div", {role: "tooltip", className: "n-table-op-btn-popover popover bottom in", style: styles}, 
+				React.createElement("div", {className: "arrow"}), 
+				React.createElement("div", {className: "popover-content"}, 
+					this.isRenderMoreOperationButtonsAsIcon(moreOperations) ?
+						this.renderPopoverAsIcon(moreOperations, rowModel) :
+						this.renderPopoverAsMenu(moreOperations, rowModel)
+				)
+			)), this.state.popoverDiv.get(0));
+		},
+		showPopover: function(moreOperations, rowModel, eventTarget) {
+			this.renderPopoverContainer();
+			this.renderPopover(moreOperations, rowModel, eventTarget);
+			this.state.popoverDiv.show();
+
+			// reset position
+			var styles = {};
+			var target = $(eventTarget.closest('a'));
+			var offset = target.offset();
+			var popover = this.state.popoverDiv.children('.popover');
+			var popWidth = popover.outerWidth();
+			styles.left = offset.left + target.outerWidth() - popWidth + 10;
+			popover.css(styles);
+		},
+		hidePopover: function() {
+			if (this.state.popoverDiv && this.state.popoverDiv.is(':visible')) {
+				this.state.popoverDiv.hide();
+				React.render(React.createElement("noscript", null), this.state.popoverDiv.get(0));
+			}
+		},
+		destroyPopover: function() {
+			if (this.state.popoverDiv) {
+				$(document).off('click', this.onDocumentClicked).off('keyup', this.onDocumentKeyUp);
+				this.state.popoverDiv.remove();
+				delete this.state.popoverDiv;
+			}
+		},
+		onDocumentClicked: function(evt) {
+			var target = $(evt.target);
+			if (target.closest(this.state.popoverDiv).length == 0) {
+				this.hidePopover();
+			}
+		},
+		onDocumentKeyUp: function(evt) {
+			if (evt.keyCode === 27) {
+				this.hidePopover();
+			}
+		},
+		onRowOperationMoreClicked: function(moreOperations, rowModel, eventTarget) {
+			this.showPopover(moreOperations, rowModel, eventTarget);
+		},
+		/**
+		 * render more operations buttons
+		 */
+		renderRowOperationMoreButton: function(moreOperations, rowModel) {
+			var layout = $pt.createCellLayout('rowButton', {
+				comp: {
+					style: 'link',
+					icon: NTable.ROW_MORE_BUTTON_ICON,
+					click: this.onRowOperationMoreClicked.bind(this, moreOperations),
+					tooltip: NTable.TOOLTIP_MORE
+				},
+				css: {
+					comp: 'n-table-op-btn more'
+				}
+			});
+			return React.createElement(NFormButton, {model: rowModel, layout: layout});
+		},
 		/**
 		 * render dropdown operation cell, only buttons which before maxButtonCount are renderred as a line,
 		 * a dropdown button is renderred in last, other buttons are renderred in popover of dropdown button.
@@ -11367,16 +11583,7 @@
 			var hasDropdown = (rowOperations.length - used) > 1;
 			var dropdown = null;
 			if (hasDropdown) {
-				var menus = rowOperations.slice(used + 1).map(function(operation) {
-					return _this.renderRowOperationButton(operation, rowModel);
-				});
-				dropdown = (React.createElement(OverlayTrigger, {trigger: "click", rootClose: true, placement: "bottom", 
-					overlay: React.createElement(Popover, {className: "n-table-op-btn-popover"}, menus)}, 
-					React.createElement("a", {href: "javascript:void(0);", 
-						className: "n-table-op-btn btn btn-xs btn-link pull-right"}, 
-						React.createElement(NIcon, {icon: NTable.ROW_MORE_BUTTON_ICON, size: "lg", tooltip: NTable.TOOLTIP_MORE})
-					)
-				));
+				buttons.push(this.renderRowOperationMoreButton(rowOperations.slice(used + 1), rowModel));
 			}
 
 			return (React.createElement(ButtonGroup, {className: "n-table-op-btn-group"}, 
@@ -11851,7 +12058,7 @@
 				// calculate width
 				this.columns.forEach(function (column) {
 					if (column.visible === undefined || column.visible === true) {
-						width += column.width;
+						width += (column.width ? (column.width * 1) : 0);
 					}
 				});
 			} else {
@@ -11873,7 +12080,7 @@
 			this.columns.forEach(function (element) {
 				if (columnIndex <= fixedLeftColumns && (element.visible === undefined || element.visible === true)) {
 					// column is fixed.
-					width += element.width;
+					width += element.width ? (element.width * 1) : 0;
 				}
 				columnIndex++;
 			});

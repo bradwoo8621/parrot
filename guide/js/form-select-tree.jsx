@@ -82,6 +82,22 @@
 					index: 30
 				};
 			},
+			hideChild: function() {
+				var layoutTemplate = {comp: {data: codes, hideChildWhenParentChecked: true, treeLayout: {comp: {hierarchyCheck: true}}}};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'nodes',
+					template: layoutTemplate
+				});
+				return {
+					id: 'select-tree-hideChild',
+					title: 'Hide Child',
+					desc: <span>Child node can be hide by set <code>hideChildWhenParentChecked</code> as true only when <code>hierarchyCheck</code> is enabled.</span>,
+					xml: {width: 12, xml: <NSelectTree model={model} layout={$pt.createCellLayout('nodes', layoutTemplate)}/>},
+					code: [codesCode, modelCode, layoutCode, compCode],
+					index: 40
+				};
+			},
 			css: function () {
 				return $demo.convertCSSJSONToExample({
 					id: 'select-tree-css',
