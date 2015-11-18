@@ -255,9 +255,18 @@ table.n-table {
 			overflow: hidden;
 			outline: 0;
 			display: inline-block;
+			&.more .btn {
+				margin-top: -2px;
+			}
 			.btn {
 				padding-left: 3px;
 				padding-right: 3px;
+				&:focus:before,
+				&.effect:focus:before {
+					animation: none;
+					-webkit-animation: none;
+					-o-animation: none;
+				}
 				&.disabled {
 					box-shadow: none;
 					-webkit-box-shadow: none;
@@ -321,9 +330,17 @@ table.n-table tbody tr {
 	}
 }
 
-.n-table-op-btn-popover {
+.n-table-op-btn-popover.popover.bottom {
+	.arrow {
+		margin-left: -8px;
+		top: -8px;
+		border-width: 8px;
+		border-top-width: 0;
+		left: initial;
+		right: 15px;
+	}
 	.popover-content {
-		padding: 5px 5px 0;
+		padding: 5px;
 		margin-bottom: -5px;
 		.n-button.n-table-op-btn {
 			font-size: 10px;
@@ -335,11 +352,39 @@ table.n-table tbody tr {
 			.btn {
 				padding-left: 3px;
 				padding-right: 3px;
+				&:focus:before {
+					-webkit-animation: none;
+					animation: none;
+					-o-animation: none;
+				}
+				&.effect:focus:before {
+					-webkit-animation: none;
+					animation: none;
+					-o-animation: none;
+				}
 				&.disabled {
 					box-shadow: none;
 					-webkit-box-shadow: none;
 					-o-box-shadow: none;
 					color: @disabled-color;
+				}
+			}
+		}
+		ul.nav {
+			li {
+				line-height: 1.5;
+				height: 25px;
+				padding-right: 2px;
+			}
+			.n-button.n-table-op-btn {
+				height: 25px;
+				a {
+					padding: 0;
+					&:hover {
+						box-shadow: none;
+						-webkit-box-shadow: none;
+						-o-box-shadow: none;
+					}
 				}
 			}
 		}

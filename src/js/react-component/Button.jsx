@@ -188,12 +188,12 @@
 				</div>);
 			}
 		},
-		onClicked: function () {
-			$(React.findDOMNode(this.refs.a)).toggleClass('effect');
+		onClicked: function (evt) {
 			if (this.isEnabled()) {
+				$(React.findDOMNode(this.refs.a)).toggleClass('effect');
 				var onclick = this.getComponentOption("click");
 				if (onclick) {
-					onclick.call(this, this.getModel());
+					onclick.call(this, this.getModel(), evt.target);
 				}
 			}
 		},

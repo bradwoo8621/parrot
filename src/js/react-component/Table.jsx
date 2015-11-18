@@ -228,6 +228,7 @@
 		componentWillUnmount: function () {
 			this.detachListeners();
 			this.unregisterFromComponentCentral();
+			this.destroyPopover();
 		},
 		/**
 		 * render when IE8, fixed the height of table since IE8 doesn't support max-height
@@ -618,6 +619,131 @@
 				{removeButton}
 			</ButtonGroup>);
 		},
+		renderPopoverContainer: function() {
+			if (this.state.popoverDiv == null) {
+				this.state.popoverDiv = $('<div>');
+				this.state.popoverDiv.appendTo($('body'));
+				$(document).on('click', this.onDocumentClicked).on('keyup', this.onDocumentKeyUp);
+			}
+			this.state.popoverDiv.hide();
+		},
+		/**
+		 * check all row operation buttons in more popover are renderred as icon and tooltip or menu?
+		 * if operation with no icon declared, return false (render as menu)
+		 */
+		isRenderMoreOperationButtonsAsIcon: function(moreOperations) {
+			if (this.getComponentOption('moreAsMenu')) {
+				return true;
+			} else {
+				return !moreOperations.some(function(operation) {
+					return operation.icon == null;
+				});
+			}
+		},
+		renderPopoverAsMenu: function(moreOperations, rowModel) {
+			var hasIcon = moreOperations.some(function(operation) {
+				return operation.icon != null;
+			});
+			var _this = this;
+			var renderOperation = function(operation) {
+				var layout = $pt.createCellLayout('rowButton', {
+					label: operation.tooltip,
+					comp: {
+						style: 'link',
+						icon: hasIcon ? (operation.icon ? operation.icon : 'placeholder') : null,
+						enabled: operation.enabled,
+						click: _this.onRowOperationClicked.bind(_this, operation.click, rowModel.getCurrentModel())
+					},
+					css: {
+						comp: 'n-table-op-btn'
+					}
+				});
+				return (<li>
+					<NFormButton model={rowModel} layout={layout} />
+				</li>);
+			};
+			return (<ul className='nav'>{moreOperations.map(renderOperation)}</ul>);
+		},
+		renderPopoverAsIcon: function(moreOperations, rowModel) {
+			return moreOperations.map(function(operation) {
+				return _this.renderRowOperationButton(operation, rowModel);
+			});
+		},
+		renderPopover: function(moreOperations, rowModel, eventTarget) {
+			var styles = {display: 'block'};
+			var target = $(eventTarget.closest('a'));
+			var offset = target.offset();
+			styles.top = offset.top + target.outerHeight() - 5;
+			styles.left = offset.left;
+
+			var _this = this;
+			React.render((<div role="tooltip" className="n-table-op-btn-popover popover bottom in" style={styles}>
+				<div className="arrow"></div>
+				<div className="popover-content">
+					{this.isRenderMoreOperationButtonsAsIcon(moreOperations) ?
+						this.renderPopoverAsIcon(moreOperations, rowModel) :
+						this.renderPopoverAsMenu(moreOperations, rowModel)}
+				</div>
+			</div>), this.state.popoverDiv.get(0));
+		},
+		showPopover: function(moreOperations, rowModel, eventTarget) {
+			this.renderPopoverContainer();
+			this.renderPopover(moreOperations, rowModel, eventTarget);
+			this.state.popoverDiv.show();
+
+			// reset position
+			var styles = {};
+			var target = $(eventTarget.closest('a'));
+			var offset = target.offset();
+			var popover = this.state.popoverDiv.children('.popover');
+			var popWidth = popover.outerWidth();
+			styles.left = offset.left + target.outerWidth() - popWidth + 10;
+			popover.css(styles);
+		},
+		hidePopover: function() {
+			if (this.state.popoverDiv && this.state.popoverDiv.is(':visible')) {
+				this.state.popoverDiv.hide();
+				React.render(<noscript/>, this.state.popoverDiv.get(0));
+			}
+		},
+		destroyPopover: function() {
+			if (this.state.popoverDiv) {
+				$(document).off('click', this.onDocumentClicked).off('keyup', this.onDocumentKeyUp);
+				this.state.popoverDiv.remove();
+				delete this.state.popoverDiv;
+			}
+		},
+		onDocumentClicked: function(evt) {
+			var target = $(evt.target);
+			if (target.closest(this.state.popoverDiv).length == 0) {
+				this.hidePopover();
+			}
+		},
+		onDocumentKeyUp: function(evt) {
+			if (evt.keyCode === 27) {
+				this.hidePopover();
+			}
+		},
+		onRowOperationMoreClicked: function(moreOperations, rowModel, eventTarget) {
+			this.showPopover(moreOperations, rowModel, eventTarget);
+		},
+		/**
+		 * render more operations buttons
+		 */
+		renderRowOperationMoreButton: function(moreOperations, rowModel) {
+			var layout = $pt.createCellLayout('rowButton', {
+				comp: {
+					style: 'link',
+					icon: NTable.ROW_MORE_BUTTON_ICON,
+					click: this.onRowOperationMoreClicked.bind(this, moreOperations),
+					tooltip: NTable.TOOLTIP_MORE
+				},
+				css: {
+					comp: 'n-table-op-btn more'
+				}
+			});
+			return <NFormButton model={rowModel} layout={layout} />;
+		},
 		/**
 		 * render dropdown operation cell, only buttons which before maxButtonCount are renderred as a line,
 		 * a dropdown button is renderred in last, other buttons are renderred in popover of dropdown button.
@@ -648,16 +774,7 @@
 			var hasDropdown = (rowOperations.length - used) > 1;
 			var dropdown = null;
 			if (hasDropdown) {
-				var menus = rowOperations.slice(used + 1).map(function(operation) {
-					return _this.renderRowOperationButton(operation, rowModel);
-				});
-				dropdown = (<OverlayTrigger trigger='click' rootClose placement='bottom'
-					overlay={<Popover className='n-table-op-btn-popover'>{menus}</Popover>}>
-					<a href='javascript:void(0);'
-						className='n-table-op-btn btn btn-xs btn-link pull-right'>
-						<NIcon icon={NTable.ROW_MORE_BUTTON_ICON} size="lg" tooltip={NTable.TOOLTIP_MORE}/>
-					</a>
-				</OverlayTrigger>);
+				buttons.push(this.renderRowOperationMoreButton(rowOperations.slice(used + 1), rowModel));
 			}
 
 			return (<ButtonGroup className="n-table-op-btn-group">
@@ -1132,7 +1249,7 @@
 				// calculate width
 				this.columns.forEach(function (column) {
 					if (column.visible === undefined || column.visible === true) {
-						width += column.width;
+						width += (column.width ? (column.width * 1) : 0);
 					}
 				});
 			} else {
@@ -1154,7 +1271,7 @@
 			this.columns.forEach(function (element) {
 				if (columnIndex <= fixedLeftColumns && (element.visible === undefined || element.visible === true)) {
 					// column is fixed.
-					width += element.width;
+					width += element.width ? (element.width * 1) : 0;
 				}
 				columnIndex++;
 			});

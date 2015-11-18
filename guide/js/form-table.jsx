@@ -576,7 +576,9 @@
 					id: 'table-edit-maxRowButton',
 					title: <span>Max Row Buttons</span>,
 					desc: <span>Set <code>maxOperationButtonCount</code> to fix row operation buttons,
-					more operation button automatically added and show more operation buttons in popover.</span>,
+					more operation button automatically added and show more operation buttons in popover.<br/>
+					If there is any button declared with no <code>icon</code>, then popover will be renderred as menu style.
+					Or force to render as menu style by set <code>moreAsMenu</code> to true.</span>,
 					xml: {
 						width: 12,
 						xml: <NTable model={model} layout={$pt.createCellLayout('items', layout)}/>

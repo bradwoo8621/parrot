@@ -383,7 +383,7 @@
                     }
                 }
             }, {
-                icon: 'hand-paper-o',
+                // icon: 'hand-paper-o',
                 tooltip: 'Hand',
                 click: function(row) {
                     alert('Row Clicked, [' + row.name + '] by hand.');
@@ -395,7 +395,7 @@
                     }
                 }
             }, {
-                icon: 'clone',
+                // icon: 'clone',
                 tooltip: 'Clone',
                 click: function(row) {
                     alert('Row Clicked, [' + row.name + '] by clone.');

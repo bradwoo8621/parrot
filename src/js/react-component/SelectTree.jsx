@@ -222,7 +222,7 @@
 			styles.top = offset.top + component.outerHeight();
 			styles.left = offset.left;
 			var popover = (<div role="tooltip" className="n-select-tree-popover popover bottom in" style={styles}>
-				<div className="arrow" style={{left: '20px'}}></div>
+				<div className="arrow"></div>
 				<div className="popover-content">
 					{this.renderTree()}
 				</div>
