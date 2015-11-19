@@ -39,7 +39,7 @@
         comp: {
             itemTitle: {
                 when: function (item) {
-                    return item.name;
+                    return item.get('name');
                 },
                 depends: 'name'
             },
@@ -51,7 +51,7 @@
         comp: {
             itemTitle: {
                 when: function (item) {
-                    return item.name;
+                    return item.get('name');
                 },
                 depends: 'name'
             },

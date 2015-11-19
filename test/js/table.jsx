@@ -387,6 +387,10 @@
                 tooltip: 'Hand',
                 click: function(row) {
                     alert('Row Clicked, [' + row.name + '] by hand.');
+                    var table = $pt.LayoutHelper.getComponent('test');
+                    var columns = this.getComponentOption("columns");
+                    columns.splice(0, 1);
+                    table.clearColumnsDefinition();
                 },
                 enabled: {
                     depends: 'name',
@@ -401,6 +405,13 @@
                     alert('Row Clicked, [' + row.name + '] by clone.');
                 }
             }],
+            centralId: 'test',
+            rowListener: {
+                id: 'name',
+                listener: function(evt) {
+                    console.log(evt.new);
+                }
+            },
             columns: [{
                 title: 'Name',
                 inline: 'text',

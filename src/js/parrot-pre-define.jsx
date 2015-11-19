@@ -81,6 +81,7 @@
 		Err_Unsupported_Component: "PT-00001",
 		Err_Unuspported_Column_Sort: "PT-00002",
 		Err_Search_Text_Trigger_Digits_Not_Defined: "PT-00003",
+		Err_Tab_Index_Out_Of_Bound: "PT-00004",
 		// http status
 		Http_Status: {
 			"0": "Browser Error",

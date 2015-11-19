@@ -164,6 +164,22 @@
 			return this.state.activeTabIndex;
 		},
 		/**
+		 * set active tab index
+		 * @param {number}
+		 */
+		setActiveTabIndex: function(index) {
+			if (index < 0) {
+				index = 0;
+			} else if (index >= this.props.tabs.length) {
+				index = this.props.tabs.length - 1;
+			}
+			if (index < 0) {
+				throw $pt.createComponentException($pt.ComponentConstants.Err_Tab_Index_Out_Of_Bound, 'Tab index[' + index + '] out of bound.');
+			}
+			this.setState({activeTabIndex: index});
+			return this;
+		},
+		/**
 		 * on tab clicked
 		 * @param evt
 		 */

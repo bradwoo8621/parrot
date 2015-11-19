@@ -60,7 +60,7 @@
 								}
 							};
 							var items = this.getModel().get('items');
-							return items.indexOf(item) == 0 ? $.extend(true, {}, basic, {
+							return items.indexOf(item.getCurrentModel()) == 0 ? $.extend(true, {}, basic, {
 								another: {
 									label: 'Enabled',
 									comp: {type: $pt.ComponentConstants.Check},
@@ -87,7 +87,7 @@
 					desc: ['Form Array Panel is a wrapper for deal with the array data.',
 						'All attributes are same as Form Panel, but be careful with the follows:',
 						<span><code>itemTitle</code>, can be plain text or JSON with <code>depends</code> and <code>when</code>.</span>,
-						<span><code>editLayout</code>, <code>itemTitle</code>, <code>expandedLabel</code> and <code>collapsedLabel</code> are all monitor the item of array, not form model.</span>],
+						<span><code>editLayout</code>, <code>itemTitle</code>, <code>expandedLabel</code> and <code>collapsedLabel</code> are all monitor the item model of array, not form model.</span>],
 					xml: {
 						width: 12,
 						xml: <NArrayPanel model={model} layout={$pt.createCellLayout('items', layoutTemplate)}/>

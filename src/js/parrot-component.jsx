@@ -1406,6 +1406,9 @@
 	};
 
 	var LayoutHelper = jsface.Class({
+		constructor: function() {
+			this.__comp = {};
+		},
 		/**
 		 * copy from React.addons.classSet
 		 * @param classNames

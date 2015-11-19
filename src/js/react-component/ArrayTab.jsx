@@ -185,6 +185,10 @@
 		 */
 		render: function () {
 			var tabs = this.getTabs();
+			var canActive = this.getComponentOption('canActive');
+			if (canActive) {
+				canActive.bind(this);
+			}
 			return (<div className={this.getComponentCSS('n-array-tab')}>
 				<NTab type={this.getComponentOption('tabType')}
 				      justified={this.getComponentOption('justified')}
@@ -192,7 +196,7 @@
 				      size={this.getComponentOption('titleIconSize')}
 				      tabClassName={this.getAdditionalCSS('tabs')}
 				      tabs={tabs}
-				      canActive={this.getComponentOption('canActive')}
+				      canActive={canActive}
 				      onActive={this.onTabClicked}
 				      ref='tab'>
 				</NTab>
@@ -335,6 +339,21 @@
 				});
 			}
 			return this.state.activeTabIndex;
+		},
+		/**
+		 * set active tab index
+		 * @param {number}
+		 */
+		setActiveTabIndex: function(index) {
+			if (index < 0) {
+				index = 0;
+			} else if (index > (this.state.tabs.length - 1)) {
+				index = this.state.tabs.length - 1;
+			}
+			if (index < 0) {
+				throw $pt.createComponentException($pt.ComponentConstants.Err_Tab_Index_Out_Of_Bound, 'Tab index[' + index + '] out of bound.');
+			}
+			this.setState({activeTabeIndex: index});
 		}
 	}));
 	context.NArrayTab = NArrayTab;
