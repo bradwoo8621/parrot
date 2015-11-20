@@ -254,9 +254,7 @@
             );
         },
         onNodeClicked: function(node, nodeId) {
-            if (this.isLeaf(node)) {
-                return;
-            } else {
+            if (!this.isLeaf(node)) {
                 if (this.state.activeNodes[nodeId]) {
                     this.collapseNode(node, nodeId);
                 } else {
