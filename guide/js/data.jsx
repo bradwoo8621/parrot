@@ -27,9 +27,10 @@
 							{
 								id: 'data-add',
 								title: '#add',
-								pattern: '#add(id: string, row: JSON) : ModelInterface',
+								pattern: '#add(id: string, row: JSON, index) : ModelInterface',
 								desc: <span>Add a JSON object into the array which located by give id. Returns model itself.<br/>
-								Fire event <code>{'\u007B'}model: this, id: id, array: data, index: data.length - 1,
+								Parameter <code>index</code> is optional, default push data at the end of array.<br/>
+								Fire event <code>{'\u007B'}model: this, id: id, array: data, index: index,
 										old: null, new: row, time: "post", type: "add"{'\u007D'}</code>.</span>
 							}, {
 								id: 'data-get',
