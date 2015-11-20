@@ -202,10 +202,7 @@
 		 * @returns {SectionLayout}
 		 */
 		getInnerLayout: function () {
-			if (this.state.innerLayout == null) {
-				this.state.innerLayout = $pt.createSectionLayout({layout: this.getComponentOption('editLayout')});
-			}
-			return this.state.innerLayout;
+			return $pt.createSectionLayout({layout: this.getComponentOption('editLayout')});
 		},
 		/**
 		 * is collapsible or not

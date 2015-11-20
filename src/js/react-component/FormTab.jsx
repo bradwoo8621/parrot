@@ -212,7 +212,7 @@
 			if (index < 0) {
 				throw $pt.createComponentException($pt.ComponentConstants.Err_Tab_Index_Out_Of_Bound, 'Tab index[' + index + '] out of bound.');
 			}
-			this.setState({activeTabeIndex: index});
+			this.setState({activeTabIndex: index});
 		}
 	}));
 	context.NFormTab = NFormTab;

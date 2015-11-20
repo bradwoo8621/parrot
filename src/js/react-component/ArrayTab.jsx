@@ -61,7 +61,6 @@
 		},
 		getInitialState: function () {
 			return {
-				tabs: null,
 				activeTabIndex: null
 			};
 		},
@@ -89,6 +88,9 @@
 			this.addPostRemoveListener(this.onModelChanged);
 			this.addPostValidateListener(this.onModelValidateChanged);
 			this.registerToComponentCentral();
+
+			// TODO since NTab will keep the active tab index in state, force change it.
+			this.refs.tab.setActiveTabIndex(this.getActiveTabIndex());
 		},
 		/**
 		 * did mount
@@ -118,43 +120,18 @@
 		 * @param index
 		 * @returns {XML}
 		 */
-		renderTabContent: function (tab, index) {
-			var activeIndex = this.getActiveTabIndex();
+		renderTabContent: function (tab) {
 			var css = {
 				'n-array-tab-card': true,
-				show: index == activeIndex,
-				hide: index != activeIndex
+				show: tab.active,
+				hide: !tab.active
 			};
 
-			var parentModel = this.getModel();
-			var parentValidator = parentModel.getValidator();
-			var validator = null;
-			if (parentValidator) {
-				var parentValidationConfig = parentValidator.getConfig()[this.getDataId()];
-				if (parentValidationConfig && parentValidationConfig.table) {
-					validator = $pt.createModelValidator(parentValidationConfig.table);
-				}
-			}
-			var model = validator ? $pt.createModel(tab.data, validator) : $pt.createModel(tab.data);
-			model.useBaseAsCurrent();
-			model.parent(parentModel);
-			// synchronized the validation result from parent model
-			// get errors about current value
-			var errors = this.getModel().getError(this.getDataId());
-			if (errors) {
-				var itemError = null;
-				for (var errorIndex = 0, errorCount = errors.length; errorIndex < errorCount; errorIndex++) {
-					if (typeof errors[errorIndex] !== "string") {
-						itemError = errors[errorIndex].getError(tab.data);
-						model.mergeError(itemError);
-					}
-				}
-			}
 			// no base here. since no apply operation
 			var _this = this;
 			// add item title and item icon listener
 			this.getDependencies(['itemTitle', 'itemIcon']).forEach(function (key) {
-				model.addListener(key, "post", "change", function () {
+				tab.data.addListener(key, "post", "change", function () {
 					_this.forceUpdate();
 				});
 			});
@@ -162,18 +139,18 @@
 			var badge = this.getComponentOption('badge');
 			if (badge != null) {
 				if (typeof badge === 'string') {
-					model.addListener(badge, "post", "change", function () {
+					tab.data.addListener(badge, "post", "change", function () {
 						_this.forceUpdate();
 					});
 				} else {
 					this.getDependencies(badge).forEach(function (key) {
-						model.addListener(key, "post", "change", function () {
+						tab.data.addListener(key, "post", "change", function () {
 							_this.forceUpdate();
 						});
 					});
 				}
 			}
-			return (<NForm model={model}
+			return (<NForm model={tab.data}
 			               layout={$pt.createFormLayout(tab.layout)}
 			               direction={this.props.direction}
 			               className={$pt.LayoutHelper.classSet(css)}/>
@@ -185,10 +162,12 @@
 		 */
 		render: function () {
 			var tabs = this.getTabs();
+			this.activeTab(tabs, this.getActiveTabIndex());
 			var canActive = this.getComponentOption('canActive');
 			if (canActive) {
 				canActive.bind(this);
 			}
+			var _this = this;
 			return (<div className={this.getComponentCSS('n-array-tab')}>
 				<NTab type={this.getComponentOption('tabType')}
 				      justified={this.getComponentOption('justified')}
@@ -206,6 +185,45 @@
 				</div>
 			</div>);
 		},
+		activeTab: function(tabs, activeTabIndex) {
+			if (activeTabIndex >= tabs.length) {
+				activeTabIndex = tabs.length - 1;
+			}
+			if (activeTabIndex < 0) {
+				activeTabIndex = 0;
+			}
+			if (tabs.length > 0) {
+				tabs[activeTabIndex].active = true;
+			}
+			this.state.activeTabIndex = activeTabIndex;
+		},
+		createItemModel: function(item) {
+			var parentModel = this.getModel();
+			var parentValidator = parentModel.getValidator();
+			var validator = null;
+			if (parentValidator) {
+				var parentValidationConfig = parentValidator.getConfig()[this.getDataId()];
+				if (parentValidationConfig && parentValidationConfig.table) {
+					validator = $pt.createModelValidator(parentValidationConfig.table);
+				}
+			}
+			var model = validator ? $pt.createModel(item, validator) : $pt.createModel(item);
+			model.useBaseAsCurrent();
+			model.parent(parentModel);
+			// synchronized the validation result from parent model
+			// get errors about current value
+			var errors = this.getModel().getError(this.getDataId());
+			if (errors) {
+				var itemError = null;
+				for (var errorIndex = 0, errorCount = errors.length; errorIndex < errorCount; errorIndex++) {
+					if (typeof errors[errorIndex] !== "string") {
+						itemError = errors[errorIndex].getError(item);
+						model.mergeError(itemError);
+					}
+				}
+			}
+			return model;
+		},
 		/**
 		 * get tabs
 		 * @returns {Array}
@@ -215,16 +233,15 @@
 			var tabs = [];
 			var data = this.getValueFromModel();
 			data.forEach(function (item) {
+				var model = _this.createItemModel(item);
 				tabs.push({
-					label: _this.getTabTitle(item),
-					icon: _this.getTabIcon(item),
-					layout: _this.getEditLayout(item),
-					badge: _this.getTabBadge(item),
-					data: item
+					label: _this.getTabTitle(model),
+					icon: _this.getTabIcon(model),
+					layout: _this.getEditLayout(model),
+					badge: _this.getTabBadge(model),
+					data: model
 				});
 			});
-			this.state.tabs = tabs;
-			this.getActiveTabIndex();
 			return tabs;
 		},
 		/**
@@ -240,7 +257,14 @@
 		 * @param evt
 		 */
 		onModelChanged: function (evt) {
-			this.forceUpdate();
+			if (evt.type === 'add') {
+				this.setActiveTabIndex(evt.index);
+			} else if (evt.type === 'remove') {
+				var index = evt.index;
+				this.setActiveTabIndex(index);
+			} else {
+				this.forceUpdate();
+			}
 		},
 		/**
 		 * monitor the parent model validation
@@ -252,61 +276,61 @@
 		},
 		/**
 		 * get edit layout
-		 * @param item
+		 * @param model {ModelInterface} item model
 		 * @returns {FormLayout}
 		 */
-		getEditLayout: function (item) {
+		getEditLayout: function (model) {
 			var layout = this.getComponentOption('editLayout');
 			if (typeof layout === 'function') {
-				return layout.call(this, item);
+				return layout.call(this, model);
 			} else {
 				return layout;
 			}
 		},
 		/**
 		 * get item title
-		 * @param item
+		 * @param model {ModelInterface} item model
 		 * @returns {string}
 		 */
-		getTabTitle: function (item) {
+		getTabTitle: function (model) {
 			var title = this.getComponentOption('itemTitle');
 			if (title == null) {
 				return NArrayTab.UNTITLED;
 			} else if (typeof title === 'string') {
 				return title;
 			} else {
-				var titleText = title.when.call(this, item);
+				var titleText = title.when.call(this, model);
 				return (titleText == null || titleText.isBlank()) ? NArrayTab.UNTITLED : titleText;
 			}
 		},
-		getTabBadge: function (item) {
+		getTabBadge: function (model) {
 			var badge = this.getComponentOption('badge');
 			if (badge == null) {
 				return null;
 			} else if (typeof badge === 'string') {
-				var badgeValue = $pt.getValueFromJSON(item, badge);
+				var badgeValue = model.get(badge);
 				var badgeRender = this.getComponentOption('badgeRender');
 				if (badgeRender) {
-					badgeValue = badgeRender.call(this, badgeValue, item, this.getModel());
+					badgeValue = badgeRender.call(this, badgeValue, model, this.getModel());
 				}
 				return badgeValue;
 			} else {
-				return badge.when.call(this, item);
+				return badge.when.call(this, model);
 			}
 		},
 		/**
 		 * get item icon
-		 * @param item
+		 * @param model {ModelInterface} item model
 		 * @returns {string}
 		 */
-		getTabIcon: function (item) {
+		getTabIcon: function (model) {
 			var icon = this.getComponentOption('itemIcon');
 			if (icon == null) {
 				return null;
 			} else if (typeof icon === 'string') {
 				return icon;
 			} else {
-				return icon.when.call(this, item);
+				return icon.when.call(this, model);
 			}
 		},
 		/**
@@ -330,13 +354,7 @@
 		getActiveTabIndex: function () {
 			if (this.state.activeTabIndex == null) {
 				// get initial active tab index, or 0 if not set
-				var _this = this;
 				this.state.activeTabIndex = 0;
-				this.state.tabs.forEach(function (tab, index) {
-					if (tab.active === true) {
-						_this.state.activeTabIndex = index;
-					}
-				});
 			}
 			return this.state.activeTabIndex;
 		},
@@ -345,15 +363,7 @@
 		 * @param {number}
 		 */
 		setActiveTabIndex: function(index) {
-			if (index < 0) {
-				index = 0;
-			} else if (index > (this.state.tabs.length - 1)) {
-				index = this.state.tabs.length - 1;
-			}
-			if (index < 0) {
-				throw $pt.createComponentException($pt.ComponentConstants.Err_Tab_Index_Out_Of_Bound, 'Tab index[' + index + '] out of bound.');
-			}
-			this.setState({activeTabeIndex: index});
+			this.setState({activeTabIndex: index});
 		}
 	}));
 	context.NArrayTab = NArrayTab;

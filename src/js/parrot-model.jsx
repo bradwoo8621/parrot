@@ -1017,24 +1017,32 @@
 		 * @param id {string} property id
 		 * @param row {{}} row data
 		 */
-		add: function (id, row) {
+		add: function (id, row, index) {
 			var data = this.get(id);
 			if (data == null) {
 				data = [];
 				// do not call #set, since #set will invoke event
 				this.__model[id] = data;
 			}
-			var index = data.findIndex(function (item) {
+			var findIndex = data.findIndex(function (item) {
 				return item === row;
 			});
-			if (index == -1) {
-				data.push(row);
+			if (findIndex == -1) {
+				if (index == null) {
+					data.push(row);
+					index = data.length - 1;
+				} else {
+					if (index >= data.length) {
+						index = data.length;
+					}
+					data.splice(index, 0, row);
+				}
 				this.__changed = true;
 				this.fireEvent({
 					model: this,
 					id: id,
 					array: data, // after add
-					index: data.length - 1,
+					index: index,
 					old: null,
 					"new": row,
 					type: "add",

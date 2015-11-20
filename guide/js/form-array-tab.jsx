@@ -41,13 +41,13 @@
 							depends: 'owner',
 							when: function (item) {
 								var items = this.getModel().get('items');
-								return items.indexOf(item) == 0 ? 'usd' : 'cny'
+								return items.indexOf(item.getCurrentModel()) == 0 ? 'usd' : 'cny'
 							}
 						},
 						itemTitle: {
 							depends: 'premium',
 							when: function (item) {
-								return item.owner;
+								return item.get('owner');
 							}
 						},
 						editLayout: function (item) {
@@ -66,7 +66,7 @@
 								}
 							};
 							var items = this.getModel().get('items');
-							return items.indexOf(item) == 0 ? $.extend(true, {}, basic, {
+							return items.indexOf(item.getCurrentModel()) == 0 ? $.extend(true, {}, basic, {
 								another: {
 									label: 'Enabled',
 									comp: {type: $pt.ComponentConstants.Check},
@@ -103,11 +103,11 @@
 						<code>itemTitle</code>, <code>itemIcon</code> can be a plain string,
 						or likes <code>enabled</code>, is a JSON with <code>depends</code> and <code>when</code>.
 						Which means it can monitor the given properties. see <code>enabled</code> in Form Cell.
-						Note it monitors the item of array, not form model of tab.
+						Note it monitors the item model, not form model of tab.
 						Of course, form model and inner model can be got from this of <code>when</code> function.
 					</span>,
 						<span>
-						<code>editLayout</code> can be JSON or function. Item of array will be passed to function and returns a JSON.
+						<code>editLayout</code> can be JSON or function. Item model will be passed to function and returns a JSON.
 						It makes even for an array, different layout for each tab is possible.
 						If it is JSON, then same layout for every tab.
 					</span>,
