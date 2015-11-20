@@ -256,11 +256,12 @@
         onNodeClicked: function(node, nodeId) {
             if (this.isLeaf(node)) {
                 return;
-            }
-            if (this.state.activeNodes[nodeId]) {
-                this.collapseNode(node, nodeId);
             } else {
-                this.expandNode(node, nodeId);
+                if (this.state.activeNodes[nodeId]) {
+                    this.collapseNode(node, nodeId);
+                } else {
+                    this.expandNode(node, nodeId);
+                }
             }
             var nodeClick = this.getComponentOption('nodeClick');
             if (nodeClick) {
