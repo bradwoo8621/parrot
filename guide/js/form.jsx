@@ -110,7 +110,8 @@
 					title: 'Position',
 					desc: [
 						<span><code>width</code> is used to control section width, from 1 to 12, default is 12.</span>,
-						<span><code>row</code> and <code>col</code> are used to control the section position. Continuous is not necessary.</span>],
+						<span><code>row</code> and <code>col</code> are used to control the section position. Continuous is not necessary.</span>,
+						<span className='text-danger'>Note if no <code>row</code> or <code>col</code> set, order of component might be random.</span>],
 					xml: {width: 12, xml: <NForm model={model} layout={$pt.createFormLayout(layoutTemplate)}/>},
 					code: [modelCode, layoutCode, compCode],
 					index: 20
