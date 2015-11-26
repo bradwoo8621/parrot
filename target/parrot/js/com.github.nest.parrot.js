@@ -1,4 +1,4 @@
-/** com.github.nest.parrot.V0.0.4 2015-11-20 */
+/** com.github.nest.parrot.V0.0.4 2015-11-26 */
 (function ($) {
 	var patches = {
 		console: function () {
@@ -4368,7 +4368,8 @@
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
-					style: 'default'
+					style: 'default',
+					labelFromModel: false
 				}
 			};
 		},
@@ -4472,7 +4473,7 @@
 				disabled: !this.isEnabled()
 			};
 			css['btn-' + this.getStyle()] = true;
-			var label = this.getLayout().getLabel();
+			var label = this.getLabel();
 			var icon = this.renderButtonIcon();
 			if (this.getLabelPosition() === 'left') {
 				if (label && icon) {
@@ -4542,12 +4543,13 @@
 		getLabelPosition: function () {
 			return this.getComponentOption("labelPosition");
 		},
-		/**
-		 * @overrides always return null
-		 * @returns {*}
-		 */
-		getValueFromModel: function () {
-			return null;
+		getLabel: function() {
+			var labelFromModel = this.getComponentOption('labelFromModel');
+			if (labelFromModel) {
+				return this.getValueFromModel();
+			} else {
+				return this.getLayout().getLabel();
+			}
 		},
 		/**
 		 * @overrides do nothing
