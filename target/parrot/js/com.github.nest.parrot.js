@@ -1,4 +1,4 @@
-/** com.github.nest.parrot.V0.0.4 2015-11-18 */
+/** com.github.nest.parrot.V0.0.4 2015-11-26 */
 (function ($) {
 	var patches = {
 		console: function () {
@@ -329,6 +329,7 @@
 		Err_Unsupported_Component: "PT-00001",
 		Err_Unuspported_Column_Sort: "PT-00002",
 		Err_Search_Text_Trigger_Digits_Not_Defined: "PT-00003",
+		Err_Tab_Index_Out_Of_Bound: "PT-00004",
 		// http status
 		Http_Status: {
 			"0": "Browser Error",
@@ -1956,24 +1957,32 @@
 		 * @param id {string} property id
 		 * @param row {{}} row data
 		 */
-		add: function (id, row) {
+		add: function (id, row, index) {
 			var data = this.get(id);
 			if (data == null) {
 				data = [];
 				// do not call #set, since #set will invoke event
 				this.__model[id] = data;
 			}
-			var index = data.findIndex(function (item) {
+			var findIndex = data.findIndex(function (item) {
 				return item === row;
 			});
-			if (index == -1) {
-				data.push(row);
+			if (findIndex == -1) {
+				if (index == null) {
+					data.push(row);
+					index = data.length - 1;
+				} else {
+					if (index >= data.length) {
+						index = data.length;
+					}
+					data.splice(index, 0, row);
+				}
 				this.__changed = true;
 				this.fireEvent({
 					model: this,
 					id: id,
 					array: data, // after add
-					index: data.length - 1,
+					index: index,
 					old: null,
 					"new": row,
 					type: "add",
@@ -3458,6 +3467,9 @@
 	};
 
 	var LayoutHelper = jsface.Class({
+		constructor: function() {
+			this.__comp = {};
+		},
 		/**
 		 * copy from React.addons.classSet
 		 * @param classNames
@@ -3841,14 +3853,14 @@
 				});
 			});
 			var cellLayout = {
-				label: this.getPanelTitle(item),
+				label: this.getPanelTitle(model),
 				comp: {
 					type: $pt.ComponentConstants.Panel,
 					collapsible: this.getComponentOption('collapsible'),
 					expanded: this.getComponentOption('expanded'),
-					editLayout: this.getEditLayout(item),
+					editLayout: this.getEditLayout(model),
 					style: this.getComponentOption('style'),
-					checkInTitle: this.getCheckInTitle(item),
+					checkInTitle: this.getCheckInTitle(model),
 					expandedLabel: this.getComponentOption('expandedLabel'),
 					collapsedLabel: this.getComponentOption('collapsedLabel')
 				}
@@ -3895,43 +3907,43 @@
 		},
 		/**
 		 * get edit layout
-		 * @param item
+		 * @param model {ModelInterface} item model
 		 * @returns {{}}
 		 */
-		getEditLayout: function (item) {
+		getEditLayout: function (model) {
 			var layout = this.getComponentOption('editLayout');
 			if (typeof layout === 'function') {
-				return layout.call(this, item);
+				return layout.call(this, model);
 			} else {
 				return layout;
 			}
 		},
 		/**
 		 * get check in title
-		 * @param item
+		 * @param model {ModelInterface} item model
 		 * @returns {{}}
 		 */
-		getCheckInTitle: function (item) {
+		getCheckInTitle: function (model) {
 			var checkInTitle = this.getComponentOption('checkInTitle');
 			if (typeof checkInTitle === 'function') {
-				return checkInTitle.call(this, item);
+				return checkInTitle.call(this, model);
 			} else {
 				return checkInTitle;
 			}
 		},
 		/**
 		 * get panel titled
-		 * @param item {{}}
+		 * @param model {ModelInterface} item model
 		 * @returns {string}
 		 */
-		getPanelTitle: function (item) {
+		getPanelTitle: function (model) {
 			var title = this.getComponentOption('itemTitle');
 			if (title == null) {
 				return NArrayPanel.UNTITLED;
 			} else if (typeof title === 'string') {
 				return title;
 			} else {
-				var titleText = title.when.call(this, item);
+				var titleText = title.when.call(this, model);
 				return (titleText == null || titleText.isBlank()) ? NArrayPanel.UNTITLED : titleText;
 			}
 		}
@@ -4002,7 +4014,6 @@
 		},
 		getInitialState: function () {
 			return {
-				tabs: null,
 				activeTabIndex: null
 			};
 		},
@@ -4030,6 +4041,9 @@
 			this.addPostRemoveListener(this.onModelChanged);
 			this.addPostValidateListener(this.onModelValidateChanged);
 			this.registerToComponentCentral();
+
+			// TODO since NTab will keep the active tab index in state, force change it.
+			this.refs.tab.setActiveTabIndex(this.getActiveTabIndex());
 		},
 		/**
 		 * did mount
@@ -4059,43 +4073,18 @@
 		 * @param index
 		 * @returns {XML}
 		 */
-		renderTabContent: function (tab, index) {
-			var activeIndex = this.getActiveTabIndex();
+		renderTabContent: function (tab) {
 			var css = {
 				'n-array-tab-card': true,
-				show: index == activeIndex,
-				hide: index != activeIndex
+				show: tab.active,
+				hide: !tab.active
 			};
 
-			var parentModel = this.getModel();
-			var parentValidator = parentModel.getValidator();
-			var validator = null;
-			if (parentValidator) {
-				var parentValidationConfig = parentValidator.getConfig()[this.getDataId()];
-				if (parentValidationConfig && parentValidationConfig.table) {
-					validator = $pt.createModelValidator(parentValidationConfig.table);
-				}
-			}
-			var model = validator ? $pt.createModel(tab.data, validator) : $pt.createModel(tab.data);
-			model.useBaseAsCurrent();
-			model.parent(parentModel);
-			// synchronized the validation result from parent model
-			// get errors about current value
-			var errors = this.getModel().getError(this.getDataId());
-			if (errors) {
-				var itemError = null;
-				for (var errorIndex = 0, errorCount = errors.length; errorIndex < errorCount; errorIndex++) {
-					if (typeof errors[errorIndex] !== "string") {
-						itemError = errors[errorIndex].getError(tab.data);
-						model.mergeError(itemError);
-					}
-				}
-			}
 			// no base here. since no apply operation
 			var _this = this;
 			// add item title and item icon listener
 			this.getDependencies(['itemTitle', 'itemIcon']).forEach(function (key) {
-				model.addListener(key, "post", "change", function () {
+				tab.data.addListener(key, "post", "change", function () {
 					_this.forceUpdate();
 				});
 			});
@@ -4103,18 +4092,18 @@
 			var badge = this.getComponentOption('badge');
 			if (badge != null) {
 				if (typeof badge === 'string') {
-					model.addListener(badge, "post", "change", function () {
+					tab.data.addListener(badge, "post", "change", function () {
 						_this.forceUpdate();
 					});
 				} else {
 					this.getDependencies(badge).forEach(function (key) {
-						model.addListener(key, "post", "change", function () {
+						tab.data.addListener(key, "post", "change", function () {
 							_this.forceUpdate();
 						});
 					});
 				}
 			}
-			return (React.createElement(NForm, {model: model, 
+			return (React.createElement(NForm, {model: tab.data, 
 			               layout: $pt.createFormLayout(tab.layout), 
 			               direction: this.props.direction, 
 			               className: $pt.LayoutHelper.classSet(css)})
@@ -4126,6 +4115,12 @@
 		 */
 		render: function () {
 			var tabs = this.getTabs();
+			this.activeTab(tabs, this.getActiveTabIndex());
+			var canActive = this.getComponentOption('canActive');
+			if (canActive) {
+				canActive.bind(this);
+			}
+			var _this = this;
 			return (React.createElement("div", {className: this.getComponentCSS('n-array-tab')}, 
 				React.createElement(NTab, {type: this.getComponentOption('tabType'), 
 				      justified: this.getComponentOption('justified'), 
@@ -4133,7 +4128,7 @@
 				      size: this.getComponentOption('titleIconSize'), 
 				      tabClassName: this.getAdditionalCSS('tabs'), 
 				      tabs: tabs, 
-				      canActive: this.getComponentOption('canActive'), 
+				      canActive: canActive, 
 				      onActive: this.onTabClicked, 
 				      ref: "tab"}
 				), 
@@ -4142,6 +4137,45 @@
 					tabs.map(this.renderTabContent)
 				)
 			));
+		},
+		activeTab: function(tabs, activeTabIndex) {
+			if (activeTabIndex >= tabs.length) {
+				activeTabIndex = tabs.length - 1;
+			}
+			if (activeTabIndex < 0) {
+				activeTabIndex = 0;
+			}
+			if (tabs.length > 0) {
+				tabs[activeTabIndex].active = true;
+			}
+			this.state.activeTabIndex = activeTabIndex;
+		},
+		createItemModel: function(item) {
+			var parentModel = this.getModel();
+			var parentValidator = parentModel.getValidator();
+			var validator = null;
+			if (parentValidator) {
+				var parentValidationConfig = parentValidator.getConfig()[this.getDataId()];
+				if (parentValidationConfig && parentValidationConfig.table) {
+					validator = $pt.createModelValidator(parentValidationConfig.table);
+				}
+			}
+			var model = validator ? $pt.createModel(item, validator) : $pt.createModel(item);
+			model.useBaseAsCurrent();
+			model.parent(parentModel);
+			// synchronized the validation result from parent model
+			// get errors about current value
+			var errors = this.getModel().getError(this.getDataId());
+			if (errors) {
+				var itemError = null;
+				for (var errorIndex = 0, errorCount = errors.length; errorIndex < errorCount; errorIndex++) {
+					if (typeof errors[errorIndex] !== "string") {
+						itemError = errors[errorIndex].getError(item);
+						model.mergeError(itemError);
+					}
+				}
+			}
+			return model;
 		},
 		/**
 		 * get tabs
@@ -4152,16 +4186,15 @@
 			var tabs = [];
 			var data = this.getValueFromModel();
 			data.forEach(function (item) {
+				var model = _this.createItemModel(item);
 				tabs.push({
-					label: _this.getTabTitle(item),
-					icon: _this.getTabIcon(item),
-					layout: _this.getEditLayout(item),
-					badge: _this.getTabBadge(item),
-					data: item
+					label: _this.getTabTitle(model),
+					icon: _this.getTabIcon(model),
+					layout: _this.getEditLayout(model),
+					badge: _this.getTabBadge(model),
+					data: model
 				});
 			});
-			this.state.tabs = tabs;
-			this.getActiveTabIndex();
 			return tabs;
 		},
 		/**
@@ -4177,7 +4210,14 @@
 		 * @param evt
 		 */
 		onModelChanged: function (evt) {
-			this.forceUpdate();
+			if (evt.type === 'add') {
+				this.setActiveTabIndex(evt.index);
+			} else if (evt.type === 'remove') {
+				var index = evt.index;
+				this.setActiveTabIndex(index);
+			} else {
+				this.forceUpdate();
+			}
 		},
 		/**
 		 * monitor the parent model validation
@@ -4189,61 +4229,61 @@
 		},
 		/**
 		 * get edit layout
-		 * @param item
+		 * @param model {ModelInterface} item model
 		 * @returns {FormLayout}
 		 */
-		getEditLayout: function (item) {
+		getEditLayout: function (model) {
 			var layout = this.getComponentOption('editLayout');
 			if (typeof layout === 'function') {
-				return layout.call(this, item);
+				return layout.call(this, model);
 			} else {
 				return layout;
 			}
 		},
 		/**
 		 * get item title
-		 * @param item
+		 * @param model {ModelInterface} item model
 		 * @returns {string}
 		 */
-		getTabTitle: function (item) {
+		getTabTitle: function (model) {
 			var title = this.getComponentOption('itemTitle');
 			if (title == null) {
 				return NArrayTab.UNTITLED;
 			} else if (typeof title === 'string') {
 				return title;
 			} else {
-				var titleText = title.when.call(this, item);
+				var titleText = title.when.call(this, model);
 				return (titleText == null || titleText.isBlank()) ? NArrayTab.UNTITLED : titleText;
 			}
 		},
-		getTabBadge: function (item) {
+		getTabBadge: function (model) {
 			var badge = this.getComponentOption('badge');
 			if (badge == null) {
 				return null;
 			} else if (typeof badge === 'string') {
-				var badgeValue = $pt.getValueFromJSON(item, badge);
+				var badgeValue = model.get(badge);
 				var badgeRender = this.getComponentOption('badgeRender');
 				if (badgeRender) {
-					badgeValue = badgeRender.call(this, badgeValue, item, this.getModel());
+					badgeValue = badgeRender.call(this, badgeValue, model, this.getModel());
 				}
 				return badgeValue;
 			} else {
-				return badge.when.call(this, item);
+				return badge.when.call(this, model);
 			}
 		},
 		/**
 		 * get item icon
-		 * @param item
+		 * @param model {ModelInterface} item model
 		 * @returns {string}
 		 */
-		getTabIcon: function (item) {
+		getTabIcon: function (model) {
 			var icon = this.getComponentOption('itemIcon');
 			if (icon == null) {
 				return null;
 			} else if (typeof icon === 'string') {
 				return icon;
 			} else {
-				return icon.when.call(this, item);
+				return icon.when.call(this, model);
 			}
 		},
 		/**
@@ -4267,15 +4307,16 @@
 		getActiveTabIndex: function () {
 			if (this.state.activeTabIndex == null) {
 				// get initial active tab index, or 0 if not set
-				var _this = this;
 				this.state.activeTabIndex = 0;
-				this.state.tabs.forEach(function (tab, index) {
-					if (tab.active === true) {
-						_this.state.activeTabIndex = index;
-					}
-				});
 			}
 			return this.state.activeTabIndex;
+		},
+		/**
+		 * set active tab index
+		 * @param {number}
+		 */
+		setActiveTabIndex: function(index) {
+			this.setState({activeTabIndex: index});
 		}
 	}));
 	context.NArrayTab = NArrayTab;
@@ -4327,7 +4368,8 @@
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
-					style: 'default'
+					style: 'default',
+					labelFromModel: false
 				}
 			};
 		},
@@ -4431,7 +4473,7 @@
 				disabled: !this.isEnabled()
 			};
 			css['btn-' + this.getStyle()] = true;
-			var label = this.getLayout().getLabel();
+			var label = this.getLabel();
 			var icon = this.renderButtonIcon();
 			if (this.getLabelPosition() === 'left') {
 				if (label && icon) {
@@ -4501,12 +4543,13 @@
 		getLabelPosition: function () {
 			return this.getComponentOption("labelPosition");
 		},
-		/**
-		 * @overrides always return null
-		 * @returns {*}
-		 */
-		getValueFromModel: function () {
-			return null;
+		getLabel: function() {
+			var labelFromModel = this.getComponentOption('labelFromModel');
+			if (labelFromModel) {
+				return this.getValueFromModel();
+			} else {
+				return this.getLayout().getLabel();
+			}
 		},
 		/**
 		 * @overrides do nothing
@@ -6625,6 +6668,10 @@
 		},
 		render: function () {
 			var tabs = this.getTabs();
+			var canActive = this.getComponentOption('canActive');
+			if (canActive) {
+				canActive.bind(this);
+			}
 			return (React.createElement("div", {className: this.getComponentCSS('n-form-tab')}, 
 				React.createElement(NTab, {type: this.getComponentOption('tabType'), 
 				      justified: this.getComponentOption('justified'), 
@@ -6632,7 +6679,7 @@
 				      size: this.getComponentOption('titleIconSize'), 
 				      tabClassName: this.getAdditionalCSS('tabs'), 
 				      tabs: tabs, 
-				      canActive: this.getComponentOption('canActive'), 
+				      canActive: canActive, 
 				      onActive: this.onTabClicked}), 
 
 				React.createElement("div", {className: "n-form-tab-content", ref: "content"}, 
@@ -6695,6 +6742,21 @@
 				});
 			}
 			return this.state.activeTabIndex;
+		},
+		/**
+		 * set active tab index
+		 * @param {number}
+		 */
+		setActiveTabIndex: function(index) {
+			if (index < 0) {
+				index = 0;
+			} else if (index > (this.state.tabs.length - 1)) {
+				index = this.state.tabs.length - 1;
+			}
+			if (index < 0) {
+				throw $pt.createComponentException($pt.ComponentConstants.Err_Tab_Index_Out_Of_Bound, 'Tab index[' + index + '] out of bound.');
+			}
+			this.setState({activeTabIndex: index});
 		}
 	}));
 	context.NFormTab = NFormTab;
@@ -8584,10 +8646,7 @@
 		 * @returns {SectionLayout}
 		 */
 		getInnerLayout: function () {
-			if (this.state.innerLayout == null) {
-				this.state.innerLayout = $pt.createSectionLayout({layout: this.getComponentOption('editLayout')});
-			}
-			return this.state.innerLayout;
+			return $pt.createSectionLayout({layout: this.getComponentOption('editLayout')});
 		},
 		/**
 		 * is collapsible or not
@@ -10727,6 +10786,22 @@
 			return this.state.activeTabIndex;
 		},
 		/**
+		 * set active tab index
+		 * @param {number}
+		 */
+		setActiveTabIndex: function(index) {
+			if (index < 0) {
+				index = 0;
+			} else if (index >= this.props.tabs.length) {
+				index = this.props.tabs.length - 1;
+			}
+			if (index < 0) {
+				throw $pt.createComponentException($pt.ComponentConstants.Err_Tab_Index_Out_Of_Bound, 'Tab index[' + index + '] out of bound.');
+			}
+			this.setState({activeTabIndex: index});
+			return this;
+		},
+		/**
 		 * on tab clicked
 		 * @param evt
 		 */
@@ -11011,7 +11086,7 @@
 			this.detachListeners();
 			if (nextProps != this.props) {
 				// clear definition
-				this.columns = null;
+				this.state.columns = null;
 			}
 			this.unregisterFromComponentCentral();
 		},
@@ -11087,20 +11162,20 @@
 		 * prepare display options
 		 */
 		prepareDisplayOptions: function () {
-			if (this.columns != null) {
+			if (this.state.columns != null) {
 				// already initialized, do nothing and return
 				return;
 			}
 			// this.state.searchModel.addListener('text', 'post', 'change', this.onSearchBoxChanged);
 
 			// copy from this.props.columns
-			this.columns = this.getComponentOption("columns");
+			this.state.columns = this.getComponentOption("columns");
 			// is it is json array, construct to TableColumnLayout object
-			if (Array.isArray(this.columns)) {
-				this.columns = $pt.createTableColumnLayout(this.columns);
+			if (Array.isArray(this.state.columns)) {
+				this.state.columns = $pt.createTableColumnLayout(this.state.columns);
 			} else {
 				// get original columns definition can create new object
-				this.columns = $pt.createTableColumnLayout(this.columns.columns());
+				this.state.columns = $pt.createTableColumnLayout(this.state.columns.columns());
 			}
 			this.fixedRightColumns = this.getComponentOption("fixedRightColumns");
 			this.fixedLeftColumns = this.getComponentOption("fixedLeftColumns");
@@ -11131,7 +11206,7 @@
 					}
 					config.width = config.width < NTable.__minOperationButtonWidth ? NTable.__minOperationButtonWidth : config.width;
 				}
-				this.columns.push(config);
+				this.state.columns.push(config);
 				if (this.fixedRightColumns > 0 || this.getComponentOption("operationFixed") === true) {
 					this.fixedRightColumns++;
 				}
@@ -11144,7 +11219,7 @@
 					width: 40,
 					title: ''
 				};
-				this.columns.splice(0, 0, config);
+				this.state.columns.splice(0, 0, config);
 				if (this.fixedLeftColumns > 0 || this.getComponentOption('rowSelectFixed') === true) {
 					this.fixedLeftColumns++;
 				}
@@ -11157,7 +11232,7 @@
 					width: 40,
 					title: "#"
 				};
-				this.columns.splice(0, 0, config);
+				this.state.columns.splice(0, 0, config);
 				if (this.fixedLeftColumns > 0 || this.getComponentOption("indexFixed") === true) {
 					this.fixedLeftColumns++;
 				}
@@ -11334,7 +11409,7 @@
 			var _this = this;
 			return (React.createElement("thead", null, 
 			React.createElement("tr", null, 
-				this.columns.map(function (column) {
+				this.state.columns.map(function (column) {
 					if (columnIndex >= indexToRender.min && columnIndex <= indexToRender.max) {
 						// column is fixed.
 						columnIndex++;
@@ -11653,7 +11728,7 @@
 
 			var inlineModel = this.createInlineRowModel(row);
 			return (React.createElement("tr", {className: className}, 
-				this.columns.map(function (column) {
+				this.state.columns.map(function (column) {
 					if (columnIndex >= indexToRender.min && columnIndex <= indexToRender.max) {
 						// column is fixed.
 						columnIndex++;
@@ -12056,7 +12131,7 @@
 			if (this.hasHorizontalScrollBar()) {
 				width = 0;
 				// calculate width
-				this.columns.forEach(function (column) {
+				this.state.columns.forEach(function (column) {
 					if (column.visible === undefined || column.visible === true) {
 						width += (column.width ? (column.width * 1) : 0);
 					}
@@ -12077,7 +12152,7 @@
 			var width = 0;
 			var fixedLeftColumns = this.getMaxFixedLeftColumnIndex();
 			var columnIndex = 0;
-			this.columns.forEach(function (element) {
+			this.state.columns.forEach(function (element) {
 				if (columnIndex <= fixedLeftColumns && (element.visible === undefined || element.visible === true)) {
 					// column is fixed.
 					width += element.width ? (element.width * 1) : 0;
@@ -12094,7 +12169,7 @@
 			var width = 0;
 			var fixedRightColumns = this.getMinFixedRightColumnIndex();
 			var columnIndex = 0;
-			this.columns.forEach(function (element) {
+			this.state.columns.forEach(function (element) {
 				if (columnIndex >= fixedRightColumns && (element.visible === undefined || element.visible === true)) {
 					// column is fixed
 					width += element.width;
@@ -12142,7 +12217,7 @@
 		 * @returns {number}
 		 */
 		getMinFixedRightColumnIndex: function () {
-			return this.columns.length() - this.fixedRightColumns;
+			return this.state.columns.length() - this.fixedRightColumns;
 		},
 		/**
 		 * get query settings
@@ -12633,6 +12708,16 @@
 		createInlineRowModel: function(item) {
 			var model = this.createEditingModel(item);
 			model.useBaseAsCurrent();
+			var listeners = this.getComponentOption('rowListener');
+			if (listeners) {
+				listeners = Array.isArray(listeners) ? listeners : [listeners];
+				listeners.forEach(function(listener) {
+					model.addListener(listener.id,
+						listener.time ? listener.time : 'post',
+						listener.type ? listener.type : 'change',
+					listener.listener);
+				});
+			}
 			return model;
 		},
 		/**
@@ -12770,6 +12855,13 @@
 		 */
 		getFixedRightBodyDivId: function () {
 			return "n-table-scrolled-right-body";
+		},
+		/**
+		 * clear columns definition
+		 */
+		clearColumnsDefinition: function() {
+			this.state.columns = null;
+			this.forceUpdate();
 		}
 	}));
 	context.NTable = NTable;
@@ -13730,13 +13822,12 @@
             );
         },
         onNodeClicked: function(node, nodeId) {
-            if (this.isLeaf(node)) {
-                return;
-            }
-            if (this.state.activeNodes[nodeId]) {
-                this.collapseNode(node, nodeId);
-            } else {
-                this.expandNode(node, nodeId);
+            if (!this.isLeaf(node)) {
+                if (this.state.activeNodes[nodeId]) {
+                    this.collapseNode(node, nodeId);
+                } else {
+                    this.expandNode(node, nodeId);
+                }
             }
             var nodeClick = this.getComponentOption('nodeClick');
             if (nodeClick) {

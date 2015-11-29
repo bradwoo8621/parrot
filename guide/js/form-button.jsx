@@ -59,6 +59,35 @@
 					index: 20
 				};
 			},
+			label: function () {
+				var model = $pt.createModel({button: 'Yes'});
+				var modelCode = $demo.convertModelCreatorToString({
+					variable: 'model',
+					template: modelTemplate
+				});
+				var layoutTemplate = {
+					label: 'Click me',
+					comp: {
+						icon: 'commenting',
+						labelPosition: 'left',
+						labelFromModel: true
+					}
+				};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'button',
+					template: layoutTemplate
+				});
+				return {
+					id: 'button-label',
+					title: 'Label',
+					desc: [<span>Label of button default get from <code>label</code>,
+						and also can get from data model by set <code>labelFromModel</code> as true.</span>],
+					xml: <NFormButton model={model} layout={$pt.createCellLayout('button', layoutTemplate)}/>,
+					code: [modelCode, layoutCode, compCode],
+					index: 25
+				};
+			},
 			labelPos: function () {
 				var layoutTemplate = {
 					label: 'Click me',

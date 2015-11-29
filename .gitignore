@@ -1,5 +1,6 @@
 /bower_components/
 /node_modules/
+/temp-test/
 /target/bootstrap3/css/bootstrap-datetimepicker.css
 /target/bootstrap3/css/bootstrap-datetimepicker.min.css
 /target/bootstrap3/css/bootstrap-theme.css

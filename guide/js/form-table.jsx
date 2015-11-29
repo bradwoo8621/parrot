@@ -783,6 +783,11 @@
 					2. Cell Layout: Simply use cell layout JSON, such as <code>inline: {"{}"}</code>. Note in JSON object, <code>inlineType: 'cell'</code> is necessary,
 					or the JSON object will be treated as option 3.<br/>
 					3. Form Layout: Use form layout JSON, take care of the CSS, it's very important. Form CSS class name can be defined via additional property <code>__className</code> in JSON.<br/>
+					4. User <code>rowListener</code> to monitor change of row model. Pattern of <code>rowListener</code> is JSON or an array of JSON, each object format as below,<br/>
+					4.1 id: string. Property id of row model.<br/>
+					4.2 time: string. Event time, see ModelInterface.<br/>
+					4.3 type: string. Event type, see ModelInterface.<br/>
+					4.4 listener: function(evt). Event listener, see ModelInterface.<br/>
 					<span className='text-danger'>Note: <br/>
 					1. NEVER try to wrap lines in cell, if need, customized your own component, DONOT use Table.<br/>
 					2. NEVER forget the set comp CSS as <code>inline-editor</code> for Table which has inline editor.</span>
