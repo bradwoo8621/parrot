@@ -1326,21 +1326,21 @@
 			var _this = this;
 			if (model) {
 				dependencies.forEach(function(key) {
-					model.addListener(key, 'post', 'change', monitor);
+					model.addPostChangeListener(key, monitor);
 				});
 			} else {
 				dependencies.forEach(function (key) {
 					if (typeof key === 'object') {
 						var id = key.id;
 						if (key.on === 'form') {
-							_this.getFormModel().addListener(id, 'post', 'change', monitor);
+							_this.getFormModel().addPostChangeListener(id, monitor);
 						} else if (key.on === 'inner') {
-							_this.getInnerModel().addListener(id, 'post', 'change', monitor);
+							_this.getInnerModel().addPostChangeListener(id, monitor);
 						} else {
-							_this.getModel().addListener(id, "post", "change", monitor);
+							_this.getModel().addPostChangeListener(id, monitor);
 						}
 					} else {
-						_this.getModel().addListener(key, "post", "change", monitor);
+						_this.getModel().addPostChangeListener(key, monitor);
 					}
 				});
 			}
@@ -1357,21 +1357,21 @@
 			var _this = this;
 			if (model) {
 				dependencies.forEach(function(key) {
-					model.addListener(key, 'post', 'change', monitor);
+					model.removePostChangeListener(key, monitor);
 				});
 			} else {
 				dependencies.forEach(function (key) {
 					if (typeof key === 'object') {
 						var id = key.id;
 						if (key.on === 'form') {
-							_this.getFormModel().removeListener(id, 'post', 'change', monitor);
+							_this.getFormModel().removePostChangeListener(id, monitor);
 						} else if (key.on === 'inner') {
-							_this.getInnerModel().removeListener(id, 'post', 'change', monitor);
+							_this.getInnerModel().removePostChangeListener(id, monitor);
 						} else {
-							_this.getModel().removeListener(id, "post", "change", monitor);
+							_this.getModel().removePostChangeListener(id, monitor);
 						}
 					} else {
-						_this.getModel().removeListener(key, "post", "change", monitor);
+						_this.getModel().removePostChangeListener(key, monitor);
 					}
 				});
 			}
@@ -1379,28 +1379,28 @@
 		},
 		// event
 		addPostChangeListener: function (listener) {
-			this.getModel().addListener(this.getDataId(), "post", "change", listener);
+			this.getModel().addPostChangeListener(this.getDataId(), listener);
 		},
 		removePostChangeListener: function (listener) {
-			this.getModel().removeListener(this.getDataId(), "post", "change", listener);
+			this.getModel().removePostChangeListener(this.getDataId(), listener);
 		},
 		addPostAddListener: function (listener) {
-			this.getModel().addListener(this.getDataId(), "post", "add", listener);
+			this.getModel().addPostAddListener(this.getDataId(), listener);
 		},
 		removePostAddListener: function (listener) {
-			this.getModel().removeListener(this.getDataId(), "post", "add", listener);
+			this.getModel().removePostAddListener(this.getDataId(), listener);
 		},
 		addPostRemoveListener: function (listener) {
-			this.getModel().addListener(this.getDataId(), "post", "remove", listener);
+			this.getModel().addPostRemoveListener(this.getDataId(), listener);
 		},
 		removePostRemoveListener: function (listener) {
-			this.getModel().removeListener(this.getDataId(), "post", "remove", listener);
+			this.getModel().removePostRemoveListener(this.getDataId(), listener);
 		},
 		addPostValidateListener: function (listener) {
-			this.getModel().addListener(this.getDataId(), "post", "validate", listener);
+			this.getModel().addPostValidateListener(this.getDataId(), listener);
 		},
 		removePostValidateListener: function (listener) {
-			this.getModel().removeListener(this.getDataId(), "post", "validate", listener);
+			this.getModel().removePostValidateListener(this.getDataId(), listener);
 		}
 	};
 
