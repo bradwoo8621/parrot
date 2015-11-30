@@ -4173,11 +4173,18 @@
 		 * @returns {Array}
 		 */
 		getTabs: function () {
+			var _this = this;
 			if (this.state.tabs) {
+				this.state.tabs.forEach(function(tab) {
+					var model = tab.data;
+					tab.label = _this.getTabTitle(model);
+					tab.icon = _this.getTabIcon(model);
+					tab.layout = _this.getEditLayout(model);
+					tab.badge = _this.getTabBadge(model);
+				});
 				return this.state.tabs;
 			}
 
-			var _this = this;
 			this.state.tabs = this.getValueFromModel().map(function (item) {
 				var model = _this.createItemModel(item);
 				return {
