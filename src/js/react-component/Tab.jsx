@@ -162,7 +162,12 @@
 			if (activeTabIndex == -1) {
 				// find the first visible tab if no active tab found
 				activeTabIndex = this.props.tabs.findIndex(function (tab, index) {
-					return tab.visible !== false;
+					var visible =  tab.visible !== false;
+					if (visible) {
+						console.log(index);
+						tab.active = true;
+						return true;
+					}
 				});
 			}
 			return activeTabIndex;

@@ -173,6 +173,7 @@
 		 * @param index {number}
 		 */
 		onTabClicked: function (tabValue, index) {
+			this.setActiveTabIndex(index);
 			var onActive = this.getComponentOption('onActive');
 			if (onActive) {
 				onActive.call(this, tabValue, index);
@@ -191,7 +192,12 @@
 			if (activeTabIndex == -1) {
 				// find the first visible tab if no active tab found
 				activeTabIndex = tabs.findIndex(function (tab, index) {
-					return tab.visible !== false;
+					var visible =  tab.visible !== false;
+					if (visible) {
+						console.log(index);
+						tab.active = true;
+						return true;
+					}
 				});
 			}
 			return activeTabIndex;
@@ -201,6 +207,7 @@
 		 * @param {number}
 		 */
 		setActiveTabIndex: function(index) {
+			console.log(index);
 			this.refs.tabs.setActiveTabIndex(index);
 			this.forceUpdate();
 		}

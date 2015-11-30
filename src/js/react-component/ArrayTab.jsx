@@ -61,7 +61,7 @@
 		},
 		getInitialState: function () {
 			return {
-				activeTabIndex: null
+				tabs: null
 			};
 		},
 		/**
@@ -88,9 +88,6 @@
 			this.addPostRemoveListener(this.onModelChanged);
 			this.addPostValidateListener(this.onModelValidateChanged);
 			this.registerToComponentCentral();
-
-			// TODO since NTab will keep the active tab index in state, force change it.
-			this.refs.tab.setActiveTabIndex(this.getActiveTabIndex());
 		},
 		/**
 		 * did mount
@@ -117,14 +114,15 @@
 		/**
 		 * render tab content
 		 * @param tab
-		 * @param index
+		 * @param tabIndex
 		 * @returns {XML}
 		 */
-		renderTabContent: function (tab) {
+		renderTabContent: function (tab, tabIndex) {
+			var activeTabIndex = this.getActiveTabIndex();
 			var css = {
 				'n-array-tab-card': true,
-				show: tab.active,
-				hide: !tab.active
+				show: tabIndex == activeTabIndex,
+				hide: tabIndex != activeTabIndex
 			};
 
 			// no base here. since no apply operation
@@ -162,12 +160,10 @@
 		 */
 		render: function () {
 			var tabs = this.getTabs();
-			this.activeTab(tabs, this.getActiveTabIndex());
 			var canActive = this.getComponentOption('canActive');
 			if (canActive) {
 				canActive.bind(this);
 			}
-			var _this = this;
 			return (<div className={this.getComponentCSS('n-array-tab')}>
 				<NTab type={this.getComponentOption('tabType')}
 				      justified={this.getComponentOption('justified')}
@@ -177,25 +173,13 @@
 				      tabs={tabs}
 				      canActive={canActive}
 				      onActive={this.onTabClicked}
-				      ref='tab'>
+				      ref='tabs'>
 				</NTab>
 
 				<div className='n-array-tab-content' ref='content'>
 					{tabs.map(this.renderTabContent)}
 				</div>
 			</div>);
-		},
-		activeTab: function(tabs, activeTabIndex) {
-			if (activeTabIndex >= tabs.length) {
-				activeTabIndex = tabs.length - 1;
-			}
-			if (activeTabIndex < 0) {
-				activeTabIndex = 0;
-			}
-			if (tabs.length > 0) {
-				tabs[activeTabIndex].active = true;
-			}
-			this.state.activeTabIndex = activeTabIndex;
 		},
 		createItemModel: function(item) {
 			var parentModel = this.getModel();
@@ -229,20 +213,25 @@
 		 * @returns {Array}
 		 */
 		getTabs: function () {
+			if (this.state.tabs) {
+				return this.state.tabs;
+			}
+
 			var _this = this;
-			var tabs = [];
-			var data = this.getValueFromModel();
-			data.forEach(function (item) {
+			this.state.tabs = this.getValueFromModel().map(function (item) {
 				var model = _this.createItemModel(item);
-				tabs.push({
+				return {
 					label: _this.getTabTitle(model),
 					icon: _this.getTabIcon(model),
 					layout: _this.getEditLayout(model),
 					badge: _this.getTabBadge(model),
 					data: model
-				});
+				};
 			});
-			return tabs;
+			return this.state.tabs;
+		},
+		clearTabs: function(callback) {
+			this.setState({tabs: null}, callback.call(this));
 		},
 		/**
 		 * return [] when is null
@@ -258,10 +247,14 @@
 		 */
 		onModelChanged: function (evt) {
 			if (evt.type === 'add') {
-				this.setActiveTabIndex(evt.index);
+				this.clearTabs(this.setActiveTabIndex.bind(this, evt.index));
 			} else if (evt.type === 'remove') {
 				var index = evt.index;
-				this.setActiveTabIndex(index);
+				var data = this.getValueFromModel();
+				if (index == data.length) {
+					index = index - 1;
+				}
+				this.clearTabs(this.setActiveTabIndex.bind(this, index));
 			} else {
 				this.forceUpdate();
 			}
@@ -339,9 +332,7 @@
 		 * @param index {number}
 		 */
 		onTabClicked: function (tabValue, index) {
-			this.setState({
-				activeTabIndex: index
-			});
+			this.setActiveTabIndex(index);
 			var onActive = this.getComponentOption('onActive');
 			if (onActive) {
 				onActive.call(this, tabValue, index);
@@ -352,18 +343,31 @@
 		 * @returns {number}
 		 */
 		getActiveTabIndex: function () {
-			if (this.state.activeTabIndex == null) {
-				// get initial active tab index, or 0 if not set
-				this.state.activeTabIndex = 0;
+			var tabs = this.state.tabs;
+			// find the active tab
+			var activeTabIndex = tabs.findIndex(function (tab, index) {
+				return tab.active === true;
+			});
+			if (activeTabIndex == -1) {
+				// find the first visible tab if no active tab found
+				activeTabIndex = tabs.findIndex(function (tab, index) {
+					var visible =  tab.visible !== false;
+					if (visible) {
+						console.log(index);
+						tab.active = true;
+						return true;
+					}
+				});
 			}
-			return this.state.activeTabIndex;
+			return activeTabIndex;
 		},
 		/**
 		 * set active tab index
 		 * @param {number}
 		 */
 		setActiveTabIndex: function(index) {
-			this.setState({activeTabIndex: index});
+			this.refs.tabs.setActiveTabIndex(index);
+			this.forceUpdate();
 		}
 	}));
 	context.NArrayTab = NArrayTab;
