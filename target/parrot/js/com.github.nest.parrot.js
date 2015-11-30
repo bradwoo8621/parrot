@@ -1,4 +1,4 @@
-/** com.github.nest.parrot.V0.0.4 2015-11-26 */
+/** com.github.nest.parrot.V0.0.4 2015-11-30 */
 (function ($) {
 	var patches = {
 		console: function () {
@@ -2258,11 +2258,18 @@
 		getAdditionalCSS: function (key, originalCSS) {
 			if (key) {
 				var additionalCSS = this.isAdditionalCSSDefined(key) ? this.__cell.css[key] : '';
+				var cssList = additionalCSS ? additoinalCSS.split(' ') : [];
+				var css = {};
+				cssList.forEach(function(cssClassName) {
+					if (cssClassName && !cssClassName.isBlank()) {
+						css[cssClassName.trim()] = true;
+					}
+				});
+
 				if (originalCSS != null && !originalCSS.isBlank()) {
-					return originalCSS + ' ' + additionalCSS;
-				} else {
-					return additionalCSS;
+					css[originalCSS.trim()] = true;
 				}
+				return $pt.LayoutHelper.classSet(css);
 			}
 			return this.isAdditionalCSSDefined() ? this.__cell.css : {};
 		},
@@ -6598,9 +6605,7 @@
 			};
 		},
 		getInitialState: function () {
-			return {
-				activeTabIndex: null
-			};
+			return {};
 		},
 		/**
 		 * will update
@@ -6608,7 +6613,7 @@
 		 */
 		componentWillUpdate: function (nextProps) {
 			var _this = this;
-			this.state.tabs.forEach(function (tab) {
+			this.getTabs().forEach(function (tab) {
 				if (tab.badgeId) {
 					_this.removeDependencyMonitor([tab.badgeId]);
 				}
@@ -6622,7 +6627,7 @@
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
 			var _this = this;
-			this.state.tabs.forEach(function (tab) {
+			this.getTabs().forEach(function (tab) {
 				if (tab.badgeId) {
 					_this.addDependencyMonitor([tab.badgeId]);
 				}
@@ -6634,7 +6639,7 @@
 		 */
 		componentDidMount: function () {
 			var _this = this;
-			this.state.tabs.forEach(function (tab) {
+			this.getTabs().forEach(function (tab) {
 				if (tab.badgeId) {
 					_this.addDependencyMonitor([tab.badgeId]);
 				}
@@ -6646,7 +6651,7 @@
 		 */
 		componentWillUnmount: function () {
 			var _this = this;
-			this.state.tabs.forEach(function (tab) {
+			this.getTabs().forEach(function (tab) {
 				if (tab.badgeId) {
 					_this.removeDependencyMonitor([tab.badgeId]);
 				}
@@ -6667,7 +6672,7 @@
 			               key: 'form-' + index}));
 		},
 		render: function () {
-			var tabs = this.getTabs();
+			var tabs = this.initializeTabs();
 			var canActive = this.getComponentOption('canActive');
 			if (canActive) {
 				canActive.bind(this);
@@ -6680,20 +6685,21 @@
 				      tabClassName: this.getAdditionalCSS('tabs'), 
 				      tabs: tabs, 
 				      canActive: canActive, 
-				      onActive: this.onTabClicked}), 
+				      onActive: this.onTabClicked, 
+					  ref: "tabs"}), 
 
 				React.createElement("div", {className: "n-form-tab-content", ref: "content"}, 
 					this.getTabLayouts().map(this.renderTabContent)
 				)
 			));
 		},
-		getTabs: function () {
-			if (this.state.tabs == null) {
-				// clone from definition
-				this.state.tabs = this.getComponentOption('tabs').slice(0);
-			}
+		getTabs: function() {
+			return this.getComponentOption('tabs');
+		},
+		initializeTabs: function () {
 			var _this = this;
-			this.state.tabs.forEach(function (tab) {
+			var tabs = this.getTabs();
+			tabs.forEach(function (tab) {
 				if (tab.badgeId) {
 					tab.badge = _this.getModel().get(tab.badgeId);
 					if (tab.badgeRender) {
@@ -6701,7 +6707,7 @@
 					}
 				}
 			});
-			return this.state.tabs;
+			return tabs;
 		},
 		/**
 		 * get tab layouts
@@ -6718,9 +6724,6 @@
 		 * @param index {number}
 		 */
 		onTabClicked: function (tabValue, index) {
-			this.setState({
-				activeTabIndex: index
-			});
 			var onActive = this.getComponentOption('onActive');
 			if (onActive) {
 				onActive.call(this, tabValue, index);
@@ -6731,32 +6734,26 @@
 		 * @returns {number}
 		 */
 		getActiveTabIndex: function () {
-			if (this.state.activeTabIndex == null) {
-				// get initial active tab index, or 0 if not set
-				var _this = this;
-				this.state.activeTabIndex = 0;
-				this.getComponentOption('tabs').forEach(function (tab, index) {
-					if (tab.active === true) {
-						_this.state.activeTabIndex = index;
-					}
+			var tabs = this.getComponentOption('tabs');
+			// find the active tab
+			var activeTabIndex = tabs.findIndex(function (tab, index) {
+				return tab.active === true;
+			});
+			if (activeTabIndex == -1) {
+				// find the first visible tab if no active tab found
+				activeTabIndex = tabs.findIndex(function (tab, index) {
+					return tab.visible !== false;
 				});
 			}
-			return this.state.activeTabIndex;
+			return activeTabIndex;
 		},
 		/**
 		 * set active tab index
 		 * @param {number}
 		 */
 		setActiveTabIndex: function(index) {
-			if (index < 0) {
-				index = 0;
-			} else if (index > (this.state.tabs.length - 1)) {
-				index = this.state.tabs.length - 1;
-			}
-			if (index < 0) {
-				throw $pt.createComponentException($pt.ComponentConstants.Err_Tab_Index_Out_Of_Bound, 'Tab index[' + index + '] out of bound.');
-			}
-			this.setState({activeTabIndex: index});
+			this.refs.tabs.setActiveTabIndex(index);
+			this.forceUpdate();
 		}
 	}));
 	context.NFormTab = NFormTab;
@@ -10656,13 +10653,17 @@
 			};
 		},
 		getInitialState: function () {
-			return {
-				activeTabIndex: null
-			};
+			return {};
+		},
+		componentDidUpdate: function() {
+			this.renderRelatedDOM();
 		},
 		componentDidMount: function () {
+			this.renderRelatedDOM();
+		},
+		renderRelatedDOM: function() {
 			var activeTabIndex = this.getActiveTabIndex();
-			this.props.tabs.map(function (tab, index) {
+			this.props.tabs.forEach(function (tab, index) {
 				if (activeTabIndex == index) {
 					$('#' + tab.innerId).show();
 				} else {
@@ -10726,7 +10727,7 @@
 				   onClick: this.onRemoveClicked}, 
 					React.createElement("span", {className: "fa fa-fw fa-times"})
 				));
-			return (React.createElement("li", {role: "presentation", className: css}, 
+			return (React.createElement("li", {role: "presentation", className: css, key: index}, 
 				React.createElement("a", {href: "javascript:void(0);", onClick: this.onClicked}, 
 					this.renderIcon(tab.icon, this.props.size), 
 					this.renderLabel(tab.label), 
@@ -10773,32 +10774,30 @@
 		 * @returns {number}
 		 */
 		getActiveTabIndex: function () {
-			if (this.state.activeTabIndex != null) {
-				return this.state.activeTabIndex;
-			}
-			var activeTabIndex = 0;
-			this.props.tabs.forEach(function (tab, index) {
-				if (tab.active === true) {
-					activeTabIndex = index;
-				}
+			// find the active tab
+			var activeTabIndex = this.props.tabs.findIndex(function (tab, index) {
+				return tab.active === true;
 			});
-			this.state.activeTabIndex = activeTabIndex;
-			return this.state.activeTabIndex;
+			if (activeTabIndex == -1) {
+				// find the first visible tab if no active tab found
+				activeTabIndex = this.props.tabs.findIndex(function (tab, index) {
+					return tab.visible !== false;
+				});
+			}
+			return activeTabIndex;
 		},
 		/**
 		 * set active tab index
 		 * @param {number}
 		 */
 		setActiveTabIndex: function(index) {
-			if (index < 0) {
-				index = 0;
-			} else if (index >= this.props.tabs.length) {
-				index = this.props.tabs.length - 1;
+			if (index < 0 || index >= this.props.tabs.length) {
+				console.warn('Tab index[' + index + '] out of bound.');
 			}
-			if (index < 0) {
-				throw $pt.createComponentException($pt.ComponentConstants.Err_Tab_Index_Out_Of_Bound, 'Tab index[' + index + '] out of bound.');
-			}
-			this.setState({activeTabIndex: index});
+			this.props.tabs.forEach(function(tab, tabIndex) {
+				tab.active = (tabIndex == index);
+			});
+			this.forceUpdate();
 			return this;
 		},
 		/**
@@ -10808,32 +10807,23 @@
 		onClicked: function (evt) {
 			var newTab = $(evt.target).closest('li');
 			var newTabIndex = newTab.index();
+			var activeTabIndex = this.getActiveTabIndex();
 
 			var canActive = this.props.canActive;
 			if (canActive) {
-				var activeTab = this.props.tabs[this.state.activeTabIndex];
-				var ret = canActive.call(this, this.props.tabs[newTabIndex].value, newTabIndex, activeTab.value, this.state.activeTabIndex);
+				var activeTab = this.props.tabs[activeTabIndex];
+				var ret = canActive.call(this, this.props.tabs[newTabIndex].value, newTabIndex, activeTab.value, activeTabIndex);
 				if (ret === false) {
 					$(':focus').blur();
 					return;
 				}
 			}
 
-			newTab.addClass('active');
-			newTab.parent().children('li').not(newTab).removeClass('active');
-			this.state.activeTabIndex = newTabIndex;
+			this.setActiveTabIndex(newTabIndex);
 
-			var activeInnerId = this.props.tabs[this.state.activeTabIndex].innerId;
-			this.props.tabs.map(function (tab) {
-				if (tab.innerId == activeInnerId) {
-					$('#' + tab.innerId).show();
-				} else {
-					$('#' + tab.innerId).hide();
-				}
-			});
 			var onActive = this.props.onActive;
 			if (onActive) {
-				onActive.call(this, this.props.tabs[this.state.activeTabIndex].value, this.state.activeTabIndex);
+				onActive.call(this, this.props.tabs[newTabIndex].value, newTabIndex);
 			}
 		},
 		/**
@@ -10849,7 +10839,7 @@
 			var activeTab = this.props.tabs[activeIndex];
 			var activeValue = activeTab.value;
 
-			// check it can remove or not
+			// trigger can remove event, check it can remove or not
 			var canRemove = this.props.canRemove;
 			if (canRemove) {
 				var ret = canRemove.call(this, activeValue, activeIndex);
@@ -10860,23 +10850,23 @@
 
 			// remove tab
 			this.props.tabs[activeIndex].visible = false;
-			var _this = this;
 			// find the visible tab
 			// if tab index more than removed one, stop finding
 			// or return the last visible tab which before removed tab
+			var activeTabIndex = -1;
 			this.props.tabs.some(function (tab, index) {
 				if (tab.visible !== false) {
-					_this.state.activeTabIndex = index;
+					activeTabIndex = index;
 					return index > activeIndex;
 				}
 			});
+			this.setActiveTabIndex(activeTabIndex);
 
-			this.forceUpdate(function () {
-				var onRemove = _this.props.onRemove;
-				if (onRemove) {
-					onRemove.call(_this, activeValue, activeIndex);
-				}
-			});
+			// trigger on remove event
+			var onRemove = this.props.onRemove;
+			if (onRemove) {
+				onRemove.call(this, activeValue, activeIndex);
+			}
 		}
 	});
 	context.NTab = NTab;

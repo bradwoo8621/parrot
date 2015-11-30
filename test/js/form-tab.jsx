@@ -93,7 +93,7 @@
         <div className='row'>
             <div className='col-md-6 col-lg-6 col-sm-6'>
                 <span>Normal Form Tab</span>
-                <NFormTab model={model} layout={layout}/>
+                <NFormTab model={model} layout={layout} />
             </div>
         </div>
         <div className='row'>

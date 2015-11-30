@@ -54,9 +54,7 @@
 			};
 		},
 		getInitialState: function () {
-			return {
-				activeTabIndex: null
-			};
+			return {};
 		},
 		/**
 		 * will update
@@ -64,7 +62,7 @@
 		 */
 		componentWillUpdate: function (nextProps) {
 			var _this = this;
-			this.state.tabs.forEach(function (tab) {
+			this.getTabs().forEach(function (tab) {
 				if (tab.badgeId) {
 					_this.removeDependencyMonitor([tab.badgeId]);
 				}
@@ -78,7 +76,7 @@
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
 			var _this = this;
-			this.state.tabs.forEach(function (tab) {
+			this.getTabs().forEach(function (tab) {
 				if (tab.badgeId) {
 					_this.addDependencyMonitor([tab.badgeId]);
 				}
@@ -90,7 +88,7 @@
 		 */
 		componentDidMount: function () {
 			var _this = this;
-			this.state.tabs.forEach(function (tab) {
+			this.getTabs().forEach(function (tab) {
 				if (tab.badgeId) {
 					_this.addDependencyMonitor([tab.badgeId]);
 				}
@@ -102,7 +100,7 @@
 		 */
 		componentWillUnmount: function () {
 			var _this = this;
-			this.state.tabs.forEach(function (tab) {
+			this.getTabs().forEach(function (tab) {
 				if (tab.badgeId) {
 					_this.removeDependencyMonitor([tab.badgeId]);
 				}
@@ -123,7 +121,7 @@
 			               key={'form-' + index}/>);
 		},
 		render: function () {
-			var tabs = this.getTabs();
+			var tabs = this.initializeTabs();
 			var canActive = this.getComponentOption('canActive');
 			if (canActive) {
 				canActive.bind(this);
@@ -136,20 +134,21 @@
 				      tabClassName={this.getAdditionalCSS('tabs')}
 				      tabs={tabs}
 				      canActive={canActive}
-				      onActive={this.onTabClicked}/>
+				      onActive={this.onTabClicked}
+					  ref='tabs'/>
 
 				<div className='n-form-tab-content' ref='content'>
 					{this.getTabLayouts().map(this.renderTabContent)}
 				</div>
 			</div>);
 		},
-		getTabs: function () {
-			if (this.state.tabs == null) {
-				// clone from definition
-				this.state.tabs = this.getComponentOption('tabs').slice(0);
-			}
+		getTabs: function() {
+			return this.getComponentOption('tabs');
+		},
+		initializeTabs: function () {
 			var _this = this;
-			this.state.tabs.forEach(function (tab) {
+			var tabs = this.getTabs();
+			tabs.forEach(function (tab) {
 				if (tab.badgeId) {
 					tab.badge = _this.getModel().get(tab.badgeId);
 					if (tab.badgeRender) {
@@ -157,7 +156,7 @@
 					}
 				}
 			});
-			return this.state.tabs;
+			return tabs;
 		},
 		/**
 		 * get tab layouts
@@ -174,9 +173,6 @@
 		 * @param index {number}
 		 */
 		onTabClicked: function (tabValue, index) {
-			this.setState({
-				activeTabIndex: index
-			});
 			var onActive = this.getComponentOption('onActive');
 			if (onActive) {
 				onActive.call(this, tabValue, index);
@@ -187,32 +183,26 @@
 		 * @returns {number}
 		 */
 		getActiveTabIndex: function () {
-			if (this.state.activeTabIndex == null) {
-				// get initial active tab index, or 0 if not set
-				var _this = this;
-				this.state.activeTabIndex = 0;
-				this.getComponentOption('tabs').forEach(function (tab, index) {
-					if (tab.active === true) {
-						_this.state.activeTabIndex = index;
-					}
+			var tabs = this.getComponentOption('tabs');
+			// find the active tab
+			var activeTabIndex = tabs.findIndex(function (tab, index) {
+				return tab.active === true;
+			});
+			if (activeTabIndex == -1) {
+				// find the first visible tab if no active tab found
+				activeTabIndex = tabs.findIndex(function (tab, index) {
+					return tab.visible !== false;
 				});
 			}
-			return this.state.activeTabIndex;
+			return activeTabIndex;
 		},
 		/**
 		 * set active tab index
 		 * @param {number}
 		 */
 		setActiveTabIndex: function(index) {
-			if (index < 0) {
-				index = 0;
-			} else if (index > (this.state.tabs.length - 1)) {
-				index = this.state.tabs.length - 1;
-			}
-			if (index < 0) {
-				throw $pt.createComponentException($pt.ComponentConstants.Err_Tab_Index_Out_Of_Bound, 'Tab index[' + index + '] out of bound.');
-			}
-			this.setState({activeTabIndex: index});
+			this.refs.tabs.setActiveTabIndex(index);
+			this.forceUpdate();
 		}
 	}));
 	context.NFormTab = NFormTab;
