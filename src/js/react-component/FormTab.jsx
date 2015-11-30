@@ -194,7 +194,6 @@
 				activeTabIndex = tabs.findIndex(function (tab, index) {
 					var visible =  tab.visible !== false;
 					if (visible) {
-						console.log(index);
 						tab.active = true;
 						return true;
 					}
@@ -207,7 +206,6 @@
 		 * @param {number}
 		 */
 		setActiveTabIndex: function(index) {
-			console.log(index);
 			this.refs.tabs.setActiveTabIndex(index);
 			this.forceUpdate();
 		}
