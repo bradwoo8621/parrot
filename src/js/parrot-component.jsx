@@ -197,7 +197,7 @@
 		getAdditionalCSS: function (key, originalCSS) {
 			if (key) {
 				var additionalCSS = this.isAdditionalCSSDefined(key) ? this.__cell.css[key] : '';
-				var cssList = additionalCSS ? additoinalCSS.split(' ') : [];
+				var cssList = additionalCSS ? additionalCSS.split(' ') : [];
 				var css = {};
 				cssList.forEach(function(cssClassName) {
 					if (cssClassName && !cssClassName.isBlank()) {

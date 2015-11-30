@@ -11,6 +11,14 @@
         dataId: 'items',
         comp: {
             type: $pt.ComponentConstants.ArrayTab,
+            onAdd: function(model, value) {
+                console.log(model);
+                console.log(value);
+            },
+            canActive: function() {
+                console.log(arguments);
+                return true;
+            },
             editLayout: {
                 name: {
                     label: 'Name',

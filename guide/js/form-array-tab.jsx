@@ -123,17 +123,30 @@
 					index: 10
 				};
 			},
+			addable: function() {
+				return {
+					id: 'form-array-tab-addable',
+					title: 'Addable',
+					desc: [<span>Let tab be addable by set <code>onAdd</code>,
+						it is a function which be passed two parameters: current data model and current data value array.
+						Add new item into array in this function.<br/>
+						An add tab (cannot be active) should be renderred.</span>],
+					index: 20
+				};
+			},
 			constants: function () {
 				return {
 					id: 'form-array-tab-constants',
 					title: 'Constants',
 					desc: 'Available constants. Constants must be change before construct component.',
-					index: 20,
+					index: 1000,
 					code: $demo.convertJSON({
 						variable: 'NArrayTab',
 						json: {
 							statics: {
-								UNTITLED: NArrayTab.UNTITLED
+								UNTITLED: NArrayTab.UNTITLED,
+								ADD_ICON: NArrayTab.ADD_ICON,
+								ADD_LABEL: NArrayTab.ADD_LABEL
 							}
 						}
 					})
@@ -142,7 +155,7 @@
 			css: function () {
 				return $demo.convertCSSJSONToExample({
 					id: 'form-array-tab-css',
-					index: 30,
+					index: 2000,
 					css: {
 						comp: 'your-class-name',
 						tabs: 'your-class-name'

@@ -41,7 +41,9 @@
 (function (context, $, $pt) {
 	var NArrayTab = React.createClass($pt.defineCellComponent({
 		statics: {
-			UNTITLED: 'Untitled Item'
+			UNTITLED: 'Untitled Item',
+			ADD_ICON: 'plus-circle',
+			ADD_LABEL: 'Add'
 		},
 		propTypes: {
 			// model
@@ -160,10 +162,18 @@
 		 */
 		render: function () {
 			var tabs = this.getTabs();
-			var canActive = this.getComponentOption('canActive');
-			if (canActive) {
-				canActive.bind(this);
-			}
+			var canActiveProxy = function(newTabValue, newTabIndex, activeTabValue, activeTabIndex) {
+				if (this.isAddable() && (newTabIndex == tabs.length - 1)) {
+					var onAdd = this.getComponentOption('onAdd');
+					onAdd.call(this, this.getModel(), this.getValueFromModel());
+					return false;
+				} else {
+					var canActive = this.getComponentOption('canActive');
+					if (canActive) {
+						canActive.call(this, newTabValue, newTabIndex, activeTabValue, activeTabIndex);
+					}
+				}
+			}.bind(this);
 			return (<div className={this.getComponentCSS('n-array-tab')}>
 				<NTab type={this.getComponentOption('tabType')}
 				      justified={this.getComponentOption('justified')}
@@ -171,7 +181,7 @@
 				      size={this.getComponentOption('titleIconSize')}
 				      tabClassName={this.getAdditionalCSS('tabs')}
 				      tabs={tabs}
-				      canActive={canActive}
+				      canActive={canActiveProxy}
 				      onActive={this.onTabClicked}
 				      ref='tabs'>
 				</NTab>
@@ -215,12 +225,14 @@
 		getTabs: function () {
 			var _this = this;
 			if (this.state.tabs) {
-				this.state.tabs.forEach(function(tab) {
-					var model = tab.data;
-					tab.label = _this.getTabTitle(model);
-					tab.icon = _this.getTabIcon(model);
-					tab.layout = _this.getEditLayout(model);
-					tab.badge = _this.getTabBadge(model);
+				this.state.tabs.forEach(function(tab, tabIndex) {
+					if (_this.isAddable() && (tabIndex != _this.state.tabs.length - 1)) {
+						var model = tab.data;
+						tab.label = _this.getTabTitle(model);
+						tab.icon = _this.getTabIcon(model);
+						tab.layout = _this.getEditLayout(model);
+						tab.badge = _this.getTabBadge(model);
+					}
 				});
 				return this.state.tabs;
 			}
@@ -235,6 +247,20 @@
 					data: model
 				};
 			});
+			if (this.isAddable()) {
+				this.state.tabs.push({
+					icon: NArrayTab.ADD_ICON,
+					label: NArrayTab.ADD_LABEL,
+					layout: {
+						nothing: {
+							comp: {
+								type: $pt.ComponentConstants.Nothing
+							}
+						}
+					},
+					data: $pt.createModel({})
+				});
+			}
 			return this.state.tabs;
 		},
 		clearTabs: function(callback) {
@@ -332,6 +358,9 @@
 			} else {
 				return icon.when.call(this, model);
 			}
+		},
+		isAddable: function() {
+			return this.getComponentOption('onAdd') != null;
 		},
 		/**
 		 * on tab clicked

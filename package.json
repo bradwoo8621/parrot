@@ -1,7 +1,7 @@
 {
   "groupId": "com.github.nest",
   "artifactId": "parrot",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "description": "Parrot build with react",
   "repository": {
     "type": "git",
