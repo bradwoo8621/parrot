@@ -1704,6 +1704,15 @@
 		addPostChangeListener: function (id, listener) {
 			return this.addListener(id, 'post', 'change', listener);
 		},
+		addPostAddListener: function(id, listener) {
+			return this.addListener(id, 'post', 'add', listener);
+		},
+		addPostRemoveListener: function(id, listener) {
+			return this.addListener(id, 'post', 'remove', listener);
+		},
+		addPostValidateListener: function(id, listener) {
+			return this.addListener(id, 'post', 'validate', listener);
+		},
 		/**
 		 * remove listener
 		 * @param id {string} id of property
@@ -1752,17 +1761,16 @@
 			return this;
 		},
 		removePostChangeListener: function (id, listener) {
-			this.removeListener(id, 'post', 'change', listener);
+			return this.removeListener(id, 'post', 'change', listener);
 		},
-		firePostChangeEvent: function(id, _old, _new) {
-			this.fireEvent({
-				model: this,
-				id: id,
-				old: _old,
-				"new": _new,
-				time: "post",
-				type: "change"
-			});
+		removePostAddListener: function(id, listener) {
+			return this.removeListener(id, 'post', 'add', listener);
+		},
+		removePostRemoveListener: function(id, listener) {
+			return this.removeListener(id, 'post', 'remove', listener);
+		},
+		removePostValidateListener: function(id, listener) {
+			return this.removeListener(id, 'post', 'validate', listener);
 		},
 		/**
 		 * fire event
@@ -1807,6 +1815,49 @@
 			});
 			return this;
 		},
+		firePostChangeEvent: function(id, _old, _new) {
+			return this.fireEvent({
+				model: this,
+				id: id,
+				old: _old,
+				"new": _new ? _new : this.get(id),
+				time: "post",
+				type: "change"
+			});
+		},
+		firePostAddEvent: function(id, index) {
+			var array = this.get(id);
+			return this.fireEvent({
+				model: this,
+				id: id,
+				array: array,
+				index: index,
+				old: null,
+				"new": array[index],
+				type: "add",
+				time: "post"
+			});
+		},
+		firePostRemoveEvent: function(id, _old, index) {
+			return this.fireEvent({
+				model: this,
+				id: id,
+				array: this.get(id),
+				index: index,
+				old: _old,
+				"new": null,
+				type: "remove",
+				time: "post"
+			});
+		},
+		firePostValidateEvent: function(id) {
+			return this.fireEvent({
+				model: this,
+				id: id,
+				time: 'post',
+				type: 'validate'
+			});
+		},
 		/**
 		 * reset model
 		 */
@@ -1822,8 +1873,7 @@
 		 */
 		clearValidateResults: function (id) {
 			if (id) {
-				delete this.__validateResults[id]
-				;
+				delete this.__validateResults[id];
 			} else {
 				this.__validateResults = {};
 			}
