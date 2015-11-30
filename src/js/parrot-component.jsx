@@ -1120,6 +1120,13 @@
 			return this.props.layout;
 		},
 		/**
+		 * component is view mode or not
+		 * @returns {boolean}
+		 */
+		isViewMode: function() {
+			return this.props.view === true;
+		},
+		/**
 		 * get id of component
 		 * @returns {string}
 		 */
