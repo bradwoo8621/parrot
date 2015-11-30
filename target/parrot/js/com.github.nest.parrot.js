@@ -1,4 +1,4 @@
-/** com.github.nest.parrot.V0.0.6 2015-11-30 */
+/** com.github.nest.parrot.V0.0.6 2015-12-01 */
 (function ($) {
 	var patches = {
 		console: function () {
@@ -3231,6 +3231,13 @@
 			return this.props.layout;
 		},
 		/**
+		 * component is view mode or not
+		 * @returns {boolean}
+		 */
+		isViewMode: function() {
+			return this.props.view === true;
+		},
+		/**
 		 * get id of component
 		 * @returns {string}
 		 */
@@ -3437,21 +3444,21 @@
 			var _this = this;
 			if (model) {
 				dependencies.forEach(function(key) {
-					model.addListener(key, 'post', 'change', monitor);
+					model.addPostChangeListener(key, monitor);
 				});
 			} else {
 				dependencies.forEach(function (key) {
 					if (typeof key === 'object') {
 						var id = key.id;
 						if (key.on === 'form') {
-							_this.getFormModel().addListener(id, 'post', 'change', monitor);
+							_this.getFormModel().addPostChangeListener(id, monitor);
 						} else if (key.on === 'inner') {
-							_this.getInnerModel().addListener(id, 'post', 'change', monitor);
+							_this.getInnerModel().addPostChangeListener(id, monitor);
 						} else {
-							_this.getModel().addListener(id, "post", "change", monitor);
+							_this.getModel().addPostChangeListener(id, monitor);
 						}
 					} else {
-						_this.getModel().addListener(key, "post", "change", monitor);
+						_this.getModel().addPostChangeListener(key, monitor);
 					}
 				});
 			}
@@ -3468,21 +3475,21 @@
 			var _this = this;
 			if (model) {
 				dependencies.forEach(function(key) {
-					model.addListener(key, 'post', 'change', monitor);
+					model.removePostChangeListener(key, monitor);
 				});
 			} else {
 				dependencies.forEach(function (key) {
 					if (typeof key === 'object') {
 						var id = key.id;
 						if (key.on === 'form') {
-							_this.getFormModel().removeListener(id, 'post', 'change', monitor);
+							_this.getFormModel().removePostChangeListener(id, monitor);
 						} else if (key.on === 'inner') {
-							_this.getInnerModel().removeListener(id, 'post', 'change', monitor);
+							_this.getInnerModel().removePostChangeListener(id, monitor);
 						} else {
-							_this.getModel().removeListener(id, "post", "change", monitor);
+							_this.getModel().removePostChangeListener(id, monitor);
 						}
 					} else {
-						_this.getModel().removeListener(key, "post", "change", monitor);
+						_this.getModel().removePostChangeListener(key, monitor);
 					}
 				});
 			}
@@ -3490,28 +3497,28 @@
 		},
 		// event
 		addPostChangeListener: function (listener) {
-			this.getModel().addListener(this.getDataId(), "post", "change", listener);
+			this.getModel().addPostChangeListener(this.getDataId(), listener);
 		},
 		removePostChangeListener: function (listener) {
-			this.getModel().removeListener(this.getDataId(), "post", "change", listener);
+			this.getModel().removePostChangeListener(this.getDataId(), listener);
 		},
 		addPostAddListener: function (listener) {
-			this.getModel().addListener(this.getDataId(), "post", "add", listener);
+			this.getModel().addPostAddListener(this.getDataId(), listener);
 		},
 		removePostAddListener: function (listener) {
-			this.getModel().removeListener(this.getDataId(), "post", "add", listener);
+			this.getModel().removePostAddListener(this.getDataId(), listener);
 		},
 		addPostRemoveListener: function (listener) {
-			this.getModel().addListener(this.getDataId(), "post", "remove", listener);
+			this.getModel().addPostRemoveListener(this.getDataId(), listener);
 		},
 		removePostRemoveListener: function (listener) {
-			this.getModel().removeListener(this.getDataId(), "post", "remove", listener);
+			this.getModel().removePostRemoveListener(this.getDataId(), listener);
 		},
 		addPostValidateListener: function (listener) {
-			this.getModel().addListener(this.getDataId(), "post", "validate", listener);
+			this.getModel().addPostValidateListener(this.getDataId(), listener);
 		},
 		removePostValidateListener: function (listener) {
-			this.getModel().removeListener(this.getDataId(), "post", "validate", listener);
+			this.getModel().removePostValidateListener(this.getDataId(), listener);
 		}
 	};
 
@@ -6170,169 +6177,183 @@
 					return NFormCell.__componentRenderer[type];
 				}
 			},
+			transformParameters: function(model, layout, direction, viewMode) {
+				return {
+					model: model,
+					layout: layout,
+					direction: direction,
+					view: viewMode,
+					ref: layout.getId()
+				};
+			},
 			/**
 			 * render label
 			 * @returns {XML}
 			 * @private
 			 */
-			__label: function (model, layout) {
-				return React.createElement(NLabel, {model: model, layout: layout, ref: layout.getId()});
+			__label: function (model, layout, direction, viewMode) {
+				return React.createElement(NLabel, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
 			},
 			/**
 			 * render text input
 			 * @returns {XML}
 			 * @private
 			 */
-			__text: function (model, layout) {
-				return React.createElement(NText, {model: model, layout: layout, ref: layout.getId()});
+			__text: function (model, layout, direction, viewMode) {
+				return React.createElement(NText, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
 			},
 			/**
 			 * render text area
 			 * @returns {XML}
 			 * @private
 			 */
-			__textarea: function (model, layout) {
-				return React.createElement(NTextArea, {model: model, layout: layout, ref: layout.getId()});
+			__textarea: function (model, layout, direction, viewMode) {
+				return React.createElement(NTextArea, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
 			},
 			/**
 			 * render checkbox
 			 * @returns {XML}
 			 * @private
 			 */
-			__check: function (model, layout) {
-				return React.createElement(NCheck, {model: model, layout: layout, ref: layout.getId()});
+			__check: function (model, layout, direction, viewMode) {
+				return React.createElement(NCheck, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
 			},
-			__acheck: function(model, layout) {
-				return React.createElement(NArrayCheck, {model: model, layout: layout, ref: layout.getId()});
+			/**
+			 * render checkbox array
+			 * @returns {XML}
+			 * @private
+			 */
+			__acheck: function(model, layout, direction, viewMode) {
+				return React.createElement(NArrayCheck, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
 			},
 			/**
 			 * render toggle button
 			 * @returns {XML}
 			 * @private
 			 */
-			__toggle: function (model, layout) {
-				return React.createElement(NToggle, {model: model, layout: layout, ref: layout.getId()});
+			__toggle: function (model, layout, direction, viewMode) {
+				return React.createElement(NToggle, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
 			},
 			/**
 			 * render radio
 			 * @returns {XML}
 			 * @private
 			 */
-			__radio: function (model, layout) {
-				return React.createElement(NRadio, {model: model, layout: layout, ref: layout.getId()});
+			__radio: function (model, layout, direction, viewMode) {
+				return React.createElement(NRadio, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
 			},
 			/**
 			 * render datetime picker
 			 * @returns {XML}
 			 * @private
 			 */
-			__date: function (model, layout) {
-				return React.createElement(NDateTime, {model: model, layout: layout, ref: layout.getId()});
+			__date: function (model, layout, direction, viewMode) {
+				return React.createElement(NDateTime, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
 			},
 			/**
 			 * render select
 			 * @returns {XML}
 			 * @private
 			 */
-			__select: function (model, layout) {
-				return React.createElement(NSelect, {model: model, layout: layout, ref: layout.getId()});
+			__select: function (model, layout, direction, viewMode) {
+				return React.createElement(NSelect, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
 			},
 			/**
 			 * render search text
 			 * @returns {XML}
 			 * @private
 			 */
-			__search: function (model, layout, direction) {
-				return React.createElement(NSearchText, {model: model, layout: layout, direction: direction, ref: layout.getId()});
+			__search: function (model, layout, direction, viewMode) {
+				return React.createElement(NSearchText, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
 			},
 			/**
 			 * render table
 			 * @returns {XML}
 			 * @private
 			 */
-			__table: function (model, layout) {
-				return React.createElement(NTable, {model: model, layout: layout, ref: layout.getId()});
+			__table: function (model, layout, direction, viewMode) {
+				return React.createElement(NTable, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
 			},
 			/**
 			 * render tree
 			 * @returns {XML}
 			 * @private
 			 */
-			__tree: function (model, layout) {
-				return React.createElement(NTree, {model: model, layout: layout, ref: layout.getId()});
+			__tree: function (model, layout, direction, viewMode) {
+				return React.createElement(NTree, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
 			},
 			/**
 			 * render select tree
 			 * @returns {XML}
 			 * @private
 			 */
-			__seltree: function(model, layout) {
-				return React.createElement(NSelectTree, {model: model, layout: layout, ref: layout.getId()});
+			__seltree: function(model, layout, direction, viewMode) {
+				return React.createElement(NSelectTree, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
 			},
 			/**
 			 * render file
 			 * @return {XML}
 			 * @private
 			 */
-			__file: function (model, layout) {
-				return React.createElement(NFile, {model: model, layout: layout, ref: layout.getId()});
+			__file: function (model, layout, direction, viewMode) {
+				return React.createElement(NFile, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
 			},
 			/**
 			 * render button
 			 * @returns {XML}
 			 * @private
 			 */
-			__button: function (model, layout) {
-				return React.createElement(NFormButton, {model: model, layout: layout, ref: layout.getId()});
+			__button: function (model, layout, direction, viewMode) {
+				return React.createElement(NFormButton, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
 			},
 			/**
 			 * render tab
 			 * @returns {XML}
 			 * @private
 			 */
-			__tab: function (model, layout, direction) {
-				return React.createElement(NFormTab, {model: model, layout: layout, direction: direction, ref: layout.getId()});
+			__tab: function (model, layout, direction, viewMode) {
+				return React.createElement(NFormTab, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
 			},
 			/**
 			 * render array tab
 			 * @returns {XML}
 			 * @private
 			 */
-			__atab: function (model, layout, direction) {
-				return React.createElement(NArrayTab, {model: model, layout: layout, direction: direction, ref: layout.getId()});
+			__atab: function (model, layout, direction, viewMode) {
+				return React.createElement(NArrayTab, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
 			},
 			/**
 			 * render panel
 			 * @returns {XML}
 			 * @private
 			 */
-			__panel: function (model, layout, direction) {
-				return React.createElement(NPanel, {model: model, layout: layout, direction: direction, ref: layout.getId()});
+			__panel: function (model, layout, direction, viewMode) {
+				return React.createElement(NPanel, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
 			},
 			/**
 			 * render array panel
 			 * @returns {XML}
 			 * @private
 			 */
-			__apanel: function (model, layout, direction) {
-				return React.createElement(NArrayPanel, {model: model, layout: layout, direction: direction, ref: layout.getId()});
+			__apanel: function (model, layout, direction, viewMode) {
+				return React.createElement(NArrayPanel, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
 			},
 			/**
 			 * render form
 			 * @returns {XML}
 			 * @private
 			 */
-			__form: function (model, layout, direction) {
+			__form: function (model, layout, direction, viewMode) {
 				var formLayout = $pt.createFormLayout(layout.getComponentOption('editLayout'));
-				return React.createElement(NForm, {model: model, layout: formLayout, direction: direction, ref: layout.getId()});
+				return React.createElement(NForm, React.__spread({},  NFormCell.transformParameters(model, formLayout, direction, viewMode)));
 			},
 			/**
 			 * render button footer
 			 * @returns {XML}
 			 * @private
 			 */
-			__buttonfooter: function (model, layout) {
-				return React.createElement(NFormButtonFooter, {model: model, layout: layout, ref: layout.getId()});
+			__buttonfooter: function (model, layout, direction, viewMode) {
+				return React.createElement(NFormButtonFooter, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
 			},
 			/**
 			 * render nothing
@@ -6349,7 +6370,10 @@
 			model: React.PropTypes.object,
 			// CellLayout
 			layout: React.PropTypes.object,
-			direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
+			// label direction
+			direction: React.PropTypes.oneOf(['vertical', 'horizontal']),
+			// is view mode or not
+			view: React.PropTypes.bool
 		},
 		getDefaultProps: function () {
 			return {
@@ -6450,7 +6474,7 @@
 			var direction = this.props.direction ? this.props.direction : 'vertical';
 			if (componentDefinition.render) {
 				// user defined component
-				return componentDefinition.render.call(this, this.getFormModel(), this.getLayout(), direction);
+				return componentDefinition.render.call(this, this.getFormModel(), this.getLayout(), direction, this.isViewMode());
 			}
 
 			// pre-defined components
@@ -6459,7 +6483,7 @@
 				type = "text";
 			}
 			return (React.createElement("div", {ref: "comp"}, 
-				NFormCell.getComponentRenderer(type).call(this, this.getFormModel(), this.getLayout(), direction)
+				NFormCell.getComponentRenderer(type).call(this, this.getFormModel(), this.getLayout(), direction, this.isViewMode())
 			));
 		},
 		/**

@@ -39,169 +39,183 @@
 					return NFormCell.__componentRenderer[type];
 				}
 			},
+			transformParameters: function(model, layout, direction, viewMode) {
+				return {
+					model: model,
+					layout: layout,
+					direction: direction,
+					view: viewMode,
+					ref: layout.getId()
+				};
+			},
 			/**
 			 * render label
 			 * @returns {XML}
 			 * @private
 			 */
-			__label: function (model, layout) {
-				return <NLabel model={model} layout={layout} ref={layout.getId()}/>;
+			__label: function (model, layout, direction, viewMode) {
+				return <NLabel {...NFormCell.transformParameters(model, layout, direction, viewMode)}/>;
 			},
 			/**
 			 * render text input
 			 * @returns {XML}
 			 * @private
 			 */
-			__text: function (model, layout) {
-				return <NText model={model} layout={layout} ref={layout.getId()}/>;
+			__text: function (model, layout, direction, viewMode) {
+				return <NText {...NFormCell.transformParameters(model, layout, direction, viewMode)}/>;
 			},
 			/**
 			 * render text area
 			 * @returns {XML}
 			 * @private
 			 */
-			__textarea: function (model, layout) {
-				return <NTextArea model={model} layout={layout} ref={layout.getId()}/>;
+			__textarea: function (model, layout, direction, viewMode) {
+				return <NTextArea {...NFormCell.transformParameters(model, layout, direction, viewMode)}/>;
 			},
 			/**
 			 * render checkbox
 			 * @returns {XML}
 			 * @private
 			 */
-			__check: function (model, layout) {
-				return <NCheck model={model} layout={layout} ref={layout.getId()}/>;
+			__check: function (model, layout, direction, viewMode) {
+				return <NCheck {...NFormCell.transformParameters(model, layout, direction, viewMode)}/>;
 			},
-			__acheck: function(model, layout) {
-				return <NArrayCheck model={model} layout={layout} ref={layout.getId()} />;
+			/**
+			 * render checkbox array
+			 * @returns {XML}
+			 * @private
+			 */
+			__acheck: function(model, layout, direction, viewMode) {
+				return <NArrayCheck {...NFormCell.transformParameters(model, layout, direction, viewMode)} />;
 			},
 			/**
 			 * render toggle button
 			 * @returns {XML}
 			 * @private
 			 */
-			__toggle: function (model, layout) {
-				return <NToggle model={model} layout={layout} ref={layout.getId()}/>;
+			__toggle: function (model, layout, direction, viewMode) {
+				return <NToggle {...NFormCell.transformParameters(model, layout, direction, viewMode)}/>;
 			},
 			/**
 			 * render radio
 			 * @returns {XML}
 			 * @private
 			 */
-			__radio: function (model, layout) {
-				return <NRadio model={model} layout={layout} ref={layout.getId()}/>;
+			__radio: function (model, layout, direction, viewMode) {
+				return <NRadio {...NFormCell.transformParameters(model, layout, direction, viewMode)}/>;
 			},
 			/**
 			 * render datetime picker
 			 * @returns {XML}
 			 * @private
 			 */
-			__date: function (model, layout) {
-				return <NDateTime model={model} layout={layout} ref={layout.getId()}/>;
+			__date: function (model, layout, direction, viewMode) {
+				return <NDateTime {...NFormCell.transformParameters(model, layout, direction, viewMode)}/>;
 			},
 			/**
 			 * render select
 			 * @returns {XML}
 			 * @private
 			 */
-			__select: function (model, layout) {
-				return <NSelect model={model} layout={layout} ref={layout.getId()}/>;
+			__select: function (model, layout, direction, viewMode) {
+				return <NSelect {...NFormCell.transformParameters(model, layout, direction, viewMode)}/>;
 			},
 			/**
 			 * render search text
 			 * @returns {XML}
 			 * @private
 			 */
-			__search: function (model, layout, direction) {
-				return <NSearchText model={model} layout={layout} direction={direction} ref={layout.getId()}/>;
+			__search: function (model, layout, direction, viewMode) {
+				return <NSearchText {...NFormCell.transformParameters(model, layout, direction, viewMode)}/>;
 			},
 			/**
 			 * render table
 			 * @returns {XML}
 			 * @private
 			 */
-			__table: function (model, layout) {
-				return <NTable model={model} layout={layout} ref={layout.getId()}/>;
+			__table: function (model, layout, direction, viewMode) {
+				return <NTable {...NFormCell.transformParameters(model, layout, direction, viewMode)}/>;
 			},
 			/**
 			 * render tree
 			 * @returns {XML}
 			 * @private
 			 */
-			__tree: function (model, layout) {
-				return <NTree model={model} layout={layout} ref={layout.getId()}/>;
+			__tree: function (model, layout, direction, viewMode) {
+				return <NTree {...NFormCell.transformParameters(model, layout, direction, viewMode)}/>;
 			},
 			/**
 			 * render select tree
 			 * @returns {XML}
 			 * @private
 			 */
-			__seltree: function(model, layout) {
-				return <NSelectTree model={model} layout={layout} ref={layout.getId()} />;
+			__seltree: function(model, layout, direction, viewMode) {
+				return <NSelectTree {...NFormCell.transformParameters(model, layout, direction, viewMode)} />;
 			},
 			/**
 			 * render file
 			 * @return {XML}
 			 * @private
 			 */
-			__file: function (model, layout) {
-				return <NFile model={model} layout={layout} ref={layout.getId()}/>;
+			__file: function (model, layout, direction, viewMode) {
+				return <NFile {...NFormCell.transformParameters(model, layout, direction, viewMode)}/>;
 			},
 			/**
 			 * render button
 			 * @returns {XML}
 			 * @private
 			 */
-			__button: function (model, layout) {
-				return <NFormButton model={model} layout={layout} ref={layout.getId()}/>;
+			__button: function (model, layout, direction, viewMode) {
+				return <NFormButton {...NFormCell.transformParameters(model, layout, direction, viewMode)}/>;
 			},
 			/**
 			 * render tab
 			 * @returns {XML}
 			 * @private
 			 */
-			__tab: function (model, layout, direction) {
-				return <NFormTab model={model} layout={layout} direction={direction} ref={layout.getId()}/>;
+			__tab: function (model, layout, direction, viewMode) {
+				return <NFormTab {...NFormCell.transformParameters(model, layout, direction, viewMode)}/>;
 			},
 			/**
 			 * render array tab
 			 * @returns {XML}
 			 * @private
 			 */
-			__atab: function (model, layout, direction) {
-				return <NArrayTab model={model} layout={layout} direction={direction} ref={layout.getId()}/>;
+			__atab: function (model, layout, direction, viewMode) {
+				return <NArrayTab {...NFormCell.transformParameters(model, layout, direction, viewMode)}/>;
 			},
 			/**
 			 * render panel
 			 * @returns {XML}
 			 * @private
 			 */
-			__panel: function (model, layout, direction) {
-				return <NPanel model={model} layout={layout} direction={direction} ref={layout.getId()}/>;
+			__panel: function (model, layout, direction, viewMode) {
+				return <NPanel {...NFormCell.transformParameters(model, layout, direction, viewMode)}/>;
 			},
 			/**
 			 * render array panel
 			 * @returns {XML}
 			 * @private
 			 */
-			__apanel: function (model, layout, direction) {
-				return <NArrayPanel model={model} layout={layout} direction={direction} ref={layout.getId()}/>;
+			__apanel: function (model, layout, direction, viewMode) {
+				return <NArrayPanel {...NFormCell.transformParameters(model, layout, direction, viewMode)}/>;
 			},
 			/**
 			 * render form
 			 * @returns {XML}
 			 * @private
 			 */
-			__form: function (model, layout, direction) {
+			__form: function (model, layout, direction, viewMode) {
 				var formLayout = $pt.createFormLayout(layout.getComponentOption('editLayout'));
-				return <NForm model={model} layout={formLayout} direction={direction} ref={layout.getId()}/>;
+				return <NForm {...NFormCell.transformParameters(model, formLayout, direction, viewMode)}/>;
 			},
 			/**
 			 * render button footer
 			 * @returns {XML}
 			 * @private
 			 */
-			__buttonfooter: function (model, layout) {
-				return <NFormButtonFooter model={model} layout={layout} ref={layout.getId()}/>;
+			__buttonfooter: function (model, layout, direction, viewMode) {
+				return <NFormButtonFooter {...NFormCell.transformParameters(model, layout, direction, viewMode)}/>;
 			},
 			/**
 			 * render nothing
@@ -218,7 +232,10 @@
 			model: React.PropTypes.object,
 			// CellLayout
 			layout: React.PropTypes.object,
-			direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
+			// label direction
+			direction: React.PropTypes.oneOf(['vertical', 'horizontal']),
+			// is view mode or not
+			view: React.PropTypes.bool
 		},
 		getDefaultProps: function () {
 			return {
@@ -319,7 +336,7 @@
 			var direction = this.props.direction ? this.props.direction : 'vertical';
 			if (componentDefinition.render) {
 				// user defined component
-				return componentDefinition.render.call(this, this.getFormModel(), this.getLayout(), direction);
+				return componentDefinition.render.call(this, this.getFormModel(), this.getLayout(), direction, this.isViewMode());
 			}
 
 			// pre-defined components
@@ -328,7 +345,7 @@
 				type = "text";
 			}
 			return (<div ref="comp">
-				{NFormCell.getComponentRenderer(type).call(this, this.getFormModel(), this.getLayout(), direction)}
+				{NFormCell.getComponentRenderer(type).call(this, this.getFormModel(), this.getLayout(), direction, this.isViewMode())}
 			</div>);
 		},
 		/**
