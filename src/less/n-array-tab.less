@@ -1,10 +1,19 @@
 div.n-array-tab {
 	> div.n-array-tab-content {
+		background-color: @container-background-color;
 		border-bottom-left-radius: @border-radius;
 		border-bottom-right-radius: @border-radius;
 		padding: @container-padding-top 15px @container-padding-bottom;
 		border: solid 1px @border-color;
 		margin-top: -1px;
+		box-shadow: @container-box-shadow;
+		-webkit-box-shadow: @container-box-shadow;
+		-o-box-shadow: @container-box-shadow;
+		&:hover {
+			box-shadow: @container-hover-box-shadow;
+			-webkit-box-shadow: @container-hover-box-shadow;
+			-o-box-shadow: @container-hover-box-shadow;
+		}
 		> div.show {
 			display: block;
 		}

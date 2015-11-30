@@ -28,7 +28,7 @@
                 }, {
                     label: 'Card B',
                     icon: 'balance-scale',
-                    active: true,
+                    // active: true,
                     editLayout: {
                         name: {
                             label: 'Name in Card B',

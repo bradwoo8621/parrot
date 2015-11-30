@@ -672,11 +672,20 @@ div.n-panel-footer div.btn-toolbar > div.n-button {
   margin-left: 5px;
 }
 div.n-array-tab > div.n-array-tab-content {
+  background-color: #ffffff;
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
   padding: 8px 15px 7px;
   border: solid 1px #e0e0e0;
   margin-top: -1px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  -o-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+div.n-array-tab > div.n-array-tab-content:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  -o-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 div.n-array-tab > div.n-array-tab-content > div.show {
   display: block;
@@ -791,6 +800,7 @@ div.n-form-tab {
   padding-bottom: 5px;
 }
 div.n-form-tab > div.n-form-tab-content {
+  background-color: #ffffff;
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
   padding: 8px 15px 7px;
