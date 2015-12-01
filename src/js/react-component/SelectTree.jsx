@@ -426,4 +426,7 @@
 		}
 	}));
 	context.NSelectTree = NSelectTree;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.SelectTree, function (model, layout, direction, viewMode) {
+		return <NSelectTree {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+	});
 }(this, jQuery, $pt));

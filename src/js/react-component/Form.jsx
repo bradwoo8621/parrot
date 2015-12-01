@@ -532,4 +532,8 @@
 		}
 	});
 	context.NForm = NForm;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Form, function (model, layout, direction, viewMode) {
+		var formLayout = $pt.createFormLayout(layout.getComponentOption('editLayout'));
+		return <NForm {...$pt.LayoutHelper.transformParameters(model, formLayout, direction, viewMode)}/>;
+	});
 }(this, jQuery, $pt));

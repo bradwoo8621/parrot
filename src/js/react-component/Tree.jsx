@@ -643,4 +643,7 @@
 
     // expose to global
     context.NTree = NTree;
+    $pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Tree, function (model, layout, direction, viewMode) {
+		return <NTree {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+	});
 }(this, jQuery, $pt));

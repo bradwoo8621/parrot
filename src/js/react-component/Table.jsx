@@ -1981,4 +1981,7 @@
 		}
 	}));
 	context.NTable = NTable;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Table, function (model, layout, direction, viewMode) {
+		return <NTable {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+	});
 }(this, jQuery, $pt));

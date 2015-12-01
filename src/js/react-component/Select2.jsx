@@ -434,4 +434,7 @@
 		};
 	})(jQuery);
 	context.NSelect = NSelect;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Select, function (model, layout, direction, viewMode) {
+		return <NSelect {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+	});
 }(this, jQuery, $pt));

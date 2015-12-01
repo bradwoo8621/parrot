@@ -201,4 +201,7 @@
 		}
 	}));
 	context.NCheck = NCheck;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Check, function (model, layout, direction, viewMode) {
+		return <NCheck {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+	});
 }(this, jQuery, $pt));

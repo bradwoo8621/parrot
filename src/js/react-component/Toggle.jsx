@@ -158,4 +158,7 @@
 		}
 	}));
 	context.NToggle = NToggle;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Toggle, function (model, layout, direction, viewMode) {
+		return <NToggle {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+	});
 }(this, jQuery, $pt));

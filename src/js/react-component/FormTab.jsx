@@ -211,4 +211,7 @@
 		}
 	}));
 	context.NFormTab = NFormTab;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Tab, function (model, layout, direction, viewMode) {
+		return <NFormTab {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+	});
 }(this, jQuery, $pt));

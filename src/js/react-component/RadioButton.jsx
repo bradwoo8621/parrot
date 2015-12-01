@@ -189,4 +189,7 @@
 		}
 	}));
 	context.NRadio = NRadio;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Radio, function (model, layout, direction, viewMode) {
+		return <NRadio {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+	});
 }(this, jQuery, $pt));

@@ -100,4 +100,7 @@
 		}
 	}));
 	context.NLabel = NLabel;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Label, function (model, layout, direction, viewMode) {
+		return <NLabel {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+	});
 }(this, jQuery, $pt));

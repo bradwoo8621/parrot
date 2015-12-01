@@ -387,4 +387,7 @@
 		}
 	}));
 	context.NPanel = NPanel;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Panel, function (model, layout, direction, viewMode) {
+		return <NPanel {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+	});
 }(this, jQuery, $pt));

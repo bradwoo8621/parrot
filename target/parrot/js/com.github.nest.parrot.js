@@ -3533,6 +3533,7 @@
 	var LayoutHelper = jsface.Class({
 		constructor: function() {
 			this.__comp = {};
+			this.__components = {};
 		},
 		/**
 		 * copy from React.addons.classSet
@@ -3633,9 +3634,39 @@
 				}
 			}
 			return this;
+		},
+		// register components
+		registerComponentRenderer: function (type, func) {
+			if (typeof type !== 'string') {
+				type = type.type;
+			}
+			if (this.__components[type]) {
+				console.warn('Component[' + type + '] is replaced.');
+			}
+			this.__components[type] = func;
+		},
+		getComponentRenderer: function(type) {
+			if (this.__components[type]) {
+				return this.__components[type];
+			} else {
+				throw $pt.createComponentException($pt.ComponentConstants.Err_Unsupported_Component,
+					"Component type[" + type + "] is not supported yet.");
+			}
+		},
+		transformParameters: function(model, layout, direction, viewMode) {
+			return {
+				model: model,
+				layout: layout,
+				direction: direction,
+				view: viewMode,
+				ref: layout.getId()
+			};
 		}
 	});
 	$pt.LayoutHelper = new LayoutHelper();
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Nothing, function() {
+		return null;
+	});
 })(this, jQuery);
 
 (function (context, $, $pt) {
@@ -3771,6 +3802,9 @@
 		}
 	}));
 	context.NArrayCheck = NArrayCheck;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayCheck, function (model, layout, direction, viewMode) {
+		return React.createElement(NArrayCheck, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -4013,6 +4047,9 @@
 		}
 	}));
 	context.NArrayPanel = NArrayPanel;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayPanel, function (model, layout, direction, viewMode) {
+		return React.createElement(NArrayPanel, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -4423,6 +4460,9 @@
 		}
 	}));
 	context.NArrayTab = NArrayTab;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayTab, function (model, layout, direction, viewMode) {
+		return React.createElement(NArrayTab, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -4663,6 +4703,9 @@
 		}
 	}));
 	context.NFormButton = NFormButton;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Button, function (model, layout, direction, viewMode) {
+		return React.createElement(NFormButton, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -4868,6 +4911,9 @@
 		}
 	}));
 	context.NCheck = NCheck;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Check, function (model, layout, direction, viewMode) {
+		return React.createElement(NCheck, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -5242,6 +5288,9 @@
 		}
 	}));
 	context.NDateTime = NDateTime;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Date, function (model, layout, direction, viewMode) {
+		return React.createElement(NDateTime, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -5558,6 +5607,9 @@
 		}
 	}));
 	context.NFile = NFile;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.File, function (model, layout, direction, viewMode) {
+		return React.createElement(NFile, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -6094,6 +6146,10 @@
 		}
 	});
 	context.NForm = NForm;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Form, function (model, layout, direction, viewMode) {
+		var formLayout = $pt.createFormLayout(layout.getComponentOption('editLayout'));
+		return React.createElement(NForm, React.__spread({},  $pt.LayoutHelper.transformParameters(model, formLayout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -6134,6 +6190,9 @@
 		}
 	}));
 	context.NFormButtonFooter = NFormButtonFooter;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ButtonFooter, function (model, layout, direction, viewMode) {
+		return React.createElement(NFormButtonFooter, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -6162,206 +6221,10 @@
 			LABEL_WIDTH: 4,
 			__componentRenderer: {},
 			registerComponentRenderer: function (type, func) {
-				NFormCell.__componentRenderer[type] = func;
+				$pt.LayoutHelper.registerComponentRenderer(type, func);
 			},
 			getComponentRenderer: function (type) {
-				if (NFormCell.__componentRenderer[type] == null) {
-					if (NFormCell['__' + type] != null) {
-						NFormCell.registerComponentRenderer(type, NFormCell['__' + type]);
-						return NFormCell.getComponentRenderer(type);
-					} else {
-						throw $pt.createComponentException($pt.ComponentConstants.Err_Unsupported_Component,
-							"Component type[" + type + "] is not supported yet.");
-					}
-				} else {
-					return NFormCell.__componentRenderer[type];
-				}
-			},
-			transformParameters: function(model, layout, direction, viewMode) {
-				return {
-					model: model,
-					layout: layout,
-					direction: direction,
-					view: viewMode,
-					ref: layout.getId()
-				};
-			},
-			/**
-			 * render label
-			 * @returns {XML}
-			 * @private
-			 */
-			__label: function (model, layout, direction, viewMode) {
-				return React.createElement(NLabel, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
-			},
-			/**
-			 * render text input
-			 * @returns {XML}
-			 * @private
-			 */
-			__text: function (model, layout, direction, viewMode) {
-				return React.createElement(NText, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
-			},
-			/**
-			 * render text area
-			 * @returns {XML}
-			 * @private
-			 */
-			__textarea: function (model, layout, direction, viewMode) {
-				return React.createElement(NTextArea, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
-			},
-			/**
-			 * render checkbox
-			 * @returns {XML}
-			 * @private
-			 */
-			__check: function (model, layout, direction, viewMode) {
-				return React.createElement(NCheck, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
-			},
-			/**
-			 * render checkbox array
-			 * @returns {XML}
-			 * @private
-			 */
-			__acheck: function(model, layout, direction, viewMode) {
-				return React.createElement(NArrayCheck, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
-			},
-			/**
-			 * render toggle button
-			 * @returns {XML}
-			 * @private
-			 */
-			__toggle: function (model, layout, direction, viewMode) {
-				return React.createElement(NToggle, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
-			},
-			/**
-			 * render radio
-			 * @returns {XML}
-			 * @private
-			 */
-			__radio: function (model, layout, direction, viewMode) {
-				return React.createElement(NRadio, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
-			},
-			/**
-			 * render datetime picker
-			 * @returns {XML}
-			 * @private
-			 */
-			__date: function (model, layout, direction, viewMode) {
-				return React.createElement(NDateTime, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
-			},
-			/**
-			 * render select
-			 * @returns {XML}
-			 * @private
-			 */
-			__select: function (model, layout, direction, viewMode) {
-				return React.createElement(NSelect, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
-			},
-			/**
-			 * render search text
-			 * @returns {XML}
-			 * @private
-			 */
-			__search: function (model, layout, direction, viewMode) {
-				return React.createElement(NSearchText, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
-			},
-			/**
-			 * render table
-			 * @returns {XML}
-			 * @private
-			 */
-			__table: function (model, layout, direction, viewMode) {
-				return React.createElement(NTable, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
-			},
-			/**
-			 * render tree
-			 * @returns {XML}
-			 * @private
-			 */
-			__tree: function (model, layout, direction, viewMode) {
-				return React.createElement(NTree, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
-			},
-			/**
-			 * render select tree
-			 * @returns {XML}
-			 * @private
-			 */
-			__seltree: function(model, layout, direction, viewMode) {
-				return React.createElement(NSelectTree, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
-			},
-			/**
-			 * render file
-			 * @return {XML}
-			 * @private
-			 */
-			__file: function (model, layout, direction, viewMode) {
-				return React.createElement(NFile, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
-			},
-			/**
-			 * render button
-			 * @returns {XML}
-			 * @private
-			 */
-			__button: function (model, layout, direction, viewMode) {
-				return React.createElement(NFormButton, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
-			},
-			/**
-			 * render tab
-			 * @returns {XML}
-			 * @private
-			 */
-			__tab: function (model, layout, direction, viewMode) {
-				return React.createElement(NFormTab, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
-			},
-			/**
-			 * render array tab
-			 * @returns {XML}
-			 * @private
-			 */
-			__atab: function (model, layout, direction, viewMode) {
-				return React.createElement(NArrayTab, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
-			},
-			/**
-			 * render panel
-			 * @returns {XML}
-			 * @private
-			 */
-			__panel: function (model, layout, direction, viewMode) {
-				return React.createElement(NPanel, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
-			},
-			/**
-			 * render array panel
-			 * @returns {XML}
-			 * @private
-			 */
-			__apanel: function (model, layout, direction, viewMode) {
-				return React.createElement(NArrayPanel, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
-			},
-			/**
-			 * render form
-			 * @returns {XML}
-			 * @private
-			 */
-			__form: function (model, layout, direction, viewMode) {
-				var formLayout = $pt.createFormLayout(layout.getComponentOption('editLayout'));
-				return React.createElement(NForm, React.__spread({},  NFormCell.transformParameters(model, formLayout, direction, viewMode)));
-			},
-			/**
-			 * render button footer
-			 * @returns {XML}
-			 * @private
-			 */
-			__buttonfooter: function (model, layout, direction, viewMode) {
-				return React.createElement(NFormButtonFooter, React.__spread({},  NFormCell.transformParameters(model, layout, direction, viewMode)));
-			},
-			/**
-			 * render nothing
-			 * @returns {null}
-			 * @private
-			 */
-			__nothing: function () {
-				return null;
+				return $pt.LayoutHelper.getComponentRenderer(type);
 			}
 		},
 		propTypes: {
@@ -6483,7 +6346,7 @@
 				type = "text";
 			}
 			return (React.createElement("div", {ref: "comp"}, 
-				NFormCell.getComponentRenderer(type).call(this, this.getFormModel(), this.getLayout(), direction, this.isViewMode())
+				$pt.LayoutHelper.getComponentRenderer(type).call(this, this.getFormModel(), this.getLayout(), direction, this.isViewMode())
 			));
 		},
 		/**
@@ -6875,6 +6738,9 @@
 		}
 	}));
 	context.NFormTab = NFormTab;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Tab, function (model, layout, direction, viewMode) {
+		return React.createElement(NFormTab, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -7124,6 +6990,9 @@
 		}
 	}));
 	context.NLabel = NLabel;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Label, function (model, layout, direction, viewMode) {
+		return React.createElement(NLabel, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -8946,6 +8815,9 @@
 		}
 	}));
 	context.NPanel = NPanel;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Panel, function (model, layout, direction, viewMode) {
+		return React.createElement(NPanel, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -9319,6 +9191,9 @@
 		}
 	}));
 	context.NRadio = NRadio;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Radio, function (model, layout, direction, viewMode) {
+		return React.createElement(NRadio, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -9678,6 +9553,9 @@
 		}
 	}));
 	context.NSearchText = NSearchText;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Search, function (model, layout, direction, viewMode) {
+		return React.createElement(NSearchText, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -10116,6 +9994,9 @@
 		};
 	})(jQuery);
 	context.NSelect = NSelect;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Select, function (model, layout, direction, viewMode) {
+		return React.createElement(NSelect, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 (function(context, $, $pt) {
@@ -10546,6 +10427,9 @@
 		}
 	}));
 	context.NSelectTree = NSelectTree;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.SelectTree, function (model, layout, direction, viewMode) {
+		return React.createElement(NSelectTree, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 (function (context, $, $pt) {
@@ -12977,6 +12861,9 @@
 		}
 	}));
 	context.NTable = NTable;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Table, function (model, layout, direction, viewMode) {
+		return React.createElement(NTable, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -13333,6 +13220,9 @@
 		}
 	}));
 	context.NText = NText;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Text, function (model, layout, direction, viewMode) {
+		return React.createElement(NText, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -13514,6 +13404,9 @@
 		}
 	}));
 	context.NTextArea = NTextArea;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.TextArea, function (model, layout, direction, viewMode) {
+		return React.createElement(NTextArea, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -13676,6 +13569,9 @@
 		}
 	}));
 	context.NToggle = NToggle;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Toggle, function (model, layout, direction, viewMode) {
+		return React.createElement(NToggle, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 (function(context, $, $pt) {
@@ -14323,4 +14219,7 @@
 
     // expose to global
     context.NTree = NTree;
+    $pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Tree, function (model, layout, direction, viewMode) {
+		return React.createElement(NTree, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));

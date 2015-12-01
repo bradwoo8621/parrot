@@ -406,4 +406,7 @@
 		}
 	}));
 	context.NArrayTab = NArrayTab;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayTab, function (model, layout, direction, viewMode) {
+		return <NArrayTab {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+	});
 }(this, jQuery, $pt));

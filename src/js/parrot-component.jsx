@@ -1422,6 +1422,7 @@
 	var LayoutHelper = jsface.Class({
 		constructor: function() {
 			this.__comp = {};
+			this.__components = {};
 		},
 		/**
 		 * copy from React.addons.classSet
@@ -1522,7 +1523,37 @@
 				}
 			}
 			return this;
+		},
+		// register components
+		registerComponentRenderer: function (type, func) {
+			if (typeof type !== 'string') {
+				type = type.type;
+			}
+			if (this.__components[type]) {
+				console.warn('Component[' + type + '] is replaced.');
+			}
+			this.__components[type] = func;
+		},
+		getComponentRenderer: function(type) {
+			if (this.__components[type]) {
+				return this.__components[type];
+			} else {
+				throw $pt.createComponentException($pt.ComponentConstants.Err_Unsupported_Component,
+					"Component type[" + type + "] is not supported yet.");
+			}
+		},
+		transformParameters: function(model, layout, direction, viewMode) {
+			return {
+				model: model,
+				layout: layout,
+				direction: direction,
+				view: viewMode,
+				ref: layout.getId()
+			};
 		}
 	});
 	$pt.LayoutHelper = new LayoutHelper();
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Nothing, function() {
+		return null;
+	});
 })(this, jQuery);

@@ -370,4 +370,7 @@
 		}
 	}));
 	context.NDateTime = NDateTime;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Date, function (model, layout, direction, viewMode) {
+		return <NDateTime {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+	});
 }(this, jQuery, $pt));

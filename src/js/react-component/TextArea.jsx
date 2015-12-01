@@ -177,4 +177,7 @@
 		}
 	}));
 	context.NTextArea = NTextArea;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.TextArea, function (model, layout, direction, viewMode) {
+		return <NTextArea {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+	});
 }(this, jQuery, $pt));
