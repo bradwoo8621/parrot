@@ -2003,6 +2003,32 @@ div.n-checkbox span.check-label.disabled {
 div.n-checkbox.n-disabled div.check-container {
   cursor: not-allowed;
 }
+div.n-checkbox.n-view-mode span.check-container {
+  pointer-events: none;
+  cursor: auto;
+  user-select: none;
+}
+div.n-checkbox.n-view-mode span.check-container.checked,
+div.n-checkbox.n-view-mode span.check-container span.check,
+div.n-checkbox.n-view-mode span.check-container.checked span.check,
+div.n-checkbox.n-view-mode span.check-container.checked span.check:before {
+  pointer-events: none;
+  cursor: auto;
+  color: #666666;
+  user-select: none;
+}
+div.n-checkbox.n-view-mode span.check-container:focus:before,
+div.n-checkbox.n-view-mode span.check-container.checked:focus:before {
+  display: none;
+}
+div.n-checkbox.n-view-mode span.check-container:focus span.check:before {
+  -webkit-animation: none;
+  animation: none;
+  -o-animation: none;
+}
+div.n-checkbox.n-view-mode span.check-label {
+  cursor: auto;
+}
 @keyframes checkbox-on {
   0% {
     box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 15px 2px 0 11px;

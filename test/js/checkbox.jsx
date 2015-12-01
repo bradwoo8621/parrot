@@ -83,6 +83,12 @@
             <span>Disabled Check Box With Label</span>
             <NCheck model={model} layout={disabledLabelCheckbox}/>
         </div>
+        <div className='col-md-3 col-lg-3 col-sm-3'>
+            <span>View Mode</span>
+            <NCheck model={model} layout={checkbox} view={true}/>
+            <span>View Mode With Label</span>
+            <NCheck model={model} layout={labelCheckBox} view={true}/>
+        </div>
     </div>);
     React.render(panel, document.getElementById('main'));
 })();

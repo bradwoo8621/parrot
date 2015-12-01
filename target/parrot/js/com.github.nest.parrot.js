@@ -3402,6 +3402,10 @@
 		 * @returns {boolean}
 		 */
 		isEnabled: function () {
+			if (this.isViewMode()) {
+				// always enabled when in view mode
+				return true;
+			}
 			return this.getComponentRuleValue("enabled", true);
 		},
 		/**
@@ -4857,13 +4861,14 @@
 				if (label == null || label.isEmpty()) {
 					return null;
 				}
+				var enabled = this.isEnabled();
 				var css = {
 					'check-label': true,
 					disabled: !this.isEnabled(),
 					'check-label-left': labelInLeft
 				};
 				return (React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
-				             onClick: this.isEnabled() ? this.onButtonClicked : null}, 
+				             onClick: (enabled && !this.isViewMode()) ? this.onButtonClicked : null}, 
                 	this.getLayout().getLabel()
             	));
 			}
@@ -4880,14 +4885,16 @@
 				checked: checked,
 				'check-container': true
 			};
+			var enabled = this.isEnabled();
 			return (React.createElement("div", {className: "check-container"}, 
-            React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
-                  onClick: this.isEnabled() ? this.onButtonClicked : null, 
-                  onKeyUp: this.isEnabled() ? this.onKeyUp: null, 
-                  tabIndex: "0", 
-                  ref: "out"}, 
-            React.createElement("span", {className: "check", onClick: this.onInnerClicked})
-        )));
+	            React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
+	                  onClick: (enabled && !this.isViewMode()) ? this.onButtonClicked : null, 
+	                  onKeyUp: (enabled && !this.isViewMode()) ? this.onKeyUp: null, 
+	                  tabIndex: "0", 
+	                  ref: "out"}, 
+	            	React.createElement("span", {className: "check", onClick: this.onInnerClicked})
+	        	)
+			));
 		},
 		/**
 		 * render
@@ -4895,7 +4902,8 @@
 		 */
 		render: function () {
 			var css = {
-				'n-disabled': !this.isEnabled()
+				'n-disabled': !this.isEnabled(),
+				'n-view-mode': this.isViewMode()
 			};
 			css[this.getComponentCSS('n-checkbox')] = true;
 			var isLabelAtLeft = this.isLabelAtLeft();

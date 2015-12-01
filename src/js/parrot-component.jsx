@@ -1291,6 +1291,10 @@
 		 * @returns {boolean}
 		 */
 		isEnabled: function () {
+			if (this.isViewMode()) {
+				// always enabled when in view mode
+				return true;
+			}
 			return this.getComponentRuleValue("enabled", true);
 		},
 		/**
