@@ -3,7 +3,7 @@
  */
 (function () {
     var model = $pt.createModel({
-        name: null
+        name: 'Name'
     });
     var plainText = $pt.createCellLayout('name', {
         label: 'Plain Text',
@@ -256,6 +256,10 @@
             <NText model={model} layout={lrAddonDisabledText}/>
             <span>Disabled Left and Right Add-ons Clickable</span>
             <NText model={model} layout={lrAddonTextClickDisabled}/>
+        </div>
+        <div className='col-md-3 col-lg-3 col-sm-3'>
+            <span>View Mode</span>
+            <NText model={model} layout={plainText} view={true}/>
         </div>
     </div>);
     React.render(panel, document.getElementById('main'));

@@ -211,6 +211,9 @@
 		 * @returns {XML}
 		 */
 		render: function () {
+			if (this.isViewMode()) {
+				return this.renderInViewMode();
+			}
 			var css = {
 				'n-disabled': !this.isEnabled()
 			};

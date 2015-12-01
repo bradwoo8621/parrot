@@ -67,7 +67,7 @@
 		 * @returns {*}
 		 * @private
 		 */
-		_getPosition: function () {
+		getPosition: function () {
 			return this.__cell.pos ? this.__cell.pos : CellLayout.DEFAULT_POSITION;
 		},
 		/**
@@ -75,7 +75,7 @@
 		 * @returns {string}
 		 */
 		getRowIndex: function () {
-			var row = this._getPosition().row;
+			var row = this.getPosition().row;
 			return row == null ? CellLayout.DEFAULT_ROW : row;
 		},
 		/**
@@ -83,7 +83,7 @@
 		 * @returns {Array|string|boolean|*}
 		 */
 		getColumnIndex: function () {
-			var col = this._getPosition().col;
+			var col = this.getPosition().col;
 			return col == null ? CellLayout.DEFAULT_COLUMN : col;
 		},
 		/**
@@ -91,7 +91,7 @@
 		 * @returns {number}
 		 */
 		getWidth: function () {
-			var width = this._getPosition().width;
+			var width = this.getPosition().width;
 			return width == null ? CellLayout.DEFAULT_WIDTH : width;
 		},
 		/**
@@ -99,7 +99,7 @@
 		 * @returns {string}
 		 */
 		getSection: function () {
-			var section = this._getPosition().section;
+			var section = this.getPosition().section;
 			return section != null ? section : SectionLayout.DEFAULT_KEY;
 		},
 		/**
@@ -107,7 +107,7 @@
 		 * @returns {string}
 		 */
 		getCard: function () {
-			var card = this._getPosition().card;
+			var card = this.getPosition().card;
 			return card != null ? card : CardLayout.DEFAULT_KEY;
 		},
 		/**
@@ -1127,6 +1127,37 @@
 			return this.props.view === true;
 		},
 		/**
+		 * render in view mode. default render as a label.
+		 * @returns {XML}
+		 */
+		renderInViewMode: function() {
+			var externalViewModeRenderer = $pt.LayoutHelper.getComponentViewModeRenderer(this.getLayout().getComponentType());
+			if (externalViewModeRenderer) {
+				return externalViewModeRenderer.call(this, this.getModel(), this.getLayout(), this.props.direction, true);
+			}
+
+			var label = null;
+			if (this.getTextInViewMode) {
+				label = this.getTextInViewMode();
+			} else {
+				label = this.getValueFromModel();
+			}
+			var labelLayout = $pt.createCellLayout(this.getId(), $.extend(true, {}, {
+				comp: this.getComponentOption()
+				// css, pos, dataId, evt are all not necessary, since label will not use.
+			}, {
+				label: label,
+				dataId: this.getDataId(),
+				comp: {
+					type: $pt.ComponentConstants.Label,
+					textFromModel: false
+				}
+			}));
+			var parameters = $pt.LayoutHelper.transformParameters(
+				this.getModel(), labelLayout, this.props.direction, true);
+			return <NLabel {...parameters} />;
+		},
+		/**
 		 * get id of component
 		 * @returns {string}
 		 */
@@ -1530,16 +1561,41 @@
 				type = type.type;
 			}
 			if (this.__components[type]) {
-				console.warn('Component[' + type + '] is replaced.');
+				console.warn('Component [' + type + '] is replaced.');
 			}
 			this.__components[type] = func;
 		},
 		getComponentRenderer: function(type) {
+			if (typeof type !== 'string') {
+				type = type.type;
+			}
 			if (this.__components[type]) {
 				return this.__components[type];
 			} else {
 				throw $pt.createComponentException($pt.ComponentConstants.Err_Unsupported_Component,
-					"Component type[" + type + "] is not supported yet.");
+					"Component type [" + type + "] is not supported yet.");
+			}
+		},
+		registerComponentViewModeRenderer: function(type, func) {
+			if (typeof type !== 'string') {
+				type = type.type;
+			}
+			type = type + '@view';
+			if (this.__components[type]) {
+				console.warn('Component [' + type + '] is replaced.');
+			}
+			this.__components[type] = func;
+		},
+		getComponentViewModeRenderer: function(type) {
+			if (typeof type !== 'string') {
+				type = type.type;
+			}
+			type = type + '@view';
+			if (this.__components[type]) {
+				return this.__components[type];
+			} else {
+				// no view mode renderer registered yet
+				return null;
 			}
 		},
 		transformParameters: function(model, layout, direction, viewMode) {
