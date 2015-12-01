@@ -3,6 +3,7 @@
  */
 (function (context, $, $pt) {
 	var NNormalLabel = React.createClass({
+		displayName: 'NNormalLabel',
 		propTypes: {
 			text: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.arrayOf(React.PropTypes.string)]),
 			style: React.PropTypes.string,

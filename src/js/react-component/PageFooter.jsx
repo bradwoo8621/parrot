@@ -3,6 +3,7 @@
  */
 (function (context, $, $pt) {
 	var NPageFooter = React.createClass({
+		displayName: 'NPageFooter',
 		statics: {
 			TECH_BASE: 'Parrot',
 			TECH_URL: 'https://github.com/bradwoo8621/parrot',

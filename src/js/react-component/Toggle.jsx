@@ -3,6 +3,7 @@
  */
 (function (context, $, $pt) {
 	var NToggle = React.createClass($pt.defineCellComponent({
+		displayName: 'NToggle',
 		propTypes: {
 			// model
 			model: React.PropTypes.object,

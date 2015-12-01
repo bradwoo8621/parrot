@@ -1,5 +1,6 @@
 (function (context, $, $pt) {
 	var NSideMenu = React.createClass({
+		displayName: 'NSideMenu',
 		statics: {
 			/**
 			 * get side menu

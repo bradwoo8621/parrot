@@ -1,5 +1,6 @@
 (function (context, $, $pt) {
 	var NArrayCheck = React.createClass($pt.defineCellComponent({
+		displayName: 'NArrayCheck',
 		statics: {
 		},
 		propTypes: {

@@ -1,5 +1,6 @@
 (function(context, $, $pt) {
     var NTree = React.createClass($pt.defineCellComponent({
+        displayName: 'NTree',
         statics: {
             ROOT_LABEL: 'Root',
             FOLDER_ICON: 'folder-o',

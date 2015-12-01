@@ -37,6 +37,7 @@
  */
 (function (context, $, $pt) {
 	var NFormTab = React.createClass($pt.defineCellComponent({
+		displayName: 'NFormTab',
 		propTypes: {
 			// model
 			model: React.PropTypes.object,

@@ -3,6 +3,7 @@
  */
 (function (context, $, $pt) {
 	var NFormButtonFooter = React.createClass($pt.defineCellComponent({
+		displayName: 'NFormButtonFooter',
 		propTypes: {
 			// model
 			model: React.PropTypes.object,

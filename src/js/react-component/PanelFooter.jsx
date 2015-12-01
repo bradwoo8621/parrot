@@ -4,6 +4,7 @@
  */
 (function (context, $, $pt) {
 	var NPanelFooter = React.createClass({
+		displayName: 'NPanelFooter',
 		statics: {
 			RESET_TEXT: "Reset",
 			RESET_ICON: "reply-all",

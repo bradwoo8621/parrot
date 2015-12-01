@@ -3,6 +3,7 @@
  */
 (function (context, $, $pt) {
 	var NTab = React.createClass({
+		displayName: 'NTab',
 		propTypes: {
 			type: React.PropTypes.oneOf(['tab', 'pill']),
 			justified: React.PropTypes.bool,

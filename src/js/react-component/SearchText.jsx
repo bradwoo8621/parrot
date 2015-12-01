@@ -3,6 +3,7 @@
  */
 (function (context, $, $pt) {
 	var NSearchText = React.createClass($pt.defineCellComponent({
+		displayName: 'NSearchText',
 		statics: {
 			ADVANCED_SEARCH_BUTTON_ICON: 'search',
 			ADVANCED_SEARCH_DIALOG_NAME_LABEL: 'Name',

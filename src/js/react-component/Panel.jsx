@@ -37,6 +37,7 @@
  */
 (function (context, $, $pt) {
 	var NPanel = React.createClass($pt.defineCellComponent({
+		displayName: 'NPanel',
 		propTypes: {
 			// model
 			model: React.PropTypes.object,

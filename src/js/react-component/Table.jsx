@@ -5,6 +5,7 @@
  */
 (function (context, $, $pt) {
 	var NTable = React.createClass($pt.defineCellComponent({
+		displayName: 'NTable',
 		statics: {
 			__operationButtonWidth: 31,
 			__minOperationButtonWidth: 40,

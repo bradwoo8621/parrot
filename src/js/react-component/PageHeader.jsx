@@ -3,6 +3,7 @@
  */
 (function (context, $, $pt) {
 	var NPageHeader = React.createClass({
+		displayName: 'NPageHeader',
 		statics: {
 			SEARCH_PLACEHOLDER: 'Search...'
 		},

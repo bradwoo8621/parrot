@@ -42,6 +42,7 @@
  */
 (function (context, $, $pt) {
 	var NSelect = React.createClass($pt.defineCellComponent({
+		displayName: 'NSelect',
 		statics: {
 			PLACEHOLDER: "Please Select..."
 		},

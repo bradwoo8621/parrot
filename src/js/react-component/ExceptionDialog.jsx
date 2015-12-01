@@ -4,6 +4,7 @@
  */
 (function (context, $, $pt) {
 	var NExceptionModal = React.createClass({
+		displayName: 'NExceptionModal',
 		statics: {
 			getExceptionModal: function (className) {
 				if ($pt.exceptionDialog === undefined || $pt.exceptionDialog === null) {

@@ -5,6 +5,7 @@
  */
 (function (context, $, $pt) {
 	var NModalForm = React.createClass({
+		displayName: 'NModalForm',
 		statics: {
 			/**
 			 * create form modal dialog

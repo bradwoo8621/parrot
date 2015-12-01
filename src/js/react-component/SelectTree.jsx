@@ -1,5 +1,6 @@
 (function(context, $, $pt) {
 	var NSelectTree = React.createClass($pt.defineCellComponent({
+		displayName: 'NSelectTree',
 		statics: {
 		},
 		propTypes: {

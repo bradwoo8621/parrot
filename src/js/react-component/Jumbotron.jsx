@@ -3,6 +3,7 @@
  */
 (function (context, $, $pt) {
 	var NJumbortron = React.createClass({
+		displayName: 'NJumbortron',
 		propTypes: {
 			highlightText: React.PropTypes.oneOfType(
 				React.PropTypes.string,

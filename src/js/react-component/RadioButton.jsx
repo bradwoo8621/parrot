@@ -31,6 +31,7 @@
  */
 (function (context, $, $pt) {
 	var NRadio = React.createClass($pt.defineCellComponent({
+		displayName: 'NRadio',
 		propTypes: {
 			// model
 			model: React.PropTypes.object,

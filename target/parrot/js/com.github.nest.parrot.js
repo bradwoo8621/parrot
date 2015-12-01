@@ -3731,6 +3731,7 @@
 
 (function (context, $, $pt) {
 	var NArrayCheck = React.createClass($pt.defineCellComponent({
+		displayName: 'NArrayCheck',
 		statics: {
 		},
 		propTypes: {
@@ -3905,6 +3906,7 @@
  */
 (function (context, $, $pt) {
 	var NArrayPanel = React.createClass($pt.defineCellComponent({
+		displayName: 'NArrayPanel',
 		statics: {
 			UNTITLED: 'Untitled Item'
 		},
@@ -4154,6 +4156,7 @@
  */
 (function (context, $, $pt) {
 	var NArrayTab = React.createClass($pt.defineCellComponent({
+		displayName: 'NArrayTab',
 		statics: {
 			UNTITLED: 'Untitled Item',
 			ADD_ICON: 'plus-circle',
@@ -4561,6 +4564,7 @@
  */
 (function (context, $, $pt) {
 	var NFormButton = React.createClass($pt.defineCellComponent({
+		displayName: 'NFormButton',
 		propTypes: {
 			// model, whole model, not only for this cell
 			// use id to get the value of this cell from model
@@ -4801,6 +4805,7 @@
  */
 (function (context, $, $pt) {
 	var NCheck = React.createClass($pt.defineCellComponent({
+		displayName: 'NCheck',
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
@@ -5016,6 +5021,7 @@
  */
 (function (context, $, $pt) {
 	var NDateTime = React.createClass($pt.defineCellComponent({
+		displayName: 'NDateTime',
 		statics: {
 			FORMAT: 'YYYY/MM/DD',
 			DAY_VIEW_HEADER_FORMAT: 'MMMM YYYY',
@@ -5362,7 +5368,8 @@
  * z-index is 9999 and 9998, the max z-index.
  */
 (function (context, $, $pt) {
-	var NExceptionModal = React.createClass({displayName: "NExceptionModal",
+	var NExceptionModal = React.createClass({
+		displayName: 'NExceptionModal',
 		statics: {
 			getExceptionModal: function (className) {
 				if ($pt.exceptionDialog === undefined || $pt.exceptionDialog === null) {
@@ -5476,6 +5483,7 @@
 
 (function (context, $, $pt) {
 	var NFile = React.createClass($pt.defineCellComponent({
+		displayName: 'NFile',
 		statics: {},
 		propTypes: {
 			// model
@@ -5713,7 +5721,8 @@
  * }
  */
 (function (context, $, $pt) {
-	var NForm = React.createClass({displayName: "NForm",
+	var NForm = React.createClass({
+		displayName: 'NForm',
 		statics: {
 			LABEL_DIRECTION: 'vertical'
 		},
@@ -6221,6 +6230,7 @@
  */
 (function (context, $, $pt) {
 	var NFormButtonFooter = React.createClass($pt.defineCellComponent({
+		displayName: 'NFormButtonFooter',
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
@@ -6279,6 +6289,7 @@
  */
 (function (context, $, $pt) {
 	var NFormCell = React.createClass($pt.defineCellComponent({
+		displayName: 'NFormCell',
 		statics: {
 			REQUIRED_ICON: 'asterisk',
 			TOOLTIP_ICON: 'question-circle',
@@ -6628,6 +6639,7 @@
  */
 (function (context, $, $pt) {
 	var NFormTab = React.createClass($pt.defineCellComponent({
+		displayName: 'NFormTab',
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
@@ -6811,7 +6823,8 @@
  * icon based on font-awesome
  */
 (function (context, $, $pt) {
-	var NIcon = React.createClass({displayName: "NIcon",
+	var NIcon = React.createClass({
+		displayName: 'NIcon',
 		propTypes: {
 			size: React.PropTypes.oneOf(["lg", "2x", "3x", "4x", "5x"]),
 			fixWidth: React.PropTypes.bool,
@@ -6926,7 +6939,8 @@
  * Jumbortron
  */
 (function (context, $, $pt) {
-	var NJumbortron = React.createClass({displayName: "NJumbortron",
+	var NJumbortron = React.createClass({
+		displayName: 'NJumbortron',
 		propTypes: {
 			highlightText: React.PropTypes.oneOfType(
 				React.PropTypes.string,
@@ -7067,7 +7081,8 @@
  * depends NFormButton
  */
 (function (context, $, $pt) {
-	var NConfirm = React.createClass({displayName: "NConfirm",
+	var NConfirm = React.createClass({
+		displayName: 'NConfirm',
 		statics: {
 			getConfirmModal: function (className) {
 				if ($pt.confirmDialog === undefined || $pt.confirmDialog === null) {
@@ -7326,7 +7341,8 @@
  * depends NPanelFooter, NForm, NConfirm
  */
 (function (context, $, $pt) {
-	var NModalForm = React.createClass({displayName: "NModalForm",
+	var NModalForm = React.createClass({
+		displayName: 'NModalForm',
 		statics: {
 			/**
 			 * create form modal dialog
@@ -7810,7 +7826,8 @@
  * Created by brad.wu on 9/2/2015.
  */
 (function (context, $, $pt) {
-	var NNormalLabel = React.createClass({displayName: "NNormalLabel",
+	var NNormalLabel = React.createClass({
+		displayName: 'NNormalLabel',
 		propTypes: {
 			text: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.arrayOf(React.PropTypes.string)]),
 			style: React.PropTypes.string,
@@ -7854,7 +7871,8 @@
  * z-index is 9899 and 9898, less than exception dialog, more than any other.
  */
 (function (context, $, $pt) {
-	var NOnRequestModal = React.createClass({displayName: "NOnRequestModal",
+	var NOnRequestModal = React.createClass({
+		displayName: 'NOnRequestModal',
 		statics: {
 			getOnRequestModal: function (className) {
 				if ($pt.onRequestDialog === undefined || $pt.onRequestDialog === null) {
@@ -7938,7 +7956,8 @@
  * page footer.<br>
  */
 (function (context, $, $pt) {
-	var NPageFooter = React.createClass({displayName: "NPageFooter",
+	var NPageFooter = React.createClass({
+		displayName: 'NPageFooter',
 		statics: {
 			TECH_BASE: 'Parrot',
 			TECH_URL: 'https://github.com/bradwoo8621/parrot',
@@ -7990,7 +8009,8 @@
  * Page Header<br>
  */
 (function (context, $, $pt) {
-	var NPageHeader = React.createClass({displayName: "NPageHeader",
+	var NPageHeader = React.createClass({
+		displayName: 'NPageHeader',
 		statics: {
 			SEARCH_PLACEHOLDER: 'Search...'
 		},
@@ -8178,7 +8198,8 @@
  * NOTE: never jump by itself, must register the toPage and refresh this component manually
  */
 (function (context, $, $pt) {
-	var NPagination = React.createClass({displayName: "NPagination",
+	var NPagination = React.createClass({
+		displayName: 'NPagination',
 		/**
 		 * @override
 		 */
@@ -8530,6 +8551,7 @@
  */
 (function (context, $, $pt) {
 	var NPanel = React.createClass($pt.defineCellComponent({
+		displayName: 'NPanel',
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
@@ -8890,7 +8912,8 @@
  * depends NFormButton
  */
 (function (context, $, $pt) {
-	var NPanelFooter = React.createClass({displayName: "NPanelFooter",
+	var NPanelFooter = React.createClass({
+		displayName: 'NPanelFooter',
 		statics: {
 			RESET_TEXT: "Reset",
 			RESET_ICON: "reply-all",
@@ -9098,6 +9121,7 @@
  */
 (function (context, $, $pt) {
 	var NRadio = React.createClass($pt.defineCellComponent({
+		displayName: 'NRadio',
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
@@ -9268,6 +9292,7 @@
  */
 (function (context, $, $pt) {
 	var NSearchText = React.createClass($pt.defineCellComponent({
+		displayName: 'NSearchText',
 		statics: {
 			ADVANCED_SEARCH_BUTTON_ICON: 'search',
 			ADVANCED_SEARCH_DIALOG_NAME_LABEL: 'Name',
@@ -9669,6 +9694,7 @@
  */
 (function (context, $, $pt) {
 	var NSelect = React.createClass($pt.defineCellComponent({
+		displayName: 'NSelect',
 		statics: {
 			PLACEHOLDER: "Please Select..."
 		},
@@ -10068,6 +10094,7 @@
 
 (function(context, $, $pt) {
 	var NSelectTree = React.createClass($pt.defineCellComponent({
+		displayName: 'NSelectTree',
 		statics: {
 		},
 		propTypes: {
@@ -10500,7 +10527,8 @@
 }(this, jQuery, $pt));
 
 (function (context, $, $pt) {
-	var NSideMenu = React.createClass({displayName: "NSideMenu",
+	var NSideMenu = React.createClass({
+		displayName: 'NSideMenu',
 		statics: {
 			/**
 			 * get side menu
@@ -10690,7 +10718,8 @@
  * normal tab
  */
 (function (context, $, $pt) {
-	var NTab = React.createClass({displayName: "NTab",
+	var NTab = React.createClass({
+		displayName: 'NTab',
 		propTypes: {
 			type: React.PropTypes.oneOf(['tab', 'pill']),
 			justified: React.PropTypes.bool,
@@ -10952,6 +10981,7 @@
  */
 (function (context, $, $pt) {
 	var NTable = React.createClass($pt.defineCellComponent({
+		displayName: 'NTable',
 		statics: {
 			__operationButtonWidth: 31,
 			__minOperationButtonWidth: 40,
@@ -13503,6 +13533,7 @@
  */
 (function (context, $, $pt) {
 	var NToggle = React.createClass($pt.defineCellComponent({
+		displayName: 'NToggle',
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
@@ -13665,6 +13696,7 @@
 
 (function(context, $, $pt) {
     var NTree = React.createClass($pt.defineCellComponent({
+        displayName: 'NTree',
         statics: {
             ROOT_LABEL: 'Root',
             FOLDER_ICON: 'folder-o',

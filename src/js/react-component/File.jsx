@@ -1,5 +1,6 @@
 (function (context, $, $pt) {
 	var NFile = React.createClass($pt.defineCellComponent({
+		displayName: 'NFile',
 		statics: {},
 		propTypes: {
 			// model

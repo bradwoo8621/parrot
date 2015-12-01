@@ -4,6 +4,7 @@
  */
 (function (context, $, $pt) {
 	var NOnRequestModal = React.createClass({
+		displayName: 'NOnRequestModal',
 		statics: {
 			getOnRequestModal: function (className) {
 				if ($pt.onRequestDialog === undefined || $pt.onRequestDialog === null) {

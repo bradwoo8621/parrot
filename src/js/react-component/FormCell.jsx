@@ -18,6 +18,7 @@
  */
 (function (context, $, $pt) {
 	var NFormCell = React.createClass($pt.defineCellComponent({
+		displayName: 'NFormCell',
 		statics: {
 			REQUIRED_ICON: 'asterisk',
 			TOOLTIP_ICON: 'question-circle',

@@ -36,6 +36,7 @@
  */
 (function (context, $, $pt) {
 	var NArrayPanel = React.createClass($pt.defineCellComponent({
+		displayName: 'NArrayPanel',
 		statics: {
 			UNTITLED: 'Untitled Item'
 		},

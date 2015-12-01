@@ -31,6 +31,7 @@
  */
 (function (context, $, $pt) {
 	var NCheck = React.createClass($pt.defineCellComponent({
+		displayName: 'NCheck',
 		propTypes: {
 			// model
 			model: React.PropTypes.object,

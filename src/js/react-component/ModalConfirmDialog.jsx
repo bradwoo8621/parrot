@@ -6,6 +6,7 @@
  */
 (function (context, $, $pt) {
 	var NConfirm = React.createClass({
+		displayName: 'NConfirm',
 		statics: {
 			getConfirmModal: function (className) {
 				if ($pt.confirmDialog === undefined || $pt.confirmDialog === null) {

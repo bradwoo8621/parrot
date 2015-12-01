@@ -5,6 +5,7 @@
  */
 (function (context, $, $pt) {
 	var NPagination = React.createClass({
+		displayName: 'NPagination',
 		/**
 		 * @override
 		 */

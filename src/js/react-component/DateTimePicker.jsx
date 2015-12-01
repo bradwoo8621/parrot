@@ -34,6 +34,7 @@
  */
 (function (context, $, $pt) {
 	var NDateTime = React.createClass($pt.defineCellComponent({
+		displayName: 'NDateTime',
 		statics: {
 			FORMAT: 'YYYY/MM/DD',
 			DAY_VIEW_HEADER_FORMAT: 'MMMM YYYY',

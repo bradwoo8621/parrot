@@ -36,6 +36,7 @@
  */
 (function (context, $, $pt) {
 	var NForm = React.createClass({
+		displayName: 'NForm',
 		statics: {
 			LABEL_DIRECTION: 'vertical'
 		},

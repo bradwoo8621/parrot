@@ -40,6 +40,7 @@
  */
 (function (context, $, $pt) {
 	var NArrayTab = React.createClass($pt.defineCellComponent({
+		displayName: 'NArrayTab',
 		statics: {
 			UNTITLED: 'Untitled Item',
 			ADD_ICON: 'plus-circle',
