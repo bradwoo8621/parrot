@@ -301,9 +301,11 @@ hr.focus-line.focus {
 .panel .panel-heading h4.panel-title div.n-checkbox span.check-container:focus:before {
   background-color: #ffffff;
 }
+.panel .panel-heading h4.panel-title div.n-checkbox span.check-container span.check,
 .panel .panel-heading h4.panel-title div.n-checkbox span.check-container.checked span.check {
   color: #ffffff;
 }
+.panel .panel-heading h4.panel-title div.n-checkbox span.check-container span.check:before,
 .panel .panel-heading h4.panel-title div.n-checkbox span.check-container.checked span.check:before {
   color: #ffffff;
 }
@@ -324,11 +326,26 @@ hr.focus-line.focus {
 .panel.panel-default .panel-heading h4.panel-title div.n-checkbox span.check-container:focus:before {
   background-color: #2196f3;
 }
+.panel.panel-default .panel-heading h4.panel-title div.n-checkbox span.check-container span.check {
+  color: #666666;
+}
 .panel.panel-default .panel-heading h4.panel-title div.n-checkbox span.check-container.checked span.check {
   color: #2196f3;
 }
 .panel.panel-default .panel-heading h4.panel-title div.n-checkbox span.check-container.checked span.check:before {
   color: #2196f3;
+}
+.panel.panel-default .panel-heading h4.panel-title div.n-checkbox.n-view-mode span.check-container {
+  color: #666666;
+}
+.panel.panel-default .panel-heading h4.panel-title div.n-checkbox.n-view-mode span.check-container:focus:before {
+  background-color: #666666;
+}
+.panel.panel-default .panel-heading h4.panel-title div.n-checkbox.n-view-mode span.check-container.checked span.check {
+  color: #666666;
+}
+.panel.panel-default .panel-heading h4.panel-title div.n-checkbox.n-view-mode span.check-container.checked span.check:before {
+  color: #666666;
 }
 .panel .panel-body {
   padding-top: 8px;

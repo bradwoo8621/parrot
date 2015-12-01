@@ -125,7 +125,7 @@
 			};
 			return (<div>
 				(
-				<NCheck model={this.getModel()} layout={$pt.createCellLayout('check', layout)}/>
+				<NCheck model={this.getModel()} layout={$pt.createCellLayout('check', layout)} view={this.isViewMode()}/>
 				)
 			</div>);
 		},
@@ -168,7 +168,8 @@
 				return <NFormCell layout={cell}
 				                  model={_this.getModel()}
 				                  ref={cell.getId()}
-				                  direction={_this.props.direction}/>;
+				                  direction={_this.props.direction}
+								  view={_this.isViewMode()}/>;
 			});
 			return (<div className="row">{cells}</div>);
 		},

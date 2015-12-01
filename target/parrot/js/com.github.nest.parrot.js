@@ -1,4 +1,4 @@
-/** com.github.nest.parrot.V0.0.6 2015-12-01 */
+/** com.github.nest.parrot.V0.0.6 2015-12-02 */
 (function ($) {
 	var patches = {
 		console: function () {
@@ -4029,7 +4029,8 @@
 				React.createElement("div", {className: "col-sm-12 col-md-12 col-lg-12"}, 
 					React.createElement(NPanel, {model: model, 
 					        layout: $pt.createCellLayout('pseudo-panel', cellLayout), 
-					        direction: this.props.direction})
+					        direction: this.props.direction, 
+							view: this.isViewMode()})
 				)
 			));
 		},
@@ -8639,7 +8640,7 @@
 			};
 			return (React.createElement("div", null, 
 				"(", 
-				React.createElement(NCheck, {model: this.getModel(), layout: $pt.createCellLayout('check', layout)}), 
+				React.createElement(NCheck, {model: this.getModel(), layout: $pt.createCellLayout('check', layout), view: this.isViewMode()}), 
 				")"
 			));
 		},
@@ -8682,7 +8683,8 @@
 				return React.createElement(NFormCell, {layout: cell, 
 				                  model: _this.getModel(), 
 				                  ref: cell.getId(), 
-				                  direction: _this.props.direction});
+				                  direction: _this.props.direction, 
+								  view: _this.isViewMode()});
 			});
 			return (React.createElement("div", {className: "row"}, cells));
 		},

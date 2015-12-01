@@ -60,6 +60,7 @@
 					&:focus:before {
 						background-color: @font-color-reverse;
 					}
+					span.check,
 					&.checked span.check {
 						color: @font-color-reverse;
 						&:before {
@@ -89,10 +90,25 @@
 					&:focus:before {
 						background-color: @color-primary;
 					}
+					span.check {
+						color: @font-color;
+					}
 					&.checked span.check {
 						color: @color-primary;
 						&:before {
 							color: @color-primary;
+						}
+					}
+				}
+				div.n-checkbox.n-view-mode span.check-container {
+					color: @font-color;
+					&:focus:before {
+						background-color: @font-color;
+					}
+					&.checked span.check {
+						color: @font-color;
+						&:before {
+							color: @font-color;
 						}
 					}
 				}

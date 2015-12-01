@@ -159,7 +159,8 @@
 				<div className='col-sm-12 col-md-12 col-lg-12'>
 					<NPanel model={model}
 					        layout={$pt.createCellLayout('pseudo-panel', cellLayout)}
-					        direction={this.props.direction}/>
+					        direction={this.props.direction}
+							view={this.isViewMode()}/>
 				</div>
 			</div>);
 		},

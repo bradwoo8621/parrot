@@ -187,6 +187,15 @@
             <NPanel model={model} layout={checkInTitleReverseClosed}/>
             <NPanel model={model} layout={checkInTitleDepends}/>
         </div>
+        <div className='col-md-6 col-lg-6 col-sm-6'>
+            <NPanel model={model} layout={checkInTitle} view={true}/>
+            <NPanel model={model} layout={checkInTitleSame} view={true}/>
+            <NPanel model={model} layout={checkInTitleReverse} view={true}/>
+            <NPanel model={model} layout={checkInTitleCollapsible} view={true}/>
+            <NPanel model={model} layout={checkInTitleSameClosed} view={true}/>
+            <NPanel model={model} layout={checkInTitleReverseClosed} view={true}/>
+            <NPanel model={model} layout={checkInTitleDepends} view={true}/>
+        </div>
     </div>);
     React.render(panel, document.getElementById('main'));
 })();
