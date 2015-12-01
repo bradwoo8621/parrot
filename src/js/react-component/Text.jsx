@@ -48,6 +48,7 @@
  */
 (function (context, $, $pt) {
 	var NText = React.createClass($pt.defineCellComponent({
+		displayName: 'NText',
 		statics: {
 			NUMBER_FORMAT: function(value) {
 				var parts = (value + '').split('.');
@@ -99,7 +100,10 @@
 		 * @param prevState
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
-			var formattedValue = this.getFormattedValue(this.getValueFromModel());
+			var formattedValue = this.getValueFromModel();
+			if (!$(React.findDOMNode(this.refs.focusLine)).hasClass('focus')) {
+				formattedValue = this.getFormattedValue(formattedValue);
+			}
 			if (this.getComponent().val() != formattedValue) {
 				this.getComponent().val(formattedValue);
 			}
@@ -269,15 +273,18 @@
 		 * @param evt
 		 */
 		onModelChanged: function (evt) {
-			var formattedValue = this.getValueFromModel();
-			if (!$(React.findDOMNode(this.refs.focusLine)).hasClass('focus')) {
-				formattedValue = this.getFormattedValue(formattedValue);
-			}
-			if (formattedValue == this.getComponent().val()) {
-				return;
-			}
-			// console.debug('Text model changed[modelValue=' + evt.new + ', compValue=' + this.getComponent().val() + '].');
-			this.getComponent().val(formattedValue);
+			this.forceUpdate();
+			// return;
+			//
+			// var formattedValue = this.getValueFromModel();
+			// if (!$(React.findDOMNode(this.refs.focusLine)).hasClass('focus')) {
+			// 	formattedValue = this.getFormattedValue(formattedValue);
+			// }
+			// if (formattedValue == this.getComponent().val()) {
+			// 	return;
+			// }
+			// // console.debug('Text model changed[modelValue=' + evt.new + ', compValue=' + this.getComponent().val() + '].');
+			// this.getComponent().val(formattedValue);
 		},
 		onKeyUp: function (evt) {
 			var monitor = this.getEventMonitor('keyUp');

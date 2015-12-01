@@ -3,6 +3,7 @@
  */
 (function (context, $, $pt) {
 	var NLabel = React.createClass($pt.defineCellComponent({
+		displayName: 'NLabel',
 		propTypes: {
 			// model
 			model: React.PropTypes.object,

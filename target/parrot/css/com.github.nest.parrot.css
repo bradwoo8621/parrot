@@ -210,15 +210,15 @@ body {
 hr.normal-line {
   margin-top: 0;
   margin-bottom: 0;
-  border-top: solid 1px #e0e0e0;
-  border-bottom: solid 1px transparent;
+  border-bottom: solid 1px #e0e0e0;
+  border-top: solid 1px transparent;
   height: 0;
   width: 100%;
   position: absolute;
   bottom: 0;
 }
 hr.normal-line.disabled {
-  border-top: dashed 1px #e0e0e0;
+  border-bottom: dashed 1px #e0e0e0;
 }
 hr.focus-line {
   margin-top: 0;

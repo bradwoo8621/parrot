@@ -6949,6 +6949,7 @@
  */
 (function (context, $, $pt) {
 	var NLabel = React.createClass($pt.defineCellComponent({
+		displayName: 'NLabel',
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
@@ -12972,6 +12973,7 @@
  */
 (function (context, $, $pt) {
 	var NText = React.createClass($pt.defineCellComponent({
+		displayName: 'NText',
 		statics: {
 			NUMBER_FORMAT: function(value) {
 				var parts = (value + '').split('.');
@@ -13023,7 +13025,10 @@
 		 * @param prevState
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
-			var formattedValue = this.getFormattedValue(this.getValueFromModel());
+			var formattedValue = this.getValueFromModel();
+			if (!$(React.findDOMNode(this.refs.focusLine)).hasClass('focus')) {
+				formattedValue = this.getFormattedValue(formattedValue);
+			}
 			if (this.getComponent().val() != formattedValue) {
 				this.getComponent().val(formattedValue);
 			}
@@ -13193,15 +13198,18 @@
 		 * @param evt
 		 */
 		onModelChanged: function (evt) {
-			var formattedValue = this.getValueFromModel();
-			if (!$(React.findDOMNode(this.refs.focusLine)).hasClass('focus')) {
-				formattedValue = this.getFormattedValue(formattedValue);
-			}
-			if (formattedValue == this.getComponent().val()) {
-				return;
-			}
-			// console.debug('Text model changed[modelValue=' + evt.new + ', compValue=' + this.getComponent().val() + '].');
-			this.getComponent().val(formattedValue);
+			this.forceUpdate();
+			// return;
+			//
+			// var formattedValue = this.getValueFromModel();
+			// if (!$(React.findDOMNode(this.refs.focusLine)).hasClass('focus')) {
+			// 	formattedValue = this.getFormattedValue(formattedValue);
+			// }
+			// if (formattedValue == this.getComponent().val()) {
+			// 	return;
+			// }
+			// // console.debug('Text model changed[modelValue=' + evt.new + ', compValue=' + this.getComponent().val() + '].');
+			// this.getComponent().val(formattedValue);
 		},
 		onKeyUp: function (evt) {
 			var monitor = this.getEventMonitor('keyUp');
@@ -13322,6 +13330,7 @@
  */
 (function (context, $, $pt) {
 	var NTextArea = React.createClass($pt.defineCellComponent({
+		displayName: 'NTextArea',
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
@@ -13408,6 +13417,9 @@
 		 * @returns {XML}
 		 */
 		render: function () {
+			if (this.isViewMode()) {
+				return this.renderInViewMode();
+			}
 			var css = {
 				'n-disabled': !this.isEnabled()
 			};
@@ -13438,11 +13450,12 @@
 		 * @param evt
 		 */
 		onModelChanged: function (evt) {
-			var value = evt.new;
-			if (value == this.getComponent().val()) {
-				return;
-			}
-			this.getComponent().val(evt.new);
+			// var value = evt.new;
+			// if (value == this.getComponent().val()) {
+			// 	return;
+			// }
+			// this.getComponent().val(evt.new);
+			this.forceUpdate();
 		},
 		/**
 		 * on addon clicked
@@ -13460,6 +13473,13 @@
 		 */
 		getComponent: function () {
 			return $(React.findDOMNode(this.refs.txt));
+		},
+		getTextInViewMode: function() {
+			var value = this.getValueFromModel();
+			if (value != null) {
+				value = value.split(/\r|\n/);
+			}
+			return value;
 		}
 	}));
 	context.NTextArea = NTextArea;
