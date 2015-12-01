@@ -110,12 +110,12 @@
 		 */
 		renderCheckbox: function () {
 			var checked = this.isChecked();
+			var enabled = this.isEnabled();
 			var css = {
-				disabled: !this.isEnabled(),
+				disabled: !enabled,
 				checked: checked,
 				'check-container': true
 			};
-			var enabled = this.isEnabled();
 			return (<div className='check-container'>
 	            <span className={$pt.LayoutHelper.classSet(css)}
 	                  onClick={(enabled && !this.isViewMode()) ? this.onButtonClicked : null}

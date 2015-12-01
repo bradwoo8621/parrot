@@ -4880,12 +4880,12 @@
 		 */
 		renderCheckbox: function () {
 			var checked = this.isChecked();
+			var enabled = this.isEnabled();
 			var css = {
-				disabled: !this.isEnabled(),
+				disabled: !enabled,
 				checked: checked,
 				'check-container': true
 			};
-			var enabled = this.isEnabled();
 			return (React.createElement("div", {className: "check-container"}, 
 	            React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
 	                  onClick: (enabled && !this.isViewMode()) ? this.onButtonClicked : null, 
@@ -9164,7 +9164,7 @@
 				'radio-label-left': labelInLeft
 			};
 			return (React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
-			             onClick: this.isEnabled() ? this.onButtonClicked.bind(this, option) : null}, 
+			             onClick: (this.isEnabled() && !this.isViewMode()) ? this.onButtonClicked.bind(this, option) : null}, 
             	option.text
         	));
 		},
@@ -9175,8 +9175,9 @@
 		 */
 		renderRadio: function (option) {
 			var checked = this.getValueFromModel() == option.id;
+			var enabled = this.isEnabled();
 			var css = {
-				disabled: !this.isEnabled(),
+				disabled: !enabled,
 				checked: checked,
 				'radio-container': true
 			};
@@ -9185,8 +9186,8 @@
 				labelAtLeft ? this.renderLabel(option, true) : null, 
 				React.createElement("div", {className: "radio-container"}, 
                 React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
-                      onClick: this.isEnabled() ? this.onButtonClicked.bind(this, option) : null, 
-                      onKeyUp: this.isEnabled() ? this.onKeyUp.bind(this, option): null, 
+                      onClick: (enabled && !this.isViewMode()) ? this.onButtonClicked.bind(this, option) : null, 
+                      onKeyUp: (enabled && !this.isViewMode()) ? this.onKeyUp.bind(this, option): null, 
                       tabIndex: "0", 
                       ref: 'out-' + option.id}, 
                     React.createElement("span", {className: "check", onClick: this.onInnerClicked.bind(this, option)})
@@ -9199,7 +9200,8 @@
 			var css = {
 				'n-radio': true,
 				vertical: this.getComponentOption('direction') === 'vertical',
-				'n-disabled': !this.isEnabled()
+				'n-disabled': !this.isEnabled(),
+				'n-view-mode': this.isViewMode()
 			};
 			return (React.createElement("div", {className: this.getComponentCSS($pt.LayoutHelper.classSet(css))}, 
 				this.getComponentOption("data").map(this.renderRadio), 

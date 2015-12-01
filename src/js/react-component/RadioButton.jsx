@@ -97,7 +97,7 @@
 				'radio-label-left': labelInLeft
 			};
 			return (<span className={$pt.LayoutHelper.classSet(css)}
-			             onClick={this.isEnabled() ? this.onButtonClicked.bind(this, option) : null}>
+			             onClick={(this.isEnabled() && !this.isViewMode()) ? this.onButtonClicked.bind(this, option) : null}>
             	{option.text}
         	</span>);
 		},
@@ -108,8 +108,9 @@
 		 */
 		renderRadio: function (option) {
 			var checked = this.getValueFromModel() == option.id;
+			var enabled = this.isEnabled();
 			var css = {
-				disabled: !this.isEnabled(),
+				disabled: !enabled,
 				checked: checked,
 				'radio-container': true
 			};
@@ -118,8 +119,8 @@
 				{labelAtLeft ? this.renderLabel(option, true) : null}
 				<div className='radio-container'>
                 <span className={$pt.LayoutHelper.classSet(css)}
-                      onClick={this.isEnabled() ? this.onButtonClicked.bind(this, option) : null}
-                      onKeyUp={this.isEnabled() ? this.onKeyUp.bind(this, option): null}
+                      onClick={(enabled && !this.isViewMode()) ? this.onButtonClicked.bind(this, option) : null}
+                      onKeyUp={(enabled && !this.isViewMode()) ? this.onKeyUp.bind(this, option): null}
                       tabIndex='0'
                       ref={'out-' + option.id}>
                     <span className='check' onClick={this.onInnerClicked.bind(this, option)}/>
@@ -132,7 +133,8 @@
 			var css = {
 				'n-radio': true,
 				vertical: this.getComponentOption('direction') === 'vertical',
-				'n-disabled': !this.isEnabled()
+				'n-disabled': !this.isEnabled(),
+				'n-view-mode': this.isViewMode()
 			};
 			return (<div className={this.getComponentCSS($pt.LayoutHelper.classSet(css))}>
 				{this.getComponentOption("data").map(this.renderRadio)}

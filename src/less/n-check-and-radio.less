@@ -441,4 +441,32 @@ div.n-radio {
 			cursor: @disabled-cursor;
 		}
 	}
+	&.n-view-mode {
+		span.radio-container {
+			pointer-events: none;
+			cursor: auto;
+			user-select: none;
+			&.checked,
+			span.check,
+			&.checked span.check,
+			&.checked span.check:before {
+				pointer-events: none;
+				cursor: auto;
+				color: @font-color;
+				user-select: none;
+			}
+			&:focus:before,
+			&.checked:focus:before {
+				display: none;
+			}
+			&:focus span.check:before {
+				-webkit-animation: none;
+				animation: none;
+				-o-animation: none;
+			}
+		}
+		span.radio-label {
+			cursor: auto;
+		}
+	}
 }

@@ -2298,6 +2298,32 @@ div.n-radio span.radio-label.disabled {
 div.n-radio.n-disabled div.radio-container {
   cursor: not-allowed;
 }
+div.n-radio.n-view-mode span.radio-container {
+  pointer-events: none;
+  cursor: auto;
+  user-select: none;
+}
+div.n-radio.n-view-mode span.radio-container.checked,
+div.n-radio.n-view-mode span.radio-container span.check,
+div.n-radio.n-view-mode span.radio-container.checked span.check,
+div.n-radio.n-view-mode span.radio-container.checked span.check:before {
+  pointer-events: none;
+  cursor: auto;
+  color: #666666;
+  user-select: none;
+}
+div.n-radio.n-view-mode span.radio-container:focus:before,
+div.n-radio.n-view-mode span.radio-container.checked:focus:before {
+  display: none;
+}
+div.n-radio.n-view-mode span.radio-container:focus span.check:before {
+  -webkit-animation: none;
+  animation: none;
+  -o-animation: none;
+}
+div.n-radio.n-view-mode span.radio-label {
+  cursor: auto;
+}
 div.n-file {
   position: relative;
 }
