@@ -25,6 +25,7 @@
 		render: function () {
 			var buttonLayout = this.getButtonLayout();
 			return <NPanelFooter model={this.props.model}
+								 view={this.isViewMode()}
 			                     save={buttonLayout.save}
 			                     validate={buttonLayout.validate}
 			                     cancel={buttonLayout.cancel}

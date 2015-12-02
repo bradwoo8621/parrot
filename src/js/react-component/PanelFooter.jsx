@@ -50,7 +50,8 @@
 			})),
 
 			// model, pass to click
-			model: React.PropTypes.object
+			model: React.PropTypes.object,
+			view: React.PropTypes.bool
 		},
 		/**
 		 * will update
@@ -107,6 +108,11 @@
 		 * render button
 		 */
 		renderButton: function (option) {
+			if (this.isViewMode() && option.view == 'edit') {
+				return null;
+			} else if (!this.isViewMode() && option.view == 'view') {
+				return null;
+			}
 			var layout = {
 				label: option.text,
 				comp: {
@@ -174,6 +180,9 @@
 		 */
 		getModel: function () {
 			return this.props.model;
+		},
+		isViewMode: function() {
+			return this.props.view;
 		}
 	});
 	context.NPanelFooter = NPanelFooter;

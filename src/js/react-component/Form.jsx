@@ -175,7 +175,7 @@
 			return <NPanel model={this.getModel()}
 			               layout={$pt.createCellLayout(sections[0].getParentCard().getId() + '-body', sectionLayout)}
 			               direction={this.getLabelDirection()}
-						   view={this.props.view}/>;
+						   view={this.isViewMode()}/>;
 		},
 		/**
 		 * attach previous button
@@ -289,7 +289,7 @@
 			}
 			if (right.length != 0 || left.length != 0) {
 				right = right.reverse();
-				footer = (<NPanelFooter right={right} left={left} model={this.getModel()}/>);
+				footer = (<NPanelFooter right={right} left={left} model={this.getModel()} view={this.isViewMode()}/>);
 			}
 			return (<div className={$pt.LayoutHelper.classSet(css)}>
 				{this.renderSections(card.getSections())}
@@ -321,7 +321,7 @@
 				'nav-pills': true,
 				'nav-direction-vertical': false,
 				'n-cards-nav': true,
-				'n-cards-free': this.getLayout().isFreeCard()
+				'n-cards-free': this.isFreeCard()
 			});
 			var _this = this;
 			return (<ul className={css}>
@@ -332,7 +332,7 @@
 						after: _this.isAfterActiveCard(card.getId())
 					};
 					var click = null;
-					if (_this.getLayout().isFreeCard()) {
+					if (_this.isFreeCard()) {
 						click = function () {
 							_this.jumpToCard(card.getId());
 						};
@@ -423,7 +423,7 @@
 		onPreviousClicked: function () {
 			var activeIndex = this.getActiveCardIndex();
 			var prevCard = this.getLayout().getCards()[activeIndex - 1];
-			if (prevCard.isBackable()) {
+			if (this.isFreeCard() || prevCard.isBackable()) {
 				this.setState({
 					activeCard: prevCard.getId()
 				});
@@ -438,7 +438,6 @@
 			this.setState({
 				activeCard: nextCard.getId()
 			});
-			// }
 		},
 		/**
 		 * jump to card
@@ -474,13 +473,19 @@
 		getSectionKey: function (section) {
 			return section.getParentCard().getId() + '-' + section.getId();
 		},
+		isViewMode: function() {
+			return this.props.view;
+		},
+		isFreeCard: function() {
+			return this.isViewMode() || this.getLayout().isFreeCard();
+		},
 		/**
 		 * is previous card backable
 		 * @param cardId
 		 * @return {*}
 		 */
 		isPreviousCardBackable: function (cardId) {
-			if (this.getLayout().isFreeCard()) {
+			if (this.isFreeCard()) {
 				return true;
 			}
 

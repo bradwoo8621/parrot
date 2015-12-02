@@ -107,10 +107,27 @@
                     }
                 }, {
                     icon: 'pencil',
-                    text: 'left 12',
+                    text: 'Both In View & Edit',
+                    view: 'both',
                     style: 'warning',
                     click: function () {
-                        alert('I\'m left two button.');
+                        alert('I\'m both in view and edit.');
+                    }
+                }, {
+                    icon: 'pencil',
+                    text: 'Only In View',
+                    view: 'view',
+                    style: 'warning',
+                    click: function () {
+                        alert('I\'m only in view.');
+                    }
+                }, {
+                    icon: 'pencil',
+                    text: 'Only In Edit',
+                    view: 'edit',
+                    style: 'warning',
+                    click: function () {
+                        alert('I\'m only in edit.');
                     }
                 }],
                 rightButtons: {
@@ -194,6 +211,10 @@
             <div className='col-sm-12 col-md-12 col-lg-12'>
                 <span>Form With Custom Buttons</span>
                 <NForm model={model} layout={customButton}/>
+            </div>
+            <div className='col-sm-12 col-md-12 col-lg-12'>
+                <span>View Mode</span>
+                <NForm model={model} layout={customButton} view={true}/>
             </div>
         </div>
     </div>
