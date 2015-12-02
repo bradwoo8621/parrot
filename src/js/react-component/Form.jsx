@@ -46,6 +46,7 @@
 			// layout, FormLayout
 			layout: React.PropTypes.object,
 			direction: React.PropTypes.oneOf(['vertical', 'horizontal']),
+			view: React.PropTypes.bool,
 			className: React.PropTypes.string
 		},
 		getDefaultProps: function () {
@@ -173,7 +174,8 @@
 			};
 			return <NPanel model={this.getModel()}
 			               layout={$pt.createCellLayout(sections[0].getParentCard().getId() + '-body', sectionLayout)}
-			               direction={this.getLabelDirection()}/>;
+			               direction={this.getLabelDirection()}
+						   view={this.props.view}/>;
 		},
 		/**
 		 * attach previous button

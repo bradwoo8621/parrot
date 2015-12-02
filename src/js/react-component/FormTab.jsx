@@ -118,6 +118,7 @@
 			return (<NForm model={this.getModel()}
 			               layout={layout}
 			               direction={this.props.direction}
+						   view={this.isViewMode()}
 			               className={$pt.LayoutHelper.classSet(css)}
 			               key={'form-' + index}/>);
 		},

@@ -103,7 +103,10 @@
                 <span>Pill/Justified/Title Monitored Array Tab</span>
                 <NArrayTab model={model} layout={fixedTitlePill}/>
             </div>
-
+            <div className='col-md-6 col-lg-6 col-sm-6'>
+                <span>View Mode</span>
+                <NArrayTab model={model} layout={fixedTitlePill} view={true}/>
+            </div>
         </div>
     </div>);
     React.render(panel, document.getElementById('main'));

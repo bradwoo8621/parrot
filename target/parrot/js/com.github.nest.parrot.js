@@ -4271,6 +4271,7 @@
 			return (React.createElement(NForm, {model: tab.data, 
 			               layout: $pt.createFormLayout(tab.layout), 
 			               direction: this.props.direction, 
+						   view: this.isViewMode(), 
 			               className: $pt.LayoutHelper.classSet(css)})
 			);
 		},
@@ -4478,7 +4479,7 @@
 			}
 		},
 		isAddable: function() {
-			return this.getComponentOption('onAdd') != null;
+			return !this.isViewMode() && this.getComponentOption('onAdd') != null;
 		},
 		/**
 		 * on tab clicked
@@ -5733,6 +5734,7 @@
 			// layout, FormLayout
 			layout: React.PropTypes.object,
 			direction: React.PropTypes.oneOf(['vertical', 'horizontal']),
+			view: React.PropTypes.bool,
 			className: React.PropTypes.string
 		},
 		getDefaultProps: function () {
@@ -5860,7 +5862,8 @@
 			};
 			return React.createElement(NPanel, {model: this.getModel(), 
 			               layout: $pt.createCellLayout(sections[0].getParentCard().getId() + '-body', sectionLayout), 
-			               direction: this.getLabelDirection()});
+			               direction: this.getLabelDirection(), 
+						   view: this.props.view});
 		},
 		/**
 		 * attach previous button
@@ -6721,6 +6724,7 @@
 			return (React.createElement(NForm, {model: this.getModel(), 
 			               layout: layout, 
 			               direction: this.props.direction, 
+						   view: this.isViewMode(), 
 			               className: $pt.LayoutHelper.classSet(css), 
 			               key: 'form-' + index}));
 		},

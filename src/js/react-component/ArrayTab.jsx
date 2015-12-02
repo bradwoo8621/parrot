@@ -154,6 +154,7 @@
 			return (<NForm model={tab.data}
 			               layout={$pt.createFormLayout(tab.layout)}
 			               direction={this.props.direction}
+						   view={this.isViewMode()}
 			               className={$pt.LayoutHelper.classSet(css)}/>
 			);
 		},
@@ -361,7 +362,7 @@
 			}
 		},
 		isAddable: function() {
-			return this.getComponentOption('onAdd') != null;
+			return !this.isViewMode() && this.getComponentOption('onAdd') != null;
 		},
 		/**
 		 * on tab clicked

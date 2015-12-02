@@ -108,6 +108,12 @@
                 <NFormTab model={model} layout={badgeLayout}/>
             </div>
         </div>
+        <div className='row'>
+            <div className='col-md-6 col-lg-6 col-sm-6'>
+                <span>View Mode</span>
+                <NFormTab model={model} layout={badgeLayout} view={true}/>
+            </div>
+        </div>
     </div>);
     React.render(panel, document.getElementById('main'));
 })();
