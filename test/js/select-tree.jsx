@@ -91,6 +91,11 @@
 			<span>Error and Disabled Select Tree</span>
 			<NSelectTree model={model} layout={disabledSelectTree}/>
 		</div>
+		<div className='col-md-3 col-lg-3 col-sm-3'>
+			<span>View Mode</span>
+			<NSelectTree model={model} layout={selectTree} view={true}/>
+			<NSelectTree model={model} layout={disabledSelectTree} view={true}/>
+		</div>
 	</div>);
 	React.render(panel, document.getElementById('main'));
 })();

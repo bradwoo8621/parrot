@@ -2561,6 +2561,19 @@ div.n-array-check.vertical div.n-checkbox {
   -o-transform: scaleX(0);
   -webkit-transform: scaleX(0);
 }
+.n-select-tree.n-view-mode .form-control {
+  cursor: default;
+}
+.n-select-tree.n-view-mode .form-control .selection > li > span:first-child {
+  display: none;
+}
+.n-select-tree.n-view-mode .form-control > .fa {
+  display: none;
+}
+.n-select-tree.n-view-mode hr.focus-line,
+.n-select-tree.n-view-mode hr.normal-line {
+  display: none;
+}
 .n-select-tree-popover.popover.bottom {
   margin-top: 2px;
   max-width: 9999px;

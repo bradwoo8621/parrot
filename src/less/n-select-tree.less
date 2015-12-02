@@ -51,6 +51,21 @@
 			-webkit-transform: scaleX(0);
 		}
 	}
+	&.n-view-mode {
+		.form-control {
+			cursor: default;
+			.selection > li > span:first-child {
+				display: none;
+			}
+			> .fa {
+				display: none;
+			}
+		}
+		hr.focus-line,
+		hr.normal-line {
+			display: none;
+		}
+	}
 }
 
 .n-select-tree-popover.popover.bottom {

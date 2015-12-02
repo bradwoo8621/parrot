@@ -10378,7 +10378,8 @@
 		},
 		render: function() {
 			var css = {
-				'n-disabled': !this.isEnabled()
+				'n-disabled': !this.isEnabled(),
+				'n-view-mode': this.isViewMode()
 			};
 			css[this.getComponentCSS('n-select-tree')] = true;
 			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), tabIndex: "0"}, 
@@ -10429,7 +10430,7 @@
 			}
 		},
 		onComponentClicked: function() {
-			if (!this.isEnabled()) {
+			if (!this.isEnabled() || this.isViewMode()) {
 				// do nothing
 				return;
 			}
