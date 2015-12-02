@@ -9,15 +9,15 @@
 			ADVANCED_SEARCH_DIALOG_NAME_LABEL: 'Name',
 			ADVANCED_SEARCH_DIALOG_BUTTON_TEXT: 'Search',
 			ADVANCED_SEARCH_DIALOG_CODE_LABEL: 'Code',
-			ADVANCED_SEARCH_DIALOG_RESULT_TITLE: 'Search Result'
+			ADVANCED_SEARCH_DIALOG_RESULT_TITLE: 'Search Result',
+			NOT_FOUND: 'Not Found'
 		},
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
 			// CellLayout
 			layout: React.PropTypes.object,
-			// label direction
-			direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
+			view: React.PropTypes.bool
 		},
 		getDefaultProps: function () {
 			return {
@@ -76,6 +76,9 @@
 		 * @returns {XML}
 		 */
 		render: function () {
+			if (this.isViewMode()) {
+				return this.renderInViewMode();
+			}
 			var enabled = this.isEnabled();
 			var css = {
 				'n-search-text': true
@@ -131,6 +134,7 @@
 			var value = evt.new;
 			this.getComponent().val(value);
 			this.retrieveAndSetLabelTextFromRemote(value);
+			// this.forceUpdate();
 		},
 		/**
 		 * show advanced search dialog
@@ -155,8 +159,8 @@
 		 */
 		pickupAdvancedResultItem: function (item) {
 			this.state.stopRetrieveLabelFromRemote = true;
-			this.setLabelText(item.name);
 			this.getModel().set(this.getDataId(), item.code);
+			this.setLabelText(item.name);
 			this.state.stopRetrieveLabelFromRemote = false;
 		},
 		initSetValues: function() {
@@ -171,7 +175,22 @@
 			}
 		},
 		setLabelText: function (text) {
-			$(React.findDOMNode(this.refs.label)).val(text);
+			if (this.isViewMode()) {
+				var value = this.getValueFromModel();
+				if (value == null) {
+					$(React.findDOMNode(this.refs.viewLabel)).text('');
+				} else {
+					var label = value;
+					if (text == null) {
+						label += ' - ' + NSearchText.NOT_FOUND;
+					} else {
+						label += ' - ' + text;
+					}
+					$(React.findDOMNode(this.refs.viewLabel)).text(label);
+				}
+			} else {
+				$(React.findDOMNode(this.refs.label)).val(text);
+			}
 		},
 		/**
 		 * get label text from remote
@@ -353,6 +372,13 @@
 				layout = layout.call(this);
 			}
 			return $pt.createFormLayout(layout);
+		},
+		getTextInViewMode: function() {
+			var value = this.getValueFromModel();
+			if (value != null) {
+
+			}
+			return value;
 		}
 	}));
 	context.NSearchText = NSearchText;

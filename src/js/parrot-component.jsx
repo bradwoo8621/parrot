@@ -1155,6 +1155,7 @@
 			}));
 			var parameters = $pt.LayoutHelper.transformParameters(
 				this.getModel(), labelLayout, this.props.direction, true);
+			parameters.ref = 'viewLabel';
 			return <NLabel {...parameters} />;
 		},
 		/**

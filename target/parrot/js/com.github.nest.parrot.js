@@ -3266,6 +3266,7 @@
 			}));
 			var parameters = $pt.LayoutHelper.transformParameters(
 				this.getModel(), labelLayout, this.props.direction, true);
+			parameters.ref = 'viewLabel';
 			return React.createElement(NLabel, React.__spread({},  parameters));
 		},
 		/**
@@ -9304,15 +9305,15 @@
 			ADVANCED_SEARCH_DIALOG_NAME_LABEL: 'Name',
 			ADVANCED_SEARCH_DIALOG_BUTTON_TEXT: 'Search',
 			ADVANCED_SEARCH_DIALOG_CODE_LABEL: 'Code',
-			ADVANCED_SEARCH_DIALOG_RESULT_TITLE: 'Search Result'
+			ADVANCED_SEARCH_DIALOG_RESULT_TITLE: 'Search Result',
+			NOT_FOUND: 'Not Found'
 		},
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
 			// CellLayout
 			layout: React.PropTypes.object,
-			// label direction
-			direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
+			view: React.PropTypes.bool
 		},
 		getDefaultProps: function () {
 			return {
@@ -9371,6 +9372,9 @@
 		 * @returns {XML}
 		 */
 		render: function () {
+			if (this.isViewMode()) {
+				return this.renderInViewMode();
+			}
 			var enabled = this.isEnabled();
 			var css = {
 				'n-search-text': true
@@ -9426,6 +9430,7 @@
 			var value = evt.new;
 			this.getComponent().val(value);
 			this.retrieveAndSetLabelTextFromRemote(value);
+			// this.forceUpdate();
 		},
 		/**
 		 * show advanced search dialog
@@ -9450,8 +9455,8 @@
 		 */
 		pickupAdvancedResultItem: function (item) {
 			this.state.stopRetrieveLabelFromRemote = true;
-			this.setLabelText(item.name);
 			this.getModel().set(this.getDataId(), item.code);
+			this.setLabelText(item.name);
 			this.state.stopRetrieveLabelFromRemote = false;
 		},
 		initSetValues: function() {
@@ -9466,7 +9471,22 @@
 			}
 		},
 		setLabelText: function (text) {
-			$(React.findDOMNode(this.refs.label)).val(text);
+			if (this.isViewMode()) {
+				var value = this.getValueFromModel();
+				if (value == null) {
+					$(React.findDOMNode(this.refs.viewLabel)).text('');
+				} else {
+					var label = value;
+					if (text == null) {
+						label += ' - ' + NSearchText.NOT_FOUND;
+					} else {
+						label += ' - ' + text;
+					}
+					$(React.findDOMNode(this.refs.viewLabel)).text(label);
+				}
+			} else {
+				$(React.findDOMNode(this.refs.label)).val(text);
+			}
 		},
 		/**
 		 * get label text from remote
@@ -9648,6 +9668,13 @@
 				layout = layout.call(this);
 			}
 			return $pt.createFormLayout(layout);
+		},
+		getTextInViewMode: function() {
+			var value = this.getValueFromModel();
+			if (value != null) {
+
+			}
+			return value;
 		}
 	}));
 	context.NSearchText = NSearchText;
@@ -9708,7 +9735,8 @@
 			// model
 			model: React.PropTypes.object,
 			// CellLayout
-			layout: React.PropTypes.object
+			layout: React.PropTypes.object,
+			view: React.PropTypes.bool
 		},
 		getDefaultProps: function () {
 			return {
@@ -9759,6 +9787,7 @@
 					minimumResultsForSearch: null,
 					data: null
 				});
+				// TODO might has issue, not clarify yet.
 				this.resetOptions(options);
 			}
 			// reset the value when component update
@@ -9876,6 +9905,9 @@
 		 * @returns {XML}
 		 */
 		render: function () {
+			if (this.isViewMode()) {
+				return this.renderInViewMode();
+			}
 			var css = {
 				'n-disabled': !this.isEnabled()
 			};
@@ -9909,7 +9941,8 @@
 				// do nothing
 				return;
 			} else {
-				this.getComponent().val(evt.new).trigger("change");
+				// this.getComponent().val(evt.new).trigger("change");
+				this.forceUpdate();
 			}
 		},
 		/**
@@ -10020,6 +10053,25 @@
 		},
 		getComponent: function () {
 			return $(React.findDOMNode(this.refs.select));
+		},
+		getTextInViewMode: function() {
+			var value = this.getValueFromModel();
+			if (value != null) {
+				var data = null;
+				if (this.hasParent()) {
+					data = this.getAvailableOptions(this.getParentPropertyValue());
+				} else {
+					data = this.convertDataOptions(this.getComponentOption('data'));
+				}
+				data.some(function(item) {
+					if (item.id == value) {
+						value = item.text;
+						return true;
+					}
+					return false;
+				});
+			}
+			return value;
 		}
 	}));
 

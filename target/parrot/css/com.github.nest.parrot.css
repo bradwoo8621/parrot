@@ -1117,7 +1117,7 @@ div.n-modal-form .modal-title > a:hover {
   border-color: transparent transparent #9f9f9f transparent;
 }
 .select2-container.select2-container--default.select2-container--disabled hr.normal-line {
-  border-top: dashed 1px #e0e0e0;
+  border-bottom: dashed 1px #e0e0e0;
 }
 .select2-container.select2-container--default.select2-container--disabled.select2-container--focus hr.focus-line {
   transform: scaleX(0);
@@ -2559,18 +2559,23 @@ div.has-error span.select2-selection {
   border-color: #f44336;
   color: #f44336;
 }
-div.has-error .select2-container--default .select2-selection--single .select2-selection__rendered {
+div.has-error .select2-container--default .select2-selection--single .select2-selection__rendered,
+div.has-error .select2-container--default.select2-container--disabled .select2-selection--single .select2-selection__rendered {
   color: #f44336;
 }
-div.has-error .select2-container--default .select2-selection--single .select2-selection__arrow b {
+div.has-error .select2-container--default .select2-selection--single .select2-selection__arrow b,
+div.has-error .select2-container--default.select2-container--disabled .select2-selection--single .select2-selection__arrow b {
   border-color: #f44336 transparent transparent transparent;
 }
-div.has-error .select2-container--default .select2-selection--single .select2-selection__placeholder {
+div.has-error .select2-container--default .select2-selection--single .select2-selection__placeholder,
+div.has-error .select2-container--default.select2-container--disabled .select2-selection--single .select2-selection__placeholder {
   color: #f44336;
 }
-div.has-error .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
+div.has-error .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b,
+div.has-error .select2-container--default.select2-container--disabled.select2-container--open .select2-selection--single .select2-selection__arrow b {
   border-color: transparent transparent #f44336 transparent;
 }
+div.has-error .select2-container--default.select2-container--focus hr.focus-line,
 div.has-error .select2-container--default.select2-container--disabled.select2-container--focus hr.focus-line {
   transform: scaleX(1);
   -o-transform: scaleX(1);

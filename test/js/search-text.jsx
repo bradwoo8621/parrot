@@ -45,6 +45,10 @@
             <span>Disabled &amp; Has Error</span>
             <NSearchText model={model} layout={disabled}/>
         </div>
+        <div className='col-md-3 col-lg-3 col-sm-3'>
+            <span>View Mode</span>
+            <NSearchText model={model} layout={plainText} view={true}/>
+        </div>
     </div>);
     React.render(panel, document.getElementById('main'));
 
@@ -67,9 +71,13 @@
             var request = JSON.parse(settings.data);
             if (request.pageIndex) {
                 for (var index = 0; index < 10; index++) {
+                    var suffix = (request.countPerPage * (request.pageIndex - 1) + index + 1);
+                    if (suffix < 10) {
+                        suffix = '0' + suffix;
+                    }
                     items.push({
-                        code: "code" + (request.countPerPage * (request.pageIndex - 1) + index + 1),
-                        name: "name" + (request.countPerPage * (request.pageIndex - 1) + index + 1)
+                        code: "code" + suffix,
+                        name: "name" + suffix
                     });
                 }
             } else {
