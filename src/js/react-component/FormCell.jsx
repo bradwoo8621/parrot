@@ -191,7 +191,20 @@
 		 * @returns {XML}
 		 */
 		render: function () {
-			if (!this.isVisible()) {
+			// when the component is not visible
+			// or declared only view in edit mode
+			// hide it
+			var visible = this.isVisible();
+			if (visible) {
+				var view = this.getComponentOption('view');
+				if (this.isViewMode()) {
+					visible = (view == 'edit') != true;
+				} else if (!this.isViewMode()) {
+					visible = (view == 'view') != true;
+				}
+			}
+
+			if (!visible) {
 				return (<div className={this.getCSSClassName() + ' n-form-cell-invisible'}/>);
 			} else {
 				var css = this.getCSSClassName();

@@ -6,6 +6,9 @@
     var model = $pt.createModel({check: true}, validator);
     var plainText = $pt.createCellLayout('text', {
         label: 'Default Cell',
+        comp: {
+            view: 'edit'
+        },
         pos: {row: 1, col: 1}
     });
     var requiredCell = $pt.createCellLayout('text1', {
@@ -57,6 +60,13 @@
         },
         pos: {row: 1, col: 1}
     });
+    var viewText = $pt.createCellLayout('text', {
+        label: 'Only In View',
+        comp: {
+            view: 'view'
+        },
+        pos: {row: 1, col: 1}
+    });
 
     var panel = (<div>
         <div className='row'>
@@ -74,6 +84,11 @@
         </div>
         <div className='row'>
             <NFormCell model={model} layout={toggle}/>
+        </div>
+        <div className='row'>
+            <NFormCell model={model} layout={plainText} view={true}/>
+            <NFormCell model={model} layout={viewText} view={true}/>
+            <NFormCell model={model} layout={viewText}/>
         </div>
     </div>);
     React.render(panel, document.getElementById('main'));
