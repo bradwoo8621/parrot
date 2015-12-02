@@ -171,13 +171,17 @@
 					              cancel={this.getCancelButton()}
 					              left={this.getLeftButton()}
 					              right={this.getRightButton()}
-					              model={this.getModel()}/>
+					              model={this.getModel()}
+								  view={this.isViewMode()}/>
 				</Modal.Footer>);
 			}
 		},
 		renderBody: function() {
 			return (<Modal.Body ref="body" className={!this.state.expanded ? 'hide': null}>
-				<NForm model={this.getModel()} layout={this.getLayout()} direction={this.getDirection()}
+				<NForm model={this.getModel()}
+					   layout={this.getLayout()}
+					   direction={this.getDirection()}
+					   view={this.isViewMode()}
 				       ref="form"/>
 			</Modal.Body>);
 		},
@@ -281,6 +285,8 @@
 		getValidationButton: function () {
 			if (this.state.buttons && this.state.buttons.validate === false) {
 				return null;
+			} else if (this.isViewMode()) {
+				return null;
 			} else {
 				return this.onValidateClicked.bind(this);
 			}
@@ -302,6 +308,8 @@
 		 */
 		getResetButton: function () {
 			if (this.state.buttons && this.state.buttons.reset === false) {
+				return null;
+			} else if (this.isViewMode()) {
 				return null;
 			} else {
 				return this.onResetClicked.bind(this);
@@ -341,6 +349,13 @@
 		 */
 		isExpanded: function() {
 			return this.state.expanded;
+		},
+		/**
+		 * is view mode
+		 * @returns boolean
+		 */
+		isViewMode: function() {
+			return this.state.view;
 		},
 		/**
 		 * validate
@@ -402,7 +417,8 @@
 					modal: model.modal == null ? (model.draggable ? false : true) : true,
 					collapsible: model.collapsible,
 					expanded: model.expanded == null ? true : model.expanded,
-					pos: model.pos
+					pos: model.pos,
+					view: model.view === true
 				});
 			} else {
 				console.warn("Properties [draggable, expanded, collapsible, pos] are not supported in parameters, use JSON parameter instead.");
@@ -417,7 +433,8 @@
 					draggable: false,
 					modal: true,
 					expanded: true,
-					collapsible: false
+					collapsible: false,
+					view: false
 				});
 			}
 		}

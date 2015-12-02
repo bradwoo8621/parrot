@@ -385,6 +385,7 @@
             }, {
                 // icon: 'hand-paper-o',
                 tooltip: 'Hand',
+                view: 'edit',
                 click: function(row) {
                     alert('Row Clicked, [' + row.name + '] by hand.');
                     var table = $pt.LayoutHelper.getComponent('test');
@@ -401,6 +402,7 @@
             }, {
                 // icon: 'clone',
                 tooltip: 'Clone',
+                view: 'view',
                 click: function(row) {
                     alert('Row Clicked, [' + row.name + '] by clone.');
                 }
@@ -603,6 +605,22 @@
             <div className='col-sm-12 col-md-12 col-lg-12'>
                 <span>Dropdown Button</span>
                 <NTable model={model} layout={dropdown}/>
+            </div>
+            <div className='col-sm-6 col-md-6 col-lg-6'>
+                <span>View Mode</span>
+                <NTable model={model} layout={replaceDefaultSaveOperation} view={true}/>
+            </div>
+            <div className='col-sm-12 col-md-12 col-lg-12'>
+                <span>View Mode Dropdown Button</span>
+                <NTable model={model} layout={dropdown} view={true}/>
+            </div>
+            <div className='col-sm-12 col-md-12 col-lg-12'>
+                <span>View Mode InlineText</span>
+                <NTable model={model} layout={inlineText} view={true}/>
+            </div>
+            <div className='col-sm-6 col-md-6 col-lg-6'>
+                <span>View Mode Row Selectable Table</span>
+                <NTable model={model} layout={rowSelectable} view={true}/>
             </div>
         </div>
         <div style={{height: "500px"}}/>

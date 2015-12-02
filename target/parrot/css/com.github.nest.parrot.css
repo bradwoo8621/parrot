@@ -1163,7 +1163,7 @@ div.n-table-container div.n-table-heading div.n-table-search-box input {
   color: #ffffff;
 }
 div.n-table-container div.n-table-heading div.n-table-search-box hr.normal-line {
-  border-top: solid 1px #f5f5f5;
+  border-bottom: solid 1px #f5f5f5;
 }
 div.n-table-container div.n-table-heading div.n-table-search-box hr.focus-line {
   border-top: solid 2px #f9f9f9;
@@ -1236,7 +1236,7 @@ div.n-table-container.panel-default div.n-table-heading.panel-heading div.n-tabl
   color: #666666;
 }
 div.n-table-container.panel-default div.n-table-heading.panel-heading div.n-table-search-box hr.normal-line {
-  border-top: solid 1px #e0e0e0;
+  border-bottom: solid 1px #e0e0e0;
 }
 div.n-table-container.panel-default div.n-table-heading.panel-heading div.n-table-search-box hr.focus-line {
   border-top: solid 2px #00b4d4;

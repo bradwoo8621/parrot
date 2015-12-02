@@ -339,6 +339,9 @@
 		 * @param newOptions
 		 */
 		resetOptions: function (newOptions) {
+			if (this.isViewMode()) {
+				return;
+			}
 			// really sucks because select2 doesn't support change the options dynamically
 			var component = this.getComponent();
 			var orgValue = this.getValueFromModel(); //component.val();

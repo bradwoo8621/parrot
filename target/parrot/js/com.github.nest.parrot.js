@@ -5111,7 +5111,9 @@
 		 * @override
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
-			this.getComponent().data("DateTimePicker").date(this.getValueFromModel());
+			if (!this.isViewMode()) {
+				this.getComponent().data("DateTimePicker").date(this.getValueFromModel());
+			}
 			// add post change listener
 			this.addPostChangeListener(this.onModelChange);
 			this.addEnableDependencyMonitor();
@@ -5123,7 +5125,9 @@
 		 */
 		componentDidMount: function () {
 			this.createComponent();
-			this.getComponent().data("DateTimePicker").date(this.getValueFromModel());
+			if (!this.isViewMode()) {
+				this.getComponent().data("DateTimePicker").date(this.getValueFromModel());
+			}
 			// add post change listener
 			this.addPostChangeListener(this.onModelChange);
 			this.addEnableDependencyMonitor();
@@ -5263,6 +5267,9 @@
 		 * @returns {XML}
 		 */
 		render: function () {
+			if (this.isViewMode()) {
+				return this.renderInViewMode();
+			}
 			var css = {
 				'input-group-addon': true,
 				link: true,
@@ -5313,7 +5320,8 @@
 		 * @param evt
 		 */
 		onModelChange: function (evt) {
-			this.getComponent().data('DateTimePicker').date(this.convertValueFromModel(evt.new));
+			// this.getComponent().data('DateTimePicker').date(this.convertValueFromModel(evt.new));
+			this.forceUpdate();
 		},
 		/**
 		 * get component
@@ -5358,6 +5366,14 @@
 		getHeaderYearFormat: function () {
 			var format = this.getComponentOption('headerYearFormat');
 			return format ? format : NDateTime.HEADER_YEAR_FORMAT;
+		},
+		getTextInViewMode: function() {
+			var value = this.getValueFromModel();
+			return value == null ? null : value.format(this.getDisplayFormat());
+		},
+		getDisplayFormat: function() {
+			var format = this.getComponentOption('format');
+			return format ? format : NDateTime.FORMAT;
 		}
 	}));
 	context.NDateTime = NDateTime;
@@ -7533,13 +7549,17 @@
 					              cancel: this.getCancelButton(), 
 					              left: this.getLeftButton(), 
 					              right: this.getRightButton(), 
-					              model: this.getModel()})
+					              model: this.getModel(), 
+								  view: this.isViewMode()})
 				));
 			}
 		},
 		renderBody: function() {
 			return (React.createElement(Modal.Body, {ref: "body", className: !this.state.expanded ? 'hide': null}, 
-				React.createElement(NForm, {model: this.getModel(), layout: this.getLayout(), direction: this.getDirection(), 
+				React.createElement(NForm, {model: this.getModel(), 
+					   layout: this.getLayout(), 
+					   direction: this.getDirection(), 
+					   view: this.isViewMode(), 
 				       ref: "form"})
 			));
 		},
@@ -7643,6 +7663,8 @@
 		getValidationButton: function () {
 			if (this.state.buttons && this.state.buttons.validate === false) {
 				return null;
+			} else if (this.isViewMode()) {
+				return null;
 			} else {
 				return this.onValidateClicked.bind(this);
 			}
@@ -7664,6 +7686,8 @@
 		 */
 		getResetButton: function () {
 			if (this.state.buttons && this.state.buttons.reset === false) {
+				return null;
+			} else if (this.isViewMode()) {
 				return null;
 			} else {
 				return this.onResetClicked.bind(this);
@@ -7703,6 +7727,13 @@
 		 */
 		isExpanded: function() {
 			return this.state.expanded;
+		},
+		/**
+		 * is view mode
+		 * @returns boolean
+		 */
+		isViewMode: function() {
+			return this.state.view;
 		},
 		/**
 		 * validate
@@ -7764,7 +7795,8 @@
 					modal: model.modal == null ? (model.draggable ? false : true) : true,
 					collapsible: model.collapsible,
 					expanded: model.expanded == null ? true : model.expanded,
-					pos: model.pos
+					pos: model.pos,
+					view: model.view === true
 				});
 			} else {
 				console.warn("Properties [draggable, expanded, collapsible, pos] are not supported in parameters, use JSON parameter instead.");
@@ -7779,7 +7811,8 @@
 					draggable: false,
 					modal: true,
 					expanded: true,
-					collapsible: false
+					collapsible: false,
+					view: false
 				});
 			}
 		}
@@ -10052,6 +10085,9 @@
 		 * @param newOptions
 		 */
 		resetOptions: function (newOptions) {
+			if (this.isViewMode()) {
+				return;
+			}
 			// really sucks because select2 doesn't support change the options dynamically
 			var component = this.getComponent();
 			var orgValue = this.getValueFromModel(); //component.val();
@@ -11346,6 +11382,8 @@
 				// already initialized, do nothing and return
 				return;
 			}
+
+			var _this = this;
 			// this.state.searchModel.addListener('text', 'post', 'change', this.onSearchBoxChanged);
 
 			// copy from this.props.columns
@@ -11365,10 +11403,21 @@
 			var editable = this.isEditable();
 			var removable = this.isRemovable();
 			var rowOperations = this.getComponentOption("rowOperations");
-			if (rowOperations !== undefined && rowOperations !== null && !Array.isArray(rowOperations)) {
+			if (rowOperations == null) {
+				rowOperations = [];
+			} else if (!Array.isArray(rowOperations)) {
 				rowOperations = [rowOperations];
 			}
-			var hasUserDefinedRowOperations = rowOperations !== undefined && rowOperations !== null;
+			rowOperations = rowOperations.filter(function(operation) {
+				if (_this.isViewMode()) {
+					// in view mode, filter the buttons only in editing
+					return operation.view != 'edit';
+				} else if (!_this.isViewMode()) {
+					// no in view mode, filter the buttons only in view mode
+					return operation.view != 'view';
+				}
+			});
+			var hasUserDefinedRowOperations = rowOperations.length != 0;
 			if (editable || removable || hasUserDefinedRowOperations) {
 				config = {
 					editable: editable,
@@ -11378,14 +11427,24 @@
 				};
 				var maxButtonCount = this.getComponentOption('maxOperationButtonCount');
 				if (maxButtonCount) {
-					config.width = (maxButtonCount + 1) * NTable.__operationButtonWidth;
+					var actualButtonCount = (config.editable ? 1 : 0) + (config.removable ? 1: 0) + rowOperations.length;
+					if (maxButtonCount > actualButtonCount) {
+						// no button in popover
+						config.width = (config.editable ? NTable.__operationButtonWidth : 0) + (config.removable ? NTable.__operationButtonWidth : 0);
+						if (hasUserDefinedRowOperations) {
+							config.width += NTable.__operationButtonWidth * config.rowOperations.length;
+						}
+					} else {
+						// still some buttons in popover
+						config.width = (maxButtonCount + 1) * NTable.__operationButtonWidth;
+					}
 				} else {
 					config.width = (config.editable ? NTable.__operationButtonWidth : 0) + (config.removable ? NTable.__operationButtonWidth : 0);
 					if (hasUserDefinedRowOperations) {
 						config.width += NTable.__operationButtonWidth * config.rowOperations.length;
 					}
-					config.width = config.width < NTable.__minOperationButtonWidth ? NTable.__minOperationButtonWidth : config.width;
 				}
+				config.width = config.width < NTable.__minOperationButtonWidth ? NTable.__minOperationButtonWidth : config.width;
 				this.state.columns.push(config);
 				if (this.fixedRightColumns > 0 || this.getComponentOption("operationFixed") === true) {
 					this.fixedRightColumns++;
@@ -11852,8 +11911,15 @@
 		 * @returns {XML}
 		 */
 		renderOperationCell: function (column, rowModel) {
+			var needPopover = false;
 			var maxButtonCount = this.getComponentOption('maxOperationButtonCount');
-			if (!maxButtonCount) {
+			if (maxButtonCount) {
+				var actualButtonCount = (column.editable ? 1 : 0) + (column.removable ? 1 : 0) + column.rowOperations.length;
+				if (actualButtonCount > maxButtonCount) {
+					needPopover = true;
+				}
+			}
+			if (!needPopover) {
 				return this.renderFlatOperationCell(column, rowModel);
 			} else {
 				return this.renderDropDownOperationCell(column, rowModel, maxButtonCount);
@@ -11945,7 +12011,10 @@
 									}
 								}
 								// pre-defined, use with data together
-								data = React.createElement(NFormCell, {model: inlineModel, layout: $pt.createCellLayout(column.data, layout), direction: "horizontal"});
+								data = React.createElement(NFormCell, {model: inlineModel, 
+												  layout: $pt.createCellLayout(column.data, layout), 
+												  direction: "horizontal", 
+												  view: _this.isViewMode()});
 							} else if (column.inline.inlineType == 'cell') {
 								column.inline.pos = {width: 12};
 								if (column.inline.css) {
@@ -11953,13 +12022,18 @@
 								} else {
 									column.inline.css = {cell: 'inline-editor'};
 								}
-								data = React.createElement(NFormCell, {model: inlineModel, layout: $pt.createCellLayout(column.data, column.inline), 
-													direction: "horizontal", 
-													className: column.inline.__className});
+								data = React.createElement(NFormCell, {model: inlineModel, 
+												  layout: $pt.createCellLayout(column.data, column.inline), 
+												  direction: "horizontal", 
+												  view: _this.isViewMode(), 
+												  className: column.inline.__className});
 							} else {
 								// any other, treat as form layout
 								// column.data is not necessary
-								data = React.createElement(NForm, {model: inlineModel, layout: $pt.createFormLayout(column.inline), direction: "horizontal"});
+								data = React.createElement(NForm, {model: inlineModel, 
+											  layout: $pt.createFormLayout(column.inline), 
+											  direction: "horizontal", 
+											  view: this.isViewMode()});
 							}
 						} else {
 							// data is property name
@@ -12458,7 +12532,7 @@
 		 * @returns {boolean}
 		 */
 		isAddable: function () {
-			return this.getComponentOption("addable");
+			return this.getComponentOption("addable") && !this.isViewMode();
 		},
 		/**
 		 * check the table is editable or not
@@ -12475,7 +12549,7 @@
 		 * @returns {boolean}
 		 */
 		isRemovable: function () {
-			return this.getComponentOption("removable");
+			return this.getComponentOption("removable") && !this.isViewMode();
 		},
 		getRowRemoveButtonEnabled: function() {
 			return this.getComponentOption('rowRemoveEnabled');
@@ -12499,6 +12573,9 @@
 		 * @returns {boolean}
 		 */
 		isRowSelectable: function () {
+			if (this.isViewMode()) {
+				return false;
+			}
 			return this.getComponentOption('rowSelectable');
 		},
 		/**
@@ -12715,11 +12792,17 @@
 							icon: NTable.EDIT_DIALOG_SAVE_BUTTON_ICON,
 							text: NTable.EDIT_DIALOG_SAVE_BUTTON_TEXT,
 							style: "primary",
-							click: this.onEditCompleted.bind(this)
+							click: this.onEditCompleted.bind(this),
+							// show save when editing
+							view: 'edit'
 						}],
 						reset: this.getComponentOption('dialogResetVisible'),
-						validate: this.getComponentOption('dialogValidateVisible')
-					}
+						validate: this.getComponentOption('dialogValidateVisible'),
+						// use default cancel behavior when editing
+						// simply hide dialog when in view mode
+						cancel: this.isViewMode() ? function(model, hide) {hide();} : true
+					},
+					view: this.isViewMode()
 				});
 			}
 		},

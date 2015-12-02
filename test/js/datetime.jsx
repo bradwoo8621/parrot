@@ -108,6 +108,10 @@
             <span>Error Disabled Default Format</span>
             <NDateTime model={model} layout={disabledDefaultFormat}/>
         </div>
+        <div className='col-md-3 col-lg-3 col-sm-3'>
+            <span>View Mode</span>
+            <NDateTime model={model} layout={defaultFormat} view={true}/>
+        </div>
     </div>);
     React.render(panel, document.getElementById('main'));
 })();
