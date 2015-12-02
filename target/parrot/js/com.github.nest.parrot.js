@@ -13651,9 +13651,9 @@
 				disabled: !this.isEnabled()
 			};
 			css[className] = true;
-			return React.createElement("span", {className: $pt.LayoutHelper.classSet(css)}, 
-            label
-        );
+			return (React.createElement("span", {className: $pt.LayoutHelper.classSet(css)}, 
+	            label
+	        ));
 		},
 		renderLeftLabel: function () {
 			var labelAttached = this.getComponentOption('labelAttached');
@@ -13695,7 +13695,8 @@
 		 */
 		render: function () {
 			var css = {
-				'n-disabled': !this.isEnabled()
+				'n-disabled': !this.isEnabled(),
+				'n-view-mode': this.isViewMode()
 			};
 			css[this.getComponentCSS('n-toggle')] = true;
 
@@ -13711,7 +13712,7 @@
 		 * handle button clicked event
 		 */
 		onButtonClicked: function (value) {
-			if (this.isEnabled()) {
+			if (this.isEnabled() && !this.isViewMode()) {
 				this.setValueToModel(value);
 			}
 		},
@@ -13914,7 +13915,7 @@
                 }
             });
             model.addPostChangeListener('selected', this.onNodeCheckChanged.bind(this, node, nodeId));
-            return React.createElement(NCheck, {model: model, layout: layout});
+            return React.createElement(NCheck, {model: model, layout: layout, view: this.isViewMode()});
         },
         renderNode: function(parentNodeId, node) {
             var nodeId = this.getNodeId(parentNodeId, node);

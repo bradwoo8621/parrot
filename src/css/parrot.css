@@ -1636,6 +1636,11 @@ div.n-toggle.n-disabled > div.toggle-container.checked > span.n-toggle-true {
   -webkit-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);
   cursor: not-allowed;
 }
+div.n-toggle.n-disabled > div.toggle-container.checked > span.n-toggle-true:focus:before {
+  -webkit-animation: none;
+  animation: none;
+  -o-animation: none;
+}
 div.n-toggle.n-disabled > div.toggle-container.checked > span.n-toggle-false {
   cursor: default;
 }
@@ -1646,11 +1651,46 @@ div.n-toggle.n-disabled > div.toggle-container.unchecked > span.n-toggle-false {
   -webkit-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);
   cursor: not-allowed;
 }
+div.n-toggle.n-disabled > div.toggle-container.unchecked > span.n-toggle-false:focus:before {
+  -webkit-animation: none;
+  animation: none;
+  -o-animation: none;
+}
 div.n-toggle.n-disabled > div.toggle-container.unchecked > span.n-toggle-true {
   cursor: default;
 }
 div.n-toggle.n-disabled > div.toggle-container > span.n-toggle-line {
   background-color: rgba(0, 0, 0, 0.12);
+}
+div.n-toggle.n-view-mode > div.toggle-container.checked > span.n-toggle-true {
+  background-color: #f5f5f5;
+  cursor: default;
+}
+div.n-toggle.n-view-mode > div.toggle-container.checked > span.n-toggle-true:before {
+  background-color: #f5f5f5;
+}
+div.n-toggle.n-view-mode > div.toggle-container.checked > span.n-toggle-true:focus:before {
+  -webkit-animation: none;
+  animation: none;
+  -o-animation: none;
+}
+div.n-toggle.n-view-mode > div.toggle-container.checked > span.n-toggle-false {
+  cursor: default;
+}
+div.n-toggle.n-view-mode > div.toggle-container.unchecked > span.n-toggle-false {
+  background-color: #f5f5f5;
+  cursor: default;
+}
+div.n-toggle.n-view-mode > div.toggle-container.unchecked > span.n-toggle-false:before {
+  background-color: #f5f5f5;
+}
+div.n-toggle.n-view-mode > div.toggle-container.unchecked > span.n-toggle-false:focus:before {
+  -webkit-animation: none;
+  animation: none;
+  -o-animation: none;
+}
+div.n-toggle.n-view-mode > div.toggle-container.unchecked > span.n-toggle-true {
+  cursor: default;
 }
 @keyframes toggleTrueRippleOn {
   0% {

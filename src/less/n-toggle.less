@@ -107,6 +107,11 @@ div.n-toggle {
 					-o-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);;
 					-webkit-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);;
 					cursor: @disabled-cursor;
+					&:focus:before {
+						-webkit-animation: none;
+						animation: none;
+						-o-animation: none;
+					}
 				}
 				> span.n-toggle-false {
 					cursor: default;
@@ -119,6 +124,11 @@ div.n-toggle {
 					-o-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);;
 					-webkit-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);;
 					cursor: @disabled-cursor;
+					&:focus:before {
+						-webkit-animation: none;
+						animation: none;
+						-o-animation: none;
+					}
 				}
 				> span.n-toggle-true {
 					cursor: default;
@@ -126,6 +136,44 @@ div.n-toggle {
 			}
 			> span.n-toggle-line {
 				background-color: rgba(0, 0, 0, 0.12);
+			}
+		}
+	}
+	&.n-view-mode {
+		> div.toggle-container {
+			&.checked {
+				> span.n-toggle-true {
+					background-color: @background-color;
+					cursor: default;
+					&:before {
+						background-color: @background-color;
+					}
+					&:focus:before {
+						-webkit-animation: none;
+						animation: none;
+						-o-animation: none;
+					}
+				}
+				> span.n-toggle-false {
+					cursor: default;
+				}
+			}
+			&.unchecked {
+				> span.n-toggle-false {
+					background-color: @background-color;
+					cursor: default;
+					&:before {
+						background-color: @background-color;
+					}
+					&:focus:before {
+						-webkit-animation: none;
+						animation: none;
+						-o-animation: none;
+					}
+				}
+				> span.n-toggle-true {
+					cursor: default;
+				}
 			}
 		}
 	}

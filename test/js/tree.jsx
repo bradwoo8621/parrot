@@ -57,6 +57,10 @@
 			<NTree model={model} layout={tree}/>
 		</div>
 		<div className='col-md-3 col-lg-3 col-sm-3'>
+			<span>View Mode</span>
+			<NTree model={model} layout={tree} view={true}/>
+		</div>
+		<div className='col-md-3 col-lg-3 col-sm-3'>
 			<NFormButton model={model} layout={button} />
 		</div>
 	</div>);

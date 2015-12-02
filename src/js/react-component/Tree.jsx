@@ -160,7 +160,7 @@
                 }
             });
             model.addPostChangeListener('selected', this.onNodeCheckChanged.bind(this, node, nodeId));
-            return <NCheck model={model} layout={layout} />;
+            return <NCheck model={model} layout={layout} view={this.isViewMode()}/>;
         },
         renderNode: function(parentNodeId, node) {
             var nodeId = this.getNodeId(parentNodeId, node);
