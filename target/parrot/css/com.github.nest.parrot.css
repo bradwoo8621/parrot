@@ -210,15 +210,15 @@ body {
 hr.normal-line {
   margin-top: 0;
   margin-bottom: 0;
-  border-top: solid 1px #e0e0e0;
-  border-bottom: solid 1px transparent;
+  border-bottom: solid 1px #e0e0e0;
+  border-top: solid 1px transparent;
   height: 0;
   width: 100%;
   position: absolute;
   bottom: 0;
 }
 hr.normal-line.disabled {
-  border-top: dashed 1px #e0e0e0;
+  border-bottom: dashed 1px #e0e0e0;
 }
 hr.focus-line {
   margin-top: 0;
@@ -301,9 +301,11 @@ hr.focus-line.focus {
 .panel .panel-heading h4.panel-title div.n-checkbox span.check-container:focus:before {
   background-color: #ffffff;
 }
+.panel .panel-heading h4.panel-title div.n-checkbox span.check-container span.check,
 .panel .panel-heading h4.panel-title div.n-checkbox span.check-container.checked span.check {
   color: #ffffff;
 }
+.panel .panel-heading h4.panel-title div.n-checkbox span.check-container span.check:before,
 .panel .panel-heading h4.panel-title div.n-checkbox span.check-container.checked span.check:before {
   color: #ffffff;
 }
@@ -324,11 +326,26 @@ hr.focus-line.focus {
 .panel.panel-default .panel-heading h4.panel-title div.n-checkbox span.check-container:focus:before {
   background-color: #2196f3;
 }
+.panel.panel-default .panel-heading h4.panel-title div.n-checkbox span.check-container span.check {
+  color: #666666;
+}
 .panel.panel-default .panel-heading h4.panel-title div.n-checkbox span.check-container.checked span.check {
   color: #2196f3;
 }
 .panel.panel-default .panel-heading h4.panel-title div.n-checkbox span.check-container.checked span.check:before {
   color: #2196f3;
+}
+.panel.panel-default .panel-heading h4.panel-title div.n-checkbox.n-view-mode span.check-container {
+  color: #666666;
+}
+.panel.panel-default .panel-heading h4.panel-title div.n-checkbox.n-view-mode span.check-container:focus:before {
+  background-color: #666666;
+}
+.panel.panel-default .panel-heading h4.panel-title div.n-checkbox.n-view-mode span.check-container.checked span.check {
+  color: #666666;
+}
+.panel.panel-default .panel-heading h4.panel-title div.n-checkbox.n-view-mode span.check-container.checked span.check:before {
+  color: #666666;
 }
 .panel .panel-body {
   padding-top: 8px;
@@ -672,11 +689,20 @@ div.n-panel-footer div.btn-toolbar > div.n-button {
   margin-left: 5px;
 }
 div.n-array-tab > div.n-array-tab-content {
+  background-color: #ffffff;
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
   padding: 8px 15px 7px;
   border: solid 1px #e0e0e0;
   margin-top: -1px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  -o-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+div.n-array-tab > div.n-array-tab-content:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  -o-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 div.n-array-tab > div.n-array-tab-content > div.show {
   display: block;
@@ -791,6 +817,7 @@ div.n-form-tab {
   padding-bottom: 5px;
 }
 div.n-form-tab > div.n-form-tab-content {
+  background-color: #ffffff;
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
   padding: 8px 15px 7px;
@@ -1005,14 +1032,9 @@ div.n-pagination ul.pagination > li > a {
 ul.pagination > li > a.active {
   background-color: #eeeeee;
 }
-@media (min-width: 1350px) {
+@media (min-width: 768px) {
   div.n-modal-form > div.modal-dialog {
-    width: 900px;
-  }
-}
-@media (min-width: 1200px) {
-  div.n-modal-form > div.modal-dialog {
-    width: 900px;
+    width: 650px;
   }
 }
 @media (min-width: 992px) {
@@ -1020,9 +1042,19 @@ ul.pagination > li > a.active {
     width: 800px;
   }
 }
-@media (min-width: 768px) {
+@media (min-width: 1200px) {
   div.n-modal-form > div.modal-dialog {
-    width: 650px;
+    width: 900px;
+  }
+}
+@media (min-width: 1440px) {
+  div.n-modal-form > div.modal-dialog {
+    width: 1200px;
+  }
+}
+@media (min-width: 1920px) {
+  div.n-modal-form > div.modal-dialog {
+    width: 1500px;
   }
 }
 div.n-modal-form.advanced-search-dialog .n-modal-form-footer {
@@ -1090,7 +1122,7 @@ div.n-modal-form .modal-title > a:hover {
   border-color: transparent transparent #9f9f9f transparent;
 }
 .select2-container.select2-container--default.select2-container--disabled hr.normal-line {
-  border-top: dashed 1px #e0e0e0;
+  border-bottom: dashed 1px #e0e0e0;
 }
 .select2-container.select2-container--default.select2-container--disabled.select2-container--focus hr.focus-line {
   transform: scaleX(0);
@@ -1136,7 +1168,7 @@ div.n-table-container div.n-table-heading div.n-table-search-box input {
   color: #ffffff;
 }
 div.n-table-container div.n-table-heading div.n-table-search-box hr.normal-line {
-  border-top: solid 1px #f5f5f5;
+  border-bottom: solid 1px #f5f5f5;
 }
 div.n-table-container div.n-table-heading div.n-table-search-box hr.focus-line {
   border-top: solid 2px #f9f9f9;
@@ -1209,7 +1241,7 @@ div.n-table-container.panel-default div.n-table-heading.panel-heading div.n-tabl
   color: #666666;
 }
 div.n-table-container.panel-default div.n-table-heading.panel-heading div.n-table-search-box hr.normal-line {
-  border-top: solid 1px #e0e0e0;
+  border-bottom: solid 1px #e0e0e0;
 }
 div.n-table-container.panel-default div.n-table-heading.panel-heading div.n-table-search-box hr.focus-line {
   border-top: solid 2px #00b4d4;
@@ -1609,6 +1641,11 @@ div.n-toggle.n-disabled > div.toggle-container.checked > span.n-toggle-true {
   -webkit-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);
   cursor: not-allowed;
 }
+div.n-toggle.n-disabled > div.toggle-container.checked > span.n-toggle-true:focus:before {
+  -webkit-animation: none;
+  animation: none;
+  -o-animation: none;
+}
 div.n-toggle.n-disabled > div.toggle-container.checked > span.n-toggle-false {
   cursor: default;
 }
@@ -1619,11 +1656,46 @@ div.n-toggle.n-disabled > div.toggle-container.unchecked > span.n-toggle-false {
   -webkit-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);
   cursor: not-allowed;
 }
+div.n-toggle.n-disabled > div.toggle-container.unchecked > span.n-toggle-false:focus:before {
+  -webkit-animation: none;
+  animation: none;
+  -o-animation: none;
+}
 div.n-toggle.n-disabled > div.toggle-container.unchecked > span.n-toggle-true {
   cursor: default;
 }
 div.n-toggle.n-disabled > div.toggle-container > span.n-toggle-line {
   background-color: rgba(0, 0, 0, 0.12);
+}
+div.n-toggle.n-view-mode > div.toggle-container.checked > span.n-toggle-true {
+  background-color: #f5f5f5;
+  cursor: default;
+}
+div.n-toggle.n-view-mode > div.toggle-container.checked > span.n-toggle-true:before {
+  background-color: #f5f5f5;
+}
+div.n-toggle.n-view-mode > div.toggle-container.checked > span.n-toggle-true:focus:before {
+  -webkit-animation: none;
+  animation: none;
+  -o-animation: none;
+}
+div.n-toggle.n-view-mode > div.toggle-container.checked > span.n-toggle-false {
+  cursor: default;
+}
+div.n-toggle.n-view-mode > div.toggle-container.unchecked > span.n-toggle-false {
+  background-color: #f5f5f5;
+  cursor: default;
+}
+div.n-toggle.n-view-mode > div.toggle-container.unchecked > span.n-toggle-false:before {
+  background-color: #f5f5f5;
+}
+div.n-toggle.n-view-mode > div.toggle-container.unchecked > span.n-toggle-false:focus:before {
+  -webkit-animation: none;
+  animation: none;
+  -o-animation: none;
+}
+div.n-toggle.n-view-mode > div.toggle-container.unchecked > span.n-toggle-true {
+  cursor: default;
 }
 @keyframes toggleTrueRippleOn {
   0% {
@@ -1993,6 +2065,32 @@ div.n-checkbox span.check-label.disabled {
 div.n-checkbox.n-disabled div.check-container {
   cursor: not-allowed;
 }
+div.n-checkbox.n-view-mode span.check-container {
+  pointer-events: none;
+  cursor: auto;
+  user-select: none;
+}
+div.n-checkbox.n-view-mode span.check-container.checked,
+div.n-checkbox.n-view-mode span.check-container span.check,
+div.n-checkbox.n-view-mode span.check-container.checked span.check,
+div.n-checkbox.n-view-mode span.check-container.checked span.check:before {
+  pointer-events: none;
+  cursor: auto;
+  color: #666666;
+  user-select: none;
+}
+div.n-checkbox.n-view-mode span.check-container:focus:before,
+div.n-checkbox.n-view-mode span.check-container.checked:focus:before {
+  display: none;
+}
+div.n-checkbox.n-view-mode span.check-container:focus span.check:before {
+  -webkit-animation: none;
+  animation: none;
+  -o-animation: none;
+}
+div.n-checkbox.n-view-mode span.check-label {
+  cursor: auto;
+}
 @keyframes checkbox-on {
   0% {
     box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0 0 20px, 0 32px 0 20px, -5px 5px 0 10px, 15px 2px 0 11px;
@@ -2262,6 +2360,32 @@ div.n-radio span.radio-label.disabled {
 div.n-radio.n-disabled div.radio-container {
   cursor: not-allowed;
 }
+div.n-radio.n-view-mode span.radio-container {
+  pointer-events: none;
+  cursor: auto;
+  user-select: none;
+}
+div.n-radio.n-view-mode span.radio-container.checked,
+div.n-radio.n-view-mode span.radio-container span.check,
+div.n-radio.n-view-mode span.radio-container.checked span.check,
+div.n-radio.n-view-mode span.radio-container.checked span.check:before {
+  pointer-events: none;
+  cursor: auto;
+  color: #666666;
+  user-select: none;
+}
+div.n-radio.n-view-mode span.radio-container:focus:before,
+div.n-radio.n-view-mode span.radio-container.checked:focus:before {
+  display: none;
+}
+div.n-radio.n-view-mode span.radio-container:focus span.check:before {
+  -webkit-animation: none;
+  animation: none;
+  -o-animation: none;
+}
+div.n-radio.n-view-mode span.radio-label {
+  cursor: auto;
+}
 div.n-file {
   position: relative;
 }
@@ -2442,6 +2566,19 @@ div.n-array-check.vertical div.n-checkbox {
   -o-transform: scaleX(0);
   -webkit-transform: scaleX(0);
 }
+.n-select-tree.n-view-mode .form-control {
+  cursor: default;
+}
+.n-select-tree.n-view-mode .form-control .selection > li > span:first-child {
+  display: none;
+}
+.n-select-tree.n-view-mode .form-control > .fa {
+  display: none;
+}
+.n-select-tree.n-view-mode hr.focus-line,
+.n-select-tree.n-view-mode hr.normal-line {
+  display: none;
+}
 .n-select-tree-popover.popover.bottom {
   margin-top: 2px;
   max-width: 9999px;
@@ -2480,18 +2617,23 @@ div.has-error span.select2-selection {
   border-color: #f44336;
   color: #f44336;
 }
-div.has-error .select2-container--default .select2-selection--single .select2-selection__rendered {
+div.has-error .select2-container--default .select2-selection--single .select2-selection__rendered,
+div.has-error .select2-container--default.select2-container--disabled .select2-selection--single .select2-selection__rendered {
   color: #f44336;
 }
-div.has-error .select2-container--default .select2-selection--single .select2-selection__arrow b {
+div.has-error .select2-container--default .select2-selection--single .select2-selection__arrow b,
+div.has-error .select2-container--default.select2-container--disabled .select2-selection--single .select2-selection__arrow b {
   border-color: #f44336 transparent transparent transparent;
 }
-div.has-error .select2-container--default .select2-selection--single .select2-selection__placeholder {
+div.has-error .select2-container--default .select2-selection--single .select2-selection__placeholder,
+div.has-error .select2-container--default.select2-container--disabled .select2-selection--single .select2-selection__placeholder {
   color: #f44336;
 }
-div.has-error .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
+div.has-error .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b,
+div.has-error .select2-container--default.select2-container--disabled.select2-container--open .select2-selection--single .select2-selection__arrow b {
   border-color: transparent transparent #f44336 transparent;
 }
+div.has-error .select2-container--default.select2-container--focus hr.focus-line,
 div.has-error .select2-container--default.select2-container--disabled.select2-container--focus hr.focus-line {
   transform: scaleX(1);
   -o-transform: scaleX(1);

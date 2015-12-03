@@ -1,4 +1,4 @@
-/** com.github.nest.parrot.V0.0.4 2015-11-26 */
+/** com.github.nest.parrot.V0.0.6 2015-12-03 */
 (function ($) {
 	var patches = {
 		console: function () {
@@ -1704,6 +1704,15 @@
 		addPostChangeListener: function (id, listener) {
 			return this.addListener(id, 'post', 'change', listener);
 		},
+		addPostAddListener: function(id, listener) {
+			return this.addListener(id, 'post', 'add', listener);
+		},
+		addPostRemoveListener: function(id, listener) {
+			return this.addListener(id, 'post', 'remove', listener);
+		},
+		addPostValidateListener: function(id, listener) {
+			return this.addListener(id, 'post', 'validate', listener);
+		},
 		/**
 		 * remove listener
 		 * @param id {string} id of property
@@ -1752,17 +1761,16 @@
 			return this;
 		},
 		removePostChangeListener: function (id, listener) {
-			this.removeListener(id, 'post', 'change', listener);
+			return this.removeListener(id, 'post', 'change', listener);
 		},
-		firePostChangeEvent: function(id, _old, _new) {
-			this.fireEvent({
-				model: this,
-				id: id,
-				old: _old,
-				"new": _new,
-				time: "post",
-				type: "change"
-			});
+		removePostAddListener: function(id, listener) {
+			return this.removeListener(id, 'post', 'add', listener);
+		},
+		removePostRemoveListener: function(id, listener) {
+			return this.removeListener(id, 'post', 'remove', listener);
+		},
+		removePostValidateListener: function(id, listener) {
+			return this.removeListener(id, 'post', 'validate', listener);
 		},
 		/**
 		 * fire event
@@ -1807,6 +1815,49 @@
 			});
 			return this;
 		},
+		firePostChangeEvent: function(id, _old, _new) {
+			return this.fireEvent({
+				model: this,
+				id: id,
+				old: _old,
+				"new": _new ? _new : this.get(id),
+				time: "post",
+				type: "change"
+			});
+		},
+		firePostAddEvent: function(id, index) {
+			var array = this.get(id);
+			return this.fireEvent({
+				model: this,
+				id: id,
+				array: array,
+				index: index,
+				old: null,
+				"new": array[index],
+				type: "add",
+				time: "post"
+			});
+		},
+		firePostRemoveEvent: function(id, _old, index) {
+			return this.fireEvent({
+				model: this,
+				id: id,
+				array: this.get(id),
+				index: index,
+				old: _old,
+				"new": null,
+				type: "remove",
+				time: "post"
+			});
+		},
+		firePostValidateEvent: function(id) {
+			return this.fireEvent({
+				model: this,
+				id: id,
+				time: 'post',
+				type: 'validate'
+			});
+		},
 		/**
 		 * reset model
 		 */
@@ -1822,8 +1873,7 @@
 		 */
 		clearValidateResults: function (id) {
 			if (id) {
-				delete this.__validateResults[id]
-				;
+				delete this.__validateResults[id];
 			} else {
 				this.__validateResults = {};
 			}
@@ -2128,7 +2178,7 @@
 		 * @returns {*}
 		 * @private
 		 */
-		_getPosition: function () {
+		getPosition: function () {
 			return this.__cell.pos ? this.__cell.pos : CellLayout.DEFAULT_POSITION;
 		},
 		/**
@@ -2136,7 +2186,7 @@
 		 * @returns {string}
 		 */
 		getRowIndex: function () {
-			var row = this._getPosition().row;
+			var row = this.getPosition().row;
 			return row == null ? CellLayout.DEFAULT_ROW : row;
 		},
 		/**
@@ -2144,7 +2194,7 @@
 		 * @returns {Array|string|boolean|*}
 		 */
 		getColumnIndex: function () {
-			var col = this._getPosition().col;
+			var col = this.getPosition().col;
 			return col == null ? CellLayout.DEFAULT_COLUMN : col;
 		},
 		/**
@@ -2152,7 +2202,7 @@
 		 * @returns {number}
 		 */
 		getWidth: function () {
-			var width = this._getPosition().width;
+			var width = this.getPosition().width;
 			return width == null ? CellLayout.DEFAULT_WIDTH : width;
 		},
 		/**
@@ -2160,7 +2210,7 @@
 		 * @returns {string}
 		 */
 		getSection: function () {
-			var section = this._getPosition().section;
+			var section = this.getPosition().section;
 			return section != null ? section : SectionLayout.DEFAULT_KEY;
 		},
 		/**
@@ -2168,7 +2218,7 @@
 		 * @returns {string}
 		 */
 		getCard: function () {
-			var card = this._getPosition().card;
+			var card = this.getPosition().card;
 			return card != null ? card : CardLayout.DEFAULT_KEY;
 		},
 		/**
@@ -2258,11 +2308,18 @@
 		getAdditionalCSS: function (key, originalCSS) {
 			if (key) {
 				var additionalCSS = this.isAdditionalCSSDefined(key) ? this.__cell.css[key] : '';
+				var cssList = additionalCSS ? additionalCSS.split(' ') : [];
+				var css = {};
+				cssList.forEach(function(cssClassName) {
+					if (cssClassName && !cssClassName.isBlank()) {
+						css[cssClassName.trim()] = true;
+					}
+				});
+
 				if (originalCSS != null && !originalCSS.isBlank()) {
-					return originalCSS + ' ' + additionalCSS;
-				} else {
-					return additionalCSS;
+					css[originalCSS.trim()] = true;
 				}
+				return $pt.LayoutHelper.classSet(css);
 			}
 			return this.isAdditionalCSSDefined() ? this.__cell.css : {};
 		},
@@ -3174,6 +3231,45 @@
 			return this.props.layout;
 		},
 		/**
+		 * component is view mode or not
+		 * @returns {boolean}
+		 */
+		isViewMode: function() {
+			return this.props.view === true;
+		},
+		/**
+		 * render in view mode. default render as a label.
+		 * @returns {XML}
+		 */
+		renderInViewMode: function() {
+			var externalViewModeRenderer = $pt.LayoutHelper.getComponentViewModeRenderer(this.getLayout().getComponentType());
+			if (externalViewModeRenderer) {
+				return externalViewModeRenderer.call(this, this.getModel(), this.getLayout(), this.props.direction, true);
+			}
+
+			var label = null;
+			if (this.getTextInViewMode) {
+				label = this.getTextInViewMode();
+			} else {
+				label = this.getValueFromModel();
+			}
+			var labelLayout = $pt.createCellLayout(this.getId(), $.extend(true, {}, {
+				comp: this.getComponentOption()
+				// css, pos, dataId, evt are all not necessary, since label will not use.
+			}, {
+				label: label,
+				dataId: this.getDataId(),
+				comp: {
+					type: $pt.ComponentConstants.Label,
+					textFromModel: false
+				}
+			}));
+			var parameters = $pt.LayoutHelper.transformParameters(
+				this.getModel(), labelLayout, this.props.direction, true);
+			parameters.ref = 'viewLabel';
+			return React.createElement(NLabel, React.__spread({},  parameters));
+		},
+		/**
 		 * get id of component
 		 * @returns {string}
 		 */
@@ -3307,6 +3403,10 @@
 		 * @returns {boolean}
 		 */
 		isEnabled: function () {
+			if (this.isViewMode()) {
+				// always enabled when in view mode
+				return true;
+			}
 			return this.getComponentRuleValue("enabled", true);
 		},
 		/**
@@ -3380,21 +3480,21 @@
 			var _this = this;
 			if (model) {
 				dependencies.forEach(function(key) {
-					model.addListener(key, 'post', 'change', monitor);
+					model.addPostChangeListener(key, monitor);
 				});
 			} else {
 				dependencies.forEach(function (key) {
 					if (typeof key === 'object') {
 						var id = key.id;
 						if (key.on === 'form') {
-							_this.getFormModel().addListener(id, 'post', 'change', monitor);
+							_this.getFormModel().addPostChangeListener(id, monitor);
 						} else if (key.on === 'inner') {
-							_this.getInnerModel().addListener(id, 'post', 'change', monitor);
+							_this.getInnerModel().addPostChangeListener(id, monitor);
 						} else {
-							_this.getModel().addListener(id, "post", "change", monitor);
+							_this.getModel().addPostChangeListener(id, monitor);
 						}
 					} else {
-						_this.getModel().addListener(key, "post", "change", monitor);
+						_this.getModel().addPostChangeListener(key, monitor);
 					}
 				});
 			}
@@ -3411,21 +3511,21 @@
 			var _this = this;
 			if (model) {
 				dependencies.forEach(function(key) {
-					model.addListener(key, 'post', 'change', monitor);
+					model.removePostChangeListener(key, monitor);
 				});
 			} else {
 				dependencies.forEach(function (key) {
 					if (typeof key === 'object') {
 						var id = key.id;
 						if (key.on === 'form') {
-							_this.getFormModel().removeListener(id, 'post', 'change', monitor);
+							_this.getFormModel().removePostChangeListener(id, monitor);
 						} else if (key.on === 'inner') {
-							_this.getInnerModel().removeListener(id, 'post', 'change', monitor);
+							_this.getInnerModel().removePostChangeListener(id, monitor);
 						} else {
-							_this.getModel().removeListener(id, "post", "change", monitor);
+							_this.getModel().removePostChangeListener(id, monitor);
 						}
 					} else {
-						_this.getModel().removeListener(key, "post", "change", monitor);
+						_this.getModel().removePostChangeListener(key, monitor);
 					}
 				});
 			}
@@ -3433,28 +3533,28 @@
 		},
 		// event
 		addPostChangeListener: function (listener) {
-			this.getModel().addListener(this.getDataId(), "post", "change", listener);
+			this.getModel().addPostChangeListener(this.getDataId(), listener);
 		},
 		removePostChangeListener: function (listener) {
-			this.getModel().removeListener(this.getDataId(), "post", "change", listener);
+			this.getModel().removePostChangeListener(this.getDataId(), listener);
 		},
 		addPostAddListener: function (listener) {
-			this.getModel().addListener(this.getDataId(), "post", "add", listener);
+			this.getModel().addPostAddListener(this.getDataId(), listener);
 		},
 		removePostAddListener: function (listener) {
-			this.getModel().removeListener(this.getDataId(), "post", "add", listener);
+			this.getModel().removePostAddListener(this.getDataId(), listener);
 		},
 		addPostRemoveListener: function (listener) {
-			this.getModel().addListener(this.getDataId(), "post", "remove", listener);
+			this.getModel().addPostRemoveListener(this.getDataId(), listener);
 		},
 		removePostRemoveListener: function (listener) {
-			this.getModel().removeListener(this.getDataId(), "post", "remove", listener);
+			this.getModel().removePostRemoveListener(this.getDataId(), listener);
 		},
 		addPostValidateListener: function (listener) {
-			this.getModel().addListener(this.getDataId(), "post", "validate", listener);
+			this.getModel().addPostValidateListener(this.getDataId(), listener);
 		},
 		removePostValidateListener: function (listener) {
-			this.getModel().removeListener(this.getDataId(), "post", "validate", listener);
+			this.getModel().removePostValidateListener(this.getDataId(), listener);
 		}
 	};
 
@@ -3469,6 +3569,7 @@
 	var LayoutHelper = jsface.Class({
 		constructor: function() {
 			this.__comp = {};
+			this.__components = {};
 		},
 		/**
 		 * copy from React.addons.classSet
@@ -3569,13 +3670,69 @@
 				}
 			}
 			return this;
+		},
+		// register components
+		registerComponentRenderer: function (type, func) {
+			if (typeof type !== 'string') {
+				type = type.type;
+			}
+			if (this.__components[type]) {
+				console.warn('Component [' + type + '] is replaced.');
+			}
+			this.__components[type] = func;
+		},
+		getComponentRenderer: function(type) {
+			if (typeof type !== 'string') {
+				type = type.type;
+			}
+			if (this.__components[type]) {
+				return this.__components[type];
+			} else {
+				throw $pt.createComponentException($pt.ComponentConstants.Err_Unsupported_Component,
+					"Component type [" + type + "] is not supported yet.");
+			}
+		},
+		registerComponentViewModeRenderer: function(type, func) {
+			if (typeof type !== 'string') {
+				type = type.type;
+			}
+			type = type + '@view';
+			if (this.__components[type]) {
+				console.warn('Component [' + type + '] is replaced.');
+			}
+			this.__components[type] = func;
+		},
+		getComponentViewModeRenderer: function(type) {
+			if (typeof type !== 'string') {
+				type = type.type;
+			}
+			type = type + '@view';
+			if (this.__components[type]) {
+				return this.__components[type];
+			} else {
+				// no view mode renderer registered yet
+				return null;
+			}
+		},
+		transformParameters: function(model, layout, direction, viewMode) {
+			return {
+				model: model,
+				layout: layout,
+				direction: direction,
+				view: viewMode,
+				ref: layout.getId()
+			};
 		}
 	});
 	$pt.LayoutHelper = new LayoutHelper();
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Nothing, function() {
+		return null;
+	});
 })(this, jQuery);
 
 (function (context, $, $pt) {
 	var NArrayCheck = React.createClass($pt.defineCellComponent({
+		displayName: 'NArrayCheck',
 		statics: {
 		},
 		propTypes: {
@@ -3707,6 +3864,9 @@
 		}
 	}));
 	context.NArrayCheck = NArrayCheck;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayCheck, function (model, layout, direction, viewMode) {
+		return React.createElement(NArrayCheck, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -3747,6 +3907,7 @@
  */
 (function (context, $, $pt) {
 	var NArrayPanel = React.createClass($pt.defineCellComponent({
+		displayName: 'NArrayPanel',
 		statics: {
 			UNTITLED: 'Untitled Item'
 		},
@@ -3869,7 +4030,8 @@
 				React.createElement("div", {className: "col-sm-12 col-md-12 col-lg-12"}, 
 					React.createElement(NPanel, {model: model, 
 					        layout: $pt.createCellLayout('pseudo-panel', cellLayout), 
-					        direction: this.props.direction})
+					        direction: this.props.direction, 
+							view: this.isViewMode()})
 				)
 			));
 		},
@@ -3949,6 +4111,9 @@
 		}
 	}));
 	context.NArrayPanel = NArrayPanel;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayPanel, function (model, layout, direction, viewMode) {
+		return React.createElement(NArrayPanel, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -3993,8 +4158,11 @@
  */
 (function (context, $, $pt) {
 	var NArrayTab = React.createClass($pt.defineCellComponent({
+		displayName: 'NArrayTab',
 		statics: {
-			UNTITLED: 'Untitled Item'
+			UNTITLED: 'Untitled Item',
+			ADD_ICON: 'plus-circle',
+			ADD_LABEL: 'Add'
 		},
 		propTypes: {
 			// model
@@ -4014,7 +4182,7 @@
 		},
 		getInitialState: function () {
 			return {
-				activeTabIndex: null
+				tabs: null
 			};
 		},
 		/**
@@ -4041,9 +4209,6 @@
 			this.addPostRemoveListener(this.onModelChanged);
 			this.addPostValidateListener(this.onModelValidateChanged);
 			this.registerToComponentCentral();
-
-			// TODO since NTab will keep the active tab index in state, force change it.
-			this.refs.tab.setActiveTabIndex(this.getActiveTabIndex());
 		},
 		/**
 		 * did mount
@@ -4070,14 +4235,15 @@
 		/**
 		 * render tab content
 		 * @param tab
-		 * @param index
+		 * @param tabIndex
 		 * @returns {XML}
 		 */
-		renderTabContent: function (tab) {
+		renderTabContent: function (tab, tabIndex) {
+			var activeTabIndex = this.getActiveTabIndex();
 			var css = {
 				'n-array-tab-card': true,
-				show: tab.active,
-				hide: !tab.active
+				show: tabIndex == activeTabIndex,
+				hide: tabIndex != activeTabIndex
 			};
 
 			// no base here. since no apply operation
@@ -4106,6 +4272,7 @@
 			return (React.createElement(NForm, {model: tab.data, 
 			               layout: $pt.createFormLayout(tab.layout), 
 			               direction: this.props.direction, 
+						   view: this.isViewMode(), 
 			               className: $pt.LayoutHelper.classSet(css)})
 			);
 		},
@@ -4115,12 +4282,18 @@
 		 */
 		render: function () {
 			var tabs = this.getTabs();
-			this.activeTab(tabs, this.getActiveTabIndex());
-			var canActive = this.getComponentOption('canActive');
-			if (canActive) {
-				canActive.bind(this);
-			}
-			var _this = this;
+			var canActiveProxy = function(newTabValue, newTabIndex, activeTabValue, activeTabIndex) {
+				if (this.isAddable() && (newTabIndex == tabs.length - 1)) {
+					var onAdd = this.getComponentOption('onAdd');
+					onAdd.call(this, this.getModel(), this.getValueFromModel());
+					return false;
+				} else {
+					var canActive = this.getComponentOption('canActive');
+					if (canActive) {
+						canActive.call(this, newTabValue, newTabIndex, activeTabValue, activeTabIndex);
+					}
+				}
+			}.bind(this);
 			return (React.createElement("div", {className: this.getComponentCSS('n-array-tab')}, 
 				React.createElement(NTab, {type: this.getComponentOption('tabType'), 
 				      justified: this.getComponentOption('justified'), 
@@ -4128,27 +4301,15 @@
 				      size: this.getComponentOption('titleIconSize'), 
 				      tabClassName: this.getAdditionalCSS('tabs'), 
 				      tabs: tabs, 
-				      canActive: canActive, 
+				      canActive: canActiveProxy, 
 				      onActive: this.onTabClicked, 
-				      ref: "tab"}
+				      ref: "tabs"}
 				), 
 
 				React.createElement("div", {className: "n-array-tab-content", ref: "content"}, 
 					tabs.map(this.renderTabContent)
 				)
 			));
-		},
-		activeTab: function(tabs, activeTabIndex) {
-			if (activeTabIndex >= tabs.length) {
-				activeTabIndex = tabs.length - 1;
-			}
-			if (activeTabIndex < 0) {
-				activeTabIndex = 0;
-			}
-			if (tabs.length > 0) {
-				tabs[activeTabIndex].active = true;
-			}
-			this.state.activeTabIndex = activeTabIndex;
 		},
 		createItemModel: function(item) {
 			var parentModel = this.getModel();
@@ -4183,19 +4344,47 @@
 		 */
 		getTabs: function () {
 			var _this = this;
-			var tabs = [];
-			var data = this.getValueFromModel();
-			data.forEach(function (item) {
+			if (this.state.tabs) {
+				this.state.tabs.forEach(function(tab, tabIndex) {
+					if (_this.isAddable() && (tabIndex != _this.state.tabs.length - 1)) {
+						var model = tab.data;
+						tab.label = _this.getTabTitle(model);
+						tab.icon = _this.getTabIcon(model);
+						tab.layout = _this.getEditLayout(model);
+						tab.badge = _this.getTabBadge(model);
+					}
+				});
+				return this.state.tabs;
+			}
+
+			this.state.tabs = this.getValueFromModel().map(function (item) {
 				var model = _this.createItemModel(item);
-				tabs.push({
+				return {
 					label: _this.getTabTitle(model),
 					icon: _this.getTabIcon(model),
 					layout: _this.getEditLayout(model),
 					badge: _this.getTabBadge(model),
 					data: model
-				});
+				};
 			});
-			return tabs;
+			if (this.isAddable()) {
+				this.state.tabs.push({
+					icon: NArrayTab.ADD_ICON,
+					label: NArrayTab.ADD_LABEL,
+					layout: {
+						nothing: {
+							comp: {
+								type: $pt.ComponentConstants.Nothing
+							}
+						}
+					},
+					data: $pt.createModel({})
+				});
+			}
+			return this.state.tabs;
+		},
+		clearTabs: function(callback) {
+			this.setState({tabs: null}, callback.call(this));
 		},
 		/**
 		 * return [] when is null
@@ -4211,10 +4400,14 @@
 		 */
 		onModelChanged: function (evt) {
 			if (evt.type === 'add') {
-				this.setActiveTabIndex(evt.index);
+				this.clearTabs(this.setActiveTabIndex.bind(this, evt.index));
 			} else if (evt.type === 'remove') {
 				var index = evt.index;
-				this.setActiveTabIndex(index);
+				var data = this.getValueFromModel();
+				if (index == data.length) {
+					index = index - 1;
+				}
+				this.clearTabs(this.setActiveTabIndex.bind(this, index));
 			} else {
 				this.forceUpdate();
 			}
@@ -4286,15 +4479,16 @@
 				return icon.when.call(this, model);
 			}
 		},
+		isAddable: function() {
+			return !this.isViewMode() && this.getComponentOption('onAdd') != null;
+		},
 		/**
 		 * on tab clicked
 		 * @param tabValue {string} tab value
 		 * @param index {number}
 		 */
 		onTabClicked: function (tabValue, index) {
-			this.setState({
-				activeTabIndex: index
-			});
+			this.setActiveTabIndex(index);
 			var onActive = this.getComponentOption('onActive');
 			if (onActive) {
 				onActive.call(this, tabValue, index);
@@ -4305,21 +4499,36 @@
 		 * @returns {number}
 		 */
 		getActiveTabIndex: function () {
-			if (this.state.activeTabIndex == null) {
-				// get initial active tab index, or 0 if not set
-				this.state.activeTabIndex = 0;
+			var tabs = this.state.tabs;
+			// find the active tab
+			var activeTabIndex = tabs.findIndex(function (tab, index) {
+				return tab.active === true;
+			});
+			if (activeTabIndex == -1) {
+				// find the first visible tab if no active tab found
+				activeTabIndex = tabs.findIndex(function (tab, index) {
+					var visible =  tab.visible !== false;
+					if (visible) {
+						tab.active = true;
+						return true;
+					}
+				});
 			}
-			return this.state.activeTabIndex;
+			return activeTabIndex;
 		},
 		/**
 		 * set active tab index
 		 * @param {number}
 		 */
 		setActiveTabIndex: function(index) {
-			this.setState({activeTabIndex: index});
+			this.refs.tabs.setActiveTabIndex(index);
+			this.forceUpdate();
 		}
 	}));
 	context.NArrayTab = NArrayTab;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayTab, function (model, layout, direction, viewMode) {
+		return React.createElement(NArrayTab, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -4358,6 +4567,7 @@
  */
 (function (context, $, $pt) {
 	var NFormButton = React.createClass($pt.defineCellComponent({
+		displayName: 'NFormButton',
 		propTypes: {
 			// model, whole model, not only for this cell
 			// use id to get the value of this cell from model
@@ -4560,6 +4770,9 @@
 		}
 	}));
 	context.NFormButton = NFormButton;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Button, function (model, layout, direction, viewMode) {
+		return React.createElement(NFormButton, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -4595,6 +4808,7 @@
  */
 (function (context, $, $pt) {
 	var NCheck = React.createClass($pt.defineCellComponent({
+		displayName: 'NCheck',
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
@@ -4655,13 +4869,14 @@
 				if (label == null || label.isEmpty()) {
 					return null;
 				}
+				var enabled = this.isEnabled();
 				var css = {
 					'check-label': true,
 					disabled: !this.isEnabled(),
 					'check-label-left': labelInLeft
 				};
 				return (React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
-				             onClick: this.isEnabled() ? this.onButtonClicked : null}, 
+				             onClick: (enabled && !this.isViewMode()) ? this.onButtonClicked : null}, 
                 	this.getLayout().getLabel()
             	));
 			}
@@ -4673,19 +4888,21 @@
 		 */
 		renderCheckbox: function () {
 			var checked = this.isChecked();
+			var enabled = this.isEnabled();
 			var css = {
-				disabled: !this.isEnabled(),
+				disabled: !enabled,
 				checked: checked,
 				'check-container': true
 			};
 			return (React.createElement("div", {className: "check-container"}, 
-            React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
-                  onClick: this.isEnabled() ? this.onButtonClicked : null, 
-                  onKeyUp: this.isEnabled() ? this.onKeyUp: null, 
-                  tabIndex: "0", 
-                  ref: "out"}, 
-            React.createElement("span", {className: "check", onClick: this.onInnerClicked})
-        )));
+	            React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
+	                  onClick: (enabled && !this.isViewMode()) ? this.onButtonClicked : null, 
+	                  onKeyUp: (enabled && !this.isViewMode()) ? this.onKeyUp: null, 
+	                  tabIndex: "0", 
+	                  ref: "out"}, 
+	            	React.createElement("span", {className: "check", onClick: this.onInnerClicked})
+	        	)
+			));
 		},
 		/**
 		 * render
@@ -4693,7 +4910,8 @@
 		 */
 		render: function () {
 			var css = {
-				'n-disabled': !this.isEnabled()
+				'n-disabled': !this.isEnabled(),
+				'n-view-mode': this.isViewMode()
 			};
 			css[this.getComponentCSS('n-checkbox')] = true;
 			var isLabelAtLeft = this.isLabelAtLeft();
@@ -4765,6 +4983,9 @@
 		}
 	}));
 	context.NCheck = NCheck;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Check, function (model, layout, direction, viewMode) {
+		return React.createElement(NCheck, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -4803,6 +5024,7 @@
  */
 (function (context, $, $pt) {
 	var NDateTime = React.createClass($pt.defineCellComponent({
+		displayName: 'NDateTime',
 		statics: {
 			FORMAT: 'YYYY/MM/DD',
 			DAY_VIEW_HEADER_FORMAT: 'MMMM YYYY',
@@ -4889,7 +5111,9 @@
 		 * @override
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
-			this.getComponent().data("DateTimePicker").date(this.getValueFromModel());
+			if (!this.isViewMode()) {
+				this.getComponent().data("DateTimePicker").date(this.getValueFromModel());
+			}
 			// add post change listener
 			this.addPostChangeListener(this.onModelChange);
 			this.addEnableDependencyMonitor();
@@ -4901,7 +5125,9 @@
 		 */
 		componentDidMount: function () {
 			this.createComponent();
-			this.getComponent().data("DateTimePicker").date(this.getValueFromModel());
+			if (!this.isViewMode()) {
+				this.getComponent().data("DateTimePicker").date(this.getValueFromModel());
+			}
 			// add post change listener
 			this.addPostChangeListener(this.onModelChange);
 			this.addEnableDependencyMonitor();
@@ -5041,6 +5267,9 @@
 		 * @returns {XML}
 		 */
 		render: function () {
+			if (this.isViewMode()) {
+				return this.renderInViewMode();
+			}
 			var css = {
 				'input-group-addon': true,
 				link: true,
@@ -5091,7 +5320,8 @@
 		 * @param evt
 		 */
 		onModelChange: function (evt) {
-			this.getComponent().data('DateTimePicker').date(this.convertValueFromModel(evt.new));
+			// this.getComponent().data('DateTimePicker').date(this.convertValueFromModel(evt.new));
+			this.forceUpdate();
 		},
 		/**
 		 * get component
@@ -5136,9 +5366,20 @@
 		getHeaderYearFormat: function () {
 			var format = this.getComponentOption('headerYearFormat');
 			return format ? format : NDateTime.HEADER_YEAR_FORMAT;
+		},
+		getTextInViewMode: function() {
+			var value = this.getValueFromModel();
+			return value == null ? null : value.format(this.getDisplayFormat());
+		},
+		getDisplayFormat: function() {
+			var format = this.getComponentOption('format');
+			return format ? format : NDateTime.FORMAT;
 		}
 	}));
 	context.NDateTime = NDateTime;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Date, function (model, layout, direction, viewMode) {
+		return React.createElement(NDateTime, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -5146,7 +5387,8 @@
  * z-index is 9999 and 9998, the max z-index.
  */
 (function (context, $, $pt) {
-	var NExceptionModal = React.createClass({displayName: "NExceptionModal",
+	var NExceptionModal = React.createClass({
+		displayName: 'NExceptionModal',
 		statics: {
 			getExceptionModal: function (className) {
 				if ($pt.exceptionDialog === undefined || $pt.exceptionDialog === null) {
@@ -5260,6 +5502,7 @@
 
 (function (context, $, $pt) {
 	var NFile = React.createClass($pt.defineCellComponent({
+		displayName: 'NFile',
 		statics: {},
 		propTypes: {
 			// model
@@ -5455,6 +5698,9 @@
 		}
 	}));
 	context.NFile = NFile;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.File, function (model, layout, direction, viewMode) {
+		return React.createElement(NFile, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -5494,7 +5740,8 @@
  * }
  */
 (function (context, $, $pt) {
-	var NForm = React.createClass({displayName: "NForm",
+	var NForm = React.createClass({
+		displayName: 'NForm',
 		statics: {
 			LABEL_DIRECTION: 'vertical'
 		},
@@ -5504,6 +5751,7 @@
 			// layout, FormLayout
 			layout: React.PropTypes.object,
 			direction: React.PropTypes.oneOf(['vertical', 'horizontal']),
+			view: React.PropTypes.bool,
 			className: React.PropTypes.string
 		},
 		getDefaultProps: function () {
@@ -5631,7 +5879,8 @@
 			};
 			return React.createElement(NPanel, {model: this.getModel(), 
 			               layout: $pt.createCellLayout(sections[0].getParentCard().getId() + '-body', sectionLayout), 
-			               direction: this.getLabelDirection()});
+			               direction: this.getLabelDirection(), 
+						   view: this.isViewMode()});
 		},
 		/**
 		 * attach previous button
@@ -5745,7 +5994,7 @@
 			}
 			if (right.length != 0 || left.length != 0) {
 				right = right.reverse();
-				footer = (React.createElement(NPanelFooter, {right: right, left: left, model: this.getModel()}));
+				footer = (React.createElement(NPanelFooter, {right: right, left: left, model: this.getModel(), view: this.isViewMode()}));
 			}
 			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
 				this.renderSections(card.getSections()), 
@@ -5777,7 +6026,7 @@
 				'nav-pills': true,
 				'nav-direction-vertical': false,
 				'n-cards-nav': true,
-				'n-cards-free': this.getLayout().isFreeCard()
+				'n-cards-free': this.isFreeCard()
 			});
 			var _this = this;
 			return (React.createElement("ul", {className: css}, 
@@ -5788,7 +6037,7 @@
 						after: _this.isAfterActiveCard(card.getId())
 					};
 					var click = null;
-					if (_this.getLayout().isFreeCard()) {
+					if (_this.isFreeCard()) {
 						click = function () {
 							_this.jumpToCard(card.getId());
 						};
@@ -5879,7 +6128,7 @@
 		onPreviousClicked: function () {
 			var activeIndex = this.getActiveCardIndex();
 			var prevCard = this.getLayout().getCards()[activeIndex - 1];
-			if (prevCard.isBackable()) {
+			if (this.isFreeCard() || prevCard.isBackable()) {
 				this.setState({
 					activeCard: prevCard.getId()
 				});
@@ -5894,7 +6143,6 @@
 			this.setState({
 				activeCard: nextCard.getId()
 			});
-			// }
 		},
 		/**
 		 * jump to card
@@ -5930,13 +6178,19 @@
 		getSectionKey: function (section) {
 			return section.getParentCard().getId() + '-' + section.getId();
 		},
+		isViewMode: function() {
+			return this.props.view;
+		},
+		isFreeCard: function() {
+			return this.isViewMode() || this.getLayout().isFreeCard();
+		},
 		/**
 		 * is previous card backable
 		 * @param cardId
 		 * @return {*}
 		 */
 		isPreviousCardBackable: function (cardId) {
-			if (this.getLayout().isFreeCard()) {
+			if (this.isFreeCard()) {
 				return true;
 			}
 
@@ -5991,6 +6245,10 @@
 		}
 	});
 	context.NForm = NForm;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Form, function (model, layout, direction, viewMode) {
+		var formLayout = $pt.createFormLayout(layout.getComponentOption('editLayout'));
+		return React.createElement(NForm, React.__spread({},  $pt.LayoutHelper.transformParameters(model, formLayout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -5998,6 +6256,7 @@
  */
 (function (context, $, $pt) {
 	var NFormButtonFooter = React.createClass($pt.defineCellComponent({
+		displayName: 'NFormButtonFooter',
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
@@ -6019,6 +6278,7 @@
 		render: function () {
 			var buttonLayout = this.getButtonLayout();
 			return React.createElement(NPanelFooter, {model: this.props.model, 
+								 view: this.isViewMode(), 
 			                     save: buttonLayout.save, 
 			                     validate: buttonLayout.validate, 
 			                     cancel: buttonLayout.cancel, 
@@ -6031,6 +6291,9 @@
 		}
 	}));
 	context.NFormButtonFooter = NFormButtonFooter;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ButtonFooter, function (model, layout, direction, viewMode) {
+		return React.createElement(NFormButtonFooter, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -6053,198 +6316,17 @@
  */
 (function (context, $, $pt) {
 	var NFormCell = React.createClass($pt.defineCellComponent({
+		displayName: 'NFormCell',
 		statics: {
 			REQUIRED_ICON: 'asterisk',
 			TOOLTIP_ICON: 'question-circle',
 			LABEL_WIDTH: 4,
 			__componentRenderer: {},
 			registerComponentRenderer: function (type, func) {
-				NFormCell.__componentRenderer[type] = func;
+				$pt.LayoutHelper.registerComponentRenderer(type, func);
 			},
 			getComponentRenderer: function (type) {
-				if (NFormCell.__componentRenderer[type] == null) {
-					if (NFormCell['__' + type] != null) {
-						NFormCell.registerComponentRenderer(type, NFormCell['__' + type]);
-						return NFormCell.getComponentRenderer(type);
-					} else {
-						throw $pt.createComponentException($pt.ComponentConstants.Err_Unsupported_Component,
-							"Component type[" + type + "] is not supported yet.");
-					}
-				} else {
-					return NFormCell.__componentRenderer[type];
-				}
-			},
-			/**
-			 * render label
-			 * @returns {XML}
-			 * @private
-			 */
-			__label: function (model, layout) {
-				return React.createElement(NLabel, {model: model, layout: layout, ref: layout.getId()});
-			},
-			/**
-			 * render text input
-			 * @returns {XML}
-			 * @private
-			 */
-			__text: function (model, layout) {
-				return React.createElement(NText, {model: model, layout: layout, ref: layout.getId()});
-			},
-			/**
-			 * render text area
-			 * @returns {XML}
-			 * @private
-			 */
-			__textarea: function (model, layout) {
-				return React.createElement(NTextArea, {model: model, layout: layout, ref: layout.getId()});
-			},
-			/**
-			 * render checkbox
-			 * @returns {XML}
-			 * @private
-			 */
-			__check: function (model, layout) {
-				return React.createElement(NCheck, {model: model, layout: layout, ref: layout.getId()});
-			},
-			__acheck: function(model, layout) {
-				return React.createElement(NArrayCheck, {model: model, layout: layout, ref: layout.getId()});
-			},
-			/**
-			 * render toggle button
-			 * @returns {XML}
-			 * @private
-			 */
-			__toggle: function (model, layout) {
-				return React.createElement(NToggle, {model: model, layout: layout, ref: layout.getId()});
-			},
-			/**
-			 * render radio
-			 * @returns {XML}
-			 * @private
-			 */
-			__radio: function (model, layout) {
-				return React.createElement(NRadio, {model: model, layout: layout, ref: layout.getId()});
-			},
-			/**
-			 * render datetime picker
-			 * @returns {XML}
-			 * @private
-			 */
-			__date: function (model, layout) {
-				return React.createElement(NDateTime, {model: model, layout: layout, ref: layout.getId()});
-			},
-			/**
-			 * render select
-			 * @returns {XML}
-			 * @private
-			 */
-			__select: function (model, layout) {
-				return React.createElement(NSelect, {model: model, layout: layout, ref: layout.getId()});
-			},
-			/**
-			 * render search text
-			 * @returns {XML}
-			 * @private
-			 */
-			__search: function (model, layout, direction) {
-				return React.createElement(NSearchText, {model: model, layout: layout, direction: direction, ref: layout.getId()});
-			},
-			/**
-			 * render table
-			 * @returns {XML}
-			 * @private
-			 */
-			__table: function (model, layout) {
-				return React.createElement(NTable, {model: model, layout: layout, ref: layout.getId()});
-			},
-			/**
-			 * render tree
-			 * @returns {XML}
-			 * @private
-			 */
-			__tree: function (model, layout) {
-				return React.createElement(NTree, {model: model, layout: layout, ref: layout.getId()});
-			},
-			/**
-			 * render select tree
-			 * @returns {XML}
-			 * @private
-			 */
-			__seltree: function(model, layout) {
-				return React.createElement(NSelectTree, {model: model, layout: layout, ref: layout.getId()});
-			},
-			/**
-			 * render file
-			 * @return {XML}
-			 * @private
-			 */
-			__file: function (model, layout) {
-				return React.createElement(NFile, {model: model, layout: layout, ref: layout.getId()});
-			},
-			/**
-			 * render button
-			 * @returns {XML}
-			 * @private
-			 */
-			__button: function (model, layout) {
-				return React.createElement(NFormButton, {model: model, layout: layout, ref: layout.getId()});
-			},
-			/**
-			 * render tab
-			 * @returns {XML}
-			 * @private
-			 */
-			__tab: function (model, layout, direction) {
-				return React.createElement(NFormTab, {model: model, layout: layout, direction: direction, ref: layout.getId()});
-			},
-			/**
-			 * render array tab
-			 * @returns {XML}
-			 * @private
-			 */
-			__atab: function (model, layout, direction) {
-				return React.createElement(NArrayTab, {model: model, layout: layout, direction: direction, ref: layout.getId()});
-			},
-			/**
-			 * render panel
-			 * @returns {XML}
-			 * @private
-			 */
-			__panel: function (model, layout, direction) {
-				return React.createElement(NPanel, {model: model, layout: layout, direction: direction, ref: layout.getId()});
-			},
-			/**
-			 * render array panel
-			 * @returns {XML}
-			 * @private
-			 */
-			__apanel: function (model, layout, direction) {
-				return React.createElement(NArrayPanel, {model: model, layout: layout, direction: direction, ref: layout.getId()});
-			},
-			/**
-			 * render form
-			 * @returns {XML}
-			 * @private
-			 */
-			__form: function (model, layout, direction) {
-				var formLayout = $pt.createFormLayout(layout.getComponentOption('editLayout'));
-				return React.createElement(NForm, {model: model, layout: formLayout, direction: direction, ref: layout.getId()});
-			},
-			/**
-			 * render button footer
-			 * @returns {XML}
-			 * @private
-			 */
-			__buttonfooter: function (model, layout) {
-				return React.createElement(NFormButtonFooter, {model: model, layout: layout, ref: layout.getId()});
-			},
-			/**
-			 * render nothing
-			 * @returns {null}
-			 * @private
-			 */
-			__nothing: function () {
-				return null;
+				return $pt.LayoutHelper.getComponentRenderer(type);
 			}
 		},
 		propTypes: {
@@ -6253,7 +6335,10 @@
 			model: React.PropTypes.object,
 			// CellLayout
 			layout: React.PropTypes.object,
-			direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
+			// label direction
+			direction: React.PropTypes.oneOf(['vertical', 'horizontal']),
+			// is view mode or not
+			view: React.PropTypes.bool
 		},
 		getDefaultProps: function () {
 			return {
@@ -6354,7 +6439,7 @@
 			var direction = this.props.direction ? this.props.direction : 'vertical';
 			if (componentDefinition.render) {
 				// user defined component
-				return componentDefinition.render.call(this, this.getFormModel(), this.getLayout(), direction);
+				return componentDefinition.render.call(this, this.getFormModel(), this.getLayout(), direction, this.isViewMode());
 			}
 
 			// pre-defined components
@@ -6363,7 +6448,7 @@
 				type = "text";
 			}
 			return (React.createElement("div", {ref: "comp"}, 
-				NFormCell.getComponentRenderer(type).call(this, this.getFormModel(), this.getLayout(), direction)
+				$pt.LayoutHelper.getComponentRenderer(type).call(this, this.getFormModel(), this.getLayout(), direction, this.isViewMode())
 			));
 		},
 		/**
@@ -6404,7 +6489,20 @@
 		 * @returns {XML}
 		 */
 		render: function () {
-			if (!this.isVisible()) {
+			// when the component is not visible
+			// or declared only view in edit mode
+			// hide it
+			var visible = this.isVisible();
+			if (visible) {
+				var view = this.getComponentOption('view');
+				if (this.isViewMode()) {
+					visible = (view == 'edit') != true;
+				} else if (!this.isViewMode()) {
+					visible = (view == 'view') != true;
+				}
+			}
+
+			if (!visible) {
 				return (React.createElement("div", {className: this.getCSSClassName() + ' n-form-cell-invisible'}));
 			} else {
 				var css = this.getCSSClassName();
@@ -6581,6 +6679,7 @@
  */
 (function (context, $, $pt) {
 	var NFormTab = React.createClass($pt.defineCellComponent({
+		displayName: 'NFormTab',
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
@@ -6598,9 +6697,7 @@
 			};
 		},
 		getInitialState: function () {
-			return {
-				activeTabIndex: null
-			};
+			return {};
 		},
 		/**
 		 * will update
@@ -6608,7 +6705,7 @@
 		 */
 		componentWillUpdate: function (nextProps) {
 			var _this = this;
-			this.state.tabs.forEach(function (tab) {
+			this.getTabs().forEach(function (tab) {
 				if (tab.badgeId) {
 					_this.removeDependencyMonitor([tab.badgeId]);
 				}
@@ -6622,7 +6719,7 @@
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
 			var _this = this;
-			this.state.tabs.forEach(function (tab) {
+			this.getTabs().forEach(function (tab) {
 				if (tab.badgeId) {
 					_this.addDependencyMonitor([tab.badgeId]);
 				}
@@ -6634,7 +6731,7 @@
 		 */
 		componentDidMount: function () {
 			var _this = this;
-			this.state.tabs.forEach(function (tab) {
+			this.getTabs().forEach(function (tab) {
 				if (tab.badgeId) {
 					_this.addDependencyMonitor([tab.badgeId]);
 				}
@@ -6646,7 +6743,7 @@
 		 */
 		componentWillUnmount: function () {
 			var _this = this;
-			this.state.tabs.forEach(function (tab) {
+			this.getTabs().forEach(function (tab) {
 				if (tab.badgeId) {
 					_this.removeDependencyMonitor([tab.badgeId]);
 				}
@@ -6663,11 +6760,12 @@
 			return (React.createElement(NForm, {model: this.getModel(), 
 			               layout: layout, 
 			               direction: this.props.direction, 
+						   view: this.isViewMode(), 
 			               className: $pt.LayoutHelper.classSet(css), 
 			               key: 'form-' + index}));
 		},
 		render: function () {
-			var tabs = this.getTabs();
+			var tabs = this.initializeTabs();
 			var canActive = this.getComponentOption('canActive');
 			if (canActive) {
 				canActive.bind(this);
@@ -6680,20 +6778,21 @@
 				      tabClassName: this.getAdditionalCSS('tabs'), 
 				      tabs: tabs, 
 				      canActive: canActive, 
-				      onActive: this.onTabClicked}), 
+				      onActive: this.onTabClicked, 
+					  ref: "tabs"}), 
 
 				React.createElement("div", {className: "n-form-tab-content", ref: "content"}, 
 					this.getTabLayouts().map(this.renderTabContent)
 				)
 			));
 		},
-		getTabs: function () {
-			if (this.state.tabs == null) {
-				// clone from definition
-				this.state.tabs = this.getComponentOption('tabs').slice(0);
-			}
+		getTabs: function() {
+			return this.getComponentOption('tabs');
+		},
+		initializeTabs: function () {
 			var _this = this;
-			this.state.tabs.forEach(function (tab) {
+			var tabs = this.getTabs();
+			tabs.forEach(function (tab) {
 				if (tab.badgeId) {
 					tab.badge = _this.getModel().get(tab.badgeId);
 					if (tab.badgeRender) {
@@ -6701,7 +6800,7 @@
 					}
 				}
 			});
-			return this.state.tabs;
+			return tabs;
 		},
 		/**
 		 * get tab layouts
@@ -6718,9 +6817,7 @@
 		 * @param index {number}
 		 */
 		onTabClicked: function (tabValue, index) {
-			this.setState({
-				activeTabIndex: index
-			});
+			this.setActiveTabIndex(index);
 			var onActive = this.getComponentOption('onActive');
 			if (onActive) {
 				onActive.call(this, tabValue, index);
@@ -6731,42 +6828,44 @@
 		 * @returns {number}
 		 */
 		getActiveTabIndex: function () {
-			if (this.state.activeTabIndex == null) {
-				// get initial active tab index, or 0 if not set
-				var _this = this;
-				this.state.activeTabIndex = 0;
-				this.getComponentOption('tabs').forEach(function (tab, index) {
-					if (tab.active === true) {
-						_this.state.activeTabIndex = index;
+			var tabs = this.getComponentOption('tabs');
+			// find the active tab
+			var activeTabIndex = tabs.findIndex(function (tab, index) {
+				return tab.active === true;
+			});
+			if (activeTabIndex == -1) {
+				// find the first visible tab if no active tab found
+				activeTabIndex = tabs.findIndex(function (tab, index) {
+					var visible =  tab.visible !== false;
+					if (visible) {
+						tab.active = true;
+						return true;
 					}
 				});
 			}
-			return this.state.activeTabIndex;
+			return activeTabIndex;
 		},
 		/**
 		 * set active tab index
 		 * @param {number}
 		 */
 		setActiveTabIndex: function(index) {
-			if (index < 0) {
-				index = 0;
-			} else if (index > (this.state.tabs.length - 1)) {
-				index = this.state.tabs.length - 1;
-			}
-			if (index < 0) {
-				throw $pt.createComponentException($pt.ComponentConstants.Err_Tab_Index_Out_Of_Bound, 'Tab index[' + index + '] out of bound.');
-			}
-			this.setState({activeTabIndex: index});
+			this.refs.tabs.setActiveTabIndex(index);
+			this.forceUpdate();
 		}
 	}));
 	context.NFormTab = NFormTab;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Tab, function (model, layout, direction, viewMode) {
+		return React.createElement(NFormTab, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
  * icon based on font-awesome
  */
 (function (context, $, $pt) {
-	var NIcon = React.createClass({displayName: "NIcon",
+	var NIcon = React.createClass({
+		displayName: 'NIcon',
 		propTypes: {
 			size: React.PropTypes.oneOf(["lg", "2x", "3x", "4x", "5x"]),
 			fixWidth: React.PropTypes.bool,
@@ -6881,7 +6980,8 @@
  * Jumbortron
  */
 (function (context, $, $pt) {
-	var NJumbortron = React.createClass({displayName: "NJumbortron",
+	var NJumbortron = React.createClass({
+		displayName: 'NJumbortron',
 		propTypes: {
 			highlightText: React.PropTypes.oneOfType(
 				React.PropTypes.string,
@@ -6912,6 +7012,7 @@
  */
 (function (context, $, $pt) {
 	var NLabel = React.createClass($pt.defineCellComponent({
+		displayName: 'NLabel',
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
@@ -7009,6 +7110,9 @@
 		}
 	}));
 	context.NLabel = NLabel;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Label, function (model, layout, direction, viewMode) {
+		return React.createElement(NLabel, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -7018,7 +7122,8 @@
  * depends NFormButton
  */
 (function (context, $, $pt) {
-	var NConfirm = React.createClass({displayName: "NConfirm",
+	var NConfirm = React.createClass({
+		displayName: 'NConfirm',
 		statics: {
 			getConfirmModal: function (className) {
 				if ($pt.confirmDialog === undefined || $pt.confirmDialog === null) {
@@ -7277,7 +7382,8 @@
  * depends NPanelFooter, NForm, NConfirm
  */
 (function (context, $, $pt) {
-	var NModalForm = React.createClass({displayName: "NModalForm",
+	var NModalForm = React.createClass({
+		displayName: 'NModalForm',
 		statics: {
 			/**
 			 * create form modal dialog
@@ -7443,13 +7549,17 @@
 					              cancel: this.getCancelButton(), 
 					              left: this.getLeftButton(), 
 					              right: this.getRightButton(), 
-					              model: this.getModel()})
+					              model: this.getModel(), 
+								  view: this.isViewMode()})
 				));
 			}
 		},
 		renderBody: function() {
 			return (React.createElement(Modal.Body, {ref: "body", className: !this.state.expanded ? 'hide': null}, 
-				React.createElement(NForm, {model: this.getModel(), layout: this.getLayout(), direction: this.getDirection(), 
+				React.createElement(NForm, {model: this.getModel(), 
+					   layout: this.getLayout(), 
+					   direction: this.getDirection(), 
+					   view: this.isViewMode(), 
 				       ref: "form"})
 			));
 		},
@@ -7553,6 +7663,8 @@
 		getValidationButton: function () {
 			if (this.state.buttons && this.state.buttons.validate === false) {
 				return null;
+			} else if (this.isViewMode()) {
+				return null;
 			} else {
 				return this.onValidateClicked.bind(this);
 			}
@@ -7574,6 +7686,8 @@
 		 */
 		getResetButton: function () {
 			if (this.state.buttons && this.state.buttons.reset === false) {
+				return null;
+			} else if (this.isViewMode()) {
 				return null;
 			} else {
 				return this.onResetClicked.bind(this);
@@ -7613,6 +7727,13 @@
 		 */
 		isExpanded: function() {
 			return this.state.expanded;
+		},
+		/**
+		 * is view mode
+		 * @returns boolean
+		 */
+		isViewMode: function() {
+			return this.state.view;
 		},
 		/**
 		 * validate
@@ -7674,7 +7795,8 @@
 					modal: model.modal == null ? (model.draggable ? false : true) : true,
 					collapsible: model.collapsible,
 					expanded: model.expanded == null ? true : model.expanded,
-					pos: model.pos
+					pos: model.pos,
+					view: model.view === true
 				});
 			} else {
 				console.warn("Properties [draggable, expanded, collapsible, pos] are not supported in parameters, use JSON parameter instead.");
@@ -7689,7 +7811,8 @@
 					draggable: false,
 					modal: true,
 					expanded: true,
-					collapsible: false
+					collapsible: false,
+					view: false
 				});
 			}
 		}
@@ -7761,7 +7884,8 @@
  * Created by brad.wu on 9/2/2015.
  */
 (function (context, $, $pt) {
-	var NNormalLabel = React.createClass({displayName: "NNormalLabel",
+	var NNormalLabel = React.createClass({
+		displayName: 'NNormalLabel',
 		propTypes: {
 			text: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.arrayOf(React.PropTypes.string)]),
 			style: React.PropTypes.string,
@@ -7805,7 +7929,8 @@
  * z-index is 9899 and 9898, less than exception dialog, more than any other.
  */
 (function (context, $, $pt) {
-	var NOnRequestModal = React.createClass({displayName: "NOnRequestModal",
+	var NOnRequestModal = React.createClass({
+		displayName: 'NOnRequestModal',
 		statics: {
 			getOnRequestModal: function (className) {
 				if ($pt.onRequestDialog === undefined || $pt.onRequestDialog === null) {
@@ -7889,7 +8014,8 @@
  * page footer.<br>
  */
 (function (context, $, $pt) {
-	var NPageFooter = React.createClass({displayName: "NPageFooter",
+	var NPageFooter = React.createClass({
+		displayName: 'NPageFooter',
 		statics: {
 			TECH_BASE: 'Parrot',
 			TECH_URL: 'https://github.com/bradwoo8621/parrot',
@@ -7941,7 +8067,8 @@
  * Page Header<br>
  */
 (function (context, $, $pt) {
-	var NPageHeader = React.createClass({displayName: "NPageHeader",
+	var NPageHeader = React.createClass({
+		displayName: 'NPageHeader',
 		statics: {
 			SEARCH_PLACEHOLDER: 'Search...'
 		},
@@ -8129,7 +8256,8 @@
  * NOTE: never jump by itself, must register the toPage and refresh this component manually
  */
 (function (context, $, $pt) {
-	var NPagination = React.createClass({displayName: "NPagination",
+	var NPagination = React.createClass({
+		displayName: 'NPagination',
 		/**
 		 * @override
 		 */
@@ -8481,6 +8609,7 @@
  */
 (function (context, $, $pt) {
 	var NPanel = React.createClass($pt.defineCellComponent({
+		displayName: 'NPanel',
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
@@ -8568,7 +8697,7 @@
 			};
 			return (React.createElement("div", null, 
 				"(", 
-				React.createElement(NCheck, {model: this.getModel(), layout: $pt.createCellLayout('check', layout)}), 
+				React.createElement(NCheck, {model: this.getModel(), layout: $pt.createCellLayout('check', layout), view: this.isViewMode()}), 
 				")"
 			));
 		},
@@ -8611,7 +8740,8 @@
 				return React.createElement(NFormCell, {layout: cell, 
 				                  model: _this.getModel(), 
 				                  ref: cell.getId(), 
-				                  direction: _this.props.direction});
+				                  direction: _this.props.direction, 
+								  view: _this.isViewMode()});
 			});
 			return (React.createElement("div", {className: "row"}, cells));
 		},
@@ -8831,6 +8961,9 @@
 		}
 	}));
 	context.NPanel = NPanel;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Panel, function (model, layout, direction, viewMode) {
+		return React.createElement(NPanel, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -8838,7 +8971,8 @@
  * depends NFormButton
  */
 (function (context, $, $pt) {
-	var NPanelFooter = React.createClass({displayName: "NPanelFooter",
+	var NPanelFooter = React.createClass({
+		displayName: 'NPanelFooter',
 		statics: {
 			RESET_TEXT: "Reset",
 			RESET_ICON: "reply-all",
@@ -8884,7 +9018,8 @@
 			})),
 
 			// model, pass to click
-			model: React.PropTypes.object
+			model: React.PropTypes.object,
+			view: React.PropTypes.bool
 		},
 		/**
 		 * will update
@@ -8941,6 +9076,11 @@
 		 * render button
 		 */
 		renderButton: function (option) {
+			if (this.isViewMode() && option.view == 'edit') {
+				return null;
+			} else if (!this.isViewMode() && option.view == 'view') {
+				return null;
+			}
 			var layout = {
 				label: option.text,
 				comp: {
@@ -9008,6 +9148,9 @@
 		 */
 		getModel: function () {
 			return this.props.model;
+		},
+		isViewMode: function() {
+			return this.props.view;
 		}
 	});
 	context.NPanelFooter = NPanelFooter;
@@ -9046,6 +9189,7 @@
  */
 (function (context, $, $pt) {
 	var NRadio = React.createClass($pt.defineCellComponent({
+		displayName: 'NRadio',
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
@@ -9112,7 +9256,7 @@
 				'radio-label-left': labelInLeft
 			};
 			return (React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
-			             onClick: this.isEnabled() ? this.onButtonClicked.bind(this, option) : null}, 
+			             onClick: (this.isEnabled() && !this.isViewMode()) ? this.onButtonClicked.bind(this, option) : null}, 
             	option.text
         	));
 		},
@@ -9123,8 +9267,9 @@
 		 */
 		renderRadio: function (option) {
 			var checked = this.getValueFromModel() == option.id;
+			var enabled = this.isEnabled();
 			var css = {
-				disabled: !this.isEnabled(),
+				disabled: !enabled,
 				checked: checked,
 				'radio-container': true
 			};
@@ -9133,8 +9278,8 @@
 				labelAtLeft ? this.renderLabel(option, true) : null, 
 				React.createElement("div", {className: "radio-container"}, 
                 React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
-                      onClick: this.isEnabled() ? this.onButtonClicked.bind(this, option) : null, 
-                      onKeyUp: this.isEnabled() ? this.onKeyUp.bind(this, option): null, 
+                      onClick: (enabled && !this.isViewMode()) ? this.onButtonClicked.bind(this, option) : null, 
+                      onKeyUp: (enabled && !this.isViewMode()) ? this.onKeyUp.bind(this, option): null, 
                       tabIndex: "0", 
                       ref: 'out-' + option.id}, 
                     React.createElement("span", {className: "check", onClick: this.onInnerClicked.bind(this, option)})
@@ -9147,7 +9292,8 @@
 			var css = {
 				'n-radio': true,
 				vertical: this.getComponentOption('direction') === 'vertical',
-				'n-disabled': !this.isEnabled()
+				'n-disabled': !this.isEnabled(),
+				'n-view-mode': this.isViewMode()
 			};
 			return (React.createElement("div", {className: this.getComponentCSS($pt.LayoutHelper.classSet(css))}, 
 				this.getComponentOption("data").map(this.renderRadio), 
@@ -9204,6 +9350,9 @@
 		}
 	}));
 	context.NRadio = NRadio;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Radio, function (model, layout, direction, viewMode) {
+		return React.createElement(NRadio, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -9211,20 +9360,21 @@
  */
 (function (context, $, $pt) {
 	var NSearchText = React.createClass($pt.defineCellComponent({
+		displayName: 'NSearchText',
 		statics: {
 			ADVANCED_SEARCH_BUTTON_ICON: 'search',
 			ADVANCED_SEARCH_DIALOG_NAME_LABEL: 'Name',
 			ADVANCED_SEARCH_DIALOG_BUTTON_TEXT: 'Search',
 			ADVANCED_SEARCH_DIALOG_CODE_LABEL: 'Code',
-			ADVANCED_SEARCH_DIALOG_RESULT_TITLE: 'Search Result'
+			ADVANCED_SEARCH_DIALOG_RESULT_TITLE: 'Search Result',
+			NOT_FOUND: 'Not Found'
 		},
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
 			// CellLayout
 			layout: React.PropTypes.object,
-			// label direction
-			direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
+			view: React.PropTypes.bool
 		},
 		getDefaultProps: function () {
 			return {
@@ -9283,6 +9433,9 @@
 		 * @returns {XML}
 		 */
 		render: function () {
+			if (this.isViewMode()) {
+				return this.renderInViewMode();
+			}
 			var enabled = this.isEnabled();
 			var css = {
 				'n-search-text': true
@@ -9338,6 +9491,7 @@
 			var value = evt.new;
 			this.getComponent().val(value);
 			this.retrieveAndSetLabelTextFromRemote(value);
+			// this.forceUpdate();
 		},
 		/**
 		 * show advanced search dialog
@@ -9362,8 +9516,8 @@
 		 */
 		pickupAdvancedResultItem: function (item) {
 			this.state.stopRetrieveLabelFromRemote = true;
-			this.setLabelText(item.name);
 			this.getModel().set(this.getDataId(), item.code);
+			this.setLabelText(item.name);
 			this.state.stopRetrieveLabelFromRemote = false;
 		},
 		initSetValues: function() {
@@ -9378,7 +9532,22 @@
 			}
 		},
 		setLabelText: function (text) {
-			$(React.findDOMNode(this.refs.label)).val(text);
+			if (this.isViewMode()) {
+				var value = this.getValueFromModel();
+				if (value == null) {
+					$(React.findDOMNode(this.refs.viewLabel)).text('');
+				} else {
+					var label = value;
+					if (text == null) {
+						label += ' - ' + NSearchText.NOT_FOUND;
+					} else {
+						label += ' - ' + text;
+					}
+					$(React.findDOMNode(this.refs.viewLabel)).text(label);
+				}
+			} else {
+				$(React.findDOMNode(this.refs.label)).val(text);
+			}
 		},
 		/**
 		 * get label text from remote
@@ -9560,9 +9729,19 @@
 				layout = layout.call(this);
 			}
 			return $pt.createFormLayout(layout);
+		},
+		getTextInViewMode: function() {
+			var value = this.getValueFromModel();
+			if (value != null) {
+
+			}
+			return value;
 		}
 	}));
 	context.NSearchText = NSearchText;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Search, function (model, layout, direction, viewMode) {
+		return React.createElement(NSearchText, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -9609,6 +9788,7 @@
  */
 (function (context, $, $pt) {
 	var NSelect = React.createClass($pt.defineCellComponent({
+		displayName: 'NSelect',
 		statics: {
 			PLACEHOLDER: "Please Select..."
 		},
@@ -9616,7 +9796,8 @@
 			// model
 			model: React.PropTypes.object,
 			// CellLayout
-			layout: React.PropTypes.object
+			layout: React.PropTypes.object,
+			view: React.PropTypes.bool
 		},
 		getDefaultProps: function () {
 			return {
@@ -9667,6 +9848,7 @@
 					minimumResultsForSearch: null,
 					data: null
 				});
+				// TODO might has issue, not clarify yet.
 				this.resetOptions(options);
 			}
 			// reset the value when component update
@@ -9784,6 +9966,9 @@
 		 * @returns {XML}
 		 */
 		render: function () {
+			if (this.isViewMode()) {
+				return this.renderInViewMode();
+			}
 			var css = {
 				'n-disabled': !this.isEnabled()
 			};
@@ -9817,7 +10002,8 @@
 				// do nothing
 				return;
 			} else {
-				this.getComponent().val(evt.new).trigger("change");
+				// this.getComponent().val(evt.new).trigger("change");
+				this.forceUpdate();
 			}
 		},
 		/**
@@ -9899,6 +10085,9 @@
 		 * @param newOptions
 		 */
 		resetOptions: function (newOptions) {
+			if (this.isViewMode()) {
+				return;
+			}
 			// really sucks because select2 doesn't support change the options dynamically
 			var component = this.getComponent();
 			var orgValue = this.getValueFromModel(); //component.val();
@@ -9928,6 +10117,25 @@
 		},
 		getComponent: function () {
 			return $(React.findDOMNode(this.refs.select));
+		},
+		getTextInViewMode: function() {
+			var value = this.getValueFromModel();
+			if (value != null) {
+				var data = null;
+				if (this.hasParent()) {
+					data = this.getAvailableOptions(this.getParentPropertyValue());
+				} else {
+					data = this.convertDataOptions(this.getComponentOption('data'));
+				}
+				data.some(function(item) {
+					if (item.id == value) {
+						value = item.text;
+						return true;
+					}
+					return false;
+				});
+			}
+			return value;
 		}
 	}));
 
@@ -10001,10 +10209,14 @@
 		};
 	})(jQuery);
 	context.NSelect = NSelect;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Select, function (model, layout, direction, viewMode) {
+		return React.createElement(NSelect, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 (function(context, $, $pt) {
 	var NSelectTree = React.createClass($pt.defineCellComponent({
+		displayName: 'NSelectTree',
 		statics: {
 		},
 		propTypes: {
@@ -10202,7 +10414,8 @@
 		},
 		render: function() {
 			var css = {
-				'n-disabled': !this.isEnabled()
+				'n-disabled': !this.isEnabled(),
+				'n-view-mode': this.isViewMode()
 			};
 			css[this.getComponentCSS('n-select-tree')] = true;
 			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), tabIndex: "0"}, 
@@ -10253,7 +10466,7 @@
 			}
 		},
 		onComponentClicked: function() {
-			if (!this.isEnabled()) {
+			if (!this.isEnabled() || this.isViewMode()) {
 				// do nothing
 				return;
 			}
@@ -10431,10 +10644,14 @@
 		}
 	}));
 	context.NSelectTree = NSelectTree;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.SelectTree, function (model, layout, direction, viewMode) {
+		return React.createElement(NSelectTree, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 (function (context, $, $pt) {
-	var NSideMenu = React.createClass({displayName: "NSideMenu",
+	var NSideMenu = React.createClass({
+		displayName: 'NSideMenu',
 		statics: {
 			/**
 			 * get side menu
@@ -10624,7 +10841,8 @@
  * normal tab
  */
 (function (context, $, $pt) {
-	var NTab = React.createClass({displayName: "NTab",
+	var NTab = React.createClass({
+		displayName: 'NTab',
 		propTypes: {
 			type: React.PropTypes.oneOf(['tab', 'pill']),
 			justified: React.PropTypes.bool,
@@ -10656,13 +10874,17 @@
 			};
 		},
 		getInitialState: function () {
-			return {
-				activeTabIndex: null
-			};
+			return {};
+		},
+		componentDidUpdate: function() {
+			this.renderRelatedDOM();
 		},
 		componentDidMount: function () {
+			this.renderRelatedDOM();
+		},
+		renderRelatedDOM: function() {
 			var activeTabIndex = this.getActiveTabIndex();
-			this.props.tabs.map(function (tab, index) {
+			this.props.tabs.forEach(function (tab, index) {
 				if (activeTabIndex == index) {
 					$('#' + tab.innerId).show();
 				} else {
@@ -10726,7 +10948,7 @@
 				   onClick: this.onRemoveClicked}, 
 					React.createElement("span", {className: "fa fa-fw fa-times"})
 				));
-			return (React.createElement("li", {role: "presentation", className: css}, 
+			return (React.createElement("li", {role: "presentation", className: css, key: index}, 
 				React.createElement("a", {href: "javascript:void(0);", onClick: this.onClicked}, 
 					this.renderIcon(tab.icon, this.props.size), 
 					this.renderLabel(tab.label), 
@@ -10773,32 +10995,34 @@
 		 * @returns {number}
 		 */
 		getActiveTabIndex: function () {
-			if (this.state.activeTabIndex != null) {
-				return this.state.activeTabIndex;
-			}
-			var activeTabIndex = 0;
-			this.props.tabs.forEach(function (tab, index) {
-				if (tab.active === true) {
-					activeTabIndex = index;
-				}
+			// find the active tab
+			var activeTabIndex = this.props.tabs.findIndex(function (tab, index) {
+				return tab.active === true;
 			});
-			this.state.activeTabIndex = activeTabIndex;
-			return this.state.activeTabIndex;
+			if (activeTabIndex == -1) {
+				// find the first visible tab if no active tab found
+				activeTabIndex = this.props.tabs.findIndex(function (tab, index) {
+					var visible =  tab.visible !== false;
+					if (visible) {
+						tab.active = true;
+						return true;
+					}
+				});
+			}
+			return activeTabIndex;
 		},
 		/**
 		 * set active tab index
 		 * @param {number}
 		 */
 		setActiveTabIndex: function(index) {
-			if (index < 0) {
-				index = 0;
-			} else if (index >= this.props.tabs.length) {
-				index = this.props.tabs.length - 1;
+			if (index < 0 || index >= this.props.tabs.length) {
+				console.warn('Tab index[' + index + '] out of bound.');
 			}
-			if (index < 0) {
-				throw $pt.createComponentException($pt.ComponentConstants.Err_Tab_Index_Out_Of_Bound, 'Tab index[' + index + '] out of bound.');
-			}
-			this.setState({activeTabIndex: index});
+			this.props.tabs.forEach(function(tab, tabIndex) {
+				tab.active = (tabIndex == index);
+			});
+			this.forceUpdate();
 			return this;
 		},
 		/**
@@ -10808,32 +11032,23 @@
 		onClicked: function (evt) {
 			var newTab = $(evt.target).closest('li');
 			var newTabIndex = newTab.index();
+			var activeTabIndex = this.getActiveTabIndex();
 
 			var canActive = this.props.canActive;
 			if (canActive) {
-				var activeTab = this.props.tabs[this.state.activeTabIndex];
-				var ret = canActive.call(this, this.props.tabs[newTabIndex].value, newTabIndex, activeTab.value, this.state.activeTabIndex);
+				var activeTab = this.props.tabs[activeTabIndex];
+				var ret = canActive.call(this, this.props.tabs[newTabIndex].value, newTabIndex, activeTab.value, activeTabIndex);
 				if (ret === false) {
 					$(':focus').blur();
 					return;
 				}
 			}
 
-			newTab.addClass('active');
-			newTab.parent().children('li').not(newTab).removeClass('active');
-			this.state.activeTabIndex = newTabIndex;
+			this.setActiveTabIndex(newTabIndex);
 
-			var activeInnerId = this.props.tabs[this.state.activeTabIndex].innerId;
-			this.props.tabs.map(function (tab) {
-				if (tab.innerId == activeInnerId) {
-					$('#' + tab.innerId).show();
-				} else {
-					$('#' + tab.innerId).hide();
-				}
-			});
 			var onActive = this.props.onActive;
 			if (onActive) {
-				onActive.call(this, this.props.tabs[this.state.activeTabIndex].value, this.state.activeTabIndex);
+				onActive.call(this, this.props.tabs[newTabIndex].value, newTabIndex);
 			}
 		},
 		/**
@@ -10849,7 +11064,7 @@
 			var activeTab = this.props.tabs[activeIndex];
 			var activeValue = activeTab.value;
 
-			// check it can remove or not
+			// trigger can remove event, check it can remove or not
 			var canRemove = this.props.canRemove;
 			if (canRemove) {
 				var ret = canRemove.call(this, activeValue, activeIndex);
@@ -10860,23 +11075,23 @@
 
 			// remove tab
 			this.props.tabs[activeIndex].visible = false;
-			var _this = this;
 			// find the visible tab
 			// if tab index more than removed one, stop finding
 			// or return the last visible tab which before removed tab
+			var activeTabIndex = -1;
 			this.props.tabs.some(function (tab, index) {
 				if (tab.visible !== false) {
-					_this.state.activeTabIndex = index;
+					activeTabIndex = index;
 					return index > activeIndex;
 				}
 			});
+			this.setActiveTabIndex(activeTabIndex);
 
-			this.forceUpdate(function () {
-				var onRemove = _this.props.onRemove;
-				if (onRemove) {
-					onRemove.call(_this, activeValue, activeIndex);
-				}
-			});
+			// trigger on remove event
+			var onRemove = this.props.onRemove;
+			if (onRemove) {
+				onRemove.call(this, activeValue, activeIndex);
+			}
 		}
 	});
 	context.NTab = NTab;
@@ -10889,6 +11104,7 @@
  */
 (function (context, $, $pt) {
 	var NTable = React.createClass($pt.defineCellComponent({
+		displayName: 'NTable',
 		statics: {
 			__operationButtonWidth: 31,
 			__minOperationButtonWidth: 40,
@@ -11166,6 +11382,8 @@
 				// already initialized, do nothing and return
 				return;
 			}
+
+			var _this = this;
 			// this.state.searchModel.addListener('text', 'post', 'change', this.onSearchBoxChanged);
 
 			// copy from this.props.columns
@@ -11185,10 +11403,21 @@
 			var editable = this.isEditable();
 			var removable = this.isRemovable();
 			var rowOperations = this.getComponentOption("rowOperations");
-			if (rowOperations !== undefined && rowOperations !== null && !Array.isArray(rowOperations)) {
+			if (rowOperations == null) {
+				rowOperations = [];
+			} else if (!Array.isArray(rowOperations)) {
 				rowOperations = [rowOperations];
 			}
-			var hasUserDefinedRowOperations = rowOperations !== undefined && rowOperations !== null;
+			rowOperations = rowOperations.filter(function(operation) {
+				if (_this.isViewMode()) {
+					// in view mode, filter the buttons only in editing
+					return operation.view != 'edit';
+				} else if (!_this.isViewMode()) {
+					// no in view mode, filter the buttons only in view mode
+					return operation.view != 'view';
+				}
+			});
+			var hasUserDefinedRowOperations = rowOperations.length != 0;
 			if (editable || removable || hasUserDefinedRowOperations) {
 				config = {
 					editable: editable,
@@ -11198,14 +11427,24 @@
 				};
 				var maxButtonCount = this.getComponentOption('maxOperationButtonCount');
 				if (maxButtonCount) {
-					config.width = (maxButtonCount + 1) * NTable.__operationButtonWidth;
+					var actualButtonCount = (config.editable ? 1 : 0) + (config.removable ? 1: 0) + rowOperations.length;
+					if (maxButtonCount > actualButtonCount) {
+						// no button in popover
+						config.width = (config.editable ? NTable.__operationButtonWidth : 0) + (config.removable ? NTable.__operationButtonWidth : 0);
+						if (hasUserDefinedRowOperations) {
+							config.width += NTable.__operationButtonWidth * config.rowOperations.length;
+						}
+					} else {
+						// still some buttons in popover
+						config.width = (maxButtonCount + 1) * NTable.__operationButtonWidth;
+					}
 				} else {
 					config.width = (config.editable ? NTable.__operationButtonWidth : 0) + (config.removable ? NTable.__operationButtonWidth : 0);
 					if (hasUserDefinedRowOperations) {
 						config.width += NTable.__operationButtonWidth * config.rowOperations.length;
 					}
-					config.width = config.width < NTable.__minOperationButtonWidth ? NTable.__minOperationButtonWidth : config.width;
 				}
+				config.width = config.width < NTable.__minOperationButtonWidth ? NTable.__minOperationButtonWidth : config.width;
 				this.state.columns.push(config);
 				if (this.fixedRightColumns > 0 || this.getComponentOption("operationFixed") === true) {
 					this.fixedRightColumns++;
@@ -11672,8 +11911,15 @@
 		 * @returns {XML}
 		 */
 		renderOperationCell: function (column, rowModel) {
+			var needPopover = false;
 			var maxButtonCount = this.getComponentOption('maxOperationButtonCount');
-			if (!maxButtonCount) {
+			if (maxButtonCount) {
+				var actualButtonCount = (column.editable ? 1 : 0) + (column.removable ? 1 : 0) + column.rowOperations.length;
+				if (actualButtonCount > maxButtonCount) {
+					needPopover = true;
+				}
+			}
+			if (!needPopover) {
 				return this.renderFlatOperationCell(column, rowModel);
 			} else {
 				return this.renderDropDownOperationCell(column, rowModel, maxButtonCount);
@@ -11765,7 +12011,10 @@
 									}
 								}
 								// pre-defined, use with data together
-								data = React.createElement(NFormCell, {model: inlineModel, layout: $pt.createCellLayout(column.data, layout), direction: "horizontal"});
+								data = React.createElement(NFormCell, {model: inlineModel, 
+												  layout: $pt.createCellLayout(column.data, layout), 
+												  direction: "horizontal", 
+												  view: _this.isViewMode()});
 							} else if (column.inline.inlineType == 'cell') {
 								column.inline.pos = {width: 12};
 								if (column.inline.css) {
@@ -11773,13 +12022,18 @@
 								} else {
 									column.inline.css = {cell: 'inline-editor'};
 								}
-								data = React.createElement(NFormCell, {model: inlineModel, layout: $pt.createCellLayout(column.data, column.inline), 
-													direction: "horizontal", 
-													className: column.inline.__className});
+								data = React.createElement(NFormCell, {model: inlineModel, 
+												  layout: $pt.createCellLayout(column.data, column.inline), 
+												  direction: "horizontal", 
+												  view: _this.isViewMode(), 
+												  className: column.inline.__className});
 							} else {
 								// any other, treat as form layout
 								// column.data is not necessary
-								data = React.createElement(NForm, {model: inlineModel, layout: $pt.createFormLayout(column.inline), direction: "horizontal"});
+								data = React.createElement(NForm, {model: inlineModel, 
+											  layout: $pt.createFormLayout(column.inline), 
+											  direction: "horizontal", 
+											  view: this.isViewMode()});
 							}
 						} else {
 							// data is property name
@@ -12278,7 +12532,7 @@
 		 * @returns {boolean}
 		 */
 		isAddable: function () {
-			return this.getComponentOption("addable");
+			return this.getComponentOption("addable") && !this.isViewMode();
 		},
 		/**
 		 * check the table is editable or not
@@ -12295,7 +12549,7 @@
 		 * @returns {boolean}
 		 */
 		isRemovable: function () {
-			return this.getComponentOption("removable");
+			return this.getComponentOption("removable") && !this.isViewMode();
 		},
 		getRowRemoveButtonEnabled: function() {
 			return this.getComponentOption('rowRemoveEnabled');
@@ -12319,6 +12573,9 @@
 		 * @returns {boolean}
 		 */
 		isRowSelectable: function () {
+			if (this.isViewMode()) {
+				return false;
+			}
 			return this.getComponentOption('rowSelectable');
 		},
 		/**
@@ -12535,11 +12792,17 @@
 							icon: NTable.EDIT_DIALOG_SAVE_BUTTON_ICON,
 							text: NTable.EDIT_DIALOG_SAVE_BUTTON_TEXT,
 							style: "primary",
-							click: this.onEditCompleted.bind(this)
+							click: this.onEditCompleted.bind(this),
+							// show save when editing
+							view: 'edit'
 						}],
 						reset: this.getComponentOption('dialogResetVisible'),
-						validate: this.getComponentOption('dialogValidateVisible')
-					}
+						validate: this.getComponentOption('dialogValidateVisible'),
+						// use default cancel behavior when editing
+						// simply hide dialog when in view mode
+						cancel: this.isViewMode() ? function(model, hide) {hide();} : true
+					},
+					view: this.isViewMode()
 				});
 			}
 		},
@@ -12865,6 +13128,9 @@
 		}
 	}));
 	context.NTable = NTable;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Table, function (model, layout, direction, viewMode) {
+		return React.createElement(NTable, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -12917,6 +13183,7 @@
  */
 (function (context, $, $pt) {
 	var NText = React.createClass($pt.defineCellComponent({
+		displayName: 'NText',
 		statics: {
 			NUMBER_FORMAT: function(value) {
 				var parts = (value + '').split('.');
@@ -12968,7 +13235,10 @@
 		 * @param prevState
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
-			var formattedValue = this.getFormattedValue(this.getValueFromModel());
+			var formattedValue = this.getValueFromModel();
+			if (!$(React.findDOMNode(this.refs.focusLine)).hasClass('focus')) {
+				formattedValue = this.getFormattedValue(formattedValue);
+			}
 			if (this.getComponent().val() != formattedValue) {
 				this.getComponent().val(formattedValue);
 			}
@@ -13080,6 +13350,9 @@
 		 * @returns {XML}
 		 */
 		render: function () {
+			if (this.isViewMode()) {
+				return this.renderInViewMode();
+			}
 			var css = {
 				'n-disabled': !this.isEnabled()
 			};
@@ -13135,15 +13408,18 @@
 		 * @param evt
 		 */
 		onModelChanged: function (evt) {
-			var formattedValue = this.getValueFromModel();
-			if (!$(React.findDOMNode(this.refs.focusLine)).hasClass('focus')) {
-				formattedValue = this.getFormattedValue(formattedValue);
-			}
-			if (formattedValue == this.getComponent().val()) {
-				return;
-			}
-			// console.debug('Text model changed[modelValue=' + evt.new + ', compValue=' + this.getComponent().val() + '].');
-			this.getComponent().val(formattedValue);
+			this.forceUpdate();
+			// return;
+			//
+			// var formattedValue = this.getValueFromModel();
+			// if (!$(React.findDOMNode(this.refs.focusLine)).hasClass('focus')) {
+			// 	formattedValue = this.getFormattedValue(formattedValue);
+			// }
+			// if (formattedValue == this.getComponent().val()) {
+			// 	return;
+			// }
+			// // console.debug('Text model changed[modelValue=' + evt.new + ', compValue=' + this.getComponent().val() + '].');
+			// this.getComponent().val(formattedValue);
 		},
 		onKeyUp: function (evt) {
 			var monitor = this.getEventMonitor('keyUp');
@@ -13221,6 +13497,9 @@
 		}
 	}));
 	context.NText = NText;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Text, function (model, layout, direction, viewMode) {
+		return React.createElement(NText, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -13261,6 +13540,7 @@
  */
 (function (context, $, $pt) {
 	var NTextArea = React.createClass($pt.defineCellComponent({
+		displayName: 'NTextArea',
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
@@ -13347,6 +13627,9 @@
 		 * @returns {XML}
 		 */
 		render: function () {
+			if (this.isViewMode()) {
+				return this.renderInViewMode();
+			}
 			var css = {
 				'n-disabled': !this.isEnabled()
 			};
@@ -13377,11 +13660,12 @@
 		 * @param evt
 		 */
 		onModelChanged: function (evt) {
-			var value = evt.new;
-			if (value == this.getComponent().val()) {
-				return;
-			}
-			this.getComponent().val(evt.new);
+			// var value = evt.new;
+			// if (value == this.getComponent().val()) {
+			// 	return;
+			// }
+			// this.getComponent().val(evt.new);
+			this.forceUpdate();
 		},
 		/**
 		 * on addon clicked
@@ -13399,9 +13683,19 @@
 		 */
 		getComponent: function () {
 			return $(React.findDOMNode(this.refs.txt));
+		},
+		getTextInViewMode: function() {
+			var value = this.getValueFromModel();
+			if (value != null) {
+				value = value.split(/\r|\n/);
+			}
+			return value;
 		}
 	}));
 	context.NTextArea = NTextArea;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.TextArea, function (model, layout, direction, viewMode) {
+		return React.createElement(NTextArea, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 /**
@@ -13409,6 +13703,7 @@
  */
 (function (context, $, $pt) {
 	var NToggle = React.createClass($pt.defineCellComponent({
+		displayName: 'NToggle',
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
@@ -13468,9 +13763,9 @@
 				disabled: !this.isEnabled()
 			};
 			css[className] = true;
-			return React.createElement("span", {className: $pt.LayoutHelper.classSet(css)}, 
-            label
-        );
+			return (React.createElement("span", {className: $pt.LayoutHelper.classSet(css)}, 
+	            label
+	        ));
 		},
 		renderLeftLabel: function () {
 			var labelAttached = this.getComponentOption('labelAttached');
@@ -13512,7 +13807,8 @@
 		 */
 		render: function () {
 			var css = {
-				'n-disabled': !this.isEnabled()
+				'n-disabled': !this.isEnabled(),
+				'n-view-mode': this.isViewMode()
 			};
 			css[this.getComponentCSS('n-toggle')] = true;
 
@@ -13528,7 +13824,7 @@
 		 * handle button clicked event
 		 */
 		onButtonClicked: function (value) {
-			if (this.isEnabled()) {
+			if (this.isEnabled() && !this.isViewMode()) {
 				this.setValueToModel(value);
 			}
 		},
@@ -13564,10 +13860,14 @@
 		}
 	}));
 	context.NToggle = NToggle;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Toggle, function (model, layout, direction, viewMode) {
+		return React.createElement(NToggle, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));
 
 (function(context, $, $pt) {
     var NTree = React.createClass($pt.defineCellComponent({
+        displayName: 'NTree',
         statics: {
             ROOT_LABEL: 'Root',
             FOLDER_ICON: 'folder-o',
@@ -13727,7 +14027,7 @@
                 }
             });
             model.addPostChangeListener('selected', this.onNodeCheckChanged.bind(this, node, nodeId));
-            return React.createElement(NCheck, {model: model, layout: layout});
+            return React.createElement(NCheck, {model: model, layout: layout, view: this.isViewMode()});
         },
         renderNode: function(parentNodeId, node) {
             var nodeId = this.getNodeId(parentNodeId, node);
@@ -14211,4 +14511,7 @@
 
     // expose to global
     context.NTree = NTree;
+    $pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Tree, function (model, layout, direction, viewMode) {
+		return React.createElement(NTree, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+	});
 }(this, jQuery, $pt));

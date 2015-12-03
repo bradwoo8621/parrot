@@ -62,7 +62,8 @@
 				{text: 'Radio Button', func: $demo.renderer.formRadio},
 				{text: 'Toggle', func: $demo.renderer.formToggle},
 				{divider: true},
-				{text: 'Nothing', func: $demo.renderer.formNothing}
+				{text: 'Nothing', func: $demo.renderer.formNothing},
+				{text: 'View Mode', func: $demo.renderer.viewMode},
 			]
 		},
 		{
@@ -128,7 +129,7 @@
 			<p className='lead'/>
 
 			<p className='lead'>
-				Parrot is the model based framework for developing responsive projects on the web, base on Bootstrap 3
+				Parrot is a model based framework for developing responsive projects on the web, base on Bootstrap 3
 				and
 				ReactJS.
 			</p>
@@ -138,7 +139,7 @@
 					Parrot</a>
 			</p>
 
-			<p className='version'>Currently v0.0.4</p>
+			<p className='version'>Currently v0.0.5 Released. v0.0.6 under development.</p>
 		</div>);
 
 		React.render(index, document.getElementById('main'));

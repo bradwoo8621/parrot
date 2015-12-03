@@ -599,7 +599,7 @@
 					label: 'Label Of Cell',
 					comp: {
 						type: {
-							render: function (model, layout, direction) {
+							render: function (model, layout, direction, viewMode) {
 								// return <span>Customized Component with direction={direction}</span>
 								return <span>Customized Component with direction={direction}</span>;
 							}
@@ -621,7 +621,7 @@
 						Customize Form component is allowed by following:<br/>
 						1: Declare as <code>comp: {'\u007B'}type: {'\u007B'}render: function{'\u007D\u007D'}</code>,
 						It's temporary mode, when the customized component only use in current page.<br/>
-						2. Register via static function of NFormCell, <code>NFormCell.registerComponentRenderer(type,
+						2. Register via static function of NFormCell, <code>$pt.LayoutHelper.registerComponentRenderer(type,
 						function);</code>
 						Type is a string such as 'new-one', then in cell layout JSON, type can be used as
 						<code>comp: {'\u007B'}type: 'new-one'{'\u007D'}</code>,
@@ -629,7 +629,8 @@
 						Function above accepts three parameters as below:<br/>
 						1. model: form model,<br/>
 						2. layout: cell layout, which needs to be accepted by customized component,<br/>
-						3. direction: label direction, <code>vertical</code> or <code>horizontal</code>.
+						3. direction: label direction, <code>vertical</code> or <code>horizontal</code>.<br/>
+						4. viewMode: the component is shown on view mode or not.
 					</span>, <br/>,
 						<span>Here is a sample in registration mode one.</span>],
 					xml: <NFormCell model={model} layout={$pt.createCellLayout('value', layoutTemplate)}/>,
