@@ -1,4 +1,4 @@
-/** com.github.nest.parrot.V0.0.6 2015-12-02 */
+/** com.github.nest.parrot.V0.0.6 2015-12-03 */
 (function ($) {
 	var patches = {
 		console: function () {

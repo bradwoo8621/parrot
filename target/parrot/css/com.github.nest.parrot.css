@@ -1032,14 +1032,9 @@ div.n-pagination ul.pagination > li > a {
 ul.pagination > li > a.active {
   background-color: #eeeeee;
 }
-@media (min-width: 1350px) {
+@media (min-width: 768px) {
   div.n-modal-form > div.modal-dialog {
-    width: 900px;
-  }
-}
-@media (min-width: 1200px) {
-  div.n-modal-form > div.modal-dialog {
-    width: 900px;
+    width: 650px;
   }
 }
 @media (min-width: 992px) {
@@ -1047,9 +1042,19 @@ ul.pagination > li > a.active {
     width: 800px;
   }
 }
-@media (min-width: 768px) {
+@media (min-width: 1200px) {
   div.n-modal-form > div.modal-dialog {
-    width: 650px;
+    width: 900px;
+  }
+}
+@media (min-width: 1440px) {
+  div.n-modal-form > div.modal-dialog {
+    width: 1200px;
+  }
+}
+@media (min-width: 1920px) {
+  div.n-modal-form > div.modal-dialog {
+    width: 1500px;
   }
 }
 div.n-modal-form.advanced-search-dialog .n-modal-form-footer {
