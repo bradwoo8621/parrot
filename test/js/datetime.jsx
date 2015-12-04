@@ -28,14 +28,6 @@
         },
         pos: {row: 1, col: 1}
     });
-    var monthDay = $pt.createCellLayout('name', {
-        label: 'Plain Text',
-        comp: {
-            type: $pt.ComponentConstants.Date,
-            format: 'MM/DD'
-        },
-        pos: {row: 1, col: 1}
-    });
     var datetime = $pt.createCellLayout('name', {
         label: 'Plain Text',
         comp: {
@@ -71,8 +63,10 @@
         comp: {
             type: $pt.ComponentConstants.Date,
             format: 'tYY/MM/DD',
-            dayViewHeaderFormat: '民國tYY年MM月',
             headerYearFormat: '民國tYY年',
+            headerMonthFormat: 'MM月',
+            bodyYearFormat: 'tYY',
+            headerMonthFirst: false,
             locale: 'zh-TW',
             valueFormat: $pt.ComponentConstants.Default_Date_Format
         },
@@ -87,10 +81,8 @@
             <NDateTime model={model} layout={yearMonth}/>
             <span>YYYY</span>
             <NDateTime model={model} layout={year}/>
-            <span>MM/DD</span>
-            <NDateTime model={model} layout={monthDay}/>
             <span>Data Time</span>
-            <NDateTime model={model} layout={datetime}/>
+            <NDateTime2 model={model} layout={datetime}/>
             <span>Time</span>
             <NDateTime model={model} layout={time}/>
             <span>Taiwan Format</span>
