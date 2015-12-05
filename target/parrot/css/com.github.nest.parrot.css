@@ -712,12 +712,11 @@ div.n-datetime.popover.bottom .popover-content .calendar-body .time-view-body-bo
   text-align: center;
   padding-top: 15px;
   flex-grow: 1;
+  display: flex;
+  justify-content: space-around;
 }
 div.n-datetime.popover.bottom .popover-content .calendar-body .time-view-body-body svg.clock {
   overflow: overlay;
-}
-div.n-datetime.popover.bottom .popover-content .calendar-body .time-view-body-body svg.clock circle.primary {
-  fill: transparent;
 }
 div.n-datetime.popover.bottom .popover-content .calendar-body .time-view-body-body svg.clock text.text {
   fill: #999999;
@@ -727,8 +726,23 @@ div.n-datetime.popover.bottom .popover-content .calendar-body .time-view-body-bo
 div.n-datetime.popover.bottom .popover-content .calendar-body .time-view-body-body svg.clock text.text.minute {
   font-size: 1em;
 }
-div.n-datetime.popover.bottom .popover-content .calendar-body .time-view-body-body svg.clock text.text.hour {
+div.n-datetime.popover.bottom .popover-content .calendar-body .time-view-body-body svg.clock text.text.hour-12,
+div.n-datetime.popover.bottom .popover-content .calendar-body .time-view-body-body svg.clock text.text.hour-24 {
   font-size: 0.7em;
+}
+div.n-datetime.popover.bottom .popover-content .calendar-body .time-view-body-body svg.clock text.text.am {
+  text-anchor: start;
+  font-size: 1em;
+  cursor: pointer;
+}
+div.n-datetime.popover.bottom .popover-content .calendar-body .time-view-body-body svg.clock text.text.pm {
+  text-anchor: end;
+  font-size: 1em;
+  cursor: pointer;
+}
+div.n-datetime.popover.bottom .popover-content .calendar-body .time-view-body-body svg.clock text.text.am.yes,
+div.n-datetime.popover.bottom .popover-content .calendar-body .time-view-body-body svg.clock text.text.pm.yes {
+  fill: #2196f3;
 }
 div.n-datetime.popover.bottom .popover-content .calendar-body .time-view-body-body svg.clock text.text.top-num {
   text-anchor: middle;
@@ -772,7 +786,8 @@ div.n-datetime.popover.bottom .popover-content .calendar-footer {
   margin-right: 0;
 }
 div.n-datetime.popover.bottom .popover-content .calendar-footer div {
-  padding-top: 2px;
+  padding-top: 4px;
+  padding-bottom: 4px;
   border-radius: 4px;
   cursor: pointer;
   position: relative;

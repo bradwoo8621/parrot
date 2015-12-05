@@ -1,3 +1,6 @@
+/**
+ * the coordinate system of clock is center or circle.
+ */
 (function(context, $, moment, $pt) {
 	var NDateTime2 = React.createClass($pt.defineCellComponent({
 		displayName: 'NDateTime2',
@@ -393,16 +396,130 @@
 						  x2={radius * Math.cos(Math.PI * 2 * degree / 360) + offset}
 						  y2={offset - radius * Math.sin(Math.PI * 2 * degree / 360)}/>);
 		},
-		renderHourHand: function(date, radius, offset) {
+		render12HourDial: function(date, popoverType) {
+			var _this = this;
+			var am = date.hour() <= 11; // 0-23
+			var hourRadius = this.getHourRadius();
+			return (<g>
+				<text className={'text hour-12 am' + (am ? ' yes' : '')}
+					  onClick={this.onAMPMSelected.bind(this, true, popoverType)}
+					  x={0}
+					  y={0}>AM</text>
+				<text className={'text hour-12 pm' + (am ? '' : ' yes')}
+					  onClick={this.onAMPMSelected.bind(this, false, popoverType)}
+					  x={NDateTime2.CLOCK_RADIUS * 2}
+					  y={0}>PM</text>
+				<text className='text hour-12 top-num'
+					  x={NDateTime2.CLOCK_CHAR_POS.TOP.X}
+					  y={NDateTime2.CLOCK_CHAR_POS.TOP.Y + NDateTime2.CLOCK_RADIUS - hourRadius}>0</text>
+				<text className='text hour-12 left-num'
+					  x={NDateTime2.CLOCK_CHAR_POS.LEFT.X + NDateTime2.CLOCK_RADIUS - hourRadius}
+					  y={NDateTime2.CLOCK_CHAR_POS.LEFT.Y}>9</text>
+				<text className='text hour-12 right-num'
+					  x={NDateTime2.CLOCK_CHAR_POS.RIGHT.X - NDateTime2.CLOCK_RADIUS + hourRadius}
+					  y={NDateTime2.CLOCK_CHAR_POS.RIGHT.Y}>3</text>
+				<text className='text hour-12 bottom-num'
+					  x={NDateTime2.CLOCK_CHAR_POS.BOTTOM.X}
+					  y={NDateTime2.CLOCK_CHAR_POS.BOTTOM.Y - NDateTime2.CLOCK_RADIUS + hourRadius}>6</text>
+				{[30, 60, 120, 150, 210, 240, 300, 330].map(function(degree) {
+					return _this.renderEngrave(degree,
+						hourRadius,
+						NDateTime2.CLOCK_SMALL_ENGRAVE_LENGTH,
+						'big',
+						NDateTime2.CLOCK_RADIUS);
+				})}
+			</g>);
+		},
+		render24HourDial: function() {
+			var _this = this;
+			var hourRadius = this.getHourRadius();
+			return (<g>
+				<text className='text hour-24 top-num'
+					  x={NDateTime2.CLOCK_CHAR_POS.TOP.X}
+					  y={NDateTime2.CLOCK_CHAR_POS.TOP.Y + NDateTime2.CLOCK_RADIUS - hourRadius}>0</text>
+				<text className='text hour-24 left-num'
+					  x={NDateTime2.CLOCK_CHAR_POS.LEFT.X + NDateTime2.CLOCK_RADIUS - hourRadius}
+					  y={NDateTime2.CLOCK_CHAR_POS.LEFT.Y}>18</text>
+				<text className='text hour-24 right-num'
+					  x={NDateTime2.CLOCK_CHAR_POS.RIGHT.X - NDateTime2.CLOCK_RADIUS + hourRadius}
+					  y={NDateTime2.CLOCK_CHAR_POS.RIGHT.Y}>6</text>
+				<text className='text hour-24 bottom-num'
+					  x={NDateTime2.CLOCK_CHAR_POS.BOTTOM.X}
+					  y={NDateTime2.CLOCK_CHAR_POS.BOTTOM.Y - NDateTime2.CLOCK_RADIUS + hourRadius}>12</text>
+				{[45, 135, 225, 315].map(function(degree) {
+					return _this.renderEngrave(degree,
+						hourRadius,
+						NDateTime2.CLOCK_BIG_ENGRAVE_LENGTH,
+						'big',
+						NDateTime2.CLOCK_RADIUS);
+				})}
+				{[15, 30, 60, 75, 105, 120, 150, 165, 195, 210, 240, 255, 285, 300, 330, 345].map(function(degree) {
+					return _this.renderEngrave(degree,
+						hourRadius,
+						NDateTime2.CLOCK_SMALL_ENGRAVE_LENGTH,
+						'small',
+						NDateTime2.CLOCK_RADIUS);
+				})}
+			</g>);
+		},
+		renderMinuteDial: function() {
+			if (!this.hasMinute()) {
+				// no minute need to display
+				return null;
+			}
+			var _this = this;
+			return (<g>
+				<text className='text minute top-num'
+					  x={NDateTime2.CLOCK_CHAR_POS.TOP.X}
+					  y={NDateTime2.CLOCK_CHAR_POS.TOP.Y}>0</text>
+				<text className='text minute left-num'
+					  x={NDateTime2.CLOCK_CHAR_POS.LEFT.X}
+					  y={NDateTime2.CLOCK_CHAR_POS.LEFT.Y}>45</text>
+				<text className='text minute right-num'
+					  x={NDateTime2.CLOCK_CHAR_POS.RIGHT.X}
+					  y={NDateTime2.CLOCK_CHAR_POS.RIGHT.Y}>15</text>
+				<text className='text minute bottom-num'
+					  x={NDateTime2.CLOCK_CHAR_POS.BOTTOM.X}
+					  y={NDateTime2.CLOCK_CHAR_POS.BOTTOM.Y}>30</text>
+				{[30, 60, 120, 150, 210, 240, 300, 330].map(function(degree) {
+					return _this.renderEngrave(degree,
+						NDateTime2.CLOCK_RADIUS,
+						NDateTime2.CLOCK_BIG_ENGRAVE_LENGTH,
+						'big',
+						NDateTime2.CLOCK_RADIUS);
+				})}
+				{[6, 12, 18, 24, 36, 42, 48, 54, 66, 72, 78, 84,
+					96, 102, 108, 114, 126, 132, 138, 144, 156, 162, 168, 174,
+					186, 192, 198, 204, 216, 222, 228, 234, 246, 252, 258, 264,
+					276, 282, 288, 294, 306, 312, 318, 324, 336, 342, 348, 354].map(function(degree) {
+					return _this.renderEngrave(degree,
+						NDateTime2.CLOCK_RADIUS,
+						NDateTime2.CLOCK_SMALL_ENGRAVE_LENGTH,
+						'small',
+						NDateTime2.CLOCK_RADIUS);
+				})}
+			</g>);
+		},
+		renderHourHand: function(date, offset) {
 			var hour = date.hour();
-			var degree = 450 - hour * 15;
+			var degree = null;
+			if (this.is12Hour()) {
+				degree = 450 - hour * 30;
+			} else {
+				degree = 450 - hour * 15;
+			}
+			var hourRadius = this.getHourRadius();
 			return (<line x1={offset + NDateTime2.CLOCK_HAND_OFFSET * Math.cos(Math.PI * 2 * (degree - 180) / 360)}
 						  y1={offset - NDateTime2.CLOCK_HAND_OFFSET * Math.sin(Math.PI * 2 * (degree - 180) / 360)}
-						  x2={offset + (radius - NDateTime2.CLOCK_HAND_OFFSET) * Math.cos(Math.PI * 2 * (degree) / 360)}
-						  y2={offset - (radius - NDateTime2.CLOCK_HAND_OFFSET) * Math.sin(Math.PI * 2 * (degree) / 360)}
+						  x2={offset + (hourRadius - NDateTime2.CLOCK_HAND_OFFSET) * Math.cos(Math.PI * 2 * (degree) / 360)}
+						  y2={offset - (hourRadius - NDateTime2.CLOCK_HAND_OFFSET) * Math.sin(Math.PI * 2 * (degree) / 360)}
 						  className='hour-hand' />);
 		},
 		renderMinuteHand: function(date, radius, offset) {
+			if (!this.hasMinute()) {
+				// no minute need to display
+				return null;
+			}
 			var minute = date.minute();
 			var degree = 450 - minute * 6;
 			return (<line x1={offset + NDateTime2.CLOCK_HAND_OFFSET * Math.cos(Math.PI * 2 * (degree - 180) / 360)}
@@ -412,6 +529,11 @@
 						  className='minute-hand' />);
 		},
 		renderSecondHand: function(date, radius, offset) {
+			var popoverType = this.guessDisplayFormatType();
+			if (!this.hasSecond()) {
+				// no minute need to display
+				return null;
+			}
 			var _this = this;
 			var second = date.second();
 			var degree = 450 - second * 6;
@@ -421,85 +543,46 @@
 						  y2={offset - (radius) * Math.sin(Math.PI * 2 * (degree) / 360)}
 						  className='second-hand' />);
 		},
-		renderTime: function(date) {
+		renderTime: function(date, popoverType) {
 			var _this = this;
-			var type = this.guessDisplayFormatType();
-			if (!this.hasTimeToDisplay(type)) {
+			var allPopoverType = this.guessDisplayFormatType();
+			if (!this.hasTimeToDisplay(allPopoverType)) {
 				return null;
 			}
 			var styles = {
 				float: 'left',
-				width: this.hasDateToDisplay(type) ? '50%' : '100%'
+				width: this.hasDateToDisplay(allPopoverType) ? '50%' : '100%'
 			};
-			var hourRadius = NDateTime2.CLOCK_RADIUS * NDateTime2.CLOCK_HOUR_PERCENTAGE;
+			var titleFormat = 'HH';
+			if (this.hasSecond()) {
+				titleFormat = 'HH:mm:ss';
+			} else if (this.hasMinute()) {
+				titleFormat = 'HH:mm';
+			}
 			return (<div className='time-view' style={styles}>
 				<div className='calendar-header'>
-					{date.format('HH:mm:ss')}
+					{date.format(titleFormat)}
 				</div>
 				<div className='calendar-body'>
 					<div className='time-view-body-body'>
-						<svg className='clock' height={NDateTime2.CLOCK_RADIUS * 2} width={NDateTime2.CLOCK_RADIUS * 2}>
-							<circle className='primary'
-									style={{cx: NDateTime2.CLOCK_RADIUS, cy: NDateTime2.CLOCK_RADIUS, r: NDateTime2.CLOCK_RADIUS}}/>
-							<text className='text minute top-num'
-								  x={NDateTime2.CLOCK_CHAR_POS.TOP.X}
-								  y={NDateTime2.CLOCK_CHAR_POS.TOP.Y}>0</text>
-							<text className='text minute left-num'
-								  x={NDateTime2.CLOCK_CHAR_POS.LEFT.X}
-								  y={NDateTime2.CLOCK_CHAR_POS.LEFT.Y}>45</text>
-							<text className='text minute right-num'
-								  x={NDateTime2.CLOCK_CHAR_POS.RIGHT.X}
-								  y={NDateTime2.CLOCK_CHAR_POS.RIGHT.Y}>15</text>
-							<text className='text minute bottom-num'
-								  x={NDateTime2.CLOCK_CHAR_POS.BOTTOM.X}
-								  y={NDateTime2.CLOCK_CHAR_POS.BOTTOM.Y}>30</text>
-							{[30, 60, 120, 150, 210, 240, 300, 330].map(function(degree) {
-								return _this.renderEngrave(degree,
-									NDateTime2.CLOCK_RADIUS,
-									NDateTime2.CLOCK_BIG_ENGRAVE_LENGTH,
-									'big',
-									NDateTime2.CLOCK_RADIUS);
-							})}
-							{[6, 12, 18, 24, 36, 42, 48, 54, 66, 72, 78, 84,
-								96, 102, 108, 114, 126, 132, 138, 144, 156, 162, 168, 174,
-								186, 192, 198, 204, 216, 222, 228, 234, 246, 252, 258, 264,
-								276, 282, 288, 294, 306, 312, 318, 324, 336, 342, 348, 354].map(function(degree) {
-								return _this.renderEngrave(degree,
-									NDateTime2.CLOCK_RADIUS,
-									NDateTime2.CLOCK_SMALL_ENGRAVE_LENGTH,
-									'small',
-									NDateTime2.CLOCK_RADIUS);
-							})}
-							<text className='text hour top-num'
-								  x={NDateTime2.CLOCK_CHAR_POS.TOP.X}
-								  y={NDateTime2.CLOCK_CHAR_POS.TOP.Y + NDateTime2.CLOCK_RADIUS - hourRadius}>0</text>
-							<text className='text hour left-num'
-								  x={NDateTime2.CLOCK_CHAR_POS.LEFT.X + NDateTime2.CLOCK_RADIUS - hourRadius}
-								  y={NDateTime2.CLOCK_CHAR_POS.LEFT.Y}>18</text>
-							<text className='text hour right-num'
-								  x={NDateTime2.CLOCK_CHAR_POS.RIGHT.X - NDateTime2.CLOCK_RADIUS + hourRadius}
-								  y={NDateTime2.CLOCK_CHAR_POS.RIGHT.Y}>6</text>
-							<text className='text hour bottom-num'
-								  x={NDateTime2.CLOCK_CHAR_POS.BOTTOM.X}
-								  y={NDateTime2.CLOCK_CHAR_POS.BOTTOM.Y - NDateTime2.CLOCK_RADIUS + hourRadius}>12</text>
-							{[45, 135, 225, 315].map(function(degree) {
-								return _this.renderEngrave(degree,
-									hourRadius,
-									NDateTime2.CLOCK_BIG_ENGRAVE_LENGTH,
-									'big',
-									NDateTime2.CLOCK_RADIUS);
-							})}
-							{[15, 30, 60, 75, 105, 120, 150, 165, 195, 210, 240, 255, 285, 300, 330, 345].map(function(degree) {
-								return _this.renderEngrave(degree,
-									hourRadius,
-									NDateTime2.CLOCK_SMALL_ENGRAVE_LENGTH,
-									'small',
-									NDateTime2.CLOCK_RADIUS);
-							})}
-							{this.renderHourHand(date, hourRadius, NDateTime2.CLOCK_RADIUS)}
-							{this.renderMinuteHand(date, NDateTime2.CLOCK_RADIUS, NDateTime2.CLOCK_RADIUS)}
-							{this.renderSecondHand(date, NDateTime2.CLOCK_RADIUS, NDateTime2.CLOCK_RADIUS)}
-						</svg>
+						<div style={{height: NDateTime2.CLOCK_RADIUS * 2, width: NDateTime2.CLOCK_RADIUS * 2, position: 'relative'}}>
+							<svg className='clock'
+								 height={NDateTime2.CLOCK_RADIUS * 2}
+								 width={NDateTime2.CLOCK_RADIUS * 2}>
+								{this.renderMinuteDial()}
+								{this.is12Hour() ? this.render12HourDial(date, popoverType) : this.render24HourDial()}
+								{this.renderHourHand(date, NDateTime2.CLOCK_RADIUS)}
+								{this.renderMinuteHand(date, NDateTime2.CLOCK_RADIUS, NDateTime2.CLOCK_RADIUS)}
+								{this.renderSecondHand(date, NDateTime2.CLOCK_RADIUS, NDateTime2.CLOCK_RADIUS)}
+							</svg>
+							<div style={{position: 'absolute',
+										 'background-color': 'transparent',
+										 top: 0,
+										 left: 0,
+										 height: NDateTime2.CLOCK_RADIUS * 2,
+										 width: NDateTime2.CLOCK_RADIUS * 2}}
+								 onClick={this.onClockClicked.bind(this, popoverType)}/>
+						</div>
 					</div>
 				</div>
 			</div>);
@@ -528,7 +611,7 @@
 						{this.renderDayBody(date)}
 						{this.renderPopoverContentFooter(this.getToday(), NDateTime2.FORMAT_TYPES.DAY)}
 					</div>
-					{this.renderTime(date)}
+					{this.renderTime(date, NDateTime2.FORMAT_TYPES.DAY)}
 				</div>);
 			} else if ((type & NDateTime2.FORMAT_TYPES.MONTH) != 0) {
 				// has month, YM
@@ -539,7 +622,7 @@
 						{this.renderMonthBody(date)}
 						{this.renderPopoverContentFooter(this.getToday(), NDateTime2.FORMAT_TYPES.MONTH)}
 					</div>
-					{this.renderTime(date)}
+					{this.renderTime(date, NDateTime2.FORMAT_TYPES.MONTH)}
 				</div>);
 			} else if ((type & NDateTime2.FORMAT_TYPES.YEAR) != 0) {
 				// has year, YEAR
@@ -550,13 +633,13 @@
 						{this.renderYearBody(date)}
 						{this.renderPopoverContentFooter(this.getToday(), NDateTime2.FORMAT_TYPES.YEAR)}
 					</div>
-					{this.renderTime(date)}
+					{this.renderTime(date, NDateTime2.FORMAT_TYPES.YEAR)}
 				</div>);
 			} else {
 				this.startClockInterval(type);
 				// only time
 				return (<div className="popover-content row">
-					{this.renderTime(date)}
+					{this.renderTime(date, this.guessDisplayFormatType())}
 				</div>);
 			}
 		},
@@ -740,6 +823,104 @@
 				this.renderPopover({date: date, type: NDateTime2.FORMAT_TYPES.DAY});
 			}
 		},
+		onClockClicked: function(popoverType, evt) {
+			var offset = $(evt.target).offset();
+			// be careful of the quadrant
+			var point = {
+				x: (evt.pageX - offset.left) - NDateTime2.CLOCK_RADIUS,
+				y: NDateTime2.CLOCK_RADIUS - (evt.pageY - offset.top)
+			};
+			// console.log('Mouse Point: ' + point.x + ',' + point.y);
+			// calculate the radius length of point
+			var length = Math.sqrt(Math.pow(point.x, 2) + Math.pow(point.y, 2));
+			console.log('Point radius: ' + length);
+
+			// calculate it is what
+			if (length > 101) {
+				// do nothing
+				return;
+			}
+			var eventType = NDateTime2.FORMAT_TYPES.SECOND;
+			if (length > (NDateTime2.CLOCK_RADIUS - NDateTime2.CLOCK_HAND_OFFSET)) {
+				// change second or minute or hour
+				if (this.hasSecond()) {
+					eventType = NDateTime2.FORMAT_TYPES.SECOND;
+				} else if (this.hasMinute()) {
+					eventType = NDateTime2.FORMAT_TYPES.MINUTE;
+				} else {
+					eventType = NDateTime2.FORMAT_TYPES.HOUR;
+				}
+			} else if (length > (NDateTime2.CLOCK_RADIUS * NDateTime2.CLOCK_HOUR_PERCENTAGE)) {
+				// change minute or hour
+				if (this.hasMinute()) {
+					eventType = NDateTime2.FORMAT_TYPES.MINUTE;
+				} else {
+					eventType = NDateTime2.FORMAT_TYPES.HOUR;
+				}
+			} else {
+				// change hour
+				eventType = NDateTime2.FORMAT_TYPES.HOUR;
+			}
+			console.log('Event Type: ' + eventType);
+
+			// calculate degree in coordinate system
+			var degree = 0;
+			if (point.x == 0) {
+				degree = point.y >= 0 ? 90 : 270;
+			} else {
+				// atan is from -Math.PI/2 to Math.PI/2
+				degree = Math.atan(point.y / point.x) * 180 / Math.PI;
+				// transform to coordinate system degree
+				if (point.x > 0 && point.y >= 0) {
+					// do nothing
+				} else if (point.x < 0) {
+					degree += 180;
+				} else {
+					degree += 360;
+				}
+			}
+			// transform to real clock coordinate system
+			if (degree <= 90) {
+				degree = 90 - degree;
+			} else {
+				degree = 450 - degree;
+			}
+			// console.log('Degree: ' + degree);
+
+			var currentHour, hour, minute, second;
+			var date = this.getValueFromModel();
+			date = date == null ? this.getToday() : date;
+			currentHour = date.hour();
+			if (eventType == NDateTime2.FORMAT_TYPES.SECOND) {
+				second = Math.floor(degree / 6) + (degree % 6 < 3 ? 0 : 1);
+				date.second(second);
+			} else if (eventType == NDateTime2.FORMAT_TYPES.MINUTE) {
+				minute = Math.floor(degree / 6) + (degree % 6 < 3 ? 0 : 1);
+				date.minute(minute);
+			} else if (this.is12Hour()) {
+				hour = Math.floor(degree / 30) + (degree % 30 < 15 ? 0 : 1);
+				date.hour(currentHour <= 11 ? hour : (hour + 12));
+			} else {
+				hour = Math.floor(degree / 15) + (degree % 15 < 7.5 ? 0 : 1);
+				date.hour(hour);
+			}
+			console.log('Hour: [' + hour + '], Minute: [' + minute + '], Second: [' + second + ']');
+			this.renderPopover({date: date, type: popoverType, set: true});
+		},
+		onAMPMSelected: function(isAM, type) {
+			var value = this.getValueFromModel();
+			value = value == null ? this.getToday() : value;
+			var hour = value.hour();
+			if (isAM) {
+				hour = hour > 11 ? (hour - 12) : hour;
+			} else {
+				hour = hour <= 11 ? (hour + 12) : hour;
+			}
+			value.hour(hour);
+			this.setValueToModel(value);
+
+			this.renderPopover({date: value, type: type});
+		},
 		onTextInputChange: function() {
 			console.log(this.getTextInput().val());
 			console.log(this.getDisplayFormat());
@@ -855,6 +1036,23 @@
 		getValueFormat: function() {
 			var valueFormat = this.getComponentOption('valueFormat');
 			return valueFormat ? valueFormat : NDateTime2.VALUE_FORMAT;
+		},
+		is12Hour: function() {
+			return this.getComponentOption('hour') == 12;
+		},
+		getHourRadius: function() {
+			var hourRadius = NDateTime2.CLOCK_RADIUS;
+			if (this.hasMinute()) {
+				// with minute and second
+				hourRadius *= NDateTime2.CLOCK_HOUR_PERCENTAGE;
+			}
+			return hourRadius;
+		},
+		hasMinute: function() {
+			return (this.guessDisplayFormatType() & NDateTime2.FORMAT_TYPES.MINUTE) != 0;
+		},
+		hasSecond: function() {
+			return (this.guessDisplayFormatType() & NDateTime2.FORMAT_TYPES.SECOND) != 0;
 		},
 		/**
 		 * get icon definition by given icon key

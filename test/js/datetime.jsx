@@ -36,11 +36,63 @@
         },
         pos: {row: 1, col: 1}
     });
+    var datetime12 = $pt.createCellLayout('name', {
+        label: 'Plain Text',
+        comp: {
+            type: $pt.ComponentConstants.Date,
+            format: 'YYYY/MM/DD HH:mm:ss',
+            hour: 12
+        },
+        pos: {row: 1, col: 1}
+    });
     var time = $pt.createCellLayout('name', {
         label: 'Plain Text',
         comp: {
             type: $pt.ComponentConstants.Date,
             format: 'HH:mm:ss'
+        },
+        pos: {row: 1, col: 1}
+    });
+    var time12 = $pt.createCellLayout('name', {
+        label: 'Plain Text',
+        comp: {
+            type: $pt.ComponentConstants.Date,
+            format: 'HH:mm:ss',
+            hour: 12
+        },
+        pos: {row: 1, col: 1}
+    });
+    var hm = $pt.createCellLayout('name', {
+        label: 'Plain Text',
+        comp: {
+            type: $pt.ComponentConstants.Date,
+            format: 'HH:mm'
+        },
+        pos: {row: 1, col: 1}
+    });
+    var hm12 = $pt.createCellLayout('name', {
+        label: 'Plain Text',
+        comp: {
+            type: $pt.ComponentConstants.Date,
+            format: 'HH:mm',
+            hour: 12
+        },
+        pos: {row: 1, col: 1}
+    });
+    var h = $pt.createCellLayout('name', {
+        label: 'Plain Text',
+        comp: {
+            type: $pt.ComponentConstants.Date,
+            format: 'HH'
+        },
+        pos: {row: 1, col: 1}
+    });
+    var h12 = $pt.createCellLayout('name', {
+        label: 'Plain Text',
+        comp: {
+            type: $pt.ComponentConstants.Date,
+            format: 'HH',
+            hour: 12
         },
         pos: {row: 1, col: 1}
     });
@@ -83,8 +135,8 @@
             <NDateTime model={model} layout={year}/>
             <span>Data Time</span>
             <NDateTime2 model={model} layout={datetime}/>
-            <span>Time</span>
-            <NDateTime model={model} layout={time}/>
+            <span>Data Time 12 hour</span>
+            <NDateTime2 model={model} layout={datetime12}/>
             <span>Taiwan Format</span>
             <NDateTime model={model} layout={taiwan}/>
         </div>
@@ -99,6 +151,20 @@
         <div className='col-md-3 col-lg-3 col-sm-3 has-error'>
             <span>Error Disabled Default Format</span>
             <NDateTime model={model} layout={disabledDefaultFormat}/>
+        </div>
+        <div className='col-md-3 col-lg-3 col-sm-3'>
+            <span>Time</span>
+            <NDateTime2 model={model} layout={time}/>
+            <span>Time 12 Hour</span>
+            <NDateTime2 model={model} layout={time12}/>
+            <span>Time No Second</span>
+            <NDateTime2 model={model} layout={hm}/>
+            <span>Time Only Hour</span>
+            <NDateTime2 model={model} layout={h}/>
+            <span>Time No Second 12</span>
+            <NDateTime2 model={model} layout={hm12}/>
+            <span>Time Only Hour 12</span>
+            <NDateTime2 model={model} layout={h12}/>
         </div>
         <div className='col-md-3 col-lg-3 col-sm-3'>
             <span>View Mode</span>

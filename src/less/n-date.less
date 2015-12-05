@@ -191,13 +191,10 @@ div.n-datetime {
 					text-align: center;
 					padding-top: 15px;
 					flex-grow: 1;
+					display: flex;
+					justify-content: space-around;
 					svg.clock {
 						overflow: overlay;
-						circle.primary {
-							// stroke: @border-color;
-							// stroke-width: 3px;
-							fill: transparent;
-						}
 						text.text {
 							fill: lighten(@font-color, 20%);
 							font-family: 'Engravers MT', Roboto, 'Helvetica Neue', Helvetica, Arial;
@@ -205,8 +202,23 @@ div.n-datetime {
 							&.minute {
 								font-size: 1em;
 							}
-							&.hour {
+							&.hour-12,
+							&.hour-24 {
 								font-size: 0.7em;
+							}
+							&.am {
+								text-anchor: start;
+								font-size: 1em;
+								cursor: pointer;
+							}
+							&.pm {
+								text-anchor: end;
+								font-size: 1em;
+								cursor: pointer;
+							}
+							&.am.yes,
+							&.pm.yes {
+								fill: @color-primary;
 							}
 							&.top-num {
 								text-anchor: middle;
@@ -253,7 +265,8 @@ div.n-datetime {
 				margin-left: 0;
 				margin-right: 0;
 				div {
-					padding-top: 2px;
+					padding-top: 4px;
+					padding-bottom: 4px;
 					border-radius: 4px;
 					cursor: pointer;
 					position: relative;
