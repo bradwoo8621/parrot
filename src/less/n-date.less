@@ -26,6 +26,19 @@ div.n-datetime {
 		}
 	}
 
+	&.popover.top {
+		margin-top: 2px;
+		position: absolute;
+		max-width: 9999px;
+		z-index: 10000;
+		.arrow {
+			margin-left: -8px;
+			bottom: -8px;
+			border-width: 8px;
+			border-bottom-width: 0;
+			left: 20px;
+		}
+	}
 	&.popover.bottom {
 		margin-top: 2px;
 		position: absolute;
@@ -38,244 +51,253 @@ div.n-datetime {
 			border-top-width: 0;
 			left: 20px;
 		}
-		.popover-content {
-			padding: 0;
-			overflow: auto;
-			height: 270px;
-			max-height: 300px;
-			margin-left: -1px;
-			margin-right: -1px;
-			.date-view,
-			.time-view {
-				// display: inline;
-				position: relative;
-				min-width: 250px;
-				max-width: 300px;
-				padding: 5px;
-				height: 100%;
-				display: flex;
-				flex-direction: column;
+	}
+	&.popover.top.right-to-left,
+	&.popover.bottom.right-to-left {
+		.arrow {
+			left: auto;
+			right: 20px;
+			margin-right: -8px;
+		}
+	}
+	&.popover.top > div.popover-content,
+	&.popover.bottom > div.popover-content {
+		padding: 0;
+		overflow: auto;
+		height: 270px;
+		max-height: 300px;
+		margin-left: -1px;
+		margin-right: -1px;
+		.date-view,
+		.time-view {
+			// display: inline;
+			position: relative;
+			min-width: 250px;
+			max-width: 300px;
+			padding: 5px;
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+		}
+		.date-view {
+		}
+		.time-view {
+		}
+		.cell-7-1 {
+			width: 100% / 7;
+		}
+		.cell-4-1 {
+			width: 25%;
+		}
+		.cell-3-1 {
+			width: 100% / 3;
+		}
+		.cell-3-1,
+		.cell-4-1,
+		.cell-7-1 {
+			float: left;
+			text-align: center;
+			position: relative;
+			display: table;
+			span {
+				display: table-cell;
+				vertical-align: middle;
 			}
-			.date-view {
-			}
-			.time-view {
-			}
-			.cell-7-1 {
-				width: 100% / 7;
-			}
-			.cell-4-1 {
-				width: 25%;
-			}
-			.cell-3-1 {
-				width: 100% / 3;
-			}
-			.cell-3-1,
-			.cell-4-1,
-			.cell-7-1 {
-				float: left;
-				text-align: center;
-				position: relative;
-				display: table;
-				span {
-					display: table-cell;
-					vertical-align: middle;
-				}
-			}
-			.calendar-header {
-				height: 30px;
-				text-align: center;
+		}
+		.calendar-header {
+			height: 30px;
+			text-align: center;
+			font-weight: bold;
+			position: relative;
+			.header-btn {
+				font-size: 1.3em;
+				margin-top: 2px;
 				font-weight: bold;
+				cursor: pointer;
 				position: relative;
-				.header-btn {
-					font-size: 1.3em;
-					margin-top: 2px;
-					font-weight: bold;
-					cursor: pointer;
-					position: relative;
-					&.left {
-						float: left;
-					}
-					&.right {
-						float: right;
-					}
+				&.left {
+					float: left;
 				}
-				.header-date-btn {
-					cursor: pointer;
-					position: relative;
+				&.right {
+					float: right;
 				}
 			}
-			.calendar-body {
+			.header-date-btn {
+				cursor: pointer;
 				position: relative;
-				display: flex;
-			    flex-grow: 1;
-			    flex-direction: column;
-				.day-view-body-header {
-					position: relative;
-					margin-left: 0;
-					margin-right: 0;
-					div {
-						padding-top: 3px;
-						padding-bottom: 4px;
-						font-weight: bold;
-					}
-				}
-				.day-view-body-body {
-					position: relative;
-					padding-bottom: 3px;
-					margin-left: 0;
-					margin-right: 0;
-					div {
-						padding-top: 3px;
-						padding-bottom: 4px;
-						&.gap-day {
-							color: lighten(@font-color, 30%);
-						}
-					}
-				}
-				.month-view-body-body {
-					position: relative;
-					margin-left: 0;
-					margin-right: 0;
-					div {
-						padding-top: 20px;
-						padding-bottom: 20px;
-					}
-				}
-				.year-view-body-body {
-					position: relative;
-					margin-left: 0;
-					margin-right: 0;
-					div {
-						padding-top: 7px;
-						padding-bottom: 7px;
-					}
-				}
-				.day-view-body-body,
-				.month-view-body-body,
-				.year-view-body-body {
-					flex-grow: 1;
-				    display: flex;
-				    flex-wrap: wrap;
-					div {
-						border-radius: 4px;
-						cursor: pointer;
-						position: relative;
-						&.today:before {
-							content: ' ';
-							position: absolute;
-							bottom: 3px;
-							right: 3px;
-							display: block;
-							height: 8px;
-							width: 8px;
-							border-bottom: 4px solid @color-primary;
-							border-right: 4px solid @color-primary;
-							border-top: 4px solid transparent;
-							border-left: 4px solid transparent;
-						}
-						&.current-value,
-						&.current-value:hover {
-							background-color: @color-primary;
-							color: @font-color-reverse;
-						}
-						&.current-value.today:before {
-							border-bottom: 4px solid @font-color-reverse;
-							border-right: 4px solid @font-color-reverse;
-						}
-						&:hover {
-							background-color: @border-color;
-						}
-					}
-				}
-				.time-view-body-body {
-					text-align: center;
-					padding-top: 15px;
-					flex-grow: 1;
-					display: flex;
-					justify-content: space-around;
-					svg.clock {
-						overflow: overlay;
-						text.text {
-							fill: lighten(@font-color, 20%);
-							font-family: 'Engravers MT', Roboto, 'Helvetica Neue', Helvetica, Arial;
-							font-weight: bold;
-							&.minute {
-								font-size: 1em;
-							}
-							&.hour-12,
-							&.hour-24 {
-								font-size: 0.7em;
-							}
-							&.am {
-								text-anchor: start;
-								font-size: 1em;
-								cursor: pointer;
-							}
-							&.pm {
-								text-anchor: end;
-								font-size: 1em;
-								cursor: pointer;
-							}
-							&.am.yes,
-							&.pm.yes {
-								fill: @color-primary;
-							}
-							&.top-num {
-								text-anchor: middle;
-								dominant-baseline: hanging;
-							}
-							&.left-num {
-								dominant-baseline: central;
-								text-anchor: start;
-							}
-							&.right-num {
-								dominant-baseline: central;
-								text-anchor: end;
-							}
-							&.bottom-num {
-								text-anchor: middle;
-								dominant-baseline: ideographic;
-							}
-						}
-						line.big {
-							stroke-width: 3px;
-							stroke: lighten(@font-color, 20%);
-						}
-						line.small {
-							stroke-width: 1px;
-							stroke: lighten(@font-color, 20%);
-						}
-						line.hour-hand {
-							stroke-width: 5px;
-							stroke: lighten(@font-color, 20%);
-						}
-						line.minute-hand {
-							stroke-width: 3px;
-							stroke: lighten(@font-color, 20%);
-						}
-						line.second-hand {
-							stroke-width: 1px;
-							stroke: @color-primary;
-						}
-					}
-				}
 			}
-			.calendar-footer {
+		}
+		.calendar-body {
+			position: relative;
+			display: flex;
+			flex-grow: 1;
+			flex-direction: column;
+			.day-view-body-header {
 				position: relative;
 				margin-left: 0;
 				margin-right: 0;
 				div {
-					padding-top: 4px;
+					padding-top: 3px;
 					padding-bottom: 4px;
+					font-weight: bold;
+				}
+			}
+			.day-view-body-body {
+				position: relative;
+				padding-bottom: 3px;
+				margin-left: 0;
+				margin-right: 0;
+				div {
+					padding-top: 3px;
+					padding-bottom: 4px;
+					&.gap-day {
+						color: lighten(@font-color, 30%);
+					}
+				}
+			}
+			.month-view-body-body {
+				position: relative;
+				margin-left: 0;
+				margin-right: 0;
+				div {
+					padding-top: 20px;
+					padding-bottom: 20px;
+				}
+			}
+			.year-view-body-body {
+				position: relative;
+				margin-left: 0;
+				margin-right: 0;
+				div {
+					padding-top: 7px;
+					padding-bottom: 7px;
+				}
+			}
+			.day-view-body-body,
+			.month-view-body-body,
+			.year-view-body-body {
+				flex-grow: 1;
+				display: flex;
+				flex-wrap: wrap;
+				div {
 					border-radius: 4px;
 					cursor: pointer;
 					position: relative;
-					> span {
-						font-size: 1.3em;
+					&.today:before {
+						content: ' ';
+						position: absolute;
+						bottom: 3px;
+						right: 3px;
+						display: block;
+						height: 8px;
+						width: 8px;
+						border-bottom: 4px solid @color-primary;
+						border-right: 4px solid @color-primary;
+						border-top: 4px solid transparent;
+						border-left: 4px solid transparent;
+					}
+					&.current-value,
+					&.current-value:hover {
+						background-color: @color-primary;
+						color: @font-color-reverse;
+					}
+					&.current-value.today:before {
+						border-bottom: 4px solid @font-color-reverse;
+						border-right: 4px solid @font-color-reverse;
 					}
 					&:hover {
 						background-color: @border-color;
 					}
+				}
+			}
+			.time-view-body-body {
+				text-align: center;
+				padding-top: 15px;
+				flex-grow: 1;
+				display: flex;
+				justify-content: space-around;
+				svg.clock {
+					overflow: overlay;
+					text.text {
+						fill: lighten(@font-color, 20%);
+						font-family: 'Engravers MT', Roboto, 'Helvetica Neue', Helvetica, Arial;
+						font-weight: bold;
+						&.minute {
+							font-size: 1em;
+						}
+						&.hour-12,
+						&.hour-24 {
+							font-size: 0.7em;
+						}
+						&.am {
+							text-anchor: start;
+							font-size: 1em;
+							cursor: pointer;
+						}
+						&.pm {
+							text-anchor: end;
+							font-size: 1em;
+							cursor: pointer;
+						}
+						&.am.yes,
+						&.pm.yes {
+							fill: @color-primary;
+						}
+						&.top-num {
+							text-anchor: middle;
+							dominant-baseline: hanging;
+						}
+						&.left-num {
+							dominant-baseline: central;
+							text-anchor: start;
+						}
+						&.right-num {
+							dominant-baseline: central;
+							text-anchor: end;
+						}
+						&.bottom-num {
+							text-anchor: middle;
+							dominant-baseline: ideographic;
+						}
+					}
+					line.big {
+						stroke-width: 3px;
+						stroke: lighten(@font-color, 20%);
+					}
+					line.small {
+						stroke-width: 1px;
+						stroke: lighten(@font-color, 20%);
+					}
+					line.hour-hand {
+						stroke-width: 5px;
+						stroke: lighten(@font-color, 20%);
+					}
+					line.minute-hand {
+						stroke-width: 3px;
+						stroke: lighten(@font-color, 20%);
+					}
+					line.second-hand {
+						stroke-width: 1px;
+						stroke: @color-primary;
+					}
+				}
+			}
+		}
+		.calendar-footer {
+			position: relative;
+			margin-left: 0;
+			margin-right: 0;
+			div {
+				padding-top: 4px;
+				padding-bottom: 4px;
+				border-radius: 4px;
+				cursor: pointer;
+				position: relative;
+				> span {
+					font-size: 1.3em;
+				}
+				&:hover {
+					background-color: @border-color;
 				}
 			}
 		}
