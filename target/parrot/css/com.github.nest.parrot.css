@@ -2932,19 +2932,35 @@ div.n-array-check.vertical div.n-checkbox {
 .n-select-tree.n-view-mode hr.normal-line {
   display: none;
 }
+.n-select-tree-popover.popover.top,
 .n-select-tree-popover.popover.bottom {
   margin-top: 2px;
   max-width: 9999px;
+  min-width: 300px;
   z-index: 10000;
+  position: absolute;
 }
+.n-select-tree-popover.popover.top .arrow,
 .n-select-tree-popover.popover.bottom .arrow {
   margin-left: -8px;
-  top: -8px;
   border-width: 8px;
-  border-top-width: 0;
   left: 20px;
 }
-.n-select-tree-popover.popover.bottom .popover-content {
+.n-select-tree-popover.popover.top .arrow {
+  bottom: -8px;
+  border-bottom-width: 0;
+}
+.n-select-tree-popover.popover.bottom .arrow {
+  top: -8px;
+  border-top-width: 0;
+}
+.n-select-tree-popover.popover.top.right-to-left .arrow,
+.n-select-tree-popover.popover.bottom.right-to-left .arrow {
+  left: auto;
+  right: 20px;
+  margin-right: -8px;
+}
+.n-select-tree-popover .popover-content {
   padding: 5px 5px 0;
   overflow: auto;
   max-height: 300px;

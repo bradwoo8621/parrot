@@ -1,5 +1,10 @@
 /**
- * the coordinate system of clock is center or circle.
+ * 1. the coordinate system of clock is center or circle.
+ * 2. popover will be closed on
+ * 		2.1 mouse down on others in document
+ * 		2.2 press escape or tab
+ * 		2.3 mouse wheel
+ *		2.4 window resize
  */
 (function(context, $, moment, $pt) {
 	var NDateTime = React.createClass($pt.defineCellComponent({
@@ -591,19 +596,19 @@
 		/**
 		 * render popover content
 		 * @param date {moment} flag date for popover
-		 * @param type {number} popover display type
+		 * @param popoverType {number} popover display type
 		 */
-		renderPopoverContent: function(date, type) {
+		renderPopoverContent: function(date, popoverType) {
 			date = date ? date : this.getValueFromModel();
 			date = date ? date : this.getToday();
-			if (type == null) {
-				type = this.guessDisplayFormatType();
+			if (popoverType == null) {
+				popoverType = this.guessDisplayFormatType();
 			}
 			var styles = {
 				float: 'left',
 				width: this.hasTimeToDisplay(this.guessDisplayFormatType()) ? '50%' : '100%'
 			};
-			if ((type & NDateTime.FORMAT_TYPES.DAY) != 0) {
+			if ((popoverType & NDateTime.FORMAT_TYPES.DAY) != 0) {
 				// has day, YMD
 				this.startClockInterval(NDateTime.FORMAT_TYPES.DAY);
 				return (<div className="popover-content row">
@@ -614,7 +619,7 @@
 					</div>
 					{this.renderTime(date, NDateTime.FORMAT_TYPES.DAY)}
 				</div>);
-			} else if ((type & NDateTime.FORMAT_TYPES.MONTH) != 0) {
+			} else if ((popoverType & NDateTime.FORMAT_TYPES.MONTH) != 0) {
 				// has month, YM
 				this.startClockInterval(NDateTime.FORMAT_TYPES.MONTH);
 				return (<div className="popover-content row">
@@ -625,7 +630,7 @@
 					</div>
 					{this.renderTime(date, NDateTime.FORMAT_TYPES.MONTH)}
 				</div>);
-			} else if ((type & NDateTime.FORMAT_TYPES.YEAR) != 0) {
+			} else if ((popoverType & NDateTime.FORMAT_TYPES.YEAR) != 0) {
 				// has year, YEAR
 				this.startClockInterval(NDateTime.FORMAT_TYPES.YEAR);
 				return (<div className="popover-content row">
@@ -637,7 +642,7 @@
 					{this.renderTime(date, NDateTime.FORMAT_TYPES.YEAR)}
 				</div>);
 			} else {
-				this.startClockInterval(type);
+				this.startClockInterval(popoverType);
 				// only time
 				return (<div className="popover-content row">
 					{this.renderTime(date, this.guessDisplayFormatType())}
@@ -716,14 +721,16 @@
 				<div className="arrow"></div>
 				{this.renderPopoverContent(options.date, options.type)}
 			</div>);
-			popover = React.render(popover, this.state.popover.get(0));
-			popover = $(React.findDOMNode(popover));
+			React.render(popover, this.state.popover.get(0));
 		},
 		renderPopoverContainer: function() {
 			if (this.state.popover == null) {
 				this.state.popover = $('<div>');
 				this.state.popover.appendTo($('body'));
-				$(document).on('click', this.onDocumentClicked).on('keyup', this.onDocumentKeyUp);
+				$(document).on('mousedown', this.onDocumentMouseDown)
+					.on('keyup', this.onDocumentKeyUp)
+					.on('mousewheel', this.onDocumentMouseWheel);
+				$(window).on('resize', this.onWindowResize);
 			}
 			this.state.popover.hide();
 		},
@@ -733,17 +740,17 @@
 				this.state.clockInterval = null;
 			}
 		},
-		startClockInterval: function(type) {
+		startClockInterval: function(popoverType) {
 			var _this = this;
 			var value = this.getValueFromModel();
 			if (value == null) {
-				if (!this.state.clockInterval || this.state.clockInterval.type != type) {
+				if (!this.state.clockInterval || this.state.clockInterval.type != popoverType) {
 					this.stopClockInterval();
 					this.state.clockInterval = {
 						handler: setInterval(function() {
-							_this.renderPopover({date: moment(), type: type});
+							_this.renderPopover({date: moment(), type: popoverType});
 						}, 1000),
-						type: type
+						type: popoverType
 					};
 				}
 			} else {
@@ -759,16 +766,15 @@
 			this.state.popover.show();
 		},
 		hidePopover: function() {
-			if (this.state.popover && this.state.popover.is(':visible')) {
-				this.stopClockInterval();
-				this.state.popover.hide();
-				React.render(<noscript/>, this.state.popover.get(0));
-			}
+			this.destroyPopover();
 		},
 		destroyPopover: function() {
 			if (this.state.popover) {
 				this.stopClockInterval();
-				$(document).off('click', this.onDocumentClicked).off('keyup', this.onDocumentKeyUp);
+				$(document).off('mousedown', this.onDocumentMouseDown)
+					.off('keyup', this.onDocumentKeyUp)
+					.off('mousewheel', this.onDocumentMouseWheel);
+				$(window).on('resize', this.onWindowResize);
 				this.state.popover.remove();
 				delete this.state.popover;
 			}
@@ -813,16 +819,22 @@
 				(hasSecond ? NDateTime.FORMAT_TYPES.SECOND : 0) +
 				(hasMillsecond ? NDateTime.FORMAT_TYPES.MILLSECOND : 0);
 		},
-		onDocumentClicked: function(evt) {
+		onDocumentMouseDown: function(evt) {
 			var target = $(evt.target);
 			if (target.closest(this.getComponent()).length == 0 && target.closest(this.state.popover).length == 0) {
 				this.hidePopover();
 			}
 		},
+		onDocumentMouseWheel: function(evt) {
+			this.hidePopover();
+		},
 		onDocumentKeyUp: function(evt) {
-			if (evt.keyCode === 27) { // escape
+			if (evt.keyCode === 27 || evt.keyCode === 9) { // escape and tab
 				this.hidePopover();
 			}
+		},
+		onWindowResize: function() {
+			this.hidePopover();
 		},
 		onCalendarButtonClicked: function() {
 			if (!this.isEnabled() || this.isViewMode()) {
@@ -843,15 +855,14 @@
 			var text = this.getTextInput().val();
 			if (text.length == 0 || text.isBlank())  {
 				this.setValueToModel(null);
-				return;
-			}
-
-			var date = this.convertValueFromString(text, this.getDisplayFormat());
-			if (date == null && text.length != 0) {
-				// invalid date
-				this.setValueToModel(null);
 			} else {
-				this.setValueToModel(date);
+				var date = this.convertValueFromString(text, this.getDisplayFormat());
+				if (date == null && text.length != 0) {
+					// invalid date
+					this.setValueToModel(null);
+				} else {
+					this.setValueToModel(date);
+				}
 			}
 		},
 		onYearSelected: function(date) {

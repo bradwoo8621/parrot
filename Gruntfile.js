@@ -226,6 +226,13 @@ module.exports = function(grunt) {
 							src: ['*.js', '*.map'],
 							dest: '<%= targetPath %>/jquery/'
 						},
+						// jquery mousewheel
+						{
+							expand: true,
+							cwd: '<%= bowerPath %>/jquery-mousewheel',
+							src: ['*.js', '*.map'],
+							dest: '<%= targetPath %>/jquery/'
+						},
 						// jquery brower
 						{
 							expand: true,

@@ -4989,7 +4989,12 @@
 }(this, jQuery, $pt));
 
 /**
- * the coordinate system of clock is center or circle.
+ * 1. the coordinate system of clock is center or circle.
+ * 2. popover will be closed on
+ * 		2.1 mouse down on others in document
+ * 		2.2 press escape or tab
+ * 		2.3 mouse wheel
+ *		2.4 window resize
  */
 (function(context, $, moment, $pt) {
 	var NDateTime = React.createClass($pt.defineCellComponent({
@@ -5581,19 +5586,19 @@
 		/**
 		 * render popover content
 		 * @param date {moment} flag date for popover
-		 * @param type {number} popover display type
+		 * @param popoverType {number} popover display type
 		 */
-		renderPopoverContent: function(date, type) {
+		renderPopoverContent: function(date, popoverType) {
 			date = date ? date : this.getValueFromModel();
 			date = date ? date : this.getToday();
-			if (type == null) {
-				type = this.guessDisplayFormatType();
+			if (popoverType == null) {
+				popoverType = this.guessDisplayFormatType();
 			}
 			var styles = {
 				float: 'left',
 				width: this.hasTimeToDisplay(this.guessDisplayFormatType()) ? '50%' : '100%'
 			};
-			if ((type & NDateTime.FORMAT_TYPES.DAY) != 0) {
+			if ((popoverType & NDateTime.FORMAT_TYPES.DAY) != 0) {
 				// has day, YMD
 				this.startClockInterval(NDateTime.FORMAT_TYPES.DAY);
 				return (React.createElement("div", {className: "popover-content row"}, 
@@ -5604,7 +5609,7 @@
 					), 
 					this.renderTime(date, NDateTime.FORMAT_TYPES.DAY)
 				));
-			} else if ((type & NDateTime.FORMAT_TYPES.MONTH) != 0) {
+			} else if ((popoverType & NDateTime.FORMAT_TYPES.MONTH) != 0) {
 				// has month, YM
 				this.startClockInterval(NDateTime.FORMAT_TYPES.MONTH);
 				return (React.createElement("div", {className: "popover-content row"}, 
@@ -5615,7 +5620,7 @@
 					), 
 					this.renderTime(date, NDateTime.FORMAT_TYPES.MONTH)
 				));
-			} else if ((type & NDateTime.FORMAT_TYPES.YEAR) != 0) {
+			} else if ((popoverType & NDateTime.FORMAT_TYPES.YEAR) != 0) {
 				// has year, YEAR
 				this.startClockInterval(NDateTime.FORMAT_TYPES.YEAR);
 				return (React.createElement("div", {className: "popover-content row"}, 
@@ -5627,7 +5632,7 @@
 					this.renderTime(date, NDateTime.FORMAT_TYPES.YEAR)
 				));
 			} else {
-				this.startClockInterval(type);
+				this.startClockInterval(popoverType);
 				// only time
 				return (React.createElement("div", {className: "popover-content row"}, 
 					this.renderTime(date, this.guessDisplayFormatType())
@@ -5706,14 +5711,16 @@
 				React.createElement("div", {className: "arrow"}), 
 				this.renderPopoverContent(options.date, options.type)
 			));
-			popover = React.render(popover, this.state.popover.get(0));
-			popover = $(React.findDOMNode(popover));
+			React.render(popover, this.state.popover.get(0));
 		},
 		renderPopoverContainer: function() {
 			if (this.state.popover == null) {
 				this.state.popover = $('<div>');
 				this.state.popover.appendTo($('body'));
-				$(document).on('click', this.onDocumentClicked).on('keyup', this.onDocumentKeyUp);
+				$(document).on('mousedown', this.onDocumentMouseDown)
+					.on('keyup', this.onDocumentKeyUp)
+					.on('mousewheel', this.onDocumentMouseWheel);
+				$(window).on('resize', this.onWindowResize);
 			}
 			this.state.popover.hide();
 		},
@@ -5723,17 +5730,17 @@
 				this.state.clockInterval = null;
 			}
 		},
-		startClockInterval: function(type) {
+		startClockInterval: function(popoverType) {
 			var _this = this;
 			var value = this.getValueFromModel();
 			if (value == null) {
-				if (!this.state.clockInterval || this.state.clockInterval.type != type) {
+				if (!this.state.clockInterval || this.state.clockInterval.type != popoverType) {
 					this.stopClockInterval();
 					this.state.clockInterval = {
 						handler: setInterval(function() {
-							_this.renderPopover({date: moment(), type: type});
+							_this.renderPopover({date: moment(), type: popoverType});
 						}, 1000),
-						type: type
+						type: popoverType
 					};
 				}
 			} else {
@@ -5749,16 +5756,15 @@
 			this.state.popover.show();
 		},
 		hidePopover: function() {
-			if (this.state.popover && this.state.popover.is(':visible')) {
-				this.stopClockInterval();
-				this.state.popover.hide();
-				React.render(React.createElement("noscript", null), this.state.popover.get(0));
-			}
+			this.destroyPopover();
 		},
 		destroyPopover: function() {
 			if (this.state.popover) {
 				this.stopClockInterval();
-				$(document).off('click', this.onDocumentClicked).off('keyup', this.onDocumentKeyUp);
+				$(document).off('mousedown', this.onDocumentMouseDown)
+					.off('keyup', this.onDocumentKeyUp)
+					.off('mousewheel', this.onDocumentMouseWheel);
+				$(window).on('resize', this.onWindowResize);
 				this.state.popover.remove();
 				delete this.state.popover;
 			}
@@ -5803,16 +5809,22 @@
 				(hasSecond ? NDateTime.FORMAT_TYPES.SECOND : 0) +
 				(hasMillsecond ? NDateTime.FORMAT_TYPES.MILLSECOND : 0);
 		},
-		onDocumentClicked: function(evt) {
+		onDocumentMouseDown: function(evt) {
 			var target = $(evt.target);
 			if (target.closest(this.getComponent()).length == 0 && target.closest(this.state.popover).length == 0) {
 				this.hidePopover();
 			}
 		},
+		onDocumentMouseWheel: function(evt) {
+			this.hidePopover();
+		},
 		onDocumentKeyUp: function(evt) {
-			if (evt.keyCode === 27) { // escape
+			if (evt.keyCode === 27 || evt.keyCode === 9) { // escape and tab
 				this.hidePopover();
 			}
+		},
+		onWindowResize: function() {
+			this.hidePopover();
 		},
 		onCalendarButtonClicked: function() {
 			if (!this.isEnabled() || this.isViewMode()) {
@@ -5833,15 +5845,14 @@
 			var text = this.getTextInput().val();
 			if (text.length == 0 || text.isBlank())  {
 				this.setValueToModel(null);
-				return;
-			}
-
-			var date = this.convertValueFromString(text, this.getDisplayFormat());
-			if (date == null && text.length != 0) {
-				// invalid date
-				this.setValueToModel(null);
 			} else {
-				this.setValueToModel(date);
+				var date = this.convertValueFromString(text, this.getDisplayFormat());
+				if (date == null && text.length != 0) {
+					// invalid date
+					this.setValueToModel(null);
+				} else {
+					this.setValueToModel(date);
+				}
 			}
 		},
 		onYearSelected: function(date) {
@@ -11354,6 +11365,13 @@
 	});
 }(this, jQuery, $pt));
 
+/**
+ * popover will be closed on
+ * 		2.1 mouse down on others in document
+ * 		2.2 press escape or tab
+ * 		2.3 mouse wheel
+ *		2.4 window resize
+ */
 (function(context, $, $pt) {
 	var NSelectTree = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelectTree',
@@ -11568,7 +11586,10 @@
 			if (this.state.popoverDiv == null) {
 				this.state.popoverDiv = $('<div>');
 				this.state.popoverDiv.appendTo($('body'));
-				$(document).on('click', this.onDocumentClicked).on('keyup', this.onDocumentKeyUp);
+				$(document).on('mousedown', this.onDocumentMouseDown)
+					.on('keyup', this.onDocumentKeyUp)
+					.on('mousewheel', this.onDocumentMouseWheel);
+				$(window).on('resize', this.onWindowResize);
 			}
 			this.state.popoverDiv.hide();
 		},
@@ -11577,30 +11598,100 @@
 			var component = this.getComponent();
 			styles.width = component.outerWidth();
 			var offset = component.offset();
-			styles.top = offset.top + component.outerHeight();
-			styles.left = offset.left;
+			styles.top = -10000; // let it out of screen
+			styles.left = 0;
 			var popover = (React.createElement("div", {role: "tooltip", className: "n-select-tree-popover popover bottom in", style: styles}, 
 				React.createElement("div", {className: "arrow"}), 
 				React.createElement("div", {className: "popover-content"}, 
 					this.renderTree()
 				)
 			));
-			React.render(popover, this.state.popoverDiv.get(0));
+			popover = $(React.findDOMNode(React.render(popover, this.state.popoverDiv.get(0))));
 		},
 		showPopover: function() {
 			this.renderPopoverContainer();
 			this.renderPopover();
 			this.state.popoverDiv.show();
+
+			var popover = this.state.popoverDiv.children('.popover');
+			var styles = {};
+			var component = this.getComponent();
+			styles.width = component.outerWidth();
+			var offset = component.offset();
+			styles.top = offset.top + component.outerHeight(); // let it out of screen
+			styles.left = offset.left;
+
+			var onTop = false;
+			var rightToLeft = false;
+			var realHeight = popover.outerHeight();
+			var realWidth = popover.outerWidth();
+			console.log(popover);
+			console.log('Width: ' + realWidth + ', Height: ' + realHeight);
+			// set the real top, assumpt it is on bottom
+			styles.top = offset.top + component.outerHeight();
+			// check popover in top or bottom
+			if ((styles.top + realHeight) > ($(window).height() + $(window).scrollTop())) {
+				// cannot show in bottom and in current viewport
+				// check it is enough top or not
+				if ((offset.top - $(window).scrollTop()) >= realHeight) {
+					// enough
+					styles.top = offset.top - realHeight;
+					onTop = true;
+				} else if ((styles.top + realHeight) <= $(document).height()) {
+					// cannot show in bottom and in current document
+					onTop = false;
+				} else if (offset.top < realHeight) {
+					// cannot show in top and in current document
+					onTop = false;
+				} else {
+					styles.top = offset.top - realHeight;
+					onTop = true;
+				}
+			} else {
+				// can show in bottom and in current viewport
+				onTop = false;
+			}
+
+			// check popover to left or right
+			if (realWidth > styles.width) {
+				width = $(document).width();
+				// console.log(styles.width + ',' + styles.left + ',' + realWidth  + ',' + width);
+				if ((styles.left + realWidth) <= width) {
+					// normal from left to right, do nothing
+				} else if ((styles.left + styles.width) >= realWidth) {
+					// from right to left
+					styles.left = styles.left + styles.width - realWidth;
+					rightToLeft = true;
+				} else {
+					// still left to right, do nothing
+				}
+			}
+
+			if (onTop) {
+				popover.addClass('top');
+				popover.removeClass('bottom');
+			} else {
+				popover.removeClass('top');
+				popover.addClass('bottom');
+			}
+			if (rightToLeft) {
+				popover.addClass('right-to-left');
+			}
+			popover.css({top: styles.top, left: styles.left});
 		},
 		hidePopover: function() {
-			if (this.state.popoverDiv && this.state.popoverDiv.is(':visible')) {
-				this.state.popoverDiv.hide();
-				React.render(React.createElement("noscript", null), this.state.popoverDiv.get(0));
-			}
+			// if (this.state.popoverDiv && this.state.popoverDiv.is(':visible')) {
+			// 	this.state.popoverDiv.hide();
+			// 	React.render(<noscript/>, this.state.popoverDiv.get(0));
+			// }
+			this.destroyPopover();
 		},
 		destroyPopover: function() {
 			if (this.state.popoverDiv) {
-				$(document).off('click', this.onDocumentClicked).off('keyup', this.onDocumentKeyUp);
+				$(document).off('mousedown', this.onDocumentMouseDown)
+					.off('keyup', this.onDocumentKeyUp)
+					.off('mousewheel', this.onDocumentMouseWheel);
+				$(window).off('resize', this.onWindowResize);
 				this.state.popoverDiv.remove();
 				delete this.state.popoverDiv;
 			}
@@ -11612,16 +11703,22 @@
 			}
 			this.showPopover();
 		},
-		onDocumentClicked: function(evt) {
+		onDocumentMouseDown: function(evt) {
 			var target = $(evt.target);
 			if (target.closest(this.getComponent()).length == 0 && target.closest(this.state.popoverDiv).length == 0) {
 				this.hidePopover();
 			}
 		},
+		onDocumentMouseWheel: function(evt) {
+			this.hidePopover();
+		},
 		onDocumentKeyUp: function(evt) {
-			if (evt.keyCode === 27) {
+			if (evt.keyCode === 27 || evt.keyCode === 9) { // escape and tab
 				this.hidePopover();
 			}
+		},
+		onWindowResize: function() {
+			this.hidePopover();
 		},
 		/**
 		 * on parent model changed

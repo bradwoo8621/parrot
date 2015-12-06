@@ -75,6 +75,7 @@
 	});
 
 	var panel = (<div className='row'>
+		<div style={{height: "100px"}}/>
 		<div className='col-md-3 col-lg-3 col-sm-3'>
 			<span>Select Tree</span>
 			<NSelectTree model={model} layout={selectTree}/>
@@ -96,6 +97,7 @@
 			<NSelectTree model={model} layout={selectTree} view={true}/>
 			<NSelectTree model={model} layout={disabledSelectTree} view={true}/>
 		</div>
+		<div style={{height: "1000px"}}/>
 	</div>);
 	React.render(panel, document.getElementById('main'));
 })();
