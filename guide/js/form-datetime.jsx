@@ -48,39 +48,23 @@
 					index: 20
 				};
 			},
-			month: function () {
-				var layoutTemplate = {comp: {format: 'MM'}};
+			year: function () {
+				var layoutTemplate = {comp: {format: 'YYYY'}};
 				var layoutCode = $demo.convertCellLayoutCreatorToString({
 					variable: 'layout',
 					cellKey: 'value',
 					template: layoutTemplate
 				});
 				return {
-					id: 'datetime-format-month',
-					title: 'Month',
+					id: 'datetime-format-year',
+					title: 'Year',
 					desc: '',
 					xml: <NDateTime model={model} layout={$pt.createCellLayout('value', layoutTemplate)}/>,
 					code: [modelCode, layoutCode, compCode],
 					index: 30
 				};
 			},
-			day: function () {
-				var layoutTemplate = {comp: {format: 'DD'}};
-				var layoutCode = $demo.convertCellLayoutCreatorToString({
-					variable: 'layout',
-					cellKey: 'value',
-					template: layoutTemplate
-				});
-				return {
-					id: 'datetime-format-day',
-					title: 'Day',
-					desc: '',
-					xml: <NDateTime model={model} layout={$pt.createCellLayout('value', layoutTemplate)}/>,
-					code: [modelCode, layoutCode, compCode],
-					index: 40
-				};
-			},
-			time: function () {
+			hms: function () {
 				var layoutTemplate = {comp: {format: 'HH:mm:ss'}};
 				var layoutCode = $demo.convertCellLayoutCreatorToString({
 					variable: 'layout',
@@ -88,7 +72,7 @@
 					template: layoutTemplate
 				});
 				return {
-					id: 'datetime-format-time',
+					id: 'datetime-format-hms',
 					title: 'Time',
 					desc: '',
 					xml: <NDateTime model={model} layout={$pt.createCellLayout('value', layoutTemplate)}/>,
@@ -96,12 +80,76 @@
 					index: 50
 				};
 			},
+			hm: function () {
+				var layoutTemplate = {comp: {format: 'HH:mm'}};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'value',
+					template: layoutTemplate
+				});
+				return {
+					id: 'datetime-format-hm',
+					title: 'Hour & Minute',
+					desc: '',
+					xml: <NDateTime model={model} layout={$pt.createCellLayout('value', layoutTemplate)}/>,
+					code: [modelCode, layoutCode, compCode],
+					index: 60
+				};
+			},
+			h: function () {
+				var layoutTemplate = {comp: {format: 'HH'}};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'value',
+					template: layoutTemplate
+				});
+				return {
+					id: 'datetime-format-h',
+					title: 'Hour',
+					desc: '',
+					xml: <NDateTime model={model} layout={$pt.createCellLayout('value', layoutTemplate)}/>,
+					code: [modelCode, layoutCode, compCode],
+					index: 70
+				};
+			},
+			hms12: function () {
+				var layoutTemplate = {comp: {format: 'HH:mm:ss', hour: 12}};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'value',
+					template: layoutTemplate
+				});
+				return {
+					id: 'datetime-format-hms12',
+					title: 'Hour 12',
+					desc: '',
+					xml: <NDateTime model={model} layout={$pt.createCellLayout('value', layoutTemplate)}/>,
+					code: [modelCode, layoutCode, compCode],
+					index: 80
+				};
+			},
+			all: function () {
+				var layoutTemplate = {comp: {format: 'YYYY/MM/DD HH:mm:ss', hour: 12}};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'value',
+					template: layoutTemplate
+				});
+				return {
+					id: 'datetime-format-all',
+					title: 'All',
+					desc: '',
+					xml: <NDateTime model={model} layout={$pt.createCellLayout('value', layoutTemplate)}/>,
+					code: [modelCode, layoutCode, compCode],
+					index: 90
+				};
+			},
 			other: function () {
 				return {
 					id: 'datetime-format-other',
 					title: 'Other',
-					desc: 'Other format support refers to MomentJS and Bootstrap DateTimePicker.',
-					index: 60
+					desc: 'Other format support refers to MomentJS.',
+					index: 100
 				};
 			}
 		};
@@ -154,33 +202,25 @@
 				return {
 					id: 'datetime-properties',
 					title: 'Properties',
-					desc: ['Available properties.', 'Refers to Bootstrap 3 DateTimePicker'],
+					desc: ['Available properties.'],
 					index: 50,
 					code: $demo.convertJSON({
 						variable: 'layout',
 						json: {
 							comp: {
 								format: NDateTime.FORMAT,
-								dayViewHeaderFormat: NDateTime.DAY_VIEW_HEADER_FORMAT,
-								locale: NDateTime.LOCALE,
-								stepping: null,
-								useCurrent: null,
-								minDate: null,
-								maxDate: null,
-								collapse: null,
-								disabledDates: null,
-								enabledDates: null,
-								icons: null,
-								useStrict: null,
-								sideBySide: null,
-								daysOfWeekDisabled: null,
-								calendarWeeks: null,
-								viewMode: null,
-								toolbarPlacement: null,
-								showTodayButton: null,
-								showClear: null,
-								showClose: null,
-								tooltips: null
+								valueFormat: NDateTime.VALUE_FORMAT,
+								headerYearFormat: NDateTime.HEADER_YEAR_FORMAT,
+								headerMonthFormat: NDateTime.HEADER_MONTH_FORMAT,
+								bodyYearFormat: 'YYYY',
+								locale: 'en',
+								hour: 24,
+								icons: {
+									calendar: 'calendar',
+									today: 'crosshairs',
+									clear: 'trash-o',
+									close: 'close'
+								}
 							}
 						}
 					})
@@ -188,10 +228,10 @@
 			},
 			constants: function () {
 				var statics = {
-					FORMAT: NDateTime.FORMAT,
-					DAY_VIEW_HEADER_FORMAT: NDateTime.DAY_VIEW_HEADER_FORMAT,
-					VALUE_FORMAT: NDateTime.VALUE_FORMAT,
-					LOCALE: NDateTime.LOCALE
+					FORMAT: 'YYYY/MM/DD',
+					HEADER_MONTH_FORMAT: 'MMMM',
+					HEADER_YEAR_FORMAT: 'YYYY',
+					VALUE_FORMAT: $pt.ComponentConstants.Default_Date_Format
 				};
 				return {
 					id: 'datetime-constants',

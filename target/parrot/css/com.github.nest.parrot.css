@@ -535,6 +535,359 @@ div.n-datetime > div.input-group > span.input-group-addon.link.disabled {
   cursor: not-allowed;
   color: #9f9f9f;
 }
+div.n-datetime.popover.top {
+  margin-top: 2px;
+  position: absolute;
+  max-width: 9999px;
+  z-index: 10000;
+}
+div.n-datetime.popover.top .arrow {
+  margin-left: -8px;
+  bottom: -8px;
+  border-width: 8px;
+  border-bottom-width: 0;
+  left: 20px;
+}
+div.n-datetime.popover.bottom {
+  margin-top: 2px;
+  position: absolute;
+  max-width: 9999px;
+  z-index: 10000;
+}
+div.n-datetime.popover.bottom .arrow {
+  margin-left: -8px;
+  top: -8px;
+  border-width: 8px;
+  border-top-width: 0;
+  left: 20px;
+}
+div.n-datetime.popover.top.right-to-left .arrow,
+div.n-datetime.popover.bottom.right-to-left .arrow {
+  left: auto;
+  right: 20px;
+  margin-right: -8px;
+}
+div.n-datetime.popover.top > div.popover-content,
+div.n-datetime.popover.bottom > div.popover-content {
+  padding: 0;
+  overflow: auto;
+  height: 270px;
+  max-height: 300px;
+  margin-left: -1px;
+  margin-right: -1px;
+}
+div.n-datetime.popover.top > div.popover-content .date-view,
+div.n-datetime.popover.bottom > div.popover-content .date-view,
+div.n-datetime.popover.top > div.popover-content .time-view,
+div.n-datetime.popover.bottom > div.popover-content .time-view {
+  position: relative;
+  min-width: 250px;
+  max-width: 300px;
+  padding: 5px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+div.n-datetime.popover.top > div.popover-content .cell-7-1,
+div.n-datetime.popover.bottom > div.popover-content .cell-7-1 {
+  width: 14.28571429%;
+}
+div.n-datetime.popover.top > div.popover-content .cell-4-1,
+div.n-datetime.popover.bottom > div.popover-content .cell-4-1 {
+  width: 25%;
+}
+div.n-datetime.popover.top > div.popover-content .cell-3-1,
+div.n-datetime.popover.bottom > div.popover-content .cell-3-1 {
+  width: 33.33333333%;
+}
+div.n-datetime.popover.top > div.popover-content .cell-3-1,
+div.n-datetime.popover.bottom > div.popover-content .cell-3-1,
+div.n-datetime.popover.top > div.popover-content .cell-4-1,
+div.n-datetime.popover.bottom > div.popover-content .cell-4-1,
+div.n-datetime.popover.top > div.popover-content .cell-7-1,
+div.n-datetime.popover.bottom > div.popover-content .cell-7-1 {
+  float: left;
+  text-align: center;
+  position: relative;
+  display: table;
+}
+div.n-datetime.popover.top > div.popover-content .cell-3-1 span,
+div.n-datetime.popover.bottom > div.popover-content .cell-3-1 span,
+div.n-datetime.popover.top > div.popover-content .cell-4-1 span,
+div.n-datetime.popover.bottom > div.popover-content .cell-4-1 span,
+div.n-datetime.popover.top > div.popover-content .cell-7-1 span,
+div.n-datetime.popover.bottom > div.popover-content .cell-7-1 span {
+  display: table-cell;
+  vertical-align: middle;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-header,
+div.n-datetime.popover.bottom > div.popover-content .calendar-header {
+  height: 30px;
+  text-align: center;
+  font-weight: bold;
+  position: relative;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-header .header-btn,
+div.n-datetime.popover.bottom > div.popover-content .calendar-header .header-btn {
+  font-size: 1.3em;
+  margin-top: 2px;
+  font-weight: bold;
+  cursor: pointer;
+  position: relative;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-header .header-btn.left,
+div.n-datetime.popover.bottom > div.popover-content .calendar-header .header-btn.left {
+  float: left;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-header .header-btn.right,
+div.n-datetime.popover.bottom > div.popover-content .calendar-header .header-btn.right {
+  float: right;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-header .header-date-btn,
+div.n-datetime.popover.bottom > div.popover-content .calendar-header .header-date-btn {
+  cursor: pointer;
+  position: relative;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body {
+  position: relative;
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .day-view-body-header,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .day-view-body-header {
+  position: relative;
+  margin-left: 0;
+  margin-right: 0;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .day-view-body-header div,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .day-view-body-header div {
+  padding-top: 3px;
+  padding-bottom: 4px;
+  font-weight: bold;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .day-view-body-body,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .day-view-body-body {
+  position: relative;
+  padding-bottom: 3px;
+  margin-left: 0;
+  margin-right: 0;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .day-view-body-body div,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .day-view-body-body div {
+  padding-top: 3px;
+  padding-bottom: 4px;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .day-view-body-body div.gap-day,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .day-view-body-body div.gap-day {
+  color: #b3b3b3;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .month-view-body-body,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .month-view-body-body {
+  position: relative;
+  margin-left: 0;
+  margin-right: 0;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .month-view-body-body div,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .month-view-body-body div {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .year-view-body-body,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .year-view-body-body {
+  position: relative;
+  margin-left: 0;
+  margin-right: 0;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .year-view-body-body div,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .year-view-body-body div {
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .day-view-body-body,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .day-view-body-body,
+div.n-datetime.popover.top > div.popover-content .calendar-body .month-view-body-body,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .month-view-body-body,
+div.n-datetime.popover.top > div.popover-content .calendar-body .year-view-body-body,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .year-view-body-body {
+  flex-grow: 1;
+  display: flex;
+  flex-wrap: wrap;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .day-view-body-body div,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .day-view-body-body div,
+div.n-datetime.popover.top > div.popover-content .calendar-body .month-view-body-body div,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .month-view-body-body div,
+div.n-datetime.popover.top > div.popover-content .calendar-body .year-view-body-body div,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .year-view-body-body div {
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .day-view-body-body div.today:before,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .day-view-body-body div.today:before,
+div.n-datetime.popover.top > div.popover-content .calendar-body .month-view-body-body div.today:before,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .month-view-body-body div.today:before,
+div.n-datetime.popover.top > div.popover-content .calendar-body .year-view-body-body div.today:before,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .year-view-body-body div.today:before {
+  content: ' ';
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  display: block;
+  height: 8px;
+  width: 8px;
+  border-bottom: 4px solid #2196f3;
+  border-right: 4px solid #2196f3;
+  border-top: 4px solid transparent;
+  border-left: 4px solid transparent;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .day-view-body-body div.current-value,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .day-view-body-body div.current-value,
+div.n-datetime.popover.top > div.popover-content .calendar-body .month-view-body-body div.current-value,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .month-view-body-body div.current-value,
+div.n-datetime.popover.top > div.popover-content .calendar-body .year-view-body-body div.current-value,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .year-view-body-body div.current-value,
+div.n-datetime.popover.top > div.popover-content .calendar-body .day-view-body-body div.current-value:hover,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .day-view-body-body div.current-value:hover,
+div.n-datetime.popover.top > div.popover-content .calendar-body .month-view-body-body div.current-value:hover,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .month-view-body-body div.current-value:hover,
+div.n-datetime.popover.top > div.popover-content .calendar-body .year-view-body-body div.current-value:hover,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .year-view-body-body div.current-value:hover {
+  background-color: #2196f3;
+  color: #ffffff;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .day-view-body-body div.current-value.today:before,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .day-view-body-body div.current-value.today:before,
+div.n-datetime.popover.top > div.popover-content .calendar-body .month-view-body-body div.current-value.today:before,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .month-view-body-body div.current-value.today:before,
+div.n-datetime.popover.top > div.popover-content .calendar-body .year-view-body-body div.current-value.today:before,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .year-view-body-body div.current-value.today:before {
+  border-bottom: 4px solid #ffffff;
+  border-right: 4px solid #ffffff;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .day-view-body-body div:hover,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .day-view-body-body div:hover,
+div.n-datetime.popover.top > div.popover-content .calendar-body .month-view-body-body div:hover,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .month-view-body-body div:hover,
+div.n-datetime.popover.top > div.popover-content .calendar-body .year-view-body-body div:hover,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .year-view-body-body div:hover {
+  background-color: #e0e0e0;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .time-view-body-body,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .time-view-body-body {
+  text-align: center;
+  padding-top: 15px;
+  flex-grow: 1;
+  display: flex;
+  justify-content: space-around;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .time-view-body-body svg.clock,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .time-view-body-body svg.clock {
+  overflow: overlay;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .time-view-body-body svg.clock text.text,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .time-view-body-body svg.clock text.text {
+  fill: #999999;
+  font-family: 'Engravers MT', Roboto, 'Helvetica Neue', Helvetica, Arial;
+  font-weight: bold;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .time-view-body-body svg.clock text.text.minute,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .time-view-body-body svg.clock text.text.minute {
+  font-size: 1em;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .time-view-body-body svg.clock text.text.hour-12,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .time-view-body-body svg.clock text.text.hour-12,
+div.n-datetime.popover.top > div.popover-content .calendar-body .time-view-body-body svg.clock text.text.hour-24,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .time-view-body-body svg.clock text.text.hour-24 {
+  font-size: 0.7em;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .time-view-body-body svg.clock text.text.am,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .time-view-body-body svg.clock text.text.am {
+  text-anchor: start;
+  font-size: 1em;
+  cursor: pointer;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .time-view-body-body svg.clock text.text.pm,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .time-view-body-body svg.clock text.text.pm {
+  text-anchor: end;
+  font-size: 1em;
+  cursor: pointer;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .time-view-body-body svg.clock text.text.am.yes,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .time-view-body-body svg.clock text.text.am.yes,
+div.n-datetime.popover.top > div.popover-content .calendar-body .time-view-body-body svg.clock text.text.pm.yes,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .time-view-body-body svg.clock text.text.pm.yes {
+  fill: #2196f3;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .time-view-body-body svg.clock text.text.top-num,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .time-view-body-body svg.clock text.text.top-num {
+  text-anchor: middle;
+  dominant-baseline: hanging;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .time-view-body-body svg.clock text.text.left-num,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .time-view-body-body svg.clock text.text.left-num {
+  dominant-baseline: central;
+  text-anchor: start;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .time-view-body-body svg.clock text.text.right-num,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .time-view-body-body svg.clock text.text.right-num {
+  dominant-baseline: central;
+  text-anchor: end;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .time-view-body-body svg.clock text.text.bottom-num,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .time-view-body-body svg.clock text.text.bottom-num {
+  text-anchor: middle;
+  dominant-baseline: ideographic;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .time-view-body-body svg.clock line.big,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .time-view-body-body svg.clock line.big {
+  stroke-width: 3px;
+  stroke: #999999;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .time-view-body-body svg.clock line.small,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .time-view-body-body svg.clock line.small {
+  stroke-width: 1px;
+  stroke: #999999;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .time-view-body-body svg.clock line.hour-hand,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .time-view-body-body svg.clock line.hour-hand {
+  stroke-width: 5px;
+  stroke: #999999;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .time-view-body-body svg.clock line.minute-hand,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .time-view-body-body svg.clock line.minute-hand {
+  stroke-width: 3px;
+  stroke: #999999;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-body .time-view-body-body svg.clock line.second-hand,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .time-view-body-body svg.clock line.second-hand {
+  stroke-width: 1px;
+  stroke: #2196f3;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-footer,
+div.n-datetime.popover.bottom > div.popover-content .calendar-footer {
+  position: relative;
+  margin-left: 0;
+  margin-right: 0;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-footer div,
+div.n-datetime.popover.bottom > div.popover-content .calendar-footer div {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-footer div > span,
+div.n-datetime.popover.bottom > div.popover-content .calendar-footer div > span {
+  font-size: 1.3em;
+}
+div.n-datetime.popover.top > div.popover-content .calendar-footer div:hover,
+div.n-datetime.popover.bottom > div.popover-content .calendar-footer div:hover {
+  background-color: #e0e0e0;
+}
 div.n-card {
   display: none;
 }
@@ -2579,19 +2932,35 @@ div.n-array-check.vertical div.n-checkbox {
 .n-select-tree.n-view-mode hr.normal-line {
   display: none;
 }
+.n-select-tree-popover.popover.top,
 .n-select-tree-popover.popover.bottom {
   margin-top: 2px;
   max-width: 9999px;
+  min-width: 300px;
   z-index: 10000;
+  position: absolute;
 }
+.n-select-tree-popover.popover.top .arrow,
 .n-select-tree-popover.popover.bottom .arrow {
   margin-left: -8px;
-  top: -8px;
   border-width: 8px;
-  border-top-width: 0;
   left: 20px;
 }
-.n-select-tree-popover.popover.bottom .popover-content {
+.n-select-tree-popover.popover.top .arrow {
+  bottom: -8px;
+  border-bottom-width: 0;
+}
+.n-select-tree-popover.popover.bottom .arrow {
+  top: -8px;
+  border-top-width: 0;
+}
+.n-select-tree-popover.popover.top.right-to-left .arrow,
+.n-select-tree-popover.popover.bottom.right-to-left .arrow {
+  left: auto;
+  right: 20px;
+  margin-right: -8px;
+}
+.n-select-tree-popover .popover-content {
   padding: 5px 5px 0;
   overflow: auto;
   max-height: 300px;
