@@ -1482,6 +1482,117 @@ div.n-modal-form .modal-title > a:hover {
   -o-transform: scaleX(0);
   -webkit-transform: scaleX(0);
 }
+div.n-select {
+  outline: none;
+  position: relative;
+}
+div.n-select .form-control {
+  box-shadow: none;
+  -webkit-box-shadow: none;
+  -o-box-shadow: none;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+div.n-select .form-control .text {
+  order: 1;
+  flex-grow: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding-right: 3px;
+  width: 0;
+  overflow: hidden;
+}
+div.n-select .form-control .clear {
+  order: 2;
+  cursor: pointer;
+  font-size: 0.8em;
+}
+div.n-select .form-control .drop {
+  order: 3;
+  cursor: pointer;
+  margin-right: 2px;
+  margin-top: -4px;
+}
+div.n-select:focus hr.focus-line {
+  transform: scaleX(1);
+  -o-transform: scaleX(1);
+  -webkit-transform: scaleX(1);
+}
+div.n-select.n-disabled .form-control {
+  cursor: not-allowed;
+  color: #9f9f9f;
+}
+div.n-select.n-disabled:focus hr.focus-line {
+  transform: scaleX(0);
+  -o-transform: scaleX(0);
+  -webkit-transform: scaleX(0);
+}
+div.n-select.n-view-mode .form-control {
+  cursor: default;
+}
+div.n-select.n-view-mode .form-control .clear,
+div.n-select.n-view-mode .form-control .drop {
+  display: none;
+}
+div.n-select.n-view-mode hr.focus-line,
+div.n-select.n-view-mode hr.normal-line {
+  display: none;
+}
+.n-select-popover.popover.top,
+.n-select-popover.popover.bottom {
+  margin-top: 2px;
+  max-width: 9999px;
+  min-width: 300px;
+  z-index: 10000;
+  position: absolute;
+}
+.n-select-popover.popover.top .arrow,
+.n-select-popover.popover.bottom .arrow {
+  margin-left: -8px;
+  border-width: 8px;
+  left: 20px;
+}
+.n-select-popover.popover.top .arrow {
+  bottom: -8px;
+  border-bottom-width: 0;
+}
+.n-select-popover.popover.bottom .arrow {
+  top: -8px;
+  border-top-width: 0;
+}
+.n-select-popover.popover.top.right-to-left .arrow,
+.n-select-popover.popover.bottom.right-to-left .arrow {
+  left: auto;
+  right: 20px;
+  margin-right: -8px;
+}
+.n-select-popover .popover-content {
+  padding: 5px;
+  overflow: auto;
+  max-height: 300px;
+}
+.n-select-popover .popover-content div.n-text {
+  margin: 0 5px 5px;
+}
+.n-select-popover .popover-content ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 0;
+}
+.n-select-popover .popover-content ul li {
+  padding: 3px 5px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.n-select-popover .popover-content ul li:hover {
+  background-color: #e0e0e0;
+}
+.n-select-popover .popover-content div.no-option {
+  text-align: center;
+}
 div.n-table-container {
   margin-bottom: 0;
 }
@@ -3099,6 +3210,16 @@ div.has-error div.n-select-tree .form-control .selection > li {
   border-color: #f44336;
 }
 div.has-error div.n-select-tree:focus hr.focus-line {
+  transform: scaleX(1);
+  -o-transform: scaleX(1);
+  -webkit-transform: scaleX(1);
+}
+div.has-error div.n-select .form-control {
+  color: #f44336;
+  background-color: transparent;
+  border: 0;
+}
+div.has-error div.n-select:focus hr.focus-line {
   transform: scaleX(1);
   -o-transform: scaleX(1);
   -webkit-transform: scaleX(1);

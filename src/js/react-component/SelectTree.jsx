@@ -239,11 +239,13 @@
 					{this.renderTree()}
 				</div>
 			</div>);
-			popover = $(React.findDOMNode(React.render(popover, this.state.popoverDiv.get(0))));
+			React.render(popover, this.state.popoverDiv.get(0), this.onPopoverRenderComplete);
 		},
 		showPopover: function() {
 			this.renderPopoverContainer();
 			this.renderPopover();
+		},
+		onPopoverRenderComplete: function() {
 			this.state.popoverDiv.show();
 
 			var popover = this.state.popoverDiv.children('.popover');
@@ -258,8 +260,6 @@
 			var rightToLeft = false;
 			var realHeight = popover.outerHeight();
 			var realWidth = popover.outerWidth();
-			console.log(popover);
-			console.log('Width: ' + realWidth + ', Height: ' + realHeight);
 			// set the real top, assumpt it is on bottom
 			styles.top = offset.top + component.outerHeight();
 			// check popover in top or bottom
@@ -288,7 +288,6 @@
 			// check popover to left or right
 			if (realWidth > styles.width) {
 				width = $(document).width();
-				// console.log(styles.width + ',' + styles.left + ',' + realWidth  + ',' + width);
 				if ((styles.left + realWidth) <= width) {
 					// normal from left to right, do nothing
 				} else if ((styles.left + styles.width) >= realWidth) {
@@ -343,7 +342,10 @@
 			}
 		},
 		onDocumentMouseWheel: function(evt) {
-			this.hidePopover();
+			var target = $(evt.target);
+			if (target.closest(this.state.popoverDiv).length == 0) {
+				this.hidePopover();
+			}
 		},
 		onDocumentKeyUp: function(evt) {
 			if (evt.keyCode === 27 || evt.keyCode === 9) { // escape and tab

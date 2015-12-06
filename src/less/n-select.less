@@ -67,3 +67,129 @@
 		}
 	}
 }
+
+div.n-select {
+	outline: none;
+	position: relative;
+	.form-control {
+		box-shadow: none;
+		-webkit-box-shadow: none;
+		-o-box-shadow: none;
+		padding: 0;
+	    display: flex;
+	    flex-direction: row;
+	    align-items: center;
+		.text {
+			order: 1;
+			flex-grow: 1;
+			cursor: pointer;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			padding-right: 3px;
+			width: 0;	// must set a exactly width, it works, no matter what it is.
+			overflow: hidden;
+		}
+		.clear {
+			order: 2;
+			cursor: pointer;
+			font-size: 0.8em;
+		}
+		.drop {
+			order: 3;
+			cursor: pointer;
+			margin-right: 2px;
+			margin-top: -4px;
+		}
+	}
+	&:focus hr.focus-line {
+		transform: scaleX(1);
+		-o-transform: scaleX(1);
+		-webkit-transform: scaleX(1);
+	}
+
+	&.n-disabled {
+		.form-control {
+			cursor: not-allowed;
+			// pointer-events: none;
+			color: @disabled-color;
+		}
+		&:focus hr.focus-line {
+			transform: scaleX(0);
+			-o-transform: scaleX(0);
+			-webkit-transform: scaleX(0);
+		}
+	}
+	&.n-view-mode {
+		.form-control {
+			cursor: default;
+			.clear,
+			.drop {
+				display: none;
+			}
+		}
+		hr.focus-line,
+		hr.normal-line {
+			display: none;
+		}
+	}
+}
+
+.n-select-popover {
+	&.popover.top,
+	&.popover.bottom {
+		margin-top: 2px;
+		max-width: 9999px;
+		min-width: 300px;
+		z-index: 10000;
+		position: absolute;
+		.arrow {
+			margin-left: -8px;
+			border-width: 8px;
+			left: 20px;
+		}
+	}
+	&.popover.top {
+		.arrow {
+			bottom: -8px;
+			border-bottom-width: 0;
+		}
+	}
+	&.popover.bottom {
+		.arrow {
+			top: -8px;
+			border-top-width: 0;
+		}
+	}
+	&.popover.top.right-to-left,
+	&.popover.bottom.right-to-left {
+		.arrow {
+			left: auto;
+			right: 20px;
+			margin-right: -8px;
+		}
+	}
+	.popover-content {
+		padding: 5px;
+		overflow: auto;
+		max-height: 300px;
+		div.n-text {
+			margin: 0 5px 5px;
+		}
+		ul {
+			list-style: none;
+			padding: 0;
+			margin-bottom: 0;
+			li {
+				padding: 3px 5px;
+				border-radius: 4px;
+				cursor: pointer;
+				&:hover {
+					background-color: @border-color;
+				}
+			}
+		}
+		div.no-option {
+			text-align: center;
+		}
+	}
+}

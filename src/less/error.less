@@ -151,6 +151,18 @@ div.has-error {
 			-webkit-transform: scaleX(1);
 		}
 	}
+	div.n-select {
+		.form-control {
+			color: @error-color;
+			background-color: transparent;
+			border: 0;
+		}
+		&:focus hr.focus-line {
+			transform: scaleX(1);
+			-o-transform: scaleX(1);
+			-webkit-transform: scaleX(1);
+		}
+	}
 
 	hr.normal-line {
 		border-top: solid 1px transparent;

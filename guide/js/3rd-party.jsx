@@ -23,7 +23,7 @@
 			{name: 'ReactJS', url: 'http://facebook.github.io/react/'},
 			{name: 'React-Bootstrap', url: 'http://react-bootstrap.github.io/'},
 			{name: 'Respond (IE8)', url: 'https://github.com/scottjehl/Respond'},
-			{name: 'Select2', url: 'https://select2.github.io/'}
+			{name: 'Select2 (Optional)', url: 'https://select2.github.io/'}
 		];
 		var renderParty = function (party) {
 			return (<div className='col-sm-12 col-md-12 col-lg-12'>
