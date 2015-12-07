@@ -1232,6 +1232,13 @@
 		getEventMonitor: function (key) {
 			return this.getLayout().getEventMonitor(key);
 		},
+		notifyEvent: function(evt) {
+            var type = evt.type;
+            var monitor = this.getEventMonitor(type);
+			if (monitor) {
+				monitor.call(this, evt);
+			}
+        },
 		/**
 		 * get component rule value.
 		 * get component option by given key. return default value if not defined.

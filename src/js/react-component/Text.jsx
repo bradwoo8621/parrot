@@ -289,7 +289,7 @@
 		onKeyUp: function (evt) {
 			var monitor = this.getEventMonitor('keyUp');
 			if (monitor) {
-				monitor.call(evt.target, evt);
+				monitor.call(this, evt);
 			}
 		},
 		/**

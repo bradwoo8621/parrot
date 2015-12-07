@@ -3343,6 +3343,13 @@
 		getEventMonitor: function (key) {
 			return this.getLayout().getEventMonitor(key);
 		},
+		notifyEvent: function(evt) {
+            var type = evt.type;
+            var monitor = this.getEventMonitor(type);
+			if (monitor) {
+				monitor.call(this, evt);
+			}
+        },
 		/**
 		 * get component rule value.
 		 * get component option by given key. return default value if not defined.
@@ -12307,6 +12314,15 @@
 			}
 			treeLayout.comp.data = this.getAvailableTreeModel();
 			treeLayout.comp.valueAsArray = treeLayout.comp.valueAsArray ? treeLayout.comp.valueAsArray : false;
+			treeLayout.evt = treeLayout.evt ? treeLayout.evt : {};
+			treeLayout.evt.expand = treeLayout.evt.expand ? function(evt) {
+				treeLayout.evt.expand.call(this, evt);
+				this.onPopoverRenderComplete.call(this);
+			} : this.onPopoverRenderComplete;
+			treeLayout.evt.collapse = treeLayout.evt.collapse ? function(evt) {
+				treeLayout.evt.collapse.call(this, evt);
+				this.onPopoverRenderComplete.call(this);
+			} : this.onPopoverRenderComplete;
 			return treeLayout;
 		},
 		isHideChildWhenParentChecked: function() {
@@ -15128,7 +15144,7 @@
 		onKeyUp: function (evt) {
 			var monitor = this.getEventMonitor('keyUp');
 			if (monitor) {
-				monitor.call(evt.target, evt);
+				monitor.call(this, evt);
 			}
 		},
 		/**
@@ -15978,7 +15994,7 @@
             // console.log(modelValue);
         },
         expandAll: function() {
-            var activeNodes = this.state.activeNodes;
+            var activeNodes = $.extend({}, this.state.activeNodes);
             var root = this.state.root;
             var expand = function(node, parentNodeId) {
                 if (!this.isLeaf(node)) {
@@ -15991,20 +16007,58 @@
                 }
             };
             expand.call(this, root, null);
-            this.setState({activeNodes: activeNodes});
+            // this.setState({activeNodes: activeNodes});
+            var _this = this;
+            var previousActiveNodes = null;
+            this.setState(function(previousState, currentProps) {
+                previousActiveNodes = previousState.activeNodes;
+                return {activeNodes: activeNodes};
+            }, function() {
+                _this.notifyEvent({
+                    type: 'expand',
+                    before: previousActiveNodes,
+                    after: activeNodes
+                });
+            });
         },
         collapseAll: function() {
+            var _this = this;
             var root = this.state.root;
+            var nodeIds = null;
             if (this.isRootPaint()) {
-                this.collapseNode(root, this.getNodeId(null, root));
+                // this.collapseNode(root, this.getNodeId(null, root));
+                nodeIds = [this.getNodeId(null, root)];
             } else {
                 var rootNodeId = this.getNodeId(null, root);
                 if (root.children) {
-                    root.children.forEach(function(node) {
-                        this.collapseNode(node, this.getNodeId(rootNodeId, node));
-                    }.bind(this));
+                    // root.children.forEach(function(node) {
+                    //     this.collapseNode(node, this.getNodeId(rootNodeId, node));
+                    // }.bind(this));
+                    nodeIds = root.children.map(function(node) {
+                        return _this.getNodeId(rootNodeId, node);
+                    });
                 }
             }
+            var regexp = new RegExp(nodeIds.map(function(nodeId) {
+                return '(' + nodeId + ')';
+            }).join('|'));
+            var activeNodes = $.extend({}, this.state.activeNodes);
+            Object.keys(activeNodes).forEach(function(key) {
+                if (key.match(regexp)) {
+                    delete activeNodes[key];
+                }
+            });
+            var previousActiveNodes = null;
+            this.setState(function(previousState, currentProps) {
+                previousActiveNodes = previousState.activeNodes;
+                return {activeNodes: activeNodes};
+            }, function() {
+                _this.notifyEvent({
+                    type: 'collapse',
+                    before: previousActiveNodes,
+                    after: activeNodes
+                });
+            });
         },
         isRootPaint: function() {
             return this.getComponentOption('root');
@@ -16028,16 +16082,28 @@
         },
         collapseNode: function(node, nodeId) {
             var regexp = new RegExp(nodeId);
-            var activeNodes = this.state.activeNodes;
+            var activeNodes = $.extend({}, this.state.activeNodes);
             Object.keys(activeNodes).forEach(function(key) {
                 if (key.match(regexp)) {
                     delete activeNodes[key];
                 }
             });
-            this.setState({activeNodes: activeNodes});
+            // this.setState({activeNodes: activeNodes});
+            var _this = this;
+            var previousActiveNodes = null;
+            this.setState(function(previousState, currentProps) {
+                previousActiveNodes = previousState.activeNodes;
+                return {activeNodes: activeNodes};
+            }, function() {
+                _this.notifyEvent({
+                    type: 'collapse',
+                    before: previousActiveNodes,
+                    after: activeNodes
+                });
+            });
         },
         expandNode: function(node, nodeId) {
-            var activeNodes = this.state.activeNodes;
+            var activeNodes = $.extend({}, this.state.activeNodes);
             if (this.isInactiveSlibingWhenActive() && !this.isLeaf(node)) {
                 // remove all slibings and their children from active list
                 var lastHyphen = nodeId.lastIndexOf(NTree.NODE_SEPARATOR);
@@ -16055,7 +16121,19 @@
                 }
             }
             activeNodes[nodeId] = node;
-            this.setState({activeNodes: activeNodes});
+            // this.setState({activeNodes: activeNodes});
+            var _this = this;
+            var previousActiveNodes = null;
+            this.setState(function(previousState, currentProps) {
+                previousActiveNodes = previousState.activeNodes;
+                return {activeNodes: activeNodes};
+            }, function() {
+                _this.notifyEvent({
+                    type: 'expand',
+                    before: previousActiveNodes,
+                    after: activeNodes
+                });
+            });
         },
         /**
          * get top level nodes

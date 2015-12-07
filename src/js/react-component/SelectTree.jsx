@@ -475,6 +475,15 @@
 			}
 			treeLayout.comp.data = this.getAvailableTreeModel();
 			treeLayout.comp.valueAsArray = treeLayout.comp.valueAsArray ? treeLayout.comp.valueAsArray : false;
+			treeLayout.evt = treeLayout.evt ? treeLayout.evt : {};
+			treeLayout.evt.expand = treeLayout.evt.expand ? function(evt) {
+				treeLayout.evt.expand.call(this, evt);
+				this.onPopoverRenderComplete.call(this);
+			} : this.onPopoverRenderComplete;
+			treeLayout.evt.collapse = treeLayout.evt.collapse ? function(evt) {
+				treeLayout.evt.collapse.call(this, evt);
+				this.onPopoverRenderComplete.call(this);
+			} : this.onPopoverRenderComplete;
 			return treeLayout;
 		},
 		isHideChildWhenParentChecked: function() {
