@@ -1,7 +1,7 @@
 (function (context) {
-	hljs.configure({
-		tabReplace: '    '
-	});
+	// hljs.configure({
+	// 	tabReplace: '    '
+	// });
 	var $demo = $pt.getService(context, '$demo');
 	var onDev = function () {
 		var onDev = (<div className='docs-head'>

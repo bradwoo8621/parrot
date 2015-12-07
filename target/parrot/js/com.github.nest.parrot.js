@@ -13850,7 +13850,7 @@
 								data = React.createElement(NForm, {model: inlineModel, 
 											  layout: $pt.createFormLayout(column.inline), 
 											  direction: "horizontal", 
-											  view: this.isViewMode()});
+											  view: _this.isViewMode()});
 							}
 						} else {
 							// data is property name
