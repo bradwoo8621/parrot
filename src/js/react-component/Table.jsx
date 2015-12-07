@@ -40,11 +40,11 @@
 			PAGE_JUMPING_PROXY: null,
 			registerInlineEditor: function(type, definition) {
 				if (NTable.__inlineEditors[type] != null) {
-					console.warn("Inline editor[" + type + "] is repalced.");
-					console.warn("From:");
-					console.warn(NTable.__inlineEditors[type]);
-					console.warn("To:");
-					console.warn(definition);
+					context.console.warn("Inline editor[" + type + "] is repalced.");
+					context.console.warn("From:");
+					context.console.warn(NTable.__inlineEditors[type]);
+					context.console.warn("To:");
+					context.console.warn(definition);
 				}
 				NTable.__inlineEditors[type] = definition;
 			},
@@ -1754,7 +1754,7 @@
 		 */
 		onSearchBoxChanged: function () {
 			var value = this.state.searchModel.get('text');
-			console.debug('Searching [text=' + value + '].');
+			context.console.debug('Searching [text=' + value + '].');
 			if (value == null || value == "") {
 				this.setState({
 					searchText: null
@@ -1896,7 +1896,7 @@
 				// do nothing
 			} else if (evt.type == "change") {
 				// do nothing
-				console.log('Table[' + this.getDataId() + '] data changed.');
+				context.console.log('Table[' + this.getDataId() + '] data changed.');
 			}
 
 			if (this.getModel().getValidator() != null) {

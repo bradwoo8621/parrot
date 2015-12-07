@@ -228,9 +228,9 @@
 					}
 					_this.setLabelText(data.name);
 				}).fail(function() {
-					console.error('Error occured when retrieve label from remote in NSearch.');
+					context.console.error('Error occured when retrieve label from remote in NSearch.');
 					arguments.slice(0).forEach(function(argu) {
-						console.error(argu);
+						context.console.error(argu);
 					});
 				});
 			}, 300);
@@ -321,7 +321,7 @@
 										}
 										model.mergeCurrentModel(data);
 										model.set('criteria_url', this.getAdvancedSearchUrl());
-										console.debug(model.getCurrentModel());
+										context.console.debug(model.getCurrentModel());
 										this.state.searchDialog.forceUpdate();
 									}.bind(_this)
 								});

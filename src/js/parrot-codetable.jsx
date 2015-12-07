@@ -1,8 +1,4 @@
-/**
- * depends on jsface
- * depends on parrot-ajax, parrot-jsface
- */
-(function (context, $) {
+(function (context, $, jsface) {
 	var $pt = context.$pt;
 	if ($pt == null) {
 		$pt = {};
@@ -133,7 +129,7 @@
 				},
 				fail: function (jqXHR, textStatus, errorThrown) {
 					// error to console, quiet backend
-					window.console.error('Status:' + textStatus + ', error:' + errorThrown);
+					context.console.error('Status:' + textStatus + ', error:' + errorThrown);
 				}
 			});
 		},
@@ -335,4 +331,4 @@
 	$pt.createCodeTable = function (items, renderer, sorter) {
 		return new CodeTable(items, renderer, sorter);
 	};
-})(this, jQuery);
+})(this, jQuery, jsface);

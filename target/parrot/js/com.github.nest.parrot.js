@@ -1,8 +1,8 @@
 /** com.github.nest.parrot.V0.0.6 2015-12-07 */
-(function ($) {
+(function (context, $, browser) {
 	var patches = {
 		console: function () {
-			if ($.browser.msie && $.browser.versionNumber <= 10) {
+			if (browser.msie && browser.versionNumber <= 10) {
 				var method;
 				var noop = function () {
 				};
@@ -10,7 +10,7 @@
 					'groupCollapsed', 'groupEnd', 'info', 'log', 'markTimeline', 'profile', 'profileEnd', 'table', 'time',
 					'timeEnd', 'timeStamp', 'trace', 'warn'];
 				var length = methods.length;
-				var console = (window.console = window.console || {});
+				var console = (context.console = context.console || {});
 
 				while (length--) {
 					method = methods[length];
@@ -156,7 +156,7 @@
 					if (s1 == 0) {
 						s1 = '';
 					}
-					// console.log('Return[sign=' + sign + ', s1=' + s1 + ', s2-1=' + s2.slice(0, scale) + ', ch=' + ch + ', s2-2=' + s2.slice(scale, s2.length) + ']');
+					// context.console.log('Return[sign=' + sign + ', s1=' + s1 + ', s2-1=' + s2.slice(0, scale) + ', ch=' + ch + ', s2-2=' + s2.slice(scale, s2.length) + ']');
 					var integral = (s1 + s2.slice(0, scale)).replace(/^0+/, '');
 					if (integral.isEmpty()) {
 						integral = '0';
@@ -225,27 +225,12 @@
 	patches.string();
 	patches.number();
 	patches.array();
-})(jQuery);
+})(this, jQuery, jQuery.browser);
 
-/**
- * depends on react-bootstrap
- */
-// (function (context) {
-	// react-bootstrap tag name redefine
-	// context.Button = ReactBootstrap.Button;
-	// context.ButtonGroup = ReactBootstrap.ButtonGroup;
-	// context.ButtonToolbar = ReactBootstrap.ButtonToolbar;
-	// context.Glyphicon = ReactBootstrap.Glyphicon;
-	// context.Modal = ReactBootstrap.Modal;
-	// context.Panel = ReactBootstrap.Panel;
-	// context.OverlayTrigger = ReactBootstrap.OverlayTrigger;
-	// context.Overlay = ReactBootstrap.Overlay;
-	// context.Popover = ReactBootstrap.Popover;
-// })(this);
-
-(function () {
+(function (jsface) {
 	jsface.noConflict();
-})();
+})(jsface);
+
 /**
  * define parrot context $pt, and attach to global context.
  * can be referred directly if the global context is window
@@ -288,7 +273,7 @@
 	$pt.messages = messages;
 	$pt.defineMessage = function (key, message) {
 		if (messages[key] != null) {
-			console.log('Message[' + key + '=' + messages[key] + '] was replaced by [' + message + ']');
+			context.console.log('Message[' + key + '=' + messages[key] + '] was replaced by [' + message + ']');
 		}
 		messages[key] = message;
 		return $pt;
@@ -373,11 +358,7 @@
 	};
 })(this);
 
-/**
- * depends on jquery, jquery-mockjax(optional), jquery-deparam(optional)
- * depends on NExceptionModal, NOnRequestModal
- */
-(function (context, $) {
+(function (context, $, deparam) {
 	var $pt = context.$pt;
 	if ($pt == null) {
 		$pt = {};
@@ -525,11 +506,10 @@
 				finalURL += '?' + $.param(data);
 			}
 		}
-		window.location = finalURL;
+		context.location = finalURL;
 	};
 	/**
 	 * get data from url parameters
-	 * include jquery-deparam when call this method
 	 * @returns {*}
 	 */
 	$pt.getUrlData = function (params) {
@@ -541,14 +521,14 @@
 				paramsString = params;
 			}
 		} else {
-			paramsString = window.location.search;
+			paramsString = context.location.search;
 			if (paramsString != null && !paramsString.isBlank() && paramsString.trim() != '?') {
 				paramsString = paramsString.substring(1);
 			} else {
 				return {};
 			}
 		}
-		return $.deparam(paramsString);
+		return deparam(paramsString);
 	};
 	/**
 	 * mock ajax
@@ -584,7 +564,7 @@
 	 */
 	$pt.defineURL = function (key, urlRelateToWebContext) {
 		if (routes.urls[key] != null) {
-			console.warn('URL[' + key + '=' + routes.urls[key] + '] was replaced by [' + routes.context + urlRelateToWebContext + ']');
+			context.console.warn('URL[' + key + '=' + routes.urls[key] + '] was replaced by [' + routes.context + urlRelateToWebContext + ']');
 		}
 		routes.urls[key] = urlRelateToWebContext;
 		return $pt;
@@ -598,12 +578,9 @@
 		var url = routes.urls[key];
 		return url == null ? null : (routes.context + url);
 	};
-})(this, jQuery);
-/**
- * depends on jsface
- * depends on parrot-ajax, parrot-jsface
- */
-(function (context, $) {
+})(this, jQuery, jQuery.deparam);
+
+(function (context, $, jsface) {
 	var $pt = context.$pt;
 	if ($pt == null) {
 		$pt = {};
@@ -734,7 +711,7 @@
 				},
 				fail: function (jqXHR, textStatus, errorThrown) {
 					// error to console, quiet backend
-					window.console.error('Status:' + textStatus + ', error:' + errorThrown);
+					context.console.error('Status:' + textStatus + ', error:' + errorThrown);
 				}
 			});
 		},
@@ -936,13 +913,13 @@
 	$pt.createCodeTable = function (items, renderer, sorter) {
 		return new CodeTable(items, renderer, sorter);
 	};
-})(this, jQuery);
+})(this, jQuery, jsface);
 
 /**
  * depends on jquery, jsface
  * depends on parrot-pre-define
  */
-(function (context, $) {
+(function (context, $, moment, jsface) {
 	// define parrot context
 	var $pt = context.$pt;
 	if ($pt == null) {
@@ -2107,9 +2084,9 @@
 		var ModelClass = jsface.Class($.extend(model, ModelInterface));
 		return new ModelClass(inputModel, validator);
 	};
-})(this, jQuery);
+})(this, jQuery, moment, jsface);
 
-(function (context, $) {
+(function (context, $, jsface) {
 	var $pt = context.$pt;
 	if ($pt == null) {
 		$pt = {};
@@ -3684,7 +3661,7 @@
 				type = type.type;
 			}
 			if (this.__components[type]) {
-				console.warn('Component [' + type + '] is replaced.');
+				context.console.warn('Component [' + type + '] is replaced.');
 			}
 			this.__components[type] = func;
 		},
@@ -3705,7 +3682,7 @@
 			}
 			type = type + '@view';
 			if (this.__components[type]) {
-				console.warn('Component [' + type + '] is replaced.');
+				context.console.warn('Component [' + type + '] is replaced.');
 			}
 			this.__components[type] = func;
 		},
@@ -3735,7 +3712,7 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Nothing, function() {
 		return null;
 	});
-})(this, jQuery);
+})(this, jQuery, jsface);
 
 (function (context, $, $pt) {
 	var NArrayCheck = React.createClass($pt.defineCellComponent({
@@ -5899,10 +5876,10 @@
 				x: (evt.pageX - offset.left) - NDateTime.CLOCK_RADIUS,
 				y: NDateTime.CLOCK_RADIUS - (evt.pageY - offset.top)
 			};
-			// console.log('Mouse Point: ' + point.x + ',' + point.y);
+			// context.console.log('Mouse Point: ' + point.x + ',' + point.y);
 			// calculate the radius length of point
 			var length = Math.sqrt(Math.pow(point.x, 2) + Math.pow(point.y, 2));
-			// console.log('Point radius: ' + length);
+			// context.console.log('Point radius: ' + length);
 
 			// calculate it is what
 			if (length > 101) {
@@ -5930,7 +5907,7 @@
 				// change hour
 				eventType = NDateTime.FORMAT_TYPES.HOUR;
 			}
-			// console.log('Event Type: ' + eventType);
+			// context.console.log('Event Type: ' + eventType);
 
 			// calculate degree in coordinate system
 			var degree = 0;
@@ -5954,7 +5931,7 @@
 			} else {
 				degree = 450 - degree;
 			}
-			// console.log('Degree: ' + degree);
+			// context.console.log('Degree: ' + degree);
 
 			var currentHour, hour, minute, second;
 			var date = this.getValueFromModel();
@@ -5973,7 +5950,7 @@
 				hour = Math.floor(degree / 15) + (degree % 15 < 7.5 ? 0 : 1);
 				date.hour(hour);
 			}
-			// console.log('Hour: [' + hour + '], Minute: [' + minute + '], Second: [' + second + ']');
+			// context.console.log('Hour: [' + hour + '], Minute: [' + minute + '], Second: [' + second + ']');
 			this.renderPopover({date: date, type: popoverType, set: true});
 		},
 		onAMPMSelected: function(isAM, type) {
@@ -6056,8 +6033,8 @@
 					return date.isLeapYear() ? 29 : 28;
 				default:
 					// never run to here
-					console.warn('Something wrong with momentjs.');
-					console.warn(date);
+					context.console.warn('Something wrong with momentjs.');
+					context.console.warn(date);
 					return 31;
 			}
 		},
@@ -6180,7 +6157,7 @@
  *      }
  * }
  */
-(function (context, $, $pt) {
+(function (context, $, moment, $pt) {
 	var NDateTime2 = React.createClass($pt.defineCellComponent({
 		displayName: 'NDateTime2',
 		statics: {
@@ -6346,7 +6323,7 @@
 				var inputOffset = widget.prev().offset();
 				var widgetOffset = widget.offset();
 				var widgetHeight = widget.outerHeight(true);
-				// console.log("Widget height: " + widgetHeight);
+				// context.console.log("Widget height: " + widgetHeight);
 				if (widgetOffset.top == null || widgetOffset.top == 'auto' || inputOffset.top > widgetOffset.top) {
 					// on top
 					widgetOffset.top = inputOffset.top - widgetHeight + NDateTime2.DATE_PICKER_VERTICAL_OFFSET;
@@ -6354,8 +6331,8 @@
 					// on bottom
 					widgetOffset.top = inputOffset.top + widget.prev().height();
 				}
-				// console.log("Input Offset: " + JSON.stringify(inputOffset));
-				// console.log("Widget Offset: " + JSON.stringify(widgetOffset));
+				// context.console.log("Input Offset: " + JSON.stringify(inputOffset));
+				// context.console.log("Widget Offset: " + JSON.stringify(widgetOffset));
 				var css = {top: widgetOffset.top, left: widgetOffset.left, bottom: "auto", right: "auto", height: 'auto'};
 				var modalForm = $(target).closest('.n-modal-form');
 				if (modalForm.length != 0) {
@@ -6363,7 +6340,7 @@
 				}
 				widget.css(css);
 				widget.detach().appendTo($('body'));
-				// console.log(widget.css("top") + "," + widget.css("left") + "," + widget.css("bottom") + "," + widget.css("right") + "," + widget.outerHeight(true));
+				// context.console.log(widget.css("top") + "," + widget.css("left") + "," + widget.css("bottom") + "," + widget.css("right") + "," + widget.outerHeight(true));
 				tableBodyContainer.hide().show(0);
 			}
 
@@ -6538,7 +6515,7 @@
 	$pt.LayoutHelper.registerComponentRenderer('date2', function (model, layout, direction, viewMode) {
 		return React.createElement(NDateTime2, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, moment, $pt));
 
 /**
  * exception modal dialog
@@ -9045,7 +9022,7 @@
 					view: model.view === true
 				});
 			} else {
-				console.warn("Properties [draggable, expanded, collapsible, pos] are not supported in parameters, use JSON parameter instead.");
+				context.console.warn("Properties [draggable, expanded, collapsible, pos] are not supported in parameters, use JSON parameter instead.");
 				this.setState({
 					visible: true,
 					model: model,
@@ -10840,9 +10817,9 @@
 					}
 					_this.setLabelText(data.name);
 				}).fail(function() {
-					console.error('Error occured when retrieve label from remote in NSearch.');
+					context.console.error('Error occured when retrieve label from remote in NSearch.');
 					arguments.slice(0).forEach(function(argu) {
-						console.error(argu);
+						context.console.error(argu);
 					});
 				});
 			}, 300);
@@ -10933,7 +10910,7 @@
 										}
 										model.mergeCurrentModel(data);
 										model.set('criteria_url', this.getAdvancedSearchUrl());
-										console.debug(model.getCurrentModel());
+										context.console.debug(model.getCurrentModel());
 										this.state.searchDialog.forceUpdate();
 									}.bind(_this)
 								});
@@ -12834,7 +12811,7 @@
 		 */
 		setActiveTabIndex: function(index) {
 			if (index < 0 || index >= this.props.tabs.length) {
-				console.warn('Tab index[' + index + '] out of bound.');
+				context.console.warn('Tab index[' + index + '] out of bound.');
 			}
 			this.props.tabs.forEach(function(tab, tabIndex) {
 				tab.active = (tabIndex == index);
@@ -12956,11 +12933,11 @@
 			PAGE_JUMPING_PROXY: null,
 			registerInlineEditor: function(type, definition) {
 				if (NTable.__inlineEditors[type] != null) {
-					console.warn("Inline editor[" + type + "] is repalced.");
-					console.warn("From:");
-					console.warn(NTable.__inlineEditors[type]);
-					console.warn("To:");
-					console.warn(definition);
+					context.console.warn("Inline editor[" + type + "] is repalced.");
+					context.console.warn("From:");
+					context.console.warn(NTable.__inlineEditors[type]);
+					context.console.warn("To:");
+					context.console.warn(definition);
 				}
 				NTable.__inlineEditors[type] = definition;
 			},
@@ -14670,7 +14647,7 @@
 		 */
 		onSearchBoxChanged: function () {
 			var value = this.state.searchModel.get('text');
-			console.debug('Searching [text=' + value + '].');
+			context.console.debug('Searching [text=' + value + '].');
 			if (value == null || value == "") {
 				this.setState({
 					searchText: null
@@ -14812,7 +14789,7 @@
 				// do nothing
 			} else if (evt.type == "change") {
 				// do nothing
-				console.log('Table[' + this.getDataId() + '] data changed.');
+				context.console.log('Table[' + this.getDataId() + '] data changed.');
 			}
 
 			if (this.getModel().getValidator() != null) {
@@ -15193,7 +15170,7 @@
 				return;
 			}
 			this.getComponent().val(value);
-			// console.log("focused: " + this.getValueFromModel());
+			// context.console.log("focused: " + this.getValueFromModel());
 		},
 		onComponentBlurred: function (evt) {
 			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
@@ -15206,7 +15183,7 @@
 			if (value && !value.isBlank()) {
 				var formattedValue = this.getFormattedValue(value);
 				if (formattedValue != value) {
-					// console.debug('Change component display formatted value when onBlur.');
+					// context.console.debug('Change component display formatted value when onBlur.');
 					this.getComponent().val(formattedValue);
 				}
 			}
@@ -15217,7 +15194,7 @@
 		 * @param evt
 		 */
 		onComponentChanged: function (evt) {
-			// console.debug('Text component changed[modelValue=' + this.getValueFromModel() + ', compValue=' + evt.target.value + '].');
+			// context.console.debug('Text component changed[modelValue=' + this.getValueFromModel() + ', compValue=' + evt.target.value + '].');
 			this.setValueToModel(evt.target.value);
 		},
 		/**
@@ -15235,7 +15212,7 @@
 			// if (formattedValue == this.getComponent().val()) {
 			// 	return;
 			// }
-			// // console.debug('Text model changed[modelValue=' + evt.new + ', compValue=' + this.getComponent().val() + '].');
+			// // context.console.debug('Text model changed[modelValue=' + evt.new + ', compValue=' + this.getComponent().val() + '].');
 			// this.getComponent().val(formattedValue);
 		},
 		onKeyUp: function (evt) {
@@ -16078,17 +16055,17 @@
                             hasUncheckedChild = true;
                         }
                     });
-                    // console.log(nodeId);
+                    // context.console.log(nodeId);
                     _this.checkNode(nodeId, !hasUncheckedChild, modelValue);
                     return !hasUncheckedChild;
                 } else {
                     // no children, return checked of myself
-                    // console.log(nodeId);
+                    // context.console.log(nodeId);
                     return _this.isNodeChecked(nodeId, modelValue);
                 }
             };
             checkNodeOnChildren(this.state.root, this.getNodeId(null, this.state.root));
-            // console.log(modelValue);
+            // context.console.log(modelValue);
         },
         expandAll: function() {
             var activeNodes = $.extend({}, this.state.activeNodes);

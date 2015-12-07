@@ -902,10 +902,10 @@
 				x: (evt.pageX - offset.left) - NDateTime.CLOCK_RADIUS,
 				y: NDateTime.CLOCK_RADIUS - (evt.pageY - offset.top)
 			};
-			// console.log('Mouse Point: ' + point.x + ',' + point.y);
+			// context.console.log('Mouse Point: ' + point.x + ',' + point.y);
 			// calculate the radius length of point
 			var length = Math.sqrt(Math.pow(point.x, 2) + Math.pow(point.y, 2));
-			// console.log('Point radius: ' + length);
+			// context.console.log('Point radius: ' + length);
 
 			// calculate it is what
 			if (length > 101) {
@@ -933,7 +933,7 @@
 				// change hour
 				eventType = NDateTime.FORMAT_TYPES.HOUR;
 			}
-			// console.log('Event Type: ' + eventType);
+			// context.console.log('Event Type: ' + eventType);
 
 			// calculate degree in coordinate system
 			var degree = 0;
@@ -957,7 +957,7 @@
 			} else {
 				degree = 450 - degree;
 			}
-			// console.log('Degree: ' + degree);
+			// context.console.log('Degree: ' + degree);
 
 			var currentHour, hour, minute, second;
 			var date = this.getValueFromModel();
@@ -976,7 +976,7 @@
 				hour = Math.floor(degree / 15) + (degree % 15 < 7.5 ? 0 : 1);
 				date.hour(hour);
 			}
-			// console.log('Hour: [' + hour + '], Minute: [' + minute + '], Second: [' + second + ']');
+			// context.console.log('Hour: [' + hour + '], Minute: [' + minute + '], Second: [' + second + ']');
 			this.renderPopover({date: date, type: popoverType, set: true});
 		},
 		onAMPMSelected: function(isAM, type) {
@@ -1059,8 +1059,8 @@
 					return date.isLeapYear() ? 29 : 28;
 				default:
 					// never run to here
-					console.warn('Something wrong with momentjs.');
-					console.warn(date);
+					context.console.warn('Something wrong with momentjs.');
+					context.console.warn(date);
 					return 31;
 			}
 		},

@@ -394,17 +394,17 @@
                             hasUncheckedChild = true;
                         }
                     });
-                    // console.log(nodeId);
+                    // context.console.log(nodeId);
                     _this.checkNode(nodeId, !hasUncheckedChild, modelValue);
                     return !hasUncheckedChild;
                 } else {
                     // no children, return checked of myself
-                    // console.log(nodeId);
+                    // context.console.log(nodeId);
                     return _this.isNodeChecked(nodeId, modelValue);
                 }
             };
             checkNodeOnChildren(this.state.root, this.getNodeId(null, this.state.root));
-            // console.log(modelValue);
+            // context.console.log(modelValue);
         },
         expandAll: function() {
             var activeNodes = $.extend({}, this.state.activeNodes);

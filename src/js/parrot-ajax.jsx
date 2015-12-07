@@ -1,8 +1,4 @@
-/**
- * depends on jquery, jquery-mockjax(optional), jquery-deparam(optional)
- * depends on NExceptionModal, NOnRequestModal
- */
-(function (context, $) {
+(function (context, $, deparam) {
 	var $pt = context.$pt;
 	if ($pt == null) {
 		$pt = {};
@@ -150,11 +146,10 @@
 				finalURL += '?' + $.param(data);
 			}
 		}
-		window.location = finalURL;
+		context.location = finalURL;
 	};
 	/**
 	 * get data from url parameters
-	 * include jquery-deparam when call this method
 	 * @returns {*}
 	 */
 	$pt.getUrlData = function (params) {
@@ -166,14 +161,14 @@
 				paramsString = params;
 			}
 		} else {
-			paramsString = window.location.search;
+			paramsString = context.location.search;
 			if (paramsString != null && !paramsString.isBlank() && paramsString.trim() != '?') {
 				paramsString = paramsString.substring(1);
 			} else {
 				return {};
 			}
 		}
-		return $.deparam(paramsString);
+		return deparam(paramsString);
 	};
 	/**
 	 * mock ajax
@@ -209,7 +204,7 @@
 	 */
 	$pt.defineURL = function (key, urlRelateToWebContext) {
 		if (routes.urls[key] != null) {
-			console.warn('URL[' + key + '=' + routes.urls[key] + '] was replaced by [' + routes.context + urlRelateToWebContext + ']');
+			context.console.warn('URL[' + key + '=' + routes.urls[key] + '] was replaced by [' + routes.context + urlRelateToWebContext + ']');
 		}
 		routes.urls[key] = urlRelateToWebContext;
 		return $pt;
@@ -223,4 +218,4 @@
 		var url = routes.urls[key];
 		return url == null ? null : (routes.context + url);
 	};
-})(this, jQuery);
+})(this, jQuery, jQuery.deparam);

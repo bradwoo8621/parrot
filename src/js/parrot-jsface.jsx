@@ -1,3 +1,3 @@
-(function () {
+(function (jsface) {
 	jsface.noConflict();
-})();
+})(jsface);

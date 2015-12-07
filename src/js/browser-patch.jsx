@@ -1,7 +1,7 @@
-(function ($) {
+(function (context, $, browser) {
 	var patches = {
 		console: function () {
-			if ($.browser.msie && $.browser.versionNumber <= 10) {
+			if (browser.msie && browser.versionNumber <= 10) {
 				var method;
 				var noop = function () {
 				};
@@ -9,7 +9,7 @@
 					'groupCollapsed', 'groupEnd', 'info', 'log', 'markTimeline', 'profile', 'profileEnd', 'table', 'time',
 					'timeEnd', 'timeStamp', 'trace', 'warn'];
 				var length = methods.length;
-				var console = (window.console = window.console || {});
+				var console = (context.console = context.console || {});
 
 				while (length--) {
 					method = methods[length];
@@ -155,7 +155,7 @@
 					if (s1 == 0) {
 						s1 = '';
 					}
-					// console.log('Return[sign=' + sign + ', s1=' + s1 + ', s2-1=' + s2.slice(0, scale) + ', ch=' + ch + ', s2-2=' + s2.slice(scale, s2.length) + ']');
+					// context.console.log('Return[sign=' + sign + ', s1=' + s1 + ', s2-1=' + s2.slice(0, scale) + ', ch=' + ch + ', s2-2=' + s2.slice(scale, s2.length) + ']');
 					var integral = (s1 + s2.slice(0, scale)).replace(/^0+/, '');
 					if (integral.isEmpty()) {
 						integral = '0';
@@ -224,4 +224,4 @@
 	patches.string();
 	patches.number();
 	patches.array();
-})(jQuery);
+})(this, jQuery, jQuery.browser);

@@ -2,7 +2,7 @@
  * depends on jquery, jsface
  * depends on parrot-pre-define
  */
-(function (context, $) {
+(function (context, $, moment, jsface) {
 	// define parrot context
 	var $pt = context.$pt;
 	if ($pt == null) {
@@ -1167,4 +1167,4 @@
 		var ModelClass = jsface.Class($.extend(model, ModelInterface));
 		return new ModelClass(inputModel, validator);
 	};
-})(this, jQuery);
+})(this, jQuery, moment, jsface);

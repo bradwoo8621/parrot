@@ -40,7 +40,7 @@
 	$pt.messages = messages;
 	$pt.defineMessage = function (key, message) {
 		if (messages[key] != null) {
-			console.log('Message[' + key + '=' + messages[key] + '] was replaced by [' + message + ']');
+			context.console.log('Message[' + key + '=' + messages[key] + '] was replaced by [' + message + ']');
 		}
 		messages[key] = message;
 		return $pt;

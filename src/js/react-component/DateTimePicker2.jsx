@@ -32,7 +32,7 @@
  *      }
  * }
  */
-(function (context, $, $pt) {
+(function (context, $, moment, $pt) {
 	var NDateTime2 = React.createClass($pt.defineCellComponent({
 		displayName: 'NDateTime2',
 		statics: {
@@ -198,7 +198,7 @@
 				var inputOffset = widget.prev().offset();
 				var widgetOffset = widget.offset();
 				var widgetHeight = widget.outerHeight(true);
-				// console.log("Widget height: " + widgetHeight);
+				// context.console.log("Widget height: " + widgetHeight);
 				if (widgetOffset.top == null || widgetOffset.top == 'auto' || inputOffset.top > widgetOffset.top) {
 					// on top
 					widgetOffset.top = inputOffset.top - widgetHeight + NDateTime2.DATE_PICKER_VERTICAL_OFFSET;
@@ -206,8 +206,8 @@
 					// on bottom
 					widgetOffset.top = inputOffset.top + widget.prev().height();
 				}
-				// console.log("Input Offset: " + JSON.stringify(inputOffset));
-				// console.log("Widget Offset: " + JSON.stringify(widgetOffset));
+				// context.console.log("Input Offset: " + JSON.stringify(inputOffset));
+				// context.console.log("Widget Offset: " + JSON.stringify(widgetOffset));
 				var css = {top: widgetOffset.top, left: widgetOffset.left, bottom: "auto", right: "auto", height: 'auto'};
 				var modalForm = $(target).closest('.n-modal-form');
 				if (modalForm.length != 0) {
@@ -215,7 +215,7 @@
 				}
 				widget.css(css);
 				widget.detach().appendTo($('body'));
-				// console.log(widget.css("top") + "," + widget.css("left") + "," + widget.css("bottom") + "," + widget.css("right") + "," + widget.outerHeight(true));
+				// context.console.log(widget.css("top") + "," + widget.css("left") + "," + widget.css("bottom") + "," + widget.css("right") + "," + widget.outerHeight(true));
 				tableBodyContainer.hide().show(0);
 			}
 
@@ -390,4 +390,4 @@
 	$pt.LayoutHelper.registerComponentRenderer('date2', function (model, layout, direction, viewMode) {
 		return <NDateTime2 {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, moment, $pt));

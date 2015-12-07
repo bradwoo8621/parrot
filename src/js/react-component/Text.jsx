@@ -241,7 +241,7 @@
 				return;
 			}
 			this.getComponent().val(value);
-			// console.log("focused: " + this.getValueFromModel());
+			// context.console.log("focused: " + this.getValueFromModel());
 		},
 		onComponentBlurred: function (evt) {
 			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
@@ -254,7 +254,7 @@
 			if (value && !value.isBlank()) {
 				var formattedValue = this.getFormattedValue(value);
 				if (formattedValue != value) {
-					// console.debug('Change component display formatted value when onBlur.');
+					// context.console.debug('Change component display formatted value when onBlur.');
 					this.getComponent().val(formattedValue);
 				}
 			}
@@ -265,7 +265,7 @@
 		 * @param evt
 		 */
 		onComponentChanged: function (evt) {
-			// console.debug('Text component changed[modelValue=' + this.getValueFromModel() + ', compValue=' + evt.target.value + '].');
+			// context.console.debug('Text component changed[modelValue=' + this.getValueFromModel() + ', compValue=' + evt.target.value + '].');
 			this.setValueToModel(evt.target.value);
 		},
 		/**
@@ -283,7 +283,7 @@
 			// if (formattedValue == this.getComponent().val()) {
 			// 	return;
 			// }
-			// // console.debug('Text model changed[modelValue=' + evt.new + ', compValue=' + this.getComponent().val() + '].');
+			// // context.console.debug('Text model changed[modelValue=' + evt.new + ', compValue=' + this.getComponent().val() + '].');
 			// this.getComponent().val(formattedValue);
 		},
 		onKeyUp: function (evt) {
