@@ -133,7 +133,7 @@
 		render: function () {
 			return (<div className="row n-panel-footer">
 				<div className="col-sm-12 col-md-12 col-lg-12">
-					<ButtonToolbar className="n-panel-footer-left">
+					<div className="btn-toolbar n-panel-footer-left" role='toolbar'>
 						{this.props.reset ? this.renderButton({
 							icon: NPanelFooter.RESET_ICON,
 							text: NPanelFooter.RESET_TEXT,
@@ -151,8 +151,8 @@
 							visible: this.props.validate.visible ? this.props.validate.visible : true
 						}) : null}
 						{this.renderLeftButtons()}
-					</ButtonToolbar>
-					<ButtonToolbar className="n-panel-footer-right">
+					</div>
+					<div className="btn-toolbar n-panel-footer-right" role='toolbar'>
 						{this.props.cancel ? this.renderButton({
 							icon: NPanelFooter.CANCEL_ICON,
 							text: NPanelFooter.CANCEL_TEXT,
@@ -170,7 +170,7 @@
 							visible: this.props.save.visible ? this.props.save.visible : true
 						}) : null}
 						{this.renderRightButtons()}
-					</ButtonToolbar>
+					</div>
 				</div>
 			</div>);
 		},

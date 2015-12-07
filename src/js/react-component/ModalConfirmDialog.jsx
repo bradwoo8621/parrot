@@ -24,7 +24,8 @@
 			CLOSE_TEXT: 'Close',
 			CLOSE_ICON: 'ban',
 			CANCEL_TEXT: 'Cancel',
-			CANCEL_ICON: 'ban'
+			CANCEL_ICON: 'ban',
+			Z_INDEX: 9698
 		},
 		propTypes: {
 			className: React.PropTypes.string
@@ -43,16 +44,7 @@
 		/**
 		 * set z-index
 		 */
-		setZIndex: function () {
-			var div = $(React.findDOMNode(this.refs.body)).closest(".modal");
-			if (div.length > 0) {
-				div.css({
-					"z-index": 9699
-				});
-				div.prev().css({
-					"z-index": 9698
-				});
-			}
+		fixDocumentPadding: function () {
 			document.body.style.paddingRight = 0;
 		},
 		/**
@@ -61,13 +53,21 @@
 		 * @param prevState
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
-			this.setZIndex();
+			this.fixDocumentPadding();
+			$(document).on('keyup', this.onDocumentKeyUp);
 		},
 		/**
 		 * did mount
 		 */
 		componentDidMount: function () {
-			this.setZIndex();
+			this.fixDocumentPadding();
+			$(document).on('keyup', this.onDocumentKeyUp);
+		},
+		componentWillUpdate: function() {
+			$(document).off('keyup', this.onDocumentKeyUp);
+		},
+		componentWillUnmount: function() {
+			$(document).off('keyup', this.onDocumentKeyUp);
 		},
 		/**
 		 * render confirm button
@@ -115,10 +115,10 @@
 			if (this.state.options && this.state.options.disableButtons) {
 				return <div className='modal-footer-empty'/>;
 			}
-			return (<Modal.Footer>
+			return (<div className="modal-footer">
 				{this.renderCloseButton()}
 				{this.renderConfirmButton()}
-			</Modal.Footer>);
+			</div>);
 		},
 		/**
 		 * render content
@@ -148,22 +148,44 @@
 				return null;
 			}
 			var css = {
-				'n-confirm': true
+				'n-confirm': true,
+				modal: true,
+				fade: true,
+				in: true
 			};
 			if (this.props.className) {
 				css[this.props.className] = true;
 			}
-			return (<Modal className={$pt.LayoutHelper.classSet(css)}
-			               bsStyle="danger" backdrop="static"
-			               onHide={this.onCancelClicked}>
-				<Modal.Header closeButton={true}>
-					<Modal.Title>{this.state.title}</Modal.Title>
-				</Modal.Header>
-				<Modal.Body ref="body">
-					{this.renderContent()}
-				</Modal.Body>
-				{this.renderFooter()}
-			</Modal>);
+			return (<div>
+				<div className="modal-backdrop fade in" style={{zIndex: NConfirm.Z_INDEX}}></div>
+				<div className={$pt.LayoutHelper.classSet(css)}
+					 tabindex="-1"
+					 role="dialog"
+					 style={{display: 'block', zIndex: NConfirm.Z_INDEX + 1}}>
+					<div className="modal-dialog">
+						<div className="modal-content" role="document">
+							<div className="modal-header">
+								<button className="close"
+										onClick={this.onCancelClicked}
+										aria-label="Close"
+										style={{marginTop: '-2px'}}>
+									<span aria-hidden="true">×</span>
+								</button>
+								<h4 className="modal-title">{this.state.title}</h4>
+							</div>
+							<div className="modal-body">
+								{this.renderContent()}
+							</div>
+							{this.renderFooter()}
+						</div>
+					</div>
+				</div>
+			</div>);
+		},
+		onDocumentKeyUp: function(evt) {
+			if (evt.keyCode === 27) { // escape
+				this.onCancelClicked();
+			}
 		},
 		/**
 		 * hide dialog

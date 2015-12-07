@@ -230,18 +230,18 @@
 /**
  * depends on react-bootstrap
  */
-(function (context) {
+// (function (context) {
 	// react-bootstrap tag name redefine
-	context.Button = ReactBootstrap.Button;
-	context.ButtonGroup = ReactBootstrap.ButtonGroup;
-	context.ButtonToolbar = ReactBootstrap.ButtonToolbar;
-	//context.Glyphicon = ReactBootstrap.Glyphicon;
-	context.Modal = ReactBootstrap.Modal;
+	// context.Button = ReactBootstrap.Button;
+	// context.ButtonGroup = ReactBootstrap.ButtonGroup;
+	// context.ButtonToolbar = ReactBootstrap.ButtonToolbar;
+	// context.Glyphicon = ReactBootstrap.Glyphicon;
+	// context.Modal = ReactBootstrap.Modal;
 	// context.Panel = ReactBootstrap.Panel;
 	// context.OverlayTrigger = ReactBootstrap.OverlayTrigger;
 	// context.Overlay = ReactBootstrap.Overlay;
 	// context.Popover = ReactBootstrap.Popover;
-})(this);
+// })(this);
 
 (function () {
 	jsface.noConflict();
@@ -6561,7 +6561,8 @@
 				}
 				return $pt.exceptionDialog;
 			},
-			TITLE: 'Exception Raised...'
+			TITLE: 'Exception Raised...',
+			Z_INDEX: 9998
 		},
 		propTypes: {
 			className: React.PropTypes.string
@@ -6579,12 +6580,7 @@
 		/**
 		 * set z-index
 		 */
-		setZIndex: function () {
-			var div = $(React.findDOMNode(this.refs.body)).closest(".modal");
-			if (div.length > 0) {
-				div.css({"z-index": 9999});
-				div.prev().css({"z-index": 9998});
-			}
+		fixDocumentPadding: function () {
 			document.body.style.paddingRight = 0;
 		},
 		/**
@@ -6593,13 +6589,21 @@
 		 * @param prevState
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
-			this.setZIndex();
+			this.fixDocumentPadding();
+			$(document).on('keyup', this.onDocumentKeyUp);
 		},
 		/**
 		 * did mount
 		 */
 		componentDidMount: function () {
-			this.setZIndex();
+			this.fixDocumentPadding();
+			$(document).on('keyup', this.onDocumentKeyUp);
+		},
+		componentWillUpdate: function() {
+			$(document).off('keyup', this.onDocumentKeyUp);
+		},
+		componentWillUnmount: function() {
+			$(document).off('keyup', this.onDocumentKeyUp);
 		},
 		/**
 		 * render content
@@ -6623,21 +6627,43 @@
 			}
 
 			var css = {
-				'n-exception-modal': true
+				'n-exception-modal': true,
+				modal: true,
+				fade: true,
+				in: true
 			};
 			if (this.props.className) {
 				css[this.props.className] = true;
 			}
-			return (React.createElement(Modal, {className: $pt.LayoutHelper.classSet(css), bsStyle: "danger", 
-			               onHide: this.hide, backdrop: "static"}, 
-				React.createElement(Modal.Header, {closeButton: true}, 
-					React.createElement(Modal.Title, null, NExceptionModal.TITLE)
-				), 
-
-				React.createElement(Modal.Body, {ref: "body"}, 
-					this.renderContent()
+			return (React.createElement("div", null, 
+				React.createElement("div", {className: "modal-backdrop fade in", style: {zIndex: NExceptionModal.Z_INDEX}}), 
+				React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
+					 tabindex: "-1", 
+					 role: "dialog", 
+					 style: {display: 'block', zIndex: NExceptionModal.Z_INDEX + 1}}, 
+					React.createElement("div", {className: "modal-danger modal-dialog"}, 
+						React.createElement("div", {className: "modal-content", role: "document"}, 
+							React.createElement("div", {className: "modal-header"}, 
+								React.createElement("button", {className: "close", 
+										onClick: this.hide, 
+										"aria-label": "Close", 
+										style: {marginTop: '-2px'}}, 
+									React.createElement("span", {"aria-hidden": "true"}, "×")
+								), 
+								React.createElement("h4", {className: "modal-title"}, NExceptionModal.TITLE)
+							), 
+							React.createElement("div", {className: "modal-body"}, 
+								this.renderContent()
+							)
+						)
+					)
 				)
 			));
+		},
+		onDocumentKeyUp: function(evt) {
+			if (evt.keyCode === 27) { // escape
+				this.hide();
+			}
 		},
 		/**
 		 * hide dialog
@@ -8299,7 +8325,8 @@
 			CLOSE_TEXT: 'Close',
 			CLOSE_ICON: 'ban',
 			CANCEL_TEXT: 'Cancel',
-			CANCEL_ICON: 'ban'
+			CANCEL_ICON: 'ban',
+			Z_INDEX: 9698
 		},
 		propTypes: {
 			className: React.PropTypes.string
@@ -8318,16 +8345,7 @@
 		/**
 		 * set z-index
 		 */
-		setZIndex: function () {
-			var div = $(React.findDOMNode(this.refs.body)).closest(".modal");
-			if (div.length > 0) {
-				div.css({
-					"z-index": 9699
-				});
-				div.prev().css({
-					"z-index": 9698
-				});
-			}
+		fixDocumentPadding: function () {
 			document.body.style.paddingRight = 0;
 		},
 		/**
@@ -8336,13 +8354,21 @@
 		 * @param prevState
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
-			this.setZIndex();
+			this.fixDocumentPadding();
+			$(document).on('keyup', this.onDocumentKeyUp);
 		},
 		/**
 		 * did mount
 		 */
 		componentDidMount: function () {
-			this.setZIndex();
+			this.fixDocumentPadding();
+			$(document).on('keyup', this.onDocumentKeyUp);
+		},
+		componentWillUpdate: function() {
+			$(document).off('keyup', this.onDocumentKeyUp);
+		},
+		componentWillUnmount: function() {
+			$(document).off('keyup', this.onDocumentKeyUp);
 		},
 		/**
 		 * render confirm button
@@ -8390,7 +8416,7 @@
 			if (this.state.options && this.state.options.disableButtons) {
 				return React.createElement("div", {className: "modal-footer-empty"});
 			}
-			return (React.createElement(Modal.Footer, null, 
+			return (React.createElement("div", {className: "modal-footer"}, 
 				this.renderCloseButton(), 
 				this.renderConfirmButton()
 			));
@@ -8423,22 +8449,44 @@
 				return null;
 			}
 			var css = {
-				'n-confirm': true
+				'n-confirm': true,
+				modal: true,
+				fade: true,
+				in: true
 			};
 			if (this.props.className) {
 				css[this.props.className] = true;
 			}
-			return (React.createElement(Modal, {className: $pt.LayoutHelper.classSet(css), 
-			               bsStyle: "danger", backdrop: "static", 
-			               onHide: this.onCancelClicked}, 
-				React.createElement(Modal.Header, {closeButton: true}, 
-					React.createElement(Modal.Title, null, this.state.title)
-				), 
-				React.createElement(Modal.Body, {ref: "body"}, 
-					this.renderContent()
-				), 
-				this.renderFooter()
+			return (React.createElement("div", null, 
+				React.createElement("div", {className: "modal-backdrop fade in", style: {zIndex: NConfirm.Z_INDEX}}), 
+				React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
+					 tabindex: "-1", 
+					 role: "dialog", 
+					 style: {display: 'block', zIndex: NConfirm.Z_INDEX + 1}}, 
+					React.createElement("div", {className: "modal-dialog"}, 
+						React.createElement("div", {className: "modal-content", role: "document"}, 
+							React.createElement("div", {className: "modal-header"}, 
+								React.createElement("button", {className: "close", 
+										onClick: this.onCancelClicked, 
+										"aria-label": "Close", 
+										style: {marginTop: '-2px'}}, 
+									React.createElement("span", {"aria-hidden": "true"}, "×")
+								), 
+								React.createElement("h4", {className: "modal-title"}, this.state.title)
+							), 
+							React.createElement("div", {className: "modal-body"}, 
+								this.renderContent()
+							), 
+							this.renderFooter()
+						)
+					)
+				)
 			));
+		},
+		onDocumentKeyUp: function(evt) {
+			if (evt.keyCode === 27) { // escape
+				this.onCancelClicked();
+			}
 		},
 		/**
 		 * hide dialog
@@ -8591,19 +8639,7 @@
 		/**
 		 * set z-index
 		 */
-		setZIndex: function () {
-			if (this.props.zIndex != undefined) {
-				var div = $(React.findDOMNode(this.refs.body)).closest(".modal");
-				if (div.length > 0) {
-					div.css({
-						"z-index": this.props.zIndex * 1 + 1
-					});
-					div.prev().css({
-						"z-index": this.props.zIndex * 1
-					});
-					div.removeAttr('tabIndex');
-				}
-			}
+		fixDocumentPadding: function () {
 			document.body.style.paddingRight = 0;
 		},
 		setDraggable: function() {
@@ -8676,21 +8712,33 @@
 		 * @param prevState
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
-			this.setZIndex();
+			this.fixDocumentPadding();
 			this.setDraggable();
+			if (this.isDialogCloseShown()) {
+				$(document).on('keyup', this.onDocumentKeyUp);
+			}
 		},
 		componentWillUpdate: function() {
 			this.stopDraggable();
+			if (this.isDialogCloseShown()) {
+				$(document).off('keyup', this.onDocumentKeyUp);
+			}
 		},
 		/**
 		 * did mount
 		 */
 		componentDidMount: function () {
-			this.setZIndex();
+			this.fixDocumentPadding();
 			this.setDraggable();
+			if (this.isDialogCloseShown()) {
+				$(document).on('keyup', this.onDocumentKeyUp);
+			}
 		},
 		componentDidUnmount: function() {
 			this.stopDraggable();
+			if (this.isDialogCloseShown()) {
+				$(document).off('keyup', this.onDocumentKeyUp);
+			}
 		},
 		/**
 		 * render footer
@@ -8700,7 +8748,7 @@
 			if (this.state.footer === false || !this.state.expanded) {
 				return React.createElement("div", {ref: "footer"});
 			} else {
-				return (React.createElement(Modal.Footer, {className: "n-modal-form-footer", ref: "footer"}, 
+				return (React.createElement("div", {className: "n-modal-form-footer modal-footer", ref: "footer"}, 
 					React.createElement(NPanelFooter, {reset: this.getResetButton(), 
 					              validate: this.getValidationButton(), 
 					              save: this.getSaveButton(), 
@@ -8713,13 +8761,28 @@
 			}
 		},
 		renderBody: function() {
-			return (React.createElement(Modal.Body, {ref: "body", className: !this.state.expanded ? 'hide': null}, 
+			var css = {
+				'modal-body': true,
+				hide: !this.state.expanded
+			};
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
 				React.createElement(NForm, {model: this.getModel(), 
 					   layout: this.getLayout(), 
 					   direction: this.getDirection(), 
 					   view: this.isViewMode(), 
 				       ref: "form"})
 			));
+		},
+		renderCloseButton: function() {
+			if (this.isDialogCloseShown()) {
+				return (React.createElement("button", {className: "close", 
+						onClick: this.hide, 
+						"aria-label": "Close", 
+						style: {marginTop: '-2px'}}, 
+					React.createElement("span", {"aria-hidden": "true"}, "×")
+				));
+			}
+			return null;
 		},
 		/**
 		 * render
@@ -8733,13 +8796,38 @@
 			if (this.isCollapsible()) {
 				title = (React.createElement("a", {href: "javascript:void(0);", onClick: this.onTitleClicked}, title));
 			}
-			return (React.createElement(Modal, {className: this.props.className, backdrop: "static", onHide: this.hide, ref: "top"}, 
-				React.createElement(Modal.Header, {closeButton: this.isDialogCloseShown()}, 
-					React.createElement(Modal.Title, null, title)
-				), 
-				this.renderBody(), 
-				this.renderFooter()
+			var css = {
+				'n-confirm': true,
+				modal: true,
+				fade: true,
+				in: true
+			};
+			if (this.props.className) {
+				css[this.props.className] = true;
+			}
+			// tabindex="0"
+			return (React.createElement("div", {ref: "top"}, 
+				React.createElement("div", {className: "modal-backdrop fade in", style: {zIndex: this.props.zIndex * 1}}), 
+				React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
+					 role: "dialog", 
+					 style: {display: 'block', zIndex: this.props.zIndex * 1 + 1}}, 
+					React.createElement("div", {className: "modal-dialog"}, 
+						React.createElement("div", {className: "modal-content", role: "document"}, 
+							React.createElement("div", {className: "modal-header"}, 
+								this.renderCloseButton(), 
+								React.createElement("h4", {className: "modal-title"}, title)
+							), 
+							this.renderBody(), 
+							this.renderFooter()
+						)
+					)
+				)
 			));
+		},
+		onDocumentKeyUp: function(evt) {
+			if (evt.keyCode === 27) { // escape
+				this.hide();
+			}
 		},
 		/**
 		 * on title clicked
@@ -9101,7 +9189,8 @@
 				}
 				return $pt.onRequestDialog;
 			},
-			WAITING_MESSAGE: 'Send request to server and waiting for response...'
+			WAITING_MESSAGE: 'Send request to server and waiting for response...',
+			Z_INDEX: 9898
 		},
 		propTypes: {
 			className: React.PropTypes.string
@@ -9114,12 +9203,7 @@
 		/**
 		 * set z-index
 		 */
-		setZIndex: function () {
-			var div = $(React.findDOMNode(this.refs.body)).closest(".modal");
-			if (div.length > 0) {
-				div.css({"z-index": 9899});
-				div.prev().css({"z-index": 9898});
-			}
+		fixDocumentPadding: function () {
 			document.body.style.paddingRight = 0;
 		},
 		/**
@@ -9128,27 +9212,40 @@
 		 * @param prevState
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
-			this.setZIndex();
+			this.fixDocumentPadding();
 		},
 		/**
 		 * did mount
 		 */
 		componentDidMount: function () {
-			this.setZIndex();
+			this.fixDocumentPadding();
 		},
 		render: function () {
 			if (!this.state.visible) {
 				return null;
 			}
 			var css = {
-				'n-on-request': true
+				'n-on-request': true,
+				modal: true,
+				fade: true,
+				in: true
 			};
 			if (this.props.className) {
 				css[this.props.className] = true;
 			}
-			return (React.createElement(Modal, {className: $pt.LayoutHelper.classSet(css)}, 
-				React.createElement(Modal.Body, {ref: "body"}, 
-					React.createElement("span", {className: "fa fa-fw fa-lg fa-spin fa-spinner"}), " ", NOnRequestModal.WAITING_MESSAGE
+			return (React.createElement("div", null, 
+				React.createElement("div", {className: "modal-backdrop fade in", style: {zIndex: NOnRequestModal.Z_INDEX}}), 
+				React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
+					 tabindex: "-1", 
+					 role: "dialog", 
+					 style: {display: 'block', zIndex: NOnRequestModal.Z_INDEX + 1}}, 
+					React.createElement("div", {className: "modal-danger modal-dialog"}, 
+						React.createElement("div", {className: "modal-content", role: "document"}, 
+							React.createElement("div", {className: "modal-body", ref: "body"}, 
+								React.createElement("span", {className: "fa fa-fw fa-lg fa-spin fa-spinner"}), " ", NOnRequestModal.WAITING_MESSAGE
+							)
+						)
+					)
 				)
 			));
 		},
@@ -10259,7 +10356,7 @@
 		render: function () {
 			return (React.createElement("div", {className: "row n-panel-footer"}, 
 				React.createElement("div", {className: "col-sm-12 col-md-12 col-lg-12"}, 
-					React.createElement(ButtonToolbar, {className: "n-panel-footer-left"}, 
+					React.createElement("div", {className: "btn-toolbar n-panel-footer-left", role: "toolbar"}, 
 						this.props.reset ? this.renderButton({
 							icon: NPanelFooter.RESET_ICON,
 							text: NPanelFooter.RESET_TEXT,
@@ -10278,7 +10375,7 @@
 						}) : null, 
 						this.renderLeftButtons()
 					), 
-					React.createElement(ButtonToolbar, {className: "n-panel-footer-right"}, 
+					React.createElement("div", {className: "btn-toolbar n-panel-footer-right", role: "toolbar"}, 
 						this.props.cancel ? this.renderButton({
 							icon: NPanelFooter.CANCEL_ICON,
 							text: NPanelFooter.CANCEL_TEXT,
@@ -13454,7 +13551,7 @@
 			var removeButton = column.removable ? this.renderRowRemoveButton(rowModel) : null;
 			var rowOperations = this.getRowOperations(column);
 			var _this = this;
-			return (React.createElement(ButtonGroup, {className: "n-table-op-btn-group"}, 
+			return (React.createElement("div", {className: "btn-group n-table-op-btn-group", role: "group"}, 
 				rowOperations.map(function (operation) {
 					return _this.renderRowOperationButton(operation, rowModel);
 				}), 
@@ -13620,7 +13717,7 @@
 				buttons.push(this.renderRowOperationMoreButton(rowOperations.slice(used + 1), rowModel));
 			}
 
-			return (React.createElement(ButtonGroup, {className: "n-table-op-btn-group"}, 
+			return (React.createElement("div", {className: "btn-group n-table-op-btn-group", role: "group"}, 
 				buttons, dropdown
 			));
 		},

@@ -635,13 +635,13 @@
 			var removeButton = column.removable ? this.renderRowRemoveButton(rowModel) : null;
 			var rowOperations = this.getRowOperations(column);
 			var _this = this;
-			return (<ButtonGroup className="n-table-op-btn-group">
+			return (<div className="btn-group n-table-op-btn-group" role='group'>
 				{rowOperations.map(function (operation) {
 					return _this.renderRowOperationButton(operation, rowModel);
 				})}
 				{editButton}
 				{removeButton}
-			</ButtonGroup>);
+			</div>);
 		},
 		renderPopoverContainer: function() {
 			if (this.state.popoverDiv == null) {
@@ -801,9 +801,9 @@
 				buttons.push(this.renderRowOperationMoreButton(rowOperations.slice(used + 1), rowModel));
 			}
 
-			return (<ButtonGroup className="n-table-op-btn-group">
+			return (<div className="btn-group n-table-op-btn-group" role='group'>
 				{buttons}{dropdown}
-			</ButtonGroup>);
+			</div>);
 		},
 		/**
 		 * render operation cell

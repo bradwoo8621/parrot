@@ -55,19 +55,7 @@
 		/**
 		 * set z-index
 		 */
-		setZIndex: function () {
-			if (this.props.zIndex != undefined) {
-				var div = $(React.findDOMNode(this.refs.body)).closest(".modal");
-				if (div.length > 0) {
-					div.css({
-						"z-index": this.props.zIndex * 1 + 1
-					});
-					div.prev().css({
-						"z-index": this.props.zIndex * 1
-					});
-					div.removeAttr('tabIndex');
-				}
-			}
+		fixDocumentPadding: function () {
 			document.body.style.paddingRight = 0;
 		},
 		setDraggable: function() {
@@ -140,21 +128,33 @@
 		 * @param prevState
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
-			this.setZIndex();
+			this.fixDocumentPadding();
 			this.setDraggable();
+			if (this.isDialogCloseShown()) {
+				$(document).on('keyup', this.onDocumentKeyUp);
+			}
 		},
 		componentWillUpdate: function() {
 			this.stopDraggable();
+			if (this.isDialogCloseShown()) {
+				$(document).off('keyup', this.onDocumentKeyUp);
+			}
 		},
 		/**
 		 * did mount
 		 */
 		componentDidMount: function () {
-			this.setZIndex();
+			this.fixDocumentPadding();
 			this.setDraggable();
+			if (this.isDialogCloseShown()) {
+				$(document).on('keyup', this.onDocumentKeyUp);
+			}
 		},
 		componentDidUnmount: function() {
 			this.stopDraggable();
+			if (this.isDialogCloseShown()) {
+				$(document).off('keyup', this.onDocumentKeyUp);
+			}
 		},
 		/**
 		 * render footer
@@ -164,7 +164,7 @@
 			if (this.state.footer === false || !this.state.expanded) {
 				return <div ref='footer'/>;
 			} else {
-				return (<Modal.Footer className="n-modal-form-footer" ref='footer'>
+				return (<div className="n-modal-form-footer modal-footer" ref='footer'>
 					<NPanelFooter reset={this.getResetButton()}
 					              validate={this.getValidationButton()}
 					              save={this.getSaveButton()}
@@ -173,17 +173,32 @@
 					              right={this.getRightButton()}
 					              model={this.getModel()}
 								  view={this.isViewMode()}/>
-				</Modal.Footer>);
+				</div>);
 			}
 		},
 		renderBody: function() {
-			return (<Modal.Body ref="body" className={!this.state.expanded ? 'hide': null}>
+			var css = {
+				'modal-body': true,
+				hide: !this.state.expanded
+			};
+			return (<div className={$pt.LayoutHelper.classSet(css)}>
 				<NForm model={this.getModel()}
 					   layout={this.getLayout()}
 					   direction={this.getDirection()}
 					   view={this.isViewMode()}
 				       ref="form"/>
-			</Modal.Body>);
+			</div>);
+		},
+		renderCloseButton: function() {
+			if (this.isDialogCloseShown()) {
+				return (<button className="close"
+						onClick={this.hide}
+						aria-label="Close"
+						style={{marginTop: '-2px'}}>
+					<span aria-hidden="true">×</span>
+				</button>);
+			}
+			return null;
 		},
 		/**
 		 * render
@@ -197,13 +212,38 @@
 			if (this.isCollapsible()) {
 				title = (<a href='javascript:void(0);' onClick={this.onTitleClicked}>{title}</a>);
 			}
-			return (<Modal className={this.props.className} backdrop="static" onHide={this.hide} ref='top'>
-				<Modal.Header closeButton={this.isDialogCloseShown()}>
-					<Modal.Title>{title}</Modal.Title>
-				</Modal.Header>
-				{this.renderBody()}
-				{this.renderFooter()}
-			</Modal>);
+			var css = {
+				'n-confirm': true,
+				modal: true,
+				fade: true,
+				in: true
+			};
+			if (this.props.className) {
+				css[this.props.className] = true;
+			}
+			// tabindex="0"
+			return (<div ref='top'>
+				<div className="modal-backdrop fade in" style={{zIndex: this.props.zIndex * 1}}></div>
+				<div className={$pt.LayoutHelper.classSet(css)}
+					 role="dialog"
+					 style={{display: 'block', zIndex: this.props.zIndex * 1 + 1}}>
+					<div className="modal-dialog">
+						<div className="modal-content" role="document">
+							<div className="modal-header">
+								{this.renderCloseButton()}
+								<h4 className="modal-title">{title}</h4>
+							</div>
+							{this.renderBody()}
+							{this.renderFooter()}
+						</div>
+					</div>
+				</div>
+			</div>);
+		},
+		onDocumentKeyUp: function(evt) {
+			if (evt.keyCode === 27) { // escape
+				this.hide();
+			}
 		},
 		/**
 		 * on title clicked
