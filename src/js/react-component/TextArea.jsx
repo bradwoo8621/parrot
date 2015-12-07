@@ -34,7 +34,7 @@
  *      }
  * }
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NTextArea = React.createClass($pt.defineCellComponent({
 		displayName: 'NTextArea',
 		propTypes: {
@@ -192,4 +192,4 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.TextArea, function (model, layout, direction, viewMode) {
 		return <NTextArea {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));

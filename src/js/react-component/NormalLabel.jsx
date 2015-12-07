@@ -1,7 +1,7 @@
 /**
  * Created by brad.wu on 9/2/2015.
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NNormalLabel = React.createClass({
 		displayName: 'NNormalLabel',
 		propTypes: {
@@ -40,4 +40,4 @@
 		}
 	});
 	context.NNormalLabel = NNormalLabel;
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));

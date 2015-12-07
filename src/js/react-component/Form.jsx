@@ -34,7 +34,7 @@
  *      }
  * }
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NForm = React.createClass({
 		displayName: 'NForm',
 		statics: {
@@ -544,4 +544,4 @@
 		var formLayout = $pt.createFormLayout(layout.getComponentOption('editLayout'));
 		return <NForm {...$pt.LayoutHelper.transformParameters(model, formLayout, direction, viewMode)}/>;
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));

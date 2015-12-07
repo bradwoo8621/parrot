@@ -1,7 +1,7 @@
 /**
  * normal tab
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NTab = React.createClass({
 		displayName: 'NTab',
 		propTypes: {
@@ -256,4 +256,4 @@
 		}
 	});
 	context.NTab = NTab;
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));

@@ -1,7 +1,7 @@
 /**
  * Created by brad.wu on 9/10/2015.
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NFormButtonFooter = React.createClass($pt.defineCellComponent({
 		displayName: 'NFormButtonFooter',
 		propTypes: {
@@ -41,4 +41,4 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ButtonFooter, function (model, layout, direction, viewMode) {
 		return <NFormButtonFooter {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));

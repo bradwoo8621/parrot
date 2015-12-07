@@ -6,7 +6,7 @@
  * 		2.3 mouse wheel
  *		2.4 window resize
  */
-(function(context, $, moment, $pt) {
+(function(context, $, moment, React, $pt) {
 	var NDateTime = React.createClass($pt.defineCellComponent({
 		displayName: 'NDateTime',
 		statics: {
@@ -1147,4 +1147,4 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Date, function (model, layout, direction, viewMode) {
 		return <NDateTime {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(this, jQuery, moment, $pt));
+}(this, jQuery, moment, React, $pt));

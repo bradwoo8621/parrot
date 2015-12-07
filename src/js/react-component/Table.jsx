@@ -3,7 +3,7 @@
  *
  * depends NIcon, NText, NModalForm, NConfirm, NPagination
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NTable = React.createClass($pt.defineCellComponent({
 		displayName: 'NTable',
 		statics: {
@@ -2032,4 +2032,4 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Table, function (model, layout, direction, viewMode) {
 		return <NTable {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));

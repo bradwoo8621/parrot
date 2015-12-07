@@ -3714,7 +3714,7 @@
 	});
 })(this, jQuery, jsface);
 
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NArrayCheck = React.createClass($pt.defineCellComponent({
 		displayName: 'NArrayCheck',
 		statics: {
@@ -3851,7 +3851,7 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayCheck, function (model, layout, direction, viewMode) {
 		return React.createElement(NArrayCheck, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * Array Panel, for array property
@@ -3889,7 +3889,7 @@
  *      }
  * }
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NArrayPanel = React.createClass($pt.defineCellComponent({
 		displayName: 'NArrayPanel',
 		statics: {
@@ -4098,7 +4098,7 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayPanel, function (model, layout, direction, viewMode) {
 		return React.createElement(NArrayPanel, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * Created by brad.wu on 8/20/2015.
@@ -4140,7 +4140,7 @@
  *      }
  * }
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NArrayTab = React.createClass($pt.defineCellComponent({
 		displayName: 'NArrayTab',
 		statics: {
@@ -4513,7 +4513,7 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayTab, function (model, layout, direction, viewMode) {
 		return React.createElement(NArrayTab, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * Created by brad.wu on 8/18/2015.
@@ -4549,7 +4549,7 @@
  *      }
  * }
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NFormButton = React.createClass($pt.defineCellComponent({
 		displayName: 'NFormButton',
 		propTypes: {
@@ -4757,7 +4757,7 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Button, function (model, layout, direction, viewMode) {
 		return React.createElement(NFormButton, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * checkbox
@@ -4790,7 +4790,7 @@
  *      }
  * }
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NCheck = React.createClass($pt.defineCellComponent({
 		displayName: 'NCheck',
 		propTypes: {
@@ -4970,7 +4970,7 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Check, function (model, layout, direction, viewMode) {
 		return React.createElement(NCheck, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * 1. the coordinate system of clock is center or circle.
@@ -4980,7 +4980,7 @@
  * 		2.3 mouse wheel
  *		2.4 window resize
  */
-(function(context, $, moment, $pt) {
+(function(context, $, moment, React, $pt) {
 	var NDateTime = React.createClass($pt.defineCellComponent({
 		displayName: 'NDateTime',
 		statics: {
@@ -6121,7 +6121,7 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Date, function (model, layout, direction, viewMode) {
 		return React.createElement(NDateTime, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, moment, $pt));
+}(this, jQuery, moment, React, $pt));
 
 /**
  * datetime picker, see datetimepicker from bootstrap
@@ -6157,7 +6157,7 @@
  *      }
  * }
  */
-(function (context, $, moment, $pt) {
+(function (context, $, moment, React, $pt) {
 	var NDateTime2 = React.createClass($pt.defineCellComponent({
 		displayName: 'NDateTime2',
 		statics: {
@@ -6515,13 +6515,13 @@
 	$pt.LayoutHelper.registerComponentRenderer('date2', function (model, layout, direction, viewMode) {
 		return React.createElement(NDateTime2, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, moment, $pt));
+}(this, jQuery, moment, React, $pt));
 
 /**
  * exception modal dialog
  * z-index is 9999 and 9998, the max z-index.
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NExceptionModal = React.createClass({
 		displayName: 'NExceptionModal',
 		statics: {
@@ -6659,9 +6659,9 @@
 		}
 	});
 	context.NExceptionModal = NExceptionModal;
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NFile = React.createClass($pt.defineCellComponent({
 		displayName: 'NFile',
 		statics: {},
@@ -6862,7 +6862,7 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.File, function (model, layout, direction, viewMode) {
 		return React.createElement(NFile, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * form component, a div
@@ -6900,7 +6900,7 @@
  *      }
  * }
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NForm = React.createClass({
 		displayName: 'NForm',
 		statics: {
@@ -7410,12 +7410,12 @@
 		var formLayout = $pt.createFormLayout(layout.getComponentOption('editLayout'));
 		return React.createElement(NForm, React.__spread({},  $pt.LayoutHelper.transformParameters(model, formLayout, direction, viewMode)));
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * Created by brad.wu on 9/10/2015.
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NFormButtonFooter = React.createClass($pt.defineCellComponent({
 		displayName: 'NFormButtonFooter',
 		propTypes: {
@@ -7455,7 +7455,7 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ButtonFooter, function (model, layout, direction, viewMode) {
 		return React.createElement(NFormButtonFooter, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * Created by brad.wu on 8/18/2015.
@@ -7475,7 +7475,7 @@
  *      }
  * }
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NFormCell = React.createClass($pt.defineCellComponent({
 		displayName: 'NFormCell',
 		statics: {
@@ -7799,7 +7799,7 @@
 		}
 	}));
 	context.NFormCell = NFormCell;
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * Created by brad.wu on 8/20/2015.
@@ -7838,7 +7838,7 @@
  *      }
  * }
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NFormTab = React.createClass($pt.defineCellComponent({
 		displayName: 'NFormTab',
 		propTypes: {
@@ -8019,12 +8019,12 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Tab, function (model, layout, direction, viewMode) {
 		return React.createElement(NFormTab, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * icon based on font-awesome
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NIcon = React.createClass({
 		displayName: 'NIcon',
 		propTypes: {
@@ -8135,12 +8135,12 @@
 		}
 	});
 	context.NIcon = NIcon;
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * Jumbortron
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NJumbortron = React.createClass({
 		displayName: 'NJumbortron',
 		propTypes: {
@@ -8166,12 +8166,12 @@
 		}
 	});
 	context.NJumbortron = NJumbortron;
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * Created by brad.wu on 8/21/2015.
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NLabel = React.createClass($pt.defineCellComponent({
 		displayName: 'NLabel',
 		propTypes: {
@@ -8274,7 +8274,7 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Label, function (model, layout, direction, viewMode) {
 		return React.createElement(NLabel, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * modal confirm dialog
@@ -8282,7 +8282,7 @@
  *
  * depends NFormButton
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NConfirm = React.createClass({
 		displayName: 'NConfirm',
 		statics: {
@@ -8557,14 +8557,14 @@
 		}
 	});
 	context.NConfirm = NConfirm;
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * modal form dialog
  *
  * depends NPanelFooter, NForm, NConfirm
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NModalForm = React.createClass({
 		displayName: 'NModalForm',
 		statics: {
@@ -9101,12 +9101,12 @@
 
 		return $el.off('mousedown mouseup');
 	};
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * Created by brad.wu on 9/2/2015.
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NNormalLabel = React.createClass({
 		displayName: 'NNormalLabel',
 		propTypes: {
@@ -9145,13 +9145,13 @@
 		}
 	});
 	context.NNormalLabel = NNormalLabel;
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * on request modal dialog.
  * z-index is 9899 and 9898, less than exception dialog, more than any other.
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NOnRequestModal = React.createClass({
 		displayName: 'NOnRequestModal',
 		statics: {
@@ -9240,12 +9240,12 @@
 		}
 	});
 	context.NOnRequestModal = NOnRequestModal;
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * page footer.<br>
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NPageFooter = React.createClass({
 		displayName: 'NPageFooter',
 		statics: {
@@ -9293,12 +9293,12 @@
 		}
 	});
 	context.NPageFooter = NPageFooter;
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * Page Header<br>
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NPageHeader = React.createClass({
 		displayName: 'NPageHeader',
 		statics: {
@@ -9480,14 +9480,14 @@
 		}
 	});
 	context.NPageHeader = NPageHeader;
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * pagination
  *
  * NOTE: never jump by itself, must register the toPage and refresh this component manually
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NPagination = React.createClass({
 		displayName: 'NPagination',
 		/**
@@ -9800,7 +9800,7 @@
 		}
 	});
 	context.NPagination = NPagination;
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * panel
@@ -9839,7 +9839,7 @@
  *      }
  * }
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NPanel = React.createClass($pt.defineCellComponent({
 		displayName: 'NPanel',
 		propTypes: {
@@ -10196,13 +10196,13 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Panel, function (model, layout, direction, viewMode) {
 		return React.createElement(NPanel, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * panel footer which only contains buttons
  * depends NFormButton
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NPanelFooter = React.createClass({
 		displayName: 'NPanelFooter',
 		statics: {
@@ -10386,7 +10386,7 @@
 		}
 	});
 	context.NPanelFooter = NPanelFooter;
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * radio button
@@ -10419,7 +10419,7 @@
  *      }
  * }
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NRadio = React.createClass($pt.defineCellComponent({
 		displayName: 'NRadio',
 		propTypes: {
@@ -10585,12 +10585,12 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Radio, function (model, layout, direction, viewMode) {
 		return React.createElement(NRadio, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * search text
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NSearchText = React.createClass($pt.defineCellComponent({
 		displayName: 'NSearchText',
 		statics: {
@@ -10974,7 +10974,7 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Search, function (model, layout, direction, viewMode) {
 		return React.createElement(NSearchText, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * select component, see select2 from jQuery
@@ -11018,7 +11018,7 @@
  *      }
  * }
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NSelect2 = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelect2',
 		statics: {
@@ -11444,11 +11444,9 @@
 	$pt.LayoutHelper.registerComponentRenderer('select2', function (model, layout, direction, viewMode) {
 		return React.createElement(NSelect2, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
-/**
- */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NSelect = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelect',
 		statics: {
@@ -11909,7 +11907,7 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Select, function (model, layout, direction, viewMode) {
 		return React.createElement(NSelect, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * popover will be closed on
@@ -11918,7 +11916,7 @@
  * 		2.3 mouse wheel
  *		2.4 window resize
  */
-(function(context, $, $pt) {
+(function(context, $, React, $pt) {
 	var NSelectTree = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelectTree',
 		statics: {
@@ -12441,9 +12439,9 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.SelectTree, function (model, layout, direction, viewMode) {
 		return React.createElement(NSelectTree, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NSideMenu = React.createClass({
 		displayName: 'NSideMenu',
 		statics: {
@@ -12629,12 +12627,12 @@
 		}
 	});
 	context.NSideMenu = NSideMenu;
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * normal tab
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NTab = React.createClass({
 		displayName: 'NTab',
 		propTypes: {
@@ -12889,14 +12887,14 @@
 		}
 	});
 	context.NTab = NTab;
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * table
  *
  * depends NIcon, NText, NModalForm, NConfirm, NPagination
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NTable = React.createClass($pt.defineCellComponent({
 		displayName: 'NTable',
 		statics: {
@@ -14925,7 +14923,7 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Table, function (model, layout, direction, viewMode) {
 		return React.createElement(NTable, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * text input
@@ -14975,7 +14973,7 @@
  *      }
  * }
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NText = React.createClass($pt.defineCellComponent({
 		displayName: 'NText',
 		statics: {
@@ -15294,7 +15292,7 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Text, function (model, layout, direction, viewMode) {
 		return React.createElement(NText, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * text input
@@ -15332,7 +15330,7 @@
  *      }
  * }
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NTextArea = React.createClass($pt.defineCellComponent({
 		displayName: 'NTextArea',
 		propTypes: {
@@ -15490,12 +15488,12 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.TextArea, function (model, layout, direction, viewMode) {
 		return React.createElement(NTextArea, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
 /**
  * Created by brad.wu on 8/21/2015.
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NToggle = React.createClass($pt.defineCellComponent({
 		displayName: 'NToggle',
 		propTypes: {
@@ -15657,9 +15655,9 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Toggle, function (model, layout, direction, viewMode) {
 		return React.createElement(NToggle, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));
 
-(function(context, $, $pt) {
+(function(context, $, React, $pt) {
     var NTree = React.createClass($pt.defineCellComponent({
         displayName: 'NTree',
         statics: {
@@ -16370,4 +16368,4 @@
     $pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Tree, function (model, layout, direction, viewMode) {
 		return React.createElement(NTree, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));

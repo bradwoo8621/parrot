@@ -3,7 +3,7 @@
  *
  * depends NPanelFooter, NForm, NConfirm
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NModalForm = React.createClass({
 		displayName: 'NModalForm',
 		statics: {
@@ -540,4 +540,4 @@
 
 		return $el.off('mousedown mouseup');
 	};
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));

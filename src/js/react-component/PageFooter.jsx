@@ -1,7 +1,7 @@
 /**
  * page footer.<br>
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NPageFooter = React.createClass({
 		displayName: 'NPageFooter',
 		statics: {
@@ -49,4 +49,4 @@
 		}
 	});
 	context.NPageFooter = NPageFooter;
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));

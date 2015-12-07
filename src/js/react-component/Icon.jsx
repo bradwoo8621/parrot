@@ -1,7 +1,7 @@
 /**
  * icon based on font-awesome
  */
-(function (context, $, $pt) {
+(function (context, $, React, $pt) {
 	var NIcon = React.createClass({
 		displayName: 'NIcon',
 		propTypes: {
@@ -112,4 +112,4 @@
 		}
 	});
 	context.NIcon = NIcon;
-}(this, jQuery, $pt));
+}(this, jQuery, React, $pt));

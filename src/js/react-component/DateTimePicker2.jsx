@@ -32,7 +32,7 @@
  *      }
  * }
  */
-(function (context, $, moment, $pt) {
+(function (context, $, moment, React, $pt) {
 	var NDateTime2 = React.createClass($pt.defineCellComponent({
 		displayName: 'NDateTime2',
 		statics: {
@@ -390,4 +390,4 @@
 	$pt.LayoutHelper.registerComponentRenderer('date2', function (model, layout, direction, viewMode) {
 		return <NDateTime2 {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(this, jQuery, moment, $pt));
+}(this, jQuery, moment, React, $pt));
