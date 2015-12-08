@@ -40,7 +40,7 @@
  *      }
  * }
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NSelect2 = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelect2',
 		statics: {
@@ -462,8 +462,8 @@
 			});
 		};
 	})(jQuery);
-	context.NSelect2 = NSelect2;
+	window.NSelect2 = NSelect2;
 	$pt.LayoutHelper.registerComponentRenderer('select2', function (model, layout, direction, viewMode) {
 		return <NSelect2 {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));

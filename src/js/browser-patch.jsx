@@ -1,4 +1,4 @@
-(function (context, $, browser) {
+(function (window, $, browser) {
 	var patches = {
 		console: function () {
 			if (browser.msie && browser.versionNumber <= 10) {
@@ -9,7 +9,7 @@
 					'groupCollapsed', 'groupEnd', 'info', 'log', 'markTimeline', 'profile', 'profileEnd', 'table', 'time',
 					'timeEnd', 'timeStamp', 'trace', 'warn'];
 				var length = methods.length;
-				var console = (context.console = context.console || {});
+				var console = (window.console = window.console || {});
 
 				while (length--) {
 					method = methods[length];
@@ -88,7 +88,7 @@
 				    var s = this ? this : "";
 				    ch = ch ? ch : '0';//默认补0
 				    len = s.length;
-				    while(len<nSize){
+				    while(len < nSize){
 				        s = ch + s;
 				        len++;
 				    }
@@ -99,7 +99,7 @@
 				String.prototype.padRight = function(nSize, ch){
 				    var len = 0 ;
 				    var s = this ? this : "";
-				    ch = ch ? ch : '0';//默认补0
+				    ch = ch ? ch : '0'; // default add 0
 				    len = s.length;
 				    while(len<nSize){
 				        s = s + ch;
@@ -120,11 +120,11 @@
 				    ps = s.split('.');
 				    s1 = ps[0] ? ps[0] : "";
 				    s2 = ps[1] ? ps[1] : "";
-				    if(s1.slice(0, 1) == '-'){
+				    if(s1.slice(0, 1) == '-') {
 				        s1 = s1.slice(1);
 				        sign = '-';
 				    }
-				    if(s1.length <= scale){
+				    if(s1.length <= scale) {
 				        ch = "0.";
 				        s1 = s1.padLeft(scale);
 				    }
@@ -146,7 +146,7 @@
 				        ch = '';
 				        s2 = s2.padRight(scale);
 				    }
-					if(s1.slice(0, 1) == '-'){
+					if(s1.slice(0, 1) == '-') {
 						s1 = s1.slice(1);
 						sign = '-';
 					} else {
@@ -155,7 +155,7 @@
 					if (s1 == 0) {
 						s1 = '';
 					}
-					// context.console.log('Return[sign=' + sign + ', s1=' + s1 + ', s2-1=' + s2.slice(0, scale) + ', ch=' + ch + ', s2-2=' + s2.slice(scale, s2.length) + ']');
+					// window.console.log('Return[sign=' + sign + ', s1=' + s1 + ', s2-1=' + s2.slice(0, scale) + ', ch=' + ch + ', s2-2=' + s2.slice(scale, s2.length) + ']');
 					var integral = (s1 + s2.slice(0, scale)).replace(/^0+/, '');
 					if (integral.isEmpty()) {
 						integral = '0';
@@ -224,4 +224,4 @@
 	patches.string();
 	patches.number();
 	patches.array();
-})(this, jQuery, jQuery.browser);
+})(window, jQuery, jQuery.browser);

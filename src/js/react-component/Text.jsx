@@ -46,7 +46,7 @@
  *      }
  * }
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NText = React.createClass($pt.defineCellComponent({
 		displayName: 'NText',
 		statics: {
@@ -241,7 +241,7 @@
 				return;
 			}
 			this.getComponent().val(value);
-			// context.console.log("focused: " + this.getValueFromModel());
+			// window.console.log("focused: " + this.getValueFromModel());
 		},
 		onComponentBlurred: function (evt) {
 			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
@@ -254,7 +254,7 @@
 			if (value && !value.isBlank()) {
 				var formattedValue = this.getFormattedValue(value);
 				if (formattedValue != value) {
-					// context.console.debug('Change component display formatted value when onBlur.');
+					// window.console.debug('Change component display formatted value when onBlur.');
 					this.getComponent().val(formattedValue);
 				}
 			}
@@ -265,7 +265,7 @@
 		 * @param evt
 		 */
 		onComponentChanged: function (evt) {
-			// context.console.debug('Text component changed[modelValue=' + this.getValueFromModel() + ', compValue=' + evt.target.value + '].');
+			// window.console.debug('Text component changed[modelValue=' + this.getValueFromModel() + ', compValue=' + evt.target.value + '].');
 			this.setValueToModel(evt.target.value);
 		},
 		/**
@@ -283,7 +283,7 @@
 			// if (formattedValue == this.getComponent().val()) {
 			// 	return;
 			// }
-			// // context.console.debug('Text model changed[modelValue=' + evt.new + ', compValue=' + this.getComponent().val() + '].');
+			// // window.console.debug('Text model changed[modelValue=' + evt.new + ', compValue=' + this.getComponent().val() + '].');
 			// this.getComponent().val(formattedValue);
 		},
 		onKeyUp: function (evt) {
@@ -361,8 +361,8 @@
 			}
 		}
 	}));
-	context.NText = NText;
+	window.NText = NText;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Text, function (model, layout, direction, viewMode) {
 		return <NText {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));

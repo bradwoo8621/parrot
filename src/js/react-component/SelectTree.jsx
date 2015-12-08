@@ -5,7 +5,7 @@
  * 		2.3 mouse wheel
  *		2.4 window resize
  */
-(function(context, $, React, $pt) {
+(function(window, $, React, $pt) {
 	var NSelectTree = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelectTree',
 		statics: {
@@ -524,8 +524,8 @@
 			return this.getParentModel().get(this.getParentPropertyId());
 		}
 	}));
-	context.NSelectTree = NSelectTree;
+	window.NSelectTree = NSelectTree;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.SelectTree, function (model, layout, direction, viewMode) {
 		return <NSelectTree {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));

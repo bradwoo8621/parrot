@@ -1,8 +1,8 @@
-(function (context, $, deparam) {
-	var $pt = context.$pt;
+(function (window, $, deparam) {
+	var $pt = window.$pt;
 	if ($pt == null) {
 		$pt = {};
-		context.$pt = $pt;
+		window.$pt = $pt;
 	}
 
 	/**
@@ -146,7 +146,7 @@
 				finalURL += '?' + $.param(data);
 			}
 		}
-		context.location = finalURL;
+		window.location = finalURL;
 	};
 	/**
 	 * get data from url parameters
@@ -161,7 +161,7 @@
 				paramsString = params;
 			}
 		} else {
-			paramsString = context.location.search;
+			paramsString = window.location.search;
 			if (paramsString != null && !paramsString.isBlank() && paramsString.trim() != '?') {
 				paramsString = paramsString.substring(1);
 			} else {
@@ -204,7 +204,7 @@
 	 */
 	$pt.defineURL = function (key, urlRelateToWebContext) {
 		if (routes.urls[key] != null) {
-			context.console.warn('URL[' + key + '=' + routes.urls[key] + '] was replaced by [' + routes.context + urlRelateToWebContext + ']');
+			window.console.warn('URL[' + key + '=' + routes.urls[key] + '] was replaced by [' + routes.context + urlRelateToWebContext + ']');
 		}
 		routes.urls[key] = urlRelateToWebContext;
 		return $pt;
@@ -218,4 +218,4 @@
 		var url = routes.urls[key];
 		return url == null ? null : (routes.context + url);
 	};
-})(this, jQuery, jQuery.deparam);
+})(window, jQuery, jQuery.deparam);

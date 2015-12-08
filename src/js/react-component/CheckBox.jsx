@@ -29,7 +29,7 @@
  *      }
  * }
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NCheck = React.createClass($pt.defineCellComponent({
 		displayName: 'NCheck',
 		propTypes: {
@@ -205,8 +205,8 @@
 			return $(React.findDOMNode(this.refs.txt));
 		}
 	}));
-	context.NCheck = NCheck;
+	window.NCheck = NCheck;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Check, function (model, layout, direction, viewMode) {
 		return <NCheck {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));

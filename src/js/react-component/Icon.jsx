@@ -1,7 +1,7 @@
 /**
  * icon based on font-awesome
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NIcon = React.createClass({
 		displayName: 'NIcon',
 		propTypes: {
@@ -111,5 +111,5 @@
 			             title={this.props.tooltip}/>;
 		}
 	});
-	context.NIcon = NIcon;
-}(this, jQuery, React, $pt));
+	window.NIcon = NIcon;
+}(window, jQuery, React, $pt));

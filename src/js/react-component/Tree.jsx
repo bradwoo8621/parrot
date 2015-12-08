@@ -1,4 +1,4 @@
-(function(context, $, React, $pt) {
+(function(window, $, React, $pt) {
     var NTree = React.createClass($pt.defineCellComponent({
         displayName: 'NTree',
         statics: {
@@ -394,17 +394,17 @@
                             hasUncheckedChild = true;
                         }
                     });
-                    // context.console.log(nodeId);
+                    // window.console.log(nodeId);
                     _this.checkNode(nodeId, !hasUncheckedChild, modelValue);
                     return !hasUncheckedChild;
                 } else {
                     // no children, return checked of myself
-                    // context.console.log(nodeId);
+                    // window.console.log(nodeId);
                     return _this.isNodeChecked(nodeId, modelValue);
                 }
             };
             checkNodeOnChildren(this.state.root, this.getNodeId(null, this.state.root));
-            // context.console.log(modelValue);
+            // window.console.log(modelValue);
         },
         expandAll: function() {
             var activeNodes = $.extend({}, this.state.activeNodes);
@@ -705,8 +705,8 @@
     }));
 
     // expose to global
-    context.NTree = NTree;
+    window.NTree = NTree;
     $pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Tree, function (model, layout, direction, viewMode) {
 		return <NTree {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));

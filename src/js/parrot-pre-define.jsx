@@ -1,13 +1,8 @@
-/**
- * define parrot context $pt, and attach to global context.
- * can be referred directly if the global context is window
- */
-(function (context) {
-	// define parrot context
-	var $pt = context.$pt;
+(function (window) {
+	var $pt = window.$pt;
 	if ($pt == null) {
 		$pt = {};
-		context.$pt = $pt;
+		window.$pt = $pt;
 	}
 
 	// exceptions
@@ -24,7 +19,6 @@
 		};
 	};
 
-	// create component exception attach to parrot context
 	/**
 	 * create component exception
 	 * @param code {string} exception code
@@ -40,7 +34,7 @@
 	$pt.messages = messages;
 	$pt.defineMessage = function (key, message) {
 		if (messages[key] != null) {
-			context.console.log('Message[' + key + '=' + messages[key] + '] was replaced by [' + message + ']');
+			window.console.log('Message[' + key + '=' + messages[key] + '] was replaced by [' + message + ']');
 		}
 		messages[key] = message;
 		return $pt;
@@ -114,7 +108,7 @@
 		}
 	};
 
-	var _context = context;
+	var _context = window;
 	$pt.getService = function (context, serviceName) {
 		var innerContext = context ? context : _context;
 		var innerServiceName = serviceName ? serviceName : '$service';
@@ -123,4 +117,4 @@
 		}
 		return innerContext[innerServiceName];
 	};
-})(this);
+})(window);

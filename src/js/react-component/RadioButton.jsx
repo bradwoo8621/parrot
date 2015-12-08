@@ -29,7 +29,7 @@
  *      }
  * }
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NRadio = React.createClass($pt.defineCellComponent({
 		displayName: 'NRadio',
 		propTypes: {
@@ -191,8 +191,8 @@
 			return this.getComponentOption('labelAtLeft');
 		}
 	}));
-	context.NRadio = NRadio;
+	window.NRadio = NRadio;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Radio, function (model, layout, direction, viewMode) {
 		return <NRadio {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));

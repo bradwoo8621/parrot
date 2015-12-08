@@ -1,4 +1,4 @@
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NArrayCheck = React.createClass($pt.defineCellComponent({
 		displayName: 'NArrayCheck',
 		statics: {
@@ -131,8 +131,8 @@
 			});
 		}
 	}));
-	context.NArrayCheck = NArrayCheck;
+	window.NArrayCheck = NArrayCheck;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayCheck, function (model, layout, direction, viewMode) {
 		return <NArrayCheck {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));

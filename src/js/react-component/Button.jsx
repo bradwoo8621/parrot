@@ -32,7 +32,7 @@
  *      }
  * }
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NFormButton = React.createClass($pt.defineCellComponent({
 		displayName: 'NFormButton',
 		propTypes: {
@@ -236,8 +236,8 @@
 			// nothing
 		}
 	}));
-	context.NFormButton = NFormButton;
+	window.NFormButton = NFormButton;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Button, function (model, layout, direction, viewMode) {
 		return <NFormButton {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));

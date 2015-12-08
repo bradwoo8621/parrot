@@ -1,4 +1,4 @@
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NSideMenu = React.createClass({
 		displayName: 'NSideMenu',
 		statics: {
@@ -183,5 +183,5 @@
 			}, 300);
 		}
 	});
-	context.NSideMenu = NSideMenu;
-}(this, jQuery, React, $pt));
+	window.NSideMenu = NSideMenu;
+}(window, jQuery, React, $pt));

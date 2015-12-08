@@ -1,7 +1,7 @@
 /**
  * search text
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NSearchText = React.createClass($pt.defineCellComponent({
 		displayName: 'NSearchText',
 		statics: {
@@ -228,9 +228,9 @@
 					}
 					_this.setLabelText(data.name);
 				}).fail(function() {
-					context.console.error('Error occured when retrieve label from remote in NSearch.');
+					window.console.error('Error occured when retrieve label from remote in NSearch.');
 					arguments.slice(0).forEach(function(argu) {
-						context.console.error(argu);
+						window.console.error(argu);
 					});
 				});
 			}, 300);
@@ -321,7 +321,7 @@
 										}
 										model.mergeCurrentModel(data);
 										model.set('criteria_url', this.getAdvancedSearchUrl());
-										context.console.debug(model.getCurrentModel());
+										window.console.debug(model.getCurrentModel());
 										this.state.searchDialog.forceUpdate();
 									}.bind(_this)
 								});
@@ -381,8 +381,8 @@
 			return value;
 		}
 	}));
-	context.NSearchText = NSearchText;
+	window.NSearchText = NSearchText;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Search, function (model, layout, direction, viewMode) {
 		return <NSearchText {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));

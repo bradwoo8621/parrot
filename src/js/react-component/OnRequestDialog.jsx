@@ -2,7 +2,7 @@
  * on request modal dialog.
  * z-index is 9899 and 9898, less than exception dialog, more than any other.
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NOnRequestModal = React.createClass({
 		displayName: 'NOnRequestModal',
 		statics: {
@@ -90,5 +90,5 @@
 			this.setState({visible: true});
 		}
 	});
-	context.NOnRequestModal = NOnRequestModal;
-}(this, jQuery, React, $pt));
+	window.NOnRequestModal = NOnRequestModal;
+}(window, jQuery, React, $pt));

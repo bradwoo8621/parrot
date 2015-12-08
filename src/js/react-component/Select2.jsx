@@ -1,4 +1,4 @@
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NSelect = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelect',
 		statics: {
@@ -455,8 +455,8 @@
 			return value;
 		}
 	}));
-	context.NSelect = NSelect;
+	window.NSelect = NSelect;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Select, function (model, layout, direction, viewMode) {
 		return <NSelect {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));

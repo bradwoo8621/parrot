@@ -34,7 +34,7 @@
  *      }
  * }
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NForm = React.createClass({
 		displayName: 'NForm',
 		statics: {
@@ -539,9 +539,9 @@
 			return null;
 		}
 	});
-	context.NForm = NForm;
+	window.NForm = NForm;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Form, function (model, layout, direction, viewMode) {
 		var formLayout = $pt.createFormLayout(layout.getComponentOption('editLayout'));
 		return <NForm {...$pt.LayoutHelper.transformParameters(model, formLayout, direction, viewMode)}/>;
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));

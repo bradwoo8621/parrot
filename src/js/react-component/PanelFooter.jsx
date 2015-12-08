@@ -2,7 +2,7 @@
  * panel footer which only contains buttons
  * depends NFormButton
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NPanelFooter = React.createClass({
 		displayName: 'NPanelFooter',
 		statics: {
@@ -185,5 +185,5 @@
 			return this.props.view;
 		}
 	});
-	context.NPanelFooter = NPanelFooter;
-}(this, jQuery, React, $pt));
+	window.NPanelFooter = NPanelFooter;
+}(window, jQuery, React, $pt));

@@ -32,7 +32,7 @@
  *      }
  * }
  */
-(function (context, $, moment, React, $pt) {
+(function (window, $, moment, React, $pt) {
 	var NDateTime2 = React.createClass($pt.defineCellComponent({
 		displayName: 'NDateTime2',
 		statics: {
@@ -198,7 +198,7 @@
 				var inputOffset = widget.prev().offset();
 				var widgetOffset = widget.offset();
 				var widgetHeight = widget.outerHeight(true);
-				// context.console.log("Widget height: " + widgetHeight);
+				// window.console.log("Widget height: " + widgetHeight);
 				if (widgetOffset.top == null || widgetOffset.top == 'auto' || inputOffset.top > widgetOffset.top) {
 					// on top
 					widgetOffset.top = inputOffset.top - widgetHeight + NDateTime2.DATE_PICKER_VERTICAL_OFFSET;
@@ -206,8 +206,8 @@
 					// on bottom
 					widgetOffset.top = inputOffset.top + widget.prev().height();
 				}
-				// context.console.log("Input Offset: " + JSON.stringify(inputOffset));
-				// context.console.log("Widget Offset: " + JSON.stringify(widgetOffset));
+				// window.console.log("Input Offset: " + JSON.stringify(inputOffset));
+				// window.console.log("Widget Offset: " + JSON.stringify(widgetOffset));
 				var css = {top: widgetOffset.top, left: widgetOffset.left, bottom: "auto", right: "auto", height: 'auto'};
 				var modalForm = $(target).closest('.n-modal-form');
 				if (modalForm.length != 0) {
@@ -215,7 +215,7 @@
 				}
 				widget.css(css);
 				widget.detach().appendTo($('body'));
-				// context.console.log(widget.css("top") + "," + widget.css("left") + "," + widget.css("bottom") + "," + widget.css("right") + "," + widget.outerHeight(true));
+				// window.console.log(widget.css("top") + "," + widget.css("left") + "," + widget.css("bottom") + "," + widget.css("right") + "," + widget.outerHeight(true));
 				tableBodyContainer.hide().show(0);
 			}
 
@@ -386,8 +386,8 @@
 			return format ? format : NDateTime2.FORMAT;
 		}
 	}));
-	context.NDateTime2 = NDateTime2;
+	window.NDateTime2 = NDateTime2;
 	$pt.LayoutHelper.registerComponentRenderer('date2', function (model, layout, direction, viewMode) {
 		return <NDateTime2 {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(this, jQuery, moment, React, $pt));
+}(window, jQuery, moment, React, $pt));

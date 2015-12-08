@@ -3,7 +3,7 @@
  *
  * depends NPanelFooter, NForm, NConfirm
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NModalForm = React.createClass({
 		displayName: 'NModalForm',
 		statics: {
@@ -461,7 +461,7 @@
 					view: model.view === true
 				});
 			} else {
-				context.console.warn("Properties [draggable, expanded, collapsible, pos] are not supported in parameters, use JSON parameter instead.");
+				window.console.warn("Properties [draggable, expanded, collapsible, pos] are not supported in parameters, use JSON parameter instead.");
 				this.setState({
 					visible: true,
 					model: model,
@@ -479,7 +479,7 @@
 			}
 		}
 	});
-	context.NModalForm = NModalForm;
+	window.NModalForm = NModalForm;
 
 	$.fn.drags = function(opt) {
 		opt = $.extend({handle:"",cursor:"move"}, opt);
@@ -540,4 +540,4 @@
 
 		return $el.off('mousedown mouseup');
 	};
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));

@@ -16,7 +16,7 @@
  *      }
  * }
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NFormCell = React.createClass($pt.defineCellComponent({
 		displayName: 'NFormCell',
 		statics: {
@@ -339,5 +339,5 @@
 			}
 		}
 	}));
-	context.NFormCell = NFormCell;
-}(this, jQuery, React, $pt));
+	window.NFormCell = NFormCell;
+}(window, jQuery, React, $pt));

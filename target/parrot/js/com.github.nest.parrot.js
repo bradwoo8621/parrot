@@ -1,5 +1,5 @@
-/** com.github.nest.parrot.V0.0.6 2015-12-07 */
-(function (context, $, browser) {
+/** com.github.nest.parrot.V0.0.6 2015-12-08 */
+(function (window, $, browser) {
 	var patches = {
 		console: function () {
 			if (browser.msie && browser.versionNumber <= 10) {
@@ -10,7 +10,7 @@
 					'groupCollapsed', 'groupEnd', 'info', 'log', 'markTimeline', 'profile', 'profileEnd', 'table', 'time',
 					'timeEnd', 'timeStamp', 'trace', 'warn'];
 				var length = methods.length;
-				var console = (context.console = context.console || {});
+				var console = (window.console = window.console || {});
 
 				while (length--) {
 					method = methods[length];
@@ -89,7 +89,7 @@
 				    var s = this ? this : "";
 				    ch = ch ? ch : '0';//默认补0
 				    len = s.length;
-				    while(len<nSize){
+				    while(len < nSize){
 				        s = ch + s;
 				        len++;
 				    }
@@ -100,7 +100,7 @@
 				String.prototype.padRight = function(nSize, ch){
 				    var len = 0 ;
 				    var s = this ? this : "";
-				    ch = ch ? ch : '0';//默认补0
+				    ch = ch ? ch : '0'; // default add 0
 				    len = s.length;
 				    while(len<nSize){
 				        s = s + ch;
@@ -121,11 +121,11 @@
 				    ps = s.split('.');
 				    s1 = ps[0] ? ps[0] : "";
 				    s2 = ps[1] ? ps[1] : "";
-				    if(s1.slice(0, 1) == '-'){
+				    if(s1.slice(0, 1) == '-') {
 				        s1 = s1.slice(1);
 				        sign = '-';
 				    }
-				    if(s1.length <= scale){
+				    if(s1.length <= scale) {
 				        ch = "0.";
 				        s1 = s1.padLeft(scale);
 				    }
@@ -147,7 +147,7 @@
 				        ch = '';
 				        s2 = s2.padRight(scale);
 				    }
-					if(s1.slice(0, 1) == '-'){
+					if(s1.slice(0, 1) == '-') {
 						s1 = s1.slice(1);
 						sign = '-';
 					} else {
@@ -156,7 +156,7 @@
 					if (s1 == 0) {
 						s1 = '';
 					}
-					// context.console.log('Return[sign=' + sign + ', s1=' + s1 + ', s2-1=' + s2.slice(0, scale) + ', ch=' + ch + ', s2-2=' + s2.slice(scale, s2.length) + ']');
+					// window.console.log('Return[sign=' + sign + ', s1=' + s1 + ', s2-1=' + s2.slice(0, scale) + ', ch=' + ch + ', s2-2=' + s2.slice(scale, s2.length) + ']');
 					var integral = (s1 + s2.slice(0, scale)).replace(/^0+/, '');
 					if (integral.isEmpty()) {
 						integral = '0';
@@ -225,22 +225,17 @@
 	patches.string();
 	patches.number();
 	patches.array();
-})(this, jQuery, jQuery.browser);
+})(window, jQuery, jQuery.browser);
 
 (function (jsface) {
 	jsface.noConflict();
 })(jsface);
 
-/**
- * define parrot context $pt, and attach to global context.
- * can be referred directly if the global context is window
- */
-(function (context) {
-	// define parrot context
-	var $pt = context.$pt;
+(function (window) {
+	var $pt = window.$pt;
 	if ($pt == null) {
 		$pt = {};
-		context.$pt = $pt;
+		window.$pt = $pt;
 	}
 
 	// exceptions
@@ -257,7 +252,6 @@
 		};
 	};
 
-	// create component exception attach to parrot context
 	/**
 	 * create component exception
 	 * @param code {string} exception code
@@ -273,7 +267,7 @@
 	$pt.messages = messages;
 	$pt.defineMessage = function (key, message) {
 		if (messages[key] != null) {
-			context.console.log('Message[' + key + '=' + messages[key] + '] was replaced by [' + message + ']');
+			window.console.log('Message[' + key + '=' + messages[key] + '] was replaced by [' + message + ']');
 		}
 		messages[key] = message;
 		return $pt;
@@ -347,7 +341,7 @@
 		}
 	};
 
-	var _context = context;
+	var _context = window;
 	$pt.getService = function (context, serviceName) {
 		var innerContext = context ? context : _context;
 		var innerServiceName = serviceName ? serviceName : '$service';
@@ -356,13 +350,13 @@
 		}
 		return innerContext[innerServiceName];
 	};
-})(this);
+})(window);
 
-(function (context, $, deparam) {
-	var $pt = context.$pt;
+(function (window, $, deparam) {
+	var $pt = window.$pt;
 	if ($pt == null) {
 		$pt = {};
-		context.$pt = $pt;
+		window.$pt = $pt;
 	}
 
 	/**
@@ -506,7 +500,7 @@
 				finalURL += '?' + $.param(data);
 			}
 		}
-		context.location = finalURL;
+		window.location = finalURL;
 	};
 	/**
 	 * get data from url parameters
@@ -521,7 +515,7 @@
 				paramsString = params;
 			}
 		} else {
-			paramsString = context.location.search;
+			paramsString = window.location.search;
 			if (paramsString != null && !paramsString.isBlank() && paramsString.trim() != '?') {
 				paramsString = paramsString.substring(1);
 			} else {
@@ -564,7 +558,7 @@
 	 */
 	$pt.defineURL = function (key, urlRelateToWebContext) {
 		if (routes.urls[key] != null) {
-			context.console.warn('URL[' + key + '=' + routes.urls[key] + '] was replaced by [' + routes.context + urlRelateToWebContext + ']');
+			window.console.warn('URL[' + key + '=' + routes.urls[key] + '] was replaced by [' + routes.context + urlRelateToWebContext + ']');
 		}
 		routes.urls[key] = urlRelateToWebContext;
 		return $pt;
@@ -578,13 +572,13 @@
 		var url = routes.urls[key];
 		return url == null ? null : (routes.context + url);
 	};
-})(this, jQuery, jQuery.deparam);
+})(window, jQuery, jQuery.deparam);
 
-(function (context, $, jsface) {
-	var $pt = context.$pt;
+(function (window, $, jsface) {
+	var $pt = window.$pt;
 	if ($pt == null) {
 		$pt = {};
-		context.$pt = $pt;
+		window.$pt = $pt;
 	}
 
 	/**
@@ -711,7 +705,7 @@
 				},
 				fail: function (jqXHR, textStatus, errorThrown) {
 					// error to console, quiet backend
-					context.console.error('Status:' + textStatus + ', error:' + errorThrown);
+					window.console.error('Status:' + textStatus + ', error:' + errorThrown);
 				}
 			});
 		},
@@ -913,18 +907,17 @@
 	$pt.createCodeTable = function (items, renderer, sorter) {
 		return new CodeTable(items, renderer, sorter);
 	};
-})(this, jQuery, jsface);
+})(window, jQuery, jsface);
 
 /**
  * depends on jquery, jsface
  * depends on parrot-pre-define
  */
-(function (context, $, moment, jsface) {
-	// define parrot context
-	var $pt = context.$pt;
+(function (window, $, moment, jsface) {
+	var $pt = window.$pt;
 	if ($pt == null) {
 		$pt = {};
-		context.$pt = $pt;
+		window.$pt = $pt;
 	}
 
 	$pt.BUILD_PROPERTY_VISITOR = true;
@@ -2084,13 +2077,13 @@
 		var ModelClass = jsface.Class($.extend(model, ModelInterface));
 		return new ModelClass(inputModel, validator);
 	};
-})(this, jQuery, moment, jsface);
+})(window, jQuery, moment, jsface);
 
-(function (context, $, jsface) {
-	var $pt = context.$pt;
+(function (window, $, jsface) {
+	var $pt = window.$pt;
 	if ($pt == null) {
 		$pt = {};
-		context.$pt = $pt;
+		window.$pt = $pt;
 	}
 
 	/**
@@ -3661,7 +3654,7 @@
 				type = type.type;
 			}
 			if (this.__components[type]) {
-				context.console.warn('Component [' + type + '] is replaced.');
+				window.console.warn('Component [' + type + '] is replaced.');
 			}
 			this.__components[type] = func;
 		},
@@ -3682,7 +3675,7 @@
 			}
 			type = type + '@view';
 			if (this.__components[type]) {
-				context.console.warn('Component [' + type + '] is replaced.');
+				window.console.warn('Component [' + type + '] is replaced.');
 			}
 			this.__components[type] = func;
 		},
@@ -3712,9 +3705,9 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Nothing, function() {
 		return null;
 	});
-})(this, jQuery, jsface);
+})(window, jQuery, jsface);
 
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NArrayCheck = React.createClass($pt.defineCellComponent({
 		displayName: 'NArrayCheck',
 		statics: {
@@ -3847,11 +3840,11 @@
 			});
 		}
 	}));
-	context.NArrayCheck = NArrayCheck;
+	window.NArrayCheck = NArrayCheck;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayCheck, function (model, layout, direction, viewMode) {
 		return React.createElement(NArrayCheck, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));
 
 /**
  * Array Panel, for array property
@@ -3889,7 +3882,7 @@
  *      }
  * }
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NArrayPanel = React.createClass($pt.defineCellComponent({
 		displayName: 'NArrayPanel',
 		statics: {
@@ -4094,11 +4087,11 @@
 			}
 		}
 	}));
-	context.NArrayPanel = NArrayPanel;
+	window.NArrayPanel = NArrayPanel;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayPanel, function (model, layout, direction, viewMode) {
 		return React.createElement(NArrayPanel, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));
 
 /**
  * Created by brad.wu on 8/20/2015.
@@ -4140,7 +4133,7 @@
  *      }
  * }
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NArrayTab = React.createClass($pt.defineCellComponent({
 		displayName: 'NArrayTab',
 		statics: {
@@ -4509,11 +4502,11 @@
 			this.forceUpdate();
 		}
 	}));
-	context.NArrayTab = NArrayTab;
+	window.NArrayTab = NArrayTab;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayTab, function (model, layout, direction, viewMode) {
 		return React.createElement(NArrayTab, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));
 
 /**
  * Created by brad.wu on 8/18/2015.
@@ -4549,7 +4542,7 @@
  *      }
  * }
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NFormButton = React.createClass($pt.defineCellComponent({
 		displayName: 'NFormButton',
 		propTypes: {
@@ -4753,11 +4746,11 @@
 			// nothing
 		}
 	}));
-	context.NFormButton = NFormButton;
+	window.NFormButton = NFormButton;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Button, function (model, layout, direction, viewMode) {
 		return React.createElement(NFormButton, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));
 
 /**
  * checkbox
@@ -4790,7 +4783,7 @@
  *      }
  * }
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NCheck = React.createClass($pt.defineCellComponent({
 		displayName: 'NCheck',
 		propTypes: {
@@ -4966,11 +4959,11 @@
 			return $(React.findDOMNode(this.refs.txt));
 		}
 	}));
-	context.NCheck = NCheck;
+	window.NCheck = NCheck;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Check, function (model, layout, direction, viewMode) {
 		return React.createElement(NCheck, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));
 
 /**
  * 1. the coordinate system of clock is center or circle.
@@ -4980,7 +4973,7 @@
  * 		2.3 mouse wheel
  *		2.4 window resize
  */
-(function(context, $, moment, React, $pt) {
+(function(window, $, moment, React, $pt) {
 	var NDateTime = React.createClass($pt.defineCellComponent({
 		displayName: 'NDateTime',
 		statics: {
@@ -5876,10 +5869,10 @@
 				x: (evt.pageX - offset.left) - NDateTime.CLOCK_RADIUS,
 				y: NDateTime.CLOCK_RADIUS - (evt.pageY - offset.top)
 			};
-			// context.console.log('Mouse Point: ' + point.x + ',' + point.y);
+			// window.console.log('Mouse Point: ' + point.x + ',' + point.y);
 			// calculate the radius length of point
 			var length = Math.sqrt(Math.pow(point.x, 2) + Math.pow(point.y, 2));
-			// context.console.log('Point radius: ' + length);
+			// window.console.log('Point radius: ' + length);
 
 			// calculate it is what
 			if (length > 101) {
@@ -5907,7 +5900,7 @@
 				// change hour
 				eventType = NDateTime.FORMAT_TYPES.HOUR;
 			}
-			// context.console.log('Event Type: ' + eventType);
+			// window.console.log('Event Type: ' + eventType);
 
 			// calculate degree in coordinate system
 			var degree = 0;
@@ -5931,7 +5924,7 @@
 			} else {
 				degree = 450 - degree;
 			}
-			// context.console.log('Degree: ' + degree);
+			// window.console.log('Degree: ' + degree);
 
 			var currentHour, hour, minute, second;
 			var date = this.getValueFromModel();
@@ -5950,7 +5943,7 @@
 				hour = Math.floor(degree / 15) + (degree % 15 < 7.5 ? 0 : 1);
 				date.hour(hour);
 			}
-			// context.console.log('Hour: [' + hour + '], Minute: [' + minute + '], Second: [' + second + ']');
+			// window.console.log('Hour: [' + hour + '], Minute: [' + minute + '], Second: [' + second + ']');
 			this.renderPopover({date: date, type: popoverType, set: true});
 		},
 		onAMPMSelected: function(isAM, type) {
@@ -6033,8 +6026,8 @@
 					return date.isLeapYear() ? 29 : 28;
 				default:
 					// never run to here
-					context.console.warn('Something wrong with momentjs.');
-					context.console.warn(date);
+					window.console.warn('Something wrong with momentjs.');
+					window.console.warn(date);
 					return 31;
 			}
 		},
@@ -6117,11 +6110,11 @@
 		}
 	}));
 
-	context.NDateTime = NDateTime;
+	window.NDateTime = NDateTime;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Date, function (model, layout, direction, viewMode) {
 		return React.createElement(NDateTime, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, moment, React, $pt));
+}(window, jQuery, moment, React, $pt));
 
 /**
  * datetime picker, see datetimepicker from bootstrap
@@ -6157,7 +6150,7 @@
  *      }
  * }
  */
-(function (context, $, moment, React, $pt) {
+(function (window, $, moment, React, $pt) {
 	var NDateTime2 = React.createClass($pt.defineCellComponent({
 		displayName: 'NDateTime2',
 		statics: {
@@ -6323,7 +6316,7 @@
 				var inputOffset = widget.prev().offset();
 				var widgetOffset = widget.offset();
 				var widgetHeight = widget.outerHeight(true);
-				// context.console.log("Widget height: " + widgetHeight);
+				// window.console.log("Widget height: " + widgetHeight);
 				if (widgetOffset.top == null || widgetOffset.top == 'auto' || inputOffset.top > widgetOffset.top) {
 					// on top
 					widgetOffset.top = inputOffset.top - widgetHeight + NDateTime2.DATE_PICKER_VERTICAL_OFFSET;
@@ -6331,8 +6324,8 @@
 					// on bottom
 					widgetOffset.top = inputOffset.top + widget.prev().height();
 				}
-				// context.console.log("Input Offset: " + JSON.stringify(inputOffset));
-				// context.console.log("Widget Offset: " + JSON.stringify(widgetOffset));
+				// window.console.log("Input Offset: " + JSON.stringify(inputOffset));
+				// window.console.log("Widget Offset: " + JSON.stringify(widgetOffset));
 				var css = {top: widgetOffset.top, left: widgetOffset.left, bottom: "auto", right: "auto", height: 'auto'};
 				var modalForm = $(target).closest('.n-modal-form');
 				if (modalForm.length != 0) {
@@ -6340,7 +6333,7 @@
 				}
 				widget.css(css);
 				widget.detach().appendTo($('body'));
-				// context.console.log(widget.css("top") + "," + widget.css("left") + "," + widget.css("bottom") + "," + widget.css("right") + "," + widget.outerHeight(true));
+				// window.console.log(widget.css("top") + "," + widget.css("left") + "," + widget.css("bottom") + "," + widget.css("right") + "," + widget.outerHeight(true));
 				tableBodyContainer.hide().show(0);
 			}
 
@@ -6511,17 +6504,17 @@
 			return format ? format : NDateTime2.FORMAT;
 		}
 	}));
-	context.NDateTime2 = NDateTime2;
+	window.NDateTime2 = NDateTime2;
 	$pt.LayoutHelper.registerComponentRenderer('date2', function (model, layout, direction, viewMode) {
 		return React.createElement(NDateTime2, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, moment, React, $pt));
+}(window, jQuery, moment, React, $pt));
 
 /**
  * exception modal dialog
  * z-index is 9999 and 9998, the max z-index.
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NExceptionModal = React.createClass({
 		displayName: 'NExceptionModal',
 		statics: {
@@ -6658,10 +6651,10 @@
 			this.setState({visible: true, status: status, message: message});
 		}
 	});
-	context.NExceptionModal = NExceptionModal;
-}(this, jQuery, React, $pt));
+	window.NExceptionModal = NExceptionModal;
+}(window, jQuery, React, $pt));
 
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NFile = React.createClass($pt.defineCellComponent({
 		displayName: 'NFile',
 		statics: {},
@@ -6858,11 +6851,11 @@
 			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 		}
 	}));
-	context.NFile = NFile;
+	window.NFile = NFile;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.File, function (model, layout, direction, viewMode) {
 		return React.createElement(NFile, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));
 
 /**
  * form component, a div
@@ -6900,7 +6893,7 @@
  *      }
  * }
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NForm = React.createClass({
 		displayName: 'NForm',
 		statics: {
@@ -7405,17 +7398,17 @@
 			return null;
 		}
 	});
-	context.NForm = NForm;
+	window.NForm = NForm;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Form, function (model, layout, direction, viewMode) {
 		var formLayout = $pt.createFormLayout(layout.getComponentOption('editLayout'));
 		return React.createElement(NForm, React.__spread({},  $pt.LayoutHelper.transformParameters(model, formLayout, direction, viewMode)));
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));
 
 /**
  * Created by brad.wu on 9/10/2015.
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NFormButtonFooter = React.createClass($pt.defineCellComponent({
 		displayName: 'NFormButtonFooter',
 		propTypes: {
@@ -7451,11 +7444,11 @@
 			return this.getComponentOption('buttonLayout');
 		}
 	}));
-	context.NFormButtonFooter = NFormButtonFooter;
+	window.NFormButtonFooter = NFormButtonFooter;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ButtonFooter, function (model, layout, direction, viewMode) {
 		return React.createElement(NFormButtonFooter, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));
 
 /**
  * Created by brad.wu on 8/18/2015.
@@ -7475,7 +7468,7 @@
  *      }
  * }
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NFormCell = React.createClass($pt.defineCellComponent({
 		displayName: 'NFormCell',
 		statics: {
@@ -7798,8 +7791,8 @@
 			}
 		}
 	}));
-	context.NFormCell = NFormCell;
-}(this, jQuery, React, $pt));
+	window.NFormCell = NFormCell;
+}(window, jQuery, React, $pt));
 
 /**
  * Created by brad.wu on 8/20/2015.
@@ -7838,7 +7831,7 @@
  *      }
  * }
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NFormTab = React.createClass($pt.defineCellComponent({
 		displayName: 'NFormTab',
 		propTypes: {
@@ -8015,16 +8008,16 @@
 			this.forceUpdate();
 		}
 	}));
-	context.NFormTab = NFormTab;
+	window.NFormTab = NFormTab;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Tab, function (model, layout, direction, viewMode) {
 		return React.createElement(NFormTab, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));
 
 /**
  * icon based on font-awesome
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NIcon = React.createClass({
 		displayName: 'NIcon',
 		propTypes: {
@@ -8134,13 +8127,13 @@
 			             title: this.props.tooltip});
 		}
 	});
-	context.NIcon = NIcon;
-}(this, jQuery, React, $pt));
+	window.NIcon = NIcon;
+}(window, jQuery, React, $pt));
 
 /**
  * Jumbortron
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NJumbortron = React.createClass({
 		displayName: 'NJumbortron',
 		propTypes: {
@@ -8165,13 +8158,13 @@
 			);
 		}
 	});
-	context.NJumbortron = NJumbortron;
-}(this, jQuery, React, $pt));
+	window.NJumbortron = NJumbortron;
+}(window, jQuery, React, $pt));
 
 /**
  * Created by brad.wu on 8/21/2015.
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NLabel = React.createClass($pt.defineCellComponent({
 		displayName: 'NLabel',
 		propTypes: {
@@ -8270,11 +8263,11 @@
 			return this.getComponentOption('textFromModel') !== false;
 		}
 	}));
-	context.NLabel = NLabel;
+	window.NLabel = NLabel;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Label, function (model, layout, direction, viewMode) {
 		return React.createElement(NLabel, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));
 
 /**
  * modal confirm dialog
@@ -8282,7 +8275,7 @@
  *
  * depends NFormButton
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NConfirm = React.createClass({
 		displayName: 'NConfirm',
 		statics: {
@@ -8556,15 +8549,15 @@
 			this.setState(state);
 		}
 	});
-	context.NConfirm = NConfirm;
-}(this, jQuery, React, $pt));
+	window.NConfirm = NConfirm;
+}(window, jQuery, React, $pt));
 
 /**
  * modal form dialog
  *
  * depends NPanelFooter, NForm, NConfirm
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NModalForm = React.createClass({
 		displayName: 'NModalForm',
 		statics: {
@@ -9022,7 +9015,7 @@
 					view: model.view === true
 				});
 			} else {
-				context.console.warn("Properties [draggable, expanded, collapsible, pos] are not supported in parameters, use JSON parameter instead.");
+				window.console.warn("Properties [draggable, expanded, collapsible, pos] are not supported in parameters, use JSON parameter instead.");
 				this.setState({
 					visible: true,
 					model: model,
@@ -9040,7 +9033,7 @@
 			}
 		}
 	});
-	context.NModalForm = NModalForm;
+	window.NModalForm = NModalForm;
 
 	$.fn.drags = function(opt) {
 		opt = $.extend({handle:"",cursor:"move"}, opt);
@@ -9101,12 +9094,12 @@
 
 		return $el.off('mousedown mouseup');
 	};
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));
 
 /**
  * Created by brad.wu on 9/2/2015.
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NNormalLabel = React.createClass({
 		displayName: 'NNormalLabel',
 		propTypes: {
@@ -9144,14 +9137,14 @@
 			return this.props.text;
 		}
 	});
-	context.NNormalLabel = NNormalLabel;
-}(this, jQuery, React, $pt));
+	window.NNormalLabel = NNormalLabel;
+}(window, jQuery, React, $pt));
 
 /**
  * on request modal dialog.
  * z-index is 9899 and 9898, less than exception dialog, more than any other.
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NOnRequestModal = React.createClass({
 		displayName: 'NOnRequestModal',
 		statics: {
@@ -9239,13 +9232,13 @@
 			this.setState({visible: true});
 		}
 	});
-	context.NOnRequestModal = NOnRequestModal;
-}(this, jQuery, React, $pt));
+	window.NOnRequestModal = NOnRequestModal;
+}(window, jQuery, React, $pt));
 
 /**
  * page footer.<br>
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NPageFooter = React.createClass({
 		displayName: 'NPageFooter',
 		statics: {
@@ -9292,13 +9285,13 @@
 				));
 		}
 	});
-	context.NPageFooter = NPageFooter;
-}(this, jQuery, React, $pt));
+	window.NPageFooter = NPageFooter;
+}(window, jQuery, React, $pt));
 
 /**
  * Page Header<br>
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NPageHeader = React.createClass({
 		displayName: 'NPageHeader',
 		statics: {
@@ -9479,15 +9472,15 @@
 			);
 		}
 	});
-	context.NPageHeader = NPageHeader;
-}(this, jQuery, React, $pt));
+	window.NPageHeader = NPageHeader;
+}(window, jQuery, React, $pt));
 
 /**
  * pagination
  *
  * NOTE: never jump by itself, must register the toPage and refresh this component manually
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NPagination = React.createClass({
 		displayName: 'NPagination',
 		/**
@@ -9799,8 +9792,8 @@
 			}
 		}
 	});
-	context.NPagination = NPagination;
-}(this, jQuery, React, $pt));
+	window.NPagination = NPagination;
+}(window, jQuery, React, $pt));
 
 /**
  * panel
@@ -9839,7 +9832,7 @@
  *      }
  * }
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NPanel = React.createClass($pt.defineCellComponent({
 		displayName: 'NPanel',
 		propTypes: {
@@ -10192,17 +10185,17 @@
 			return true;
 		}
 	}));
-	context.NPanel = NPanel;
+	window.NPanel = NPanel;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Panel, function (model, layout, direction, viewMode) {
 		return React.createElement(NPanel, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));
 
 /**
  * panel footer which only contains buttons
  * depends NFormButton
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NPanelFooter = React.createClass({
 		displayName: 'NPanelFooter',
 		statics: {
@@ -10385,8 +10378,8 @@
 			return this.props.view;
 		}
 	});
-	context.NPanelFooter = NPanelFooter;
-}(this, jQuery, React, $pt));
+	window.NPanelFooter = NPanelFooter;
+}(window, jQuery, React, $pt));
 
 /**
  * radio button
@@ -10419,7 +10412,7 @@
  *      }
  * }
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NRadio = React.createClass($pt.defineCellComponent({
 		displayName: 'NRadio',
 		propTypes: {
@@ -10581,16 +10574,16 @@
 			return this.getComponentOption('labelAtLeft');
 		}
 	}));
-	context.NRadio = NRadio;
+	window.NRadio = NRadio;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Radio, function (model, layout, direction, viewMode) {
 		return React.createElement(NRadio, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));
 
 /**
  * search text
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NSearchText = React.createClass($pt.defineCellComponent({
 		displayName: 'NSearchText',
 		statics: {
@@ -10817,9 +10810,9 @@
 					}
 					_this.setLabelText(data.name);
 				}).fail(function() {
-					context.console.error('Error occured when retrieve label from remote in NSearch.');
+					window.console.error('Error occured when retrieve label from remote in NSearch.');
 					arguments.slice(0).forEach(function(argu) {
-						context.console.error(argu);
+						window.console.error(argu);
 					});
 				});
 			}, 300);
@@ -10910,7 +10903,7 @@
 										}
 										model.mergeCurrentModel(data);
 										model.set('criteria_url', this.getAdvancedSearchUrl());
-										context.console.debug(model.getCurrentModel());
+										window.console.debug(model.getCurrentModel());
 										this.state.searchDialog.forceUpdate();
 									}.bind(_this)
 								});
@@ -10970,11 +10963,11 @@
 			return value;
 		}
 	}));
-	context.NSearchText = NSearchText;
+	window.NSearchText = NSearchText;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Search, function (model, layout, direction, viewMode) {
 		return React.createElement(NSearchText, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));
 
 /**
  * select component, see select2 from jQuery
@@ -11018,7 +11011,7 @@
  *      }
  * }
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NSelect2 = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelect2',
 		statics: {
@@ -11440,13 +11433,13 @@
 			});
 		};
 	})(jQuery);
-	context.NSelect2 = NSelect2;
+	window.NSelect2 = NSelect2;
 	$pt.LayoutHelper.registerComponentRenderer('select2', function (model, layout, direction, viewMode) {
 		return React.createElement(NSelect2, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));
 
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NSelect = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelect',
 		statics: {
@@ -11903,11 +11896,11 @@
 			return value;
 		}
 	}));
-	context.NSelect = NSelect;
+	window.NSelect = NSelect;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Select, function (model, layout, direction, viewMode) {
 		return React.createElement(NSelect, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));
 
 /**
  * popover will be closed on
@@ -11916,7 +11909,7 @@
  * 		2.3 mouse wheel
  *		2.4 window resize
  */
-(function(context, $, React, $pt) {
+(function(window, $, React, $pt) {
 	var NSelectTree = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelectTree',
 		statics: {
@@ -12435,13 +12428,13 @@
 			return this.getParentModel().get(this.getParentPropertyId());
 		}
 	}));
-	context.NSelectTree = NSelectTree;
+	window.NSelectTree = NSelectTree;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.SelectTree, function (model, layout, direction, viewMode) {
 		return React.createElement(NSelectTree, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));
 
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NSideMenu = React.createClass({
 		displayName: 'NSideMenu',
 		statics: {
@@ -12626,13 +12619,13 @@
 			}, 300);
 		}
 	});
-	context.NSideMenu = NSideMenu;
-}(this, jQuery, React, $pt));
+	window.NSideMenu = NSideMenu;
+}(window, jQuery, React, $pt));
 
 /**
  * normal tab
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NTab = React.createClass({
 		displayName: 'NTab',
 		propTypes: {
@@ -12809,7 +12802,7 @@
 		 */
 		setActiveTabIndex: function(index) {
 			if (index < 0 || index >= this.props.tabs.length) {
-				context.console.warn('Tab index[' + index + '] out of bound.');
+				window.console.warn('Tab index[' + index + '] out of bound.');
 			}
 			this.props.tabs.forEach(function(tab, tabIndex) {
 				tab.active = (tabIndex == index);
@@ -12886,15 +12879,15 @@
 			}
 		}
 	});
-	context.NTab = NTab;
-}(this, jQuery, React, $pt));
+	window.NTab = NTab;
+}(window, jQuery, React, $pt));
 
 /**
  * table
  *
  * depends NIcon, NText, NModalForm, NConfirm, NPagination
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NTable = React.createClass($pt.defineCellComponent({
 		displayName: 'NTable',
 		statics: {
@@ -12931,11 +12924,11 @@
 			PAGE_JUMPING_PROXY: null,
 			registerInlineEditor: function(type, definition) {
 				if (NTable.__inlineEditors[type] != null) {
-					context.console.warn("Inline editor[" + type + "] is repalced.");
-					context.console.warn("From:");
-					context.console.warn(NTable.__inlineEditors[type]);
-					context.console.warn("To:");
-					context.console.warn(definition);
+					window.console.warn("Inline editor[" + type + "] is repalced.");
+					window.console.warn("From:");
+					window.console.warn(NTable.__inlineEditors[type]);
+					window.console.warn("To:");
+					window.console.warn(definition);
 				}
 				NTable.__inlineEditors[type] = definition;
 			},
@@ -14645,7 +14638,7 @@
 		 */
 		onSearchBoxChanged: function () {
 			var value = this.state.searchModel.get('text');
-			context.console.debug('Searching [text=' + value + '].');
+			window.console.debug('Searching [text=' + value + '].');
 			if (value == null || value == "") {
 				this.setState({
 					searchText: null
@@ -14787,7 +14780,7 @@
 				// do nothing
 			} else if (evt.type == "change") {
 				// do nothing
-				context.console.log('Table[' + this.getDataId() + '] data changed.');
+				window.console.log('Table[' + this.getDataId() + '] data changed.');
 			}
 
 			if (this.getModel().getValidator() != null) {
@@ -14919,11 +14912,11 @@
 			this.forceUpdate();
 		}
 	}));
-	context.NTable = NTable;
+	window.NTable = NTable;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Table, function (model, layout, direction, viewMode) {
 		return React.createElement(NTable, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));
 
 /**
  * text input
@@ -14973,7 +14966,7 @@
  *      }
  * }
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NText = React.createClass($pt.defineCellComponent({
 		displayName: 'NText',
 		statics: {
@@ -15168,7 +15161,7 @@
 				return;
 			}
 			this.getComponent().val(value);
-			// context.console.log("focused: " + this.getValueFromModel());
+			// window.console.log("focused: " + this.getValueFromModel());
 		},
 		onComponentBlurred: function (evt) {
 			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
@@ -15181,7 +15174,7 @@
 			if (value && !value.isBlank()) {
 				var formattedValue = this.getFormattedValue(value);
 				if (formattedValue != value) {
-					// context.console.debug('Change component display formatted value when onBlur.');
+					// window.console.debug('Change component display formatted value when onBlur.');
 					this.getComponent().val(formattedValue);
 				}
 			}
@@ -15192,7 +15185,7 @@
 		 * @param evt
 		 */
 		onComponentChanged: function (evt) {
-			// context.console.debug('Text component changed[modelValue=' + this.getValueFromModel() + ', compValue=' + evt.target.value + '].');
+			// window.console.debug('Text component changed[modelValue=' + this.getValueFromModel() + ', compValue=' + evt.target.value + '].');
 			this.setValueToModel(evt.target.value);
 		},
 		/**
@@ -15210,7 +15203,7 @@
 			// if (formattedValue == this.getComponent().val()) {
 			// 	return;
 			// }
-			// // context.console.debug('Text model changed[modelValue=' + evt.new + ', compValue=' + this.getComponent().val() + '].');
+			// // window.console.debug('Text model changed[modelValue=' + evt.new + ', compValue=' + this.getComponent().val() + '].');
 			// this.getComponent().val(formattedValue);
 		},
 		onKeyUp: function (evt) {
@@ -15288,11 +15281,11 @@
 			}
 		}
 	}));
-	context.NText = NText;
+	window.NText = NText;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Text, function (model, layout, direction, viewMode) {
 		return React.createElement(NText, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));
 
 /**
  * text input
@@ -15330,7 +15323,7 @@
  *      }
  * }
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NTextArea = React.createClass($pt.defineCellComponent({
 		displayName: 'NTextArea',
 		propTypes: {
@@ -15484,16 +15477,16 @@
 			return value;
 		}
 	}));
-	context.NTextArea = NTextArea;
+	window.NTextArea = NTextArea;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.TextArea, function (model, layout, direction, viewMode) {
 		return React.createElement(NTextArea, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));
 
 /**
  * Created by brad.wu on 8/21/2015.
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NToggle = React.createClass($pt.defineCellComponent({
 		displayName: 'NToggle',
 		propTypes: {
@@ -15651,13 +15644,13 @@
 			return $(React.findDOMNode(this.refs.txt));
 		}
 	}));
-	context.NToggle = NToggle;
+	window.NToggle = NToggle;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Toggle, function (model, layout, direction, viewMode) {
 		return React.createElement(NToggle, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));
 
-(function(context, $, React, $pt) {
+(function(window, $, React, $pt) {
     var NTree = React.createClass($pt.defineCellComponent({
         displayName: 'NTree',
         statics: {
@@ -16053,17 +16046,17 @@
                             hasUncheckedChild = true;
                         }
                     });
-                    // context.console.log(nodeId);
+                    // window.console.log(nodeId);
                     _this.checkNode(nodeId, !hasUncheckedChild, modelValue);
                     return !hasUncheckedChild;
                 } else {
                     // no children, return checked of myself
-                    // context.console.log(nodeId);
+                    // window.console.log(nodeId);
                     return _this.isNodeChecked(nodeId, modelValue);
                 }
             };
             checkNodeOnChildren(this.state.root, this.getNodeId(null, this.state.root));
-            // context.console.log(modelValue);
+            // window.console.log(modelValue);
         },
         expandAll: function() {
             var activeNodes = $.extend({}, this.state.activeNodes);
@@ -16364,8 +16357,8 @@
     }));
 
     // expose to global
-    context.NTree = NTree;
+    window.NTree = NTree;
     $pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Tree, function (model, layout, direction, viewMode) {
 		return React.createElement(NTree, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));

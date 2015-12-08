@@ -2,12 +2,11 @@
  * depends on jquery, jsface
  * depends on parrot-pre-define
  */
-(function (context, $, moment, jsface) {
-	// define parrot context
-	var $pt = context.$pt;
+(function (window, $, moment, jsface) {
+	var $pt = window.$pt;
 	if ($pt == null) {
 		$pt = {};
-		context.$pt = $pt;
+		window.$pt = $pt;
 	}
 
 	$pt.BUILD_PROPERTY_VISITOR = true;
@@ -1167,4 +1166,4 @@
 		var ModelClass = jsface.Class($.extend(model, ModelInterface));
 		return new ModelClass(inputModel, validator);
 	};
-})(this, jQuery, moment, jsface);
+})(window, jQuery, moment, jsface);

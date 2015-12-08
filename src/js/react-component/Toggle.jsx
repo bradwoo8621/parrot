@@ -1,7 +1,7 @@
 /**
  * Created by brad.wu on 8/21/2015.
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NToggle = React.createClass($pt.defineCellComponent({
 		displayName: 'NToggle',
 		propTypes: {
@@ -159,8 +159,8 @@
 			return $(React.findDOMNode(this.refs.txt));
 		}
 	}));
-	context.NToggle = NToggle;
+	window.NToggle = NToggle;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Toggle, function (model, layout, direction, viewMode) {
 		return <NToggle {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));

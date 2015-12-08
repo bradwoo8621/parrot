@@ -4,7 +4,7 @@
  *
  * depends NFormButton
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NConfirm = React.createClass({
 		displayName: 'NConfirm',
 		statics: {
@@ -278,5 +278,5 @@
 			this.setState(state);
 		}
 	});
-	context.NConfirm = NConfirm;
-}(this, jQuery, React, $pt));
+	window.NConfirm = NConfirm;
+}(window, jQuery, React, $pt));

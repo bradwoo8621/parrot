@@ -1,8 +1,8 @@
-(function (context, $, jsface) {
-	var $pt = context.$pt;
+(function (window, $, jsface) {
+	var $pt = window.$pt;
 	if ($pt == null) {
 		$pt = {};
-		context.$pt = $pt;
+		window.$pt = $pt;
 	}
 
 	/**
@@ -1573,7 +1573,7 @@
 				type = type.type;
 			}
 			if (this.__components[type]) {
-				context.console.warn('Component [' + type + '] is replaced.');
+				window.console.warn('Component [' + type + '] is replaced.');
 			}
 			this.__components[type] = func;
 		},
@@ -1594,7 +1594,7 @@
 			}
 			type = type + '@view';
 			if (this.__components[type]) {
-				context.console.warn('Component [' + type + '] is replaced.');
+				window.console.warn('Component [' + type + '] is replaced.');
 			}
 			this.__components[type] = func;
 		},
@@ -1624,4 +1624,4 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Nothing, function() {
 		return null;
 	});
-})(this, jQuery, jsface);
+})(window, jQuery, jsface);

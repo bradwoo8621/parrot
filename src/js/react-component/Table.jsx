@@ -3,7 +3,7 @@
  *
  * depends NIcon, NText, NModalForm, NConfirm, NPagination
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NTable = React.createClass($pt.defineCellComponent({
 		displayName: 'NTable',
 		statics: {
@@ -40,11 +40,11 @@
 			PAGE_JUMPING_PROXY: null,
 			registerInlineEditor: function(type, definition) {
 				if (NTable.__inlineEditors[type] != null) {
-					context.console.warn("Inline editor[" + type + "] is repalced.");
-					context.console.warn("From:");
-					context.console.warn(NTable.__inlineEditors[type]);
-					context.console.warn("To:");
-					context.console.warn(definition);
+					window.console.warn("Inline editor[" + type + "] is repalced.");
+					window.console.warn("From:");
+					window.console.warn(NTable.__inlineEditors[type]);
+					window.console.warn("To:");
+					window.console.warn(definition);
 				}
 				NTable.__inlineEditors[type] = definition;
 			},
@@ -1754,7 +1754,7 @@
 		 */
 		onSearchBoxChanged: function () {
 			var value = this.state.searchModel.get('text');
-			context.console.debug('Searching [text=' + value + '].');
+			window.console.debug('Searching [text=' + value + '].');
 			if (value == null || value == "") {
 				this.setState({
 					searchText: null
@@ -1896,7 +1896,7 @@
 				// do nothing
 			} else if (evt.type == "change") {
 				// do nothing
-				context.console.log('Table[' + this.getDataId() + '] data changed.');
+				window.console.log('Table[' + this.getDataId() + '] data changed.');
 			}
 
 			if (this.getModel().getValidator() != null) {
@@ -2028,8 +2028,8 @@
 			this.forceUpdate();
 		}
 	}));
-	context.NTable = NTable;
+	window.NTable = NTable;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Table, function (model, layout, direction, viewMode) {
 		return <NTable {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));

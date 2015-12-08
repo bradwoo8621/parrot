@@ -38,7 +38,7 @@
  *      }
  * }
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NArrayTab = React.createClass($pt.defineCellComponent({
 		displayName: 'NArrayTab',
 		statics: {
@@ -407,8 +407,8 @@
 			this.forceUpdate();
 		}
 	}));
-	context.NArrayTab = NArrayTab;
+	window.NArrayTab = NArrayTab;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayTab, function (model, layout, direction, viewMode) {
 		return <NArrayTab {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));

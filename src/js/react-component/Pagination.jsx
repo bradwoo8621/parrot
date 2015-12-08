@@ -3,7 +3,7 @@
  *
  * NOTE: never jump by itself, must register the toPage and refresh this component manually
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NPagination = React.createClass({
 		displayName: 'NPagination',
 		/**
@@ -315,5 +315,5 @@
 			}
 		}
 	});
-	context.NPagination = NPagination;
-}(this, jQuery, React, $pt));
+	window.NPagination = NPagination;
+}(window, jQuery, React, $pt));

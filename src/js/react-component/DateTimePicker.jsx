@@ -6,7 +6,7 @@
  * 		2.3 mouse wheel
  *		2.4 window resize
  */
-(function(context, $, moment, React, $pt) {
+(function(window, $, moment, React, $pt) {
 	var NDateTime = React.createClass($pt.defineCellComponent({
 		displayName: 'NDateTime',
 		statics: {
@@ -902,10 +902,10 @@
 				x: (evt.pageX - offset.left) - NDateTime.CLOCK_RADIUS,
 				y: NDateTime.CLOCK_RADIUS - (evt.pageY - offset.top)
 			};
-			// context.console.log('Mouse Point: ' + point.x + ',' + point.y);
+			// window.console.log('Mouse Point: ' + point.x + ',' + point.y);
 			// calculate the radius length of point
 			var length = Math.sqrt(Math.pow(point.x, 2) + Math.pow(point.y, 2));
-			// context.console.log('Point radius: ' + length);
+			// window.console.log('Point radius: ' + length);
 
 			// calculate it is what
 			if (length > 101) {
@@ -933,7 +933,7 @@
 				// change hour
 				eventType = NDateTime.FORMAT_TYPES.HOUR;
 			}
-			// context.console.log('Event Type: ' + eventType);
+			// window.console.log('Event Type: ' + eventType);
 
 			// calculate degree in coordinate system
 			var degree = 0;
@@ -957,7 +957,7 @@
 			} else {
 				degree = 450 - degree;
 			}
-			// context.console.log('Degree: ' + degree);
+			// window.console.log('Degree: ' + degree);
 
 			var currentHour, hour, minute, second;
 			var date = this.getValueFromModel();
@@ -976,7 +976,7 @@
 				hour = Math.floor(degree / 15) + (degree % 15 < 7.5 ? 0 : 1);
 				date.hour(hour);
 			}
-			// context.console.log('Hour: [' + hour + '], Minute: [' + minute + '], Second: [' + second + ']');
+			// window.console.log('Hour: [' + hour + '], Minute: [' + minute + '], Second: [' + second + ']');
 			this.renderPopover({date: date, type: popoverType, set: true});
 		},
 		onAMPMSelected: function(isAM, type) {
@@ -1059,8 +1059,8 @@
 					return date.isLeapYear() ? 29 : 28;
 				default:
 					// never run to here
-					context.console.warn('Something wrong with momentjs.');
-					context.console.warn(date);
+					window.console.warn('Something wrong with momentjs.');
+					window.console.warn(date);
 					return 31;
 			}
 		},
@@ -1143,8 +1143,8 @@
 		}
 	}));
 
-	context.NDateTime = NDateTime;
+	window.NDateTime = NDateTime;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Date, function (model, layout, direction, viewMode) {
 		return <NDateTime {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(this, jQuery, moment, React, $pt));
+}(window, jQuery, moment, React, $pt));

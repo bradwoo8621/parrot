@@ -1,8 +1,8 @@
-(function (context, $, jsface) {
-	var $pt = context.$pt;
+(function (window, $, jsface) {
+	var $pt = window.$pt;
 	if ($pt == null) {
 		$pt = {};
-		context.$pt = $pt;
+		window.$pt = $pt;
 	}
 
 	/**
@@ -129,7 +129,7 @@
 				},
 				fail: function (jqXHR, textStatus, errorThrown) {
 					// error to console, quiet backend
-					context.console.error('Status:' + textStatus + ', error:' + errorThrown);
+					window.console.error('Status:' + textStatus + ', error:' + errorThrown);
 				}
 			});
 		},
@@ -331,4 +331,4 @@
 	$pt.createCodeTable = function (items, renderer, sorter) {
 		return new CodeTable(items, renderer, sorter);
 	};
-})(this, jQuery, jsface);
+})(window, jQuery, jsface);

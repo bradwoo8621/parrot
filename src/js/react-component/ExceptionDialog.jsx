@@ -2,7 +2,7 @@
  * exception modal dialog
  * z-index is 9999 and 9998, the max z-index.
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NExceptionModal = React.createClass({
 		displayName: 'NExceptionModal',
 		statics: {
@@ -139,5 +139,5 @@
 			this.setState({visible: true, status: status, message: message});
 		}
 	});
-	context.NExceptionModal = NExceptionModal;
-}(this, jQuery, React, $pt));
+	window.NExceptionModal = NExceptionModal;
+}(window, jQuery, React, $pt));

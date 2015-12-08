@@ -35,7 +35,7 @@
  *      }
  * }
  */
-(function (context, $, React, $pt) {
+(function (window, $, React, $pt) {
 	var NPanel = React.createClass($pt.defineCellComponent({
 		displayName: 'NPanel',
 		propTypes: {
@@ -388,8 +388,8 @@
 			return true;
 		}
 	}));
-	context.NPanel = NPanel;
+	window.NPanel = NPanel;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Panel, function (model, layout, direction, viewMode) {
 		return <NPanel {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(this, jQuery, React, $pt));
+}(window, jQuery, React, $pt));
