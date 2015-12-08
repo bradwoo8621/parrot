@@ -8,6 +8,9 @@
     "type": "git",
     "url": "https://github.com/bradwoo8621/parrot.git"
   },
+  "scripts": {
+    "test": "grunt test"
+  },
   "dependencies": {
     "jquery": "2.1.4",
     "react": "0.13.3",
@@ -31,6 +34,7 @@
     "grunt-contrib-cssmin": "^0.12.3",
     "grunt-contrib-jshint": "^0.11.2",
     "grunt-contrib-less": "^1.0.1",
+    "grunt-contrib-nodeunit": "^0.4.1",
     "grunt-contrib-uglify": "^0.9.1",
     "grunt-copy": "^0.1.0",
     "grunt-csscomb": "^3.0.1",

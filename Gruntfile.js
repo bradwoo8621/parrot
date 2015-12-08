@@ -439,6 +439,10 @@ module.exports = function(grunt) {
 					}
 				}
 			},
+			// Unit tests.
+	        nodeunit: {
+	            tests: ['unit-test/test.js']
+	        }
 			// webpack: {
 			// 	parrot: {
 			// 		// entry: './<%= concat.js.dest %>',
@@ -482,6 +486,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
+	grunt.loadNpmTasks('grunt-contrib-nodeunit');
 	grunt.loadNpmTasks('grunt-contrib-less');
 	grunt.loadNpmTasks('grunt-react');
 	grunt.loadNpmTasks('grunt-replace');
@@ -496,4 +501,5 @@ module.exports = function(grunt) {
 	grunt.registerTask('deploy', ['clean:all', 'bower-copy', 'js-compile', 'css-compile', 'copy:fonts', 'clean:mid']);
 	grunt.registerTask('default', ['clean:compile', 'js-compile', 'css-parrot', 'clean:mid']);
 	grunt.registerTask('modules', ['webpack:parrot']);
+	grunt.registerTask('test', ['nodeunit']);
 };
