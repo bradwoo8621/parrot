@@ -1,6 +1,7 @@
 'use strict';
 
-var jQuery = require('jquery');
+var window = {document: {}};
+var jQuery = require('jquery')(window);
 var jsface = require('jsface');
 var moment = require('moment');
 var browser = require('jquery.browser');

@@ -4,7 +4,18 @@ node_js:
 install:
   - npm install -g grunt-cli
   - npm install grunt
+  - npm install grunt-contrib-copy
   - npm install grunt-contrib-nodeunit
+  - npm install grunt-contrib-clean
+  - npm install grunt-contrib-uglify
+  - npm install grunt-contrib-jshint
+  - npm install grunt-contrib-concat
+  - npm install grunt-contrib-cssmin
+  - npm install grunt-contrib-less
+  - npm install grunt-react
+  - npm install grunt-replace
+  - npm install grunt-webpack
+
   - npm install jquery
   - npm install jsface
   - npm install moment
