@@ -1,4 +1,4 @@
-(function (window, $, jsface) {
+(function (window, $, jsface, React) {
 	var $pt = window.$pt;
 	if ($pt == null) {
 		$pt = {};
@@ -1624,4 +1624,4 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Nothing, function() {
 		return null;
 	});
-})(window, jQuery, jsface);
+})(window, jQuery, jsface, React);

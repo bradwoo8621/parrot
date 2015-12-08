@@ -2079,7 +2079,7 @@
 	};
 })(window, jQuery, moment, jsface);
 
-(function (window, $, jsface) {
+(function (window, $, jsface, React) {
 	var $pt = window.$pt;
 	if ($pt == null) {
 		$pt = {};
@@ -3705,7 +3705,7 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Nothing, function() {
 		return null;
 	});
-})(window, jQuery, jsface);
+})(window, jQuery, jsface, React);
 
 (function (window, $, React, $pt) {
 	var NArrayCheck = React.createClass($pt.defineCellComponent({

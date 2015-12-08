@@ -438,7 +438,42 @@ module.exports = function(grunt) {
 						'src/css/parrot.css': 'src/less/parrot.less'
 					}
 				}
-			}
+			},
+			// webpack: {
+			// 	parrot: {
+			// 		// entry: './<%= concat.js.dest %>',
+			// 		entry: './temp-test/webpack-test.js',
+			// 		output: {
+			// 			// path: '<%= targetPath %>/parrot/js/',
+			// 			// filename: '<%= pkg.groupId %>.<%= pkg.artifactId %>.[hash].js'
+			// 			path: './temp-test',
+			// 			filename: 'bundle.js'
+			// 		},
+			// 		externals: {
+			// 	        "jquery": "jQuery"
+			// 	    },
+			// 		stats: {
+			// 	        // Configure the console output
+			// 	        colors: false,
+			// 	        modules: true,
+			// 	        reasons: true
+			// 	    },
+			// 	    storeStatsTo: "xyz", // writes the status to a variable named xyz
+			// 	    // you may use it later in grunt i.e. <%= xyz.hash %>
+			// 	    progress: false, // Don't show progress
+			// 	    // Defaults to true
+			// 	    failOnError: true, // don't report error to grunt if webpack find errors
+			// 	    // Use this if webpack errors are tolerable and grunt should continue
+			// 	    watch: false, // use webpacks watcher
+			// 	    // You need to keep the grunt process alive
+			// 	    keepalive: false, // don't finish the grunt task
+			// 	    // Use this in combination with the watch option
+			// 	    inline: false,  // embed the webpack-dev-server runtime into the bundle
+			// 	    // Defaults to false
+			// 	    hot: false, // adds the HotModuleReplacementPlugin and switch the server to hot mode
+			// 	    // Use this in combination with the inline option
+			// 	}
+			// }
 		});
 
 	grunt.loadNpmTasks('grunt-contrib-copy');
@@ -450,8 +485,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-less');
 	grunt.loadNpmTasks('grunt-react');
 	grunt.loadNpmTasks('grunt-replace');
-
-	// grunt.loadNpmTasks('grunt-webpack');
+	grunt.loadNpmTasks('grunt-webpack');
 
 	// copy bower files to target
 	grunt.registerTask('bower-copy', ['copy:bower-dependency']);
@@ -461,4 +495,5 @@ module.exports = function(grunt) {
 	grunt.registerTask('css-compile', ['bootswatch', 'css-parrot']);
 	grunt.registerTask('deploy', ['clean:all', 'bower-copy', 'js-compile', 'css-compile', 'copy:fonts', 'clean:mid']);
 	grunt.registerTask('default', ['clean:compile', 'js-compile', 'css-parrot', 'clean:mid']);
+	grunt.registerTask('modules', ['webpack:parrot']);
 };
