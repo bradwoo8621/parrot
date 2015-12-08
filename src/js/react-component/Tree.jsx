@@ -160,7 +160,7 @@
                 }
             });
             model.addPostChangeListener('selected', this.onNodeCheckChanged.bind(this, node, nodeId));
-            return <NCheck model={model} layout={layout} view={this.isViewMode()}/>;
+            return <$pt.Components.NCheck model={model} layout={layout} view={this.isViewMode()}/>;
         },
         renderNode: function(parentNodeId, node) {
             var nodeId = this.getNodeId(parentNodeId, node);
@@ -174,7 +174,7 @@
                 };
                 opIcon = (<a href='javascript:void(0);'
                             onClick={this.onNodeClicked.bind(this, node, nodeId)}>
-                    <NIcon {...expandableIconAttrs} />
+                    <$pt.Components.NIcon {...expandableIconAttrs} />
                 </a>);
             }
             var folderIconAttrs = {
@@ -184,7 +184,7 @@
             };
             var folderIcon = (<a href='javascript:void(0);'
                             onClick={this.onNodeClicked.bind(this, node, nodeId)}>
-                <NIcon {...folderIconAttrs}/>
+                <$pt.Components.NIcon {...folderIconAttrs}/>
             </a>);
 
             var active = this.isActive(nodeId) ? 'active' : null;
@@ -225,8 +225,8 @@
             return this.isRootPaint() ? this.renderRoot() : this.renderNodes(root, this.getNodeId(null, root));
         },
         renderButtons: function() {
-            var expand = this.state.expandButton ? <NFormButton model={this.getModel()} layout={this.state.expandButton}/> : null;
-            var collapse = this.state.collapseButton ? <NFormButton model={this.getModel()} layout={this.state.collapseButton}/> : null;
+            var expand = this.state.expandButton ? <$pt.Components.NFormButton model={this.getModel()} layout={this.state.expandButton}/> : null;
+            var collapse = this.state.collapseButton ? <$pt.Components.NFormButton model={this.getModel()} layout={this.state.collapseButton}/> : null;
             if (expand || collapse) {
                 return (<span className='buttons'>
                     {expand}{collapse}
@@ -705,8 +705,8 @@
     }));
 
     // expose to global
-    window.NTree = NTree;
+    $pt.Components.NTree = NTree;
     $pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Tree, function (model, layout, direction, viewMode) {
-		return <NTree {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return <$pt.Components.NTree {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
 }(window, jQuery, React, $pt));

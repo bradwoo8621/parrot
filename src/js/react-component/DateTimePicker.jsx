@@ -1143,8 +1143,8 @@
 		}
 	}));
 
-	window.NDateTime = NDateTime;
+	$pt.Components.NDateTime = NDateTime;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Date, function (model, layout, direction, viewMode) {
-		return <NDateTime {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return <$pt.Components.NDateTime {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
 }(window, jQuery, moment, React, $pt));

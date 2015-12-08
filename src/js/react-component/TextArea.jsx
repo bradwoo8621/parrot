@@ -188,8 +188,8 @@
 			return value;
 		}
 	}));
-	window.NTextArea = NTextArea;
+	$pt.Components.NTextArea = NTextArea;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.TextArea, function (model, layout, direction, viewMode) {
-		return <NTextArea {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return <$pt.Components.NTextArea {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
 }(window, jQuery, React, $pt));

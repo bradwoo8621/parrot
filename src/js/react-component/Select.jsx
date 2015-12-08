@@ -462,8 +462,8 @@
 			});
 		};
 	})(jQuery);
-	window.NSelect2 = NSelect2;
+	$pt.Components.NSelect2 = NSelect2;
 	$pt.LayoutHelper.registerComponentRenderer('select2', function (model, layout, direction, viewMode) {
-		return <NSelect2 {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return <$pt.Components.NSelect2 {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
 }(window, jQuery, React, $pt));

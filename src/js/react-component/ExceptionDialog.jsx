@@ -14,7 +14,7 @@
 					if (exceptionContainer.length == 0) {
 						$("<div id='exception_modal_container' />").appendTo($(document.body));
 					}
-					$pt.exceptionDialog = React.render(<NExceptionModal className={className}/>,
+					$pt.exceptionDialog = React.render(<$pt.Components.NExceptionModal className={className}/>,
 						document.getElementById("exception_modal_container"));
 				}
 				return $pt.exceptionDialog;
@@ -139,5 +139,5 @@
 			this.setState({visible: true, status: status, message: message});
 		}
 	});
-	window.NExceptionModal = NExceptionModal;
+	$pt.Components.NExceptionModal = NExceptionModal;
 }(window, jQuery, React, $pt));

@@ -384,7 +384,7 @@
 		 */
 		renderSearchBox: function () {
 			if (this.isSearchable()) {
-				return (<NText model={this.state.searchModel} layout={this.state.searchLayout}/>);
+				return (<$pt.Components.NText model={this.state.searchModel} layout={this.state.searchLayout}/>);
 			} else {
 				return null;
 			}
@@ -401,7 +401,7 @@
 				           ref='add-button' style={{
 					display: this.state.expanded ? 'block' : 'none'
 				}}>
-					<NIcon icon={NTable.ADD_BUTTON_ICON}/>
+					<$pt.Components.NIcon icon={NTable.ADD_BUTTON_ICON}/>
 					{NTable.ADD_BUTTON_TEXT}
 				</a>);
 			} else {
@@ -496,7 +496,7 @@
 				}
 				return (<a href="javascript:void(0);" className={sortClass}
 				           onClick={this.onSortClicked.bind(this, column)}>
-					<NIcon icon={icon}/>
+					<$pt.Components.NIcon icon={icon}/>
 				</a>);
 			}
 		},
@@ -531,7 +531,7 @@
 					_this.forceUpdate();
 				}
 			});
-			return <NCheck model={model} layout={layout}/>;
+			return <$pt.Components.NCheck model={model} layout={layout}/>;
 		},
 		/**
 		 * render heading content.
@@ -588,7 +588,7 @@
 					comp: 'n-table-op-btn'
 				}
 			});
-			return <NFormButton model={rowModel} layout={layout} />;
+			return <$pt.Components.NFormButton model={rowModel} layout={layout} />;
 		},
 		renderRowRemoveButton: function(rowModel) {
 			var layout = $pt.createCellLayout('removeButton', {
@@ -603,7 +603,7 @@
 					comp: 'n-table-op-btn'
 				}
 			});
-			return <NFormButton model={rowModel} layout={layout} />;
+			return <$pt.Components.NFormButton model={rowModel} layout={layout} />;
 		},
 		renderRowOperationButton: function(operation, rowModel) {
 			var layout = $pt.createCellLayout('rowButton', {
@@ -618,7 +618,7 @@
 					comp: 'n-table-op-btn'
 				}
 			});
-			return <NFormButton model={rowModel} layout={layout} />;
+			return <$pt.Components.NFormButton model={rowModel} layout={layout} />;
 		},
 		getRowOperations: function(column) {
 			var rowOperations = column.rowOperations;
@@ -683,7 +683,7 @@
 					}
 				});
 				return (<li>
-					<NFormButton model={rowModel} layout={layout} />
+					<$pt.Components.NFormButton model={rowModel} layout={layout} />
 				</li>);
 			};
 			return (<ul className='nav'>{moreOperations.map(renderOperation)}</ul>);
@@ -766,7 +766,7 @@
 					comp: 'n-table-op-btn more'
 				}
 			});
-			return <NFormButton model={rowModel} layout={layout} />;
+			return <$pt.Components.NFormButton model={rowModel} layout={layout} />;
 		},
 		/**
 		 * render dropdown operation cell, only buttons which before maxButtonCount are renderred as a line,
@@ -844,7 +844,7 @@
 					type: $pt.ComponentConstants.Check
 				}
 			});
-			return (<NCheck model={model} layout={layout}/>);
+			return (<$pt.Components.NCheck model={model} layout={layout}/>);
 		},
 		/**
 		 * render table body rows
@@ -912,7 +912,7 @@
 									}
 								}
 								// pre-defined, use with data together
-								data = <NFormCell model={inlineModel}
+								data = <$pt.Components.NFormCell model={inlineModel}
 												  layout={$pt.createCellLayout(column.data, layout)}
 												  direction='horizontal'
 												  view={_this.isViewMode()}/>;
@@ -923,7 +923,7 @@
 								} else {
 									column.inline.css = {cell: 'inline-editor'};
 								}
-								data = <NFormCell model={inlineModel}
+								data = <$pt.Components.NFormCell model={inlineModel}
 												  layout={$pt.createCellLayout(column.data, column.inline)}
 												  direction='horizontal'
 												  view={_this.isViewMode()}
@@ -931,7 +931,7 @@
 							} else {
 								// any other, treat as form layout
 								// column.data is not necessary
-								data = <NForm model={inlineModel}
+								data = <$pt.Components.NForm model={inlineModel}
 											  layout={$pt.createFormLayout(column.inline)}
 											  direction='horizontal'
 											  view={_this.isViewMode()} />;
@@ -1188,7 +1188,7 @@
 		renderPagination: function () {
 			if (this.isPageable() && this.hasDataToDisplay()) {
 				// only show when pageable and has data to display
-				return (<NPagination className="n-table-pagination" pageCount={this.state.pageCount}
+				return (<$pt.Components.NPagination className="n-table-pagination" pageCount={this.state.pageCount}
 				                     currentPageIndex={this.state.currentPageIndex} toPage={this.toPage.bind(this)}/>);
 			} else {
 				return null;
@@ -2028,8 +2028,8 @@
 			this.forceUpdate();
 		}
 	}));
-	window.NTable = NTable;
+	$pt.Components.NTable = NTable;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Table, function (model, layout, direction, viewMode) {
-		return <NTable {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return <$pt.Components.NTable {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
 }(window, jQuery, React, $pt));

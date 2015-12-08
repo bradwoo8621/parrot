@@ -39,5 +39,5 @@
 			return this.props.text;
 		}
 	});
-	window.NNormalLabel = NNormalLabel;
+	$pt.Components.NNormalLabel = NNormalLabel;
 }(window, jQuery, React, $pt));

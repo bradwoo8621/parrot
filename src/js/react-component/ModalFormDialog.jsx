@@ -30,7 +30,7 @@
 				if (className) {
 					css[className] = true;
 				}
-				return React.render(<NModalForm title={title} className={$pt.LayoutHelper.classSet(css)}
+				return React.render(<$pt.Components.NModalForm title={title} className={$pt.LayoutHelper.classSet(css)}
 				                                zIndex={$pt.formModalIndex}/>,
 					document.getElementById(containerId));
 			},
@@ -165,7 +165,7 @@
 				return <div ref='footer'/>;
 			} else {
 				return (<div className="n-modal-form-footer modal-footer" ref='footer'>
-					<NPanelFooter reset={this.getResetButton()}
+					<$pt.Components.NPanelFooter reset={this.getResetButton()}
 					              validate={this.getValidationButton()}
 					              save={this.getSaveButton()}
 					              cancel={this.getCancelButton()}
@@ -182,7 +182,7 @@
 				hide: !this.state.expanded
 			};
 			return (<div className={$pt.LayoutHelper.classSet(css)}>
-				<NForm model={this.getModel()}
+				<$pt.Components.NForm model={this.getModel()}
 					   layout={this.getLayout()}
 					   direction={this.getDirection()}
 					   view={this.isViewMode()}
@@ -479,7 +479,7 @@
 			}
 		}
 	});
-	window.NModalForm = NModalForm;
+	$pt.Components.NModalForm = NModalForm;
 
 	$.fn.drags = function(opt) {
 		opt = $.extend({handle:"",cursor:"move"}, opt);

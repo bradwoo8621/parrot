@@ -381,8 +381,8 @@
 			return value;
 		}
 	}));
-	window.NSearchText = NSearchText;
+	$pt.Components.NSearchText = NSearchText;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Search, function (model, layout, direction, viewMode) {
-		return <NSearchText {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return <$pt.Components.NSearchText {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
 }(window, jQuery, React, $pt));

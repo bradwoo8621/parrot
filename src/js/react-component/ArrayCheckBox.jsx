@@ -72,7 +72,7 @@
 				}
 			});
 			model.addPostChangeListener('checked', this.onCodeItemCheckedChanged.bind(this, item));
-			return <NCheck model={model} layout={layout} />;
+			return <$pt.Components.NCheck model={model} layout={layout} />;
 		},
 		render: function() {
 			var enabled = this.isEnabled();
@@ -131,8 +131,8 @@
 			});
 		}
 	}));
-	window.NArrayCheck = NArrayCheck;
+	$pt.Components.NArrayCheck = NArrayCheck;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayCheck, function (model, layout, direction, viewMode) {
-		return <NArrayCheck {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return <$pt.Components.NArrayCheck {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
 }(window, jQuery, React, $pt));

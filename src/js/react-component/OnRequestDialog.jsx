@@ -13,7 +13,7 @@
 						$("<div id='onrequest_modal_container' />").appendTo($(document.body));
 					}
 					$pt.onRequestDialog = React.render(
-						<NOnRequestModal className={className}/>, document.getElementById("onrequest_modal_container"));
+						<$pt.Components.NOnRequestModal className={className}/>, document.getElementById("onrequest_modal_container"));
 				}
 				return $pt.onRequestDialog;
 			},
@@ -90,5 +90,5 @@
 			this.setState({visible: true});
 		}
 	});
-	window.NOnRequestModal = NOnRequestModal;
+	$pt.Components.NOnRequestModal = NOnRequestModal;
 }(window, jQuery, React, $pt));

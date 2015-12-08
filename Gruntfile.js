@@ -92,7 +92,8 @@ module.exports = function(grunt) {
 						'<%= middlePath %>/js/parrot-codetable.js',
 						'<%= middlePath %>/js/parrot-model.js',
 						'<%= middlePath %>/js/parrot-component.js',
-						'<%= middlePath %>/js/react-component/*.js'],
+						'<%= middlePath %>/js/react-component/*.js',
+						'<%= middlePath %>/js/parrot-post-define.js'],
 					dest: '<%= targetPath %>/parrot/js/<%= pkg.groupId %>.<%= pkg.artifactId %>.js'
 				}
 			},

@@ -172,7 +172,7 @@
 					width: 12
 				}
 			};
-			return <NPanel model={this.getModel()}
+			return <$pt.Components.NPanel model={this.getModel()}
 			               layout={$pt.createCellLayout(sections[0].getParentCard().getId() + '-body', sectionLayout)}
 			               direction={this.getLabelDirection()}
 						   view={this.isViewMode()}/>;
@@ -289,7 +289,7 @@
 			}
 			if (right.length != 0 || left.length != 0) {
 				right = right.reverse();
-				footer = (<NPanelFooter right={right} left={left} model={this.getModel()} view={this.isViewMode()}/>);
+				footer = (<$pt.Components.NPanelFooter right={right} left={left} model={this.getModel()} view={this.isViewMode()}/>);
 			}
 			return (<div className={$pt.LayoutHelper.classSet(css)}>
 				{this.renderSections(card.getSections())}
@@ -539,9 +539,9 @@
 			return null;
 		}
 	});
-	window.NForm = NForm;
+	$pt.Components.NForm = NForm;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Form, function (model, layout, direction, viewMode) {
 		var formLayout = $pt.createFormLayout(layout.getComponentOption('editLayout'));
-		return <NForm {...$pt.LayoutHelper.transformParameters(model, formLayout, direction, viewMode)}/>;
+		return <$pt.Components.NForm {...$pt.LayoutHelper.transformParameters(model, formLayout, direction, viewMode)}/>;
 	});
 }(window, jQuery, React, $pt));

@@ -24,7 +24,7 @@
 		},
 		render: function () {
 			var buttonLayout = this.getButtonLayout();
-			return <NPanelFooter model={this.props.model}
+			return <$pt.Components.NPanelFooter model={this.props.model}
 								 view={this.isViewMode()}
 			                     save={buttonLayout.save}
 			                     validate={buttonLayout.validate}
@@ -37,8 +37,8 @@
 			return this.getComponentOption('buttonLayout');
 		}
 	}));
-	window.NFormButtonFooter = NFormButtonFooter;
+	$pt.Components.NFormButtonFooter = NFormButtonFooter;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ButtonFooter, function (model, layout, direction, viewMode) {
-		return <NFormButtonFooter {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return <$pt.Components.NFormButtonFooter {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
 }(window, jQuery, React, $pt));

@@ -111,5 +111,5 @@
 			             title={this.props.tooltip}/>;
 		}
 	});
-	window.NIcon = NIcon;
+	$pt.Components.NIcon = NIcon;
 }(window, jQuery, React, $pt));

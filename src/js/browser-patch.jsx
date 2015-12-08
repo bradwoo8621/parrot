@@ -1,7 +1,7 @@
 (function (window, $, browser) {
 	var patches = {
 		console: function () {
-			if (browser.msie && browser.versionNumber <= 10) {
+			if (browser && browser.msie && browser.versionNumber <= 10) {
 				var method;
 				var noop = function () {
 				};

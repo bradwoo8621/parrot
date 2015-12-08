@@ -151,7 +151,7 @@
 					});
 				}
 			}
-			return (<NForm model={tab.data}
+			return (<$pt.Components.NForm model={tab.data}
 			               layout={$pt.createFormLayout(tab.layout)}
 			               direction={this.props.direction}
 						   view={this.isViewMode()}
@@ -177,7 +177,7 @@
 				}
 			}.bind(this);
 			return (<div className={this.getComponentCSS('n-array-tab')}>
-				<NTab type={this.getComponentOption('tabType')}
+				<$pt.Components.NTab type={this.getComponentOption('tabType')}
 				      justified={this.getComponentOption('justified')}
 				      direction={this.getComponentOption('titleDirection')}
 				      size={this.getComponentOption('titleIconSize')}
@@ -186,7 +186,7 @@
 				      canActive={canActiveProxy}
 				      onActive={this.onTabClicked}
 				      ref='tabs'>
-				</NTab>
+				</$pt.Components.NTab>
 
 				<div className='n-array-tab-content' ref='content'>
 					{tabs.map(this.renderTabContent)}
@@ -407,8 +407,8 @@
 			this.forceUpdate();
 		}
 	}));
-	window.NArrayTab = NArrayTab;
+	$pt.Components.NArrayTab = NArrayTab;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayTab, function (model, layout, direction, viewMode) {
-		return <NArrayTab {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return <$pt.Components.NArrayTab {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
 }(window, jQuery, React, $pt));

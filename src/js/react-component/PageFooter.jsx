@@ -48,5 +48,5 @@
 				</footer>);
 		}
 	});
-	window.NPageFooter = NPageFooter;
+	$pt.Components.NPageFooter = NPageFooter;
 }(window, jQuery, React, $pt));

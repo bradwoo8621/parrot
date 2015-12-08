@@ -100,8 +100,8 @@
 			return this.getComponentOption('textFromModel') !== false;
 		}
 	}));
-	window.NLabel = NLabel;
+	$pt.Components.NLabel = NLabel;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Label, function (model, layout, direction, viewMode) {
-		return <NLabel {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return <$pt.Components.NLabel {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
 }(window, jQuery, React, $pt));

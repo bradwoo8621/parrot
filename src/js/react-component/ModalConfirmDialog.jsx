@@ -14,7 +14,7 @@
 					if (confirmContainer.length == 0) {
 						$("<div id='confirm_modal_container' />").appendTo($(document.body));
 					}
-					$pt.confirmDialog = React.render(<NConfirm className={className}/>,
+					$pt.confirmDialog = React.render(<$pt.Components.NConfirm className={className}/>,
 						document.getElementById("confirm_modal_container"));
 				}
 				return $pt.confirmDialog;
@@ -86,7 +86,7 @@
 					click: this.onConfirmClicked.bind(this)
 				}
 			});
-			return <NFormButton layout={layout}/>;
+			return <$pt.Components.NFormButton layout={layout}/>;
 		},
 		/**
 		 * render close button
@@ -105,7 +105,7 @@
 					click: this.onCancelClicked.bind(this)
 				}
 			});
-			return <NFormButton layout={layout}/>;
+			return <$pt.Components.NFormButton layout={layout}/>;
 		},
 		/**
 		 * render footer
@@ -278,5 +278,5 @@
 			this.setState(state);
 		}
 	});
-	window.NConfirm = NConfirm;
+	$pt.Components.NConfirm = NConfirm;
 }(window, jQuery, React, $pt));

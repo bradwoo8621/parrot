@@ -125,7 +125,7 @@
 			};
 			return (<div>
 				(
-				<NCheck model={this.getModel()} layout={$pt.createCellLayout('check', layout)} view={this.isViewMode()}/>
+				<$pt.Components.NCheck model={this.getModel()} layout={$pt.createCellLayout('check', layout)} view={this.isViewMode()}/>
 				)
 			</div>);
 		},
@@ -165,7 +165,7 @@
 		renderRow: function (row) {
 			var _this = this;
 			var cells = row.getCells().map(function (cell) {
-				return <NFormCell layout={cell}
+				return <$pt.Components.NFormCell layout={cell}
 				                  model={_this.getModel()}
 				                  ref={cell.getId()}
 				                  direction={_this.props.direction}
@@ -388,8 +388,8 @@
 			return true;
 		}
 	}));
-	window.NPanel = NPanel;
+	$pt.Components.NPanel = NPanel;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Panel, function (model, layout, direction, viewMode) {
-		return <NPanel {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return <$pt.Components.NPanel {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
 }(window, jQuery, React, $pt));

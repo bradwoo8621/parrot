@@ -50,7 +50,7 @@
 			});
 
 			return (<div className="navbar-form navbar-right" role="search">
-				<NText model={this.state.model} layout={layout}/>
+				<$pt.Components.NText model={this.state.model} layout={layout}/>
 			</div>);
 		},
 		renderMenuItem: function (item, index, menus, onTopLevel) {
@@ -182,5 +182,5 @@
 			);
 		}
 	});
-	window.NPageHeader = NPageHeader;
+	$pt.Components.NPageHeader = NPageHeader;
 }(window, jQuery, React, $pt));

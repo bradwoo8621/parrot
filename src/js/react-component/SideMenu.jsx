@@ -25,7 +25,7 @@
 						$("<div id='" + containerId + "' />").appendTo($(document.body));
 					}
 					$pt.sideMenu[containerId] = React.render(
-						<NSideMenu menus={menus}
+						<$pt.Components.NSideMenu menus={menus}
 						           className={className}
 						           hover={hover ? true : false}/>,
 						document.getElementById(containerId));
@@ -183,5 +183,5 @@
 			}, 300);
 		}
 	});
-	window.NSideMenu = NSideMenu;
+	$pt.Components.NSideMenu = NSideMenu;
 }(window, jQuery, React, $pt));

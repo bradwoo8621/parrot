@@ -195,8 +195,8 @@
 			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 		}
 	}));
-	window.NFile = NFile;
+	$pt.Components.NFile = NFile;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.File, function (model, layout, direction, viewMode) {
-		return <NFile {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return <$pt.Components.NFile {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
 }(window, jQuery, React, $pt));

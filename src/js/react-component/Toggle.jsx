@@ -159,8 +159,8 @@
 			return $(React.findDOMNode(this.refs.txt));
 		}
 	}));
-	window.NToggle = NToggle;
+	$pt.Components.NToggle = NToggle;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Toggle, function (model, layout, direction, viewMode) {
-		return <NToggle {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return <$pt.Components.NToggle {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
 }(window, jQuery, React, $pt));

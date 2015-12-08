@@ -339,5 +339,5 @@
 			}
 		}
 	}));
-	window.NFormCell = NFormCell;
+	$pt.Components.NFormCell = NFormCell;
 }(window, jQuery, React, $pt));

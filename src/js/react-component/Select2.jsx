@@ -181,7 +181,7 @@
 					}
 				});
 				model.addPostChangeListener('text', this.onFilterTextChange);
-				return <NText model={model} layout={layout} />;
+				return <$pt.Components.NText model={model} layout={layout} />;
 			} else {
 				return null;
 			}
@@ -455,8 +455,8 @@
 			return value;
 		}
 	}));
-	window.NSelect = NSelect;
+	$pt.Components.NSelect = NSelect;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Select, function (model, layout, direction, viewMode) {
-		return <NSelect {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return <$pt.Components.NSelect {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
 }(window, jQuery, React, $pt));

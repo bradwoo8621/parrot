@@ -28,7 +28,7 @@
     "bootstrap": "^3.3.5",
     "bootstrap-fileinput": ">=4.2.7",
     "bootswatch": ">=3.3.5",
-    "fontawesome": "4.4.0"
+    "fontawesome": ">=4.4.0"
   },
   "devDependencies": {
     "grunt": "^0.4.5",

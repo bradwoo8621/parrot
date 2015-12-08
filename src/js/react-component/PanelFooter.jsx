@@ -124,7 +124,7 @@
 					visible: option.visible
 				}
 			};
-			return <NFormButton model={this.getModel()} layout={$pt.createCellLayout('pseudo-button', layout)}/>;
+			return <$pt.Components.NFormButton model={this.getModel()} layout={$pt.createCellLayout('pseudo-button', layout)}/>;
 		},
 		/**
 		 * render
@@ -185,5 +185,5 @@
 			return this.props.view;
 		}
 	});
-	window.NPanelFooter = NPanelFooter;
+	$pt.Components.NPanelFooter = NPanelFooter;
 }(window, jQuery, React, $pt));

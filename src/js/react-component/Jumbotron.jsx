@@ -26,5 +26,5 @@
 			);
 		}
 	});
-	window.NJumbortron = NJumbortron;
+	$pt.Components.NJumbortron = NJumbortron;
 }(window, jQuery, React, $pt));

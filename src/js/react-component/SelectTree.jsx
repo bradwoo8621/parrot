@@ -98,7 +98,7 @@
 			var layout = $pt.createCellLayout('values', this.getTreeLayout());
 			var model = $pt.createModel({values: this.getValueFromModel()});
 			model.addPostChangeListener('values', this.onTreeValueChanged);
-			return <NTree model={model} layout={layout}/>;
+			return <$pt.Components.NTree model={model} layout={layout}/>;
 		},
 		renderSelectionItem: function(codeItem, nodeId) {
 			return (<li>
@@ -524,8 +524,8 @@
 			return this.getParentModel().get(this.getParentPropertyId());
 		}
 	}));
-	window.NSelectTree = NSelectTree;
+	$pt.Components.NSelectTree = NSelectTree;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.SelectTree, function (model, layout, direction, viewMode) {
-		return <NSelectTree {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return <$pt.Components.NSelectTree {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
 }(window, jQuery, React, $pt));

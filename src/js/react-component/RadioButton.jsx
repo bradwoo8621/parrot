@@ -191,8 +191,8 @@
 			return this.getComponentOption('labelAtLeft');
 		}
 	}));
-	window.NRadio = NRadio;
+	$pt.Components.NRadio = NRadio;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Radio, function (model, layout, direction, viewMode) {
-		return <NRadio {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return <$pt.Components.NRadio {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
 }(window, jQuery, React, $pt));

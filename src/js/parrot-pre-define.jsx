@@ -43,7 +43,8 @@
 		var message = messages[key];
 		return message == null ? null : message;
 	};
-
+	// components
+	$pt.Components = {};
 	// component constants
 	$pt.ComponentConstants = {
 		// component types

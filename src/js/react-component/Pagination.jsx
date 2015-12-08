@@ -315,5 +315,5 @@
 			}
 		}
 	});
-	window.NPagination = NPagination;
+	$pt.Components.NPagination = NPagination;
 }(window, jQuery, React, $pt));

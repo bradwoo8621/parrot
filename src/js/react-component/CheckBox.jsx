@@ -205,8 +205,8 @@
 			return $(React.findDOMNode(this.refs.txt));
 		}
 	}));
-	window.NCheck = NCheck;
+	$pt.Components.NCheck = NCheck;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Check, function (model, layout, direction, viewMode) {
-		return <NCheck {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return <$pt.Components.NCheck {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
 }(window, jQuery, React, $pt));

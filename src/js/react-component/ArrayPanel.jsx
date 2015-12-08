@@ -157,7 +157,7 @@
 			};
 			return (<div className='row'>
 				<div className='col-sm-12 col-md-12 col-lg-12'>
-					<NPanel model={model}
+					<$pt.Components.NPanel model={model}
 					        layout={$pt.createCellLayout('pseudo-panel', cellLayout)}
 					        direction={this.props.direction}
 							view={this.isViewMode()}/>
@@ -239,8 +239,8 @@
 			}
 		}
 	}));
-	window.NArrayPanel = NArrayPanel;
+	$pt.Components.NArrayPanel = NArrayPanel;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayPanel, function (model, layout, direction, viewMode) {
-		return <NArrayPanel {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return <$pt.Components.NArrayPanel {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
 }(window, jQuery, React, $pt));

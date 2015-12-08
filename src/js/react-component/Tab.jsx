@@ -255,5 +255,5 @@
 			}
 		}
 	});
-	window.NTab = NTab;
+	$pt.Components.NTab = NTab;
 }(window, jQuery, React, $pt));

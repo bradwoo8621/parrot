@@ -1,4 +1,4 @@
-/** com.github.nest.parrot.V0.0.6 2015-12-08 */
+/** com.github.nest.parrot.V0.0.6 2015-12-09 */
 (function (window, $, browser) {
 	var patches = {
 		console: function () {
@@ -276,7 +276,8 @@
 		var message = messages[key];
 		return message == null ? null : message;
 	};
-
+	// components
+	$pt.Components = {};
 	// component constants
 	$pt.ComponentConstants = {
 		// component types
@@ -3237,7 +3238,7 @@
 			var parameters = $pt.LayoutHelper.transformParameters(
 				this.getModel(), labelLayout, this.props.direction, true);
 			parameters.ref = 'viewLabel';
-			return React.createElement(NLabel, React.__spread({},  parameters));
+			return React.createElement($pt.Components.NLabel, React.__spread({},  parameters));
 		},
 		/**
 		 * get id of component
@@ -3781,7 +3782,7 @@
 				}
 			});
 			model.addPostChangeListener('checked', this.onCodeItemCheckedChanged.bind(this, item));
-			return React.createElement(NCheck, {model: model, layout: layout});
+			return React.createElement($pt.Components.NCheck, {model: model, layout: layout});
 		},
 		render: function() {
 			var enabled = this.isEnabled();
@@ -3840,9 +3841,9 @@
 			});
 		}
 	}));
-	window.NArrayCheck = NArrayCheck;
+	$pt.Components.NArrayCheck = NArrayCheck;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayCheck, function (model, layout, direction, viewMode) {
-		return React.createElement(NArrayCheck, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NArrayCheck, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -4005,7 +4006,7 @@
 			};
 			return (React.createElement("div", {className: "row"}, 
 				React.createElement("div", {className: "col-sm-12 col-md-12 col-lg-12"}, 
-					React.createElement(NPanel, {model: model, 
+					React.createElement($pt.Components.NPanel, {model: model, 
 					        layout: $pt.createCellLayout('pseudo-panel', cellLayout), 
 					        direction: this.props.direction, 
 							view: this.isViewMode()})
@@ -4087,9 +4088,9 @@
 			}
 		}
 	}));
-	window.NArrayPanel = NArrayPanel;
+	$pt.Components.NArrayPanel = NArrayPanel;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayPanel, function (model, layout, direction, viewMode) {
-		return React.createElement(NArrayPanel, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NArrayPanel, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -4246,7 +4247,7 @@
 					});
 				}
 			}
-			return (React.createElement(NForm, {model: tab.data, 
+			return (React.createElement($pt.Components.NForm, {model: tab.data, 
 			               layout: $pt.createFormLayout(tab.layout), 
 			               direction: this.props.direction, 
 						   view: this.isViewMode(), 
@@ -4272,7 +4273,7 @@
 				}
 			}.bind(this);
 			return (React.createElement("div", {className: this.getComponentCSS('n-array-tab')}, 
-				React.createElement(NTab, {type: this.getComponentOption('tabType'), 
+				React.createElement($pt.Components.NTab, {type: this.getComponentOption('tabType'), 
 				      justified: this.getComponentOption('justified'), 
 				      direction: this.getComponentOption('titleDirection'), 
 				      size: this.getComponentOption('titleIconSize'), 
@@ -4502,9 +4503,9 @@
 			this.forceUpdate();
 		}
 	}));
-	window.NArrayTab = NArrayTab;
+	$pt.Components.NArrayTab = NArrayTab;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayTab, function (model, layout, direction, viewMode) {
-		return React.createElement(NArrayTab, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NArrayTab, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -4746,9 +4747,9 @@
 			// nothing
 		}
 	}));
-	window.NFormButton = NFormButton;
+	$pt.Components.NFormButton = NFormButton;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Button, function (model, layout, direction, viewMode) {
-		return React.createElement(NFormButton, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NFormButton, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -4959,9 +4960,9 @@
 			return $(React.findDOMNode(this.refs.txt));
 		}
 	}));
-	window.NCheck = NCheck;
+	$pt.Components.NCheck = NCheck;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Check, function (model, layout, direction, viewMode) {
-		return React.createElement(NCheck, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NCheck, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -6110,9 +6111,9 @@
 		}
 	}));
 
-	window.NDateTime = NDateTime;
+	$pt.Components.NDateTime = NDateTime;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Date, function (model, layout, direction, viewMode) {
-		return React.createElement(NDateTime, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NDateTime, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, moment, React, $pt));
 
@@ -6504,9 +6505,9 @@
 			return format ? format : NDateTime2.FORMAT;
 		}
 	}));
-	window.NDateTime2 = NDateTime2;
+	$pt.Components.NDateTime2 = NDateTime2;
 	$pt.LayoutHelper.registerComponentRenderer('date2', function (model, layout, direction, viewMode) {
-		return React.createElement(NDateTime2, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NDateTime2, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, moment, React, $pt));
 
@@ -6526,7 +6527,7 @@
 					if (exceptionContainer.length == 0) {
 						$("<div id='exception_modal_container' />").appendTo($(document.body));
 					}
-					$pt.exceptionDialog = React.render(React.createElement(NExceptionModal, {className: className}),
+					$pt.exceptionDialog = React.render(React.createElement($pt.Components.NExceptionModal, {className: className}),
 						document.getElementById("exception_modal_container"));
 				}
 				return $pt.exceptionDialog;
@@ -6651,7 +6652,7 @@
 			this.setState({visible: true, status: status, message: message});
 		}
 	});
-	window.NExceptionModal = NExceptionModal;
+	$pt.Components.NExceptionModal = NExceptionModal;
 }(window, jQuery, React, $pt));
 
 (function (window, $, React, $pt) {
@@ -6851,9 +6852,9 @@
 			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 		}
 	}));
-	window.NFile = NFile;
+	$pt.Components.NFile = NFile;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.File, function (model, layout, direction, viewMode) {
-		return React.createElement(NFile, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NFile, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -7031,7 +7032,7 @@
 					width: 12
 				}
 			};
-			return React.createElement(NPanel, {model: this.getModel(), 
+			return React.createElement($pt.Components.NPanel, {model: this.getModel(), 
 			               layout: $pt.createCellLayout(sections[0].getParentCard().getId() + '-body', sectionLayout), 
 			               direction: this.getLabelDirection(), 
 						   view: this.isViewMode()});
@@ -7148,7 +7149,7 @@
 			}
 			if (right.length != 0 || left.length != 0) {
 				right = right.reverse();
-				footer = (React.createElement(NPanelFooter, {right: right, left: left, model: this.getModel(), view: this.isViewMode()}));
+				footer = (React.createElement($pt.Components.NPanelFooter, {right: right, left: left, model: this.getModel(), view: this.isViewMode()}));
 			}
 			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
 				this.renderSections(card.getSections()), 
@@ -7398,10 +7399,10 @@
 			return null;
 		}
 	});
-	window.NForm = NForm;
+	$pt.Components.NForm = NForm;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Form, function (model, layout, direction, viewMode) {
 		var formLayout = $pt.createFormLayout(layout.getComponentOption('editLayout'));
-		return React.createElement(NForm, React.__spread({},  $pt.LayoutHelper.transformParameters(model, formLayout, direction, viewMode)));
+		return React.createElement($pt.Components.NForm, React.__spread({},  $pt.LayoutHelper.transformParameters(model, formLayout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -7431,7 +7432,7 @@
 		},
 		render: function () {
 			var buttonLayout = this.getButtonLayout();
-			return React.createElement(NPanelFooter, {model: this.props.model, 
+			return React.createElement($pt.Components.NPanelFooter, {model: this.props.model, 
 								 view: this.isViewMode(), 
 			                     save: buttonLayout.save, 
 			                     validate: buttonLayout.validate, 
@@ -7444,9 +7445,9 @@
 			return this.getComponentOption('buttonLayout');
 		}
 	}));
-	window.NFormButtonFooter = NFormButtonFooter;
+	$pt.Components.NFormButtonFooter = NFormButtonFooter;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ButtonFooter, function (model, layout, direction, viewMode) {
-		return React.createElement(NFormButtonFooter, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NFormButtonFooter, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -7791,7 +7792,7 @@
 			}
 		}
 	}));
-	window.NFormCell = NFormCell;
+	$pt.Components.NFormCell = NFormCell;
 }(window, jQuery, React, $pt));
 
 /**
@@ -7911,7 +7912,7 @@
 				show: index == activeIndex,
 				hide: index != activeIndex
 			};
-			return (React.createElement(NForm, {model: this.getModel(), 
+			return (React.createElement($pt.Components.NForm, {model: this.getModel(), 
 			               layout: layout, 
 			               direction: this.props.direction, 
 						   view: this.isViewMode(), 
@@ -7925,7 +7926,7 @@
 				canActive.bind(this);
 			}
 			return (React.createElement("div", {className: this.getComponentCSS('n-form-tab')}, 
-				React.createElement(NTab, {type: this.getComponentOption('tabType'), 
+				React.createElement($pt.Components.NTab, {type: this.getComponentOption('tabType'), 
 				      justified: this.getComponentOption('justified'), 
 				      direction: this.getComponentOption('titleDirection'), 
 				      size: this.getComponentOption('titleIconSize'), 
@@ -8008,9 +8009,9 @@
 			this.forceUpdate();
 		}
 	}));
-	window.NFormTab = NFormTab;
+	$pt.Components.NFormTab = NFormTab;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Tab, function (model, layout, direction, viewMode) {
-		return React.createElement(NFormTab, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NFormTab, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -8127,7 +8128,7 @@
 			             title: this.props.tooltip});
 		}
 	});
-	window.NIcon = NIcon;
+	$pt.Components.NIcon = NIcon;
 }(window, jQuery, React, $pt));
 
 /**
@@ -8158,7 +8159,7 @@
 			);
 		}
 	});
-	window.NJumbortron = NJumbortron;
+	$pt.Components.NJumbortron = NJumbortron;
 }(window, jQuery, React, $pt));
 
 /**
@@ -8263,9 +8264,9 @@
 			return this.getComponentOption('textFromModel') !== false;
 		}
 	}));
-	window.NLabel = NLabel;
+	$pt.Components.NLabel = NLabel;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Label, function (model, layout, direction, viewMode) {
-		return React.createElement(NLabel, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NLabel, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -8285,7 +8286,7 @@
 					if (confirmContainer.length == 0) {
 						$("<div id='confirm_modal_container' />").appendTo($(document.body));
 					}
-					$pt.confirmDialog = React.render(React.createElement(NConfirm, {className: className}),
+					$pt.confirmDialog = React.render(React.createElement($pt.Components.NConfirm, {className: className}),
 						document.getElementById("confirm_modal_container"));
 				}
 				return $pt.confirmDialog;
@@ -8357,7 +8358,7 @@
 					click: this.onConfirmClicked.bind(this)
 				}
 			});
-			return React.createElement(NFormButton, {layout: layout});
+			return React.createElement($pt.Components.NFormButton, {layout: layout});
 		},
 		/**
 		 * render close button
@@ -8376,7 +8377,7 @@
 					click: this.onCancelClicked.bind(this)
 				}
 			});
-			return React.createElement(NFormButton, {layout: layout});
+			return React.createElement($pt.Components.NFormButton, {layout: layout});
 		},
 		/**
 		 * render footer
@@ -8549,7 +8550,7 @@
 			this.setState(state);
 		}
 	});
-	window.NConfirm = NConfirm;
+	$pt.Components.NConfirm = NConfirm;
 }(window, jQuery, React, $pt));
 
 /**
@@ -8584,7 +8585,7 @@
 				if (className) {
 					css[className] = true;
 				}
-				return React.render(React.createElement(NModalForm, {title: title, className: $pt.LayoutHelper.classSet(css), 
+				return React.render(React.createElement($pt.Components.NModalForm, {title: title, className: $pt.LayoutHelper.classSet(css), 
 				                                zIndex: $pt.formModalIndex}),
 					document.getElementById(containerId));
 			},
@@ -8719,7 +8720,7 @@
 				return React.createElement("div", {ref: "footer"});
 			} else {
 				return (React.createElement("div", {className: "n-modal-form-footer modal-footer", ref: "footer"}, 
-					React.createElement(NPanelFooter, {reset: this.getResetButton(), 
+					React.createElement($pt.Components.NPanelFooter, {reset: this.getResetButton(), 
 					              validate: this.getValidationButton(), 
 					              save: this.getSaveButton(), 
 					              cancel: this.getCancelButton(), 
@@ -8736,7 +8737,7 @@
 				hide: !this.state.expanded
 			};
 			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
-				React.createElement(NForm, {model: this.getModel(), 
+				React.createElement($pt.Components.NForm, {model: this.getModel(), 
 					   layout: this.getLayout(), 
 					   direction: this.getDirection(), 
 					   view: this.isViewMode(), 
@@ -9033,7 +9034,7 @@
 			}
 		}
 	});
-	window.NModalForm = NModalForm;
+	$pt.Components.NModalForm = NModalForm;
 
 	$.fn.drags = function(opt) {
 		opt = $.extend({handle:"",cursor:"move"}, opt);
@@ -9137,7 +9138,7 @@
 			return this.props.text;
 		}
 	});
-	window.NNormalLabel = NNormalLabel;
+	$pt.Components.NNormalLabel = NNormalLabel;
 }(window, jQuery, React, $pt));
 
 /**
@@ -9155,7 +9156,7 @@
 						$("<div id='onrequest_modal_container' />").appendTo($(document.body));
 					}
 					$pt.onRequestDialog = React.render(
-						React.createElement(NOnRequestModal, {className: className}), document.getElementById("onrequest_modal_container"));
+						React.createElement($pt.Components.NOnRequestModal, {className: className}), document.getElementById("onrequest_modal_container"));
 				}
 				return $pt.onRequestDialog;
 			},
@@ -9232,7 +9233,7 @@
 			this.setState({visible: true});
 		}
 	});
-	window.NOnRequestModal = NOnRequestModal;
+	$pt.Components.NOnRequestModal = NOnRequestModal;
 }(window, jQuery, React, $pt));
 
 /**
@@ -9285,7 +9286,7 @@
 				));
 		}
 	});
-	window.NPageFooter = NPageFooter;
+	$pt.Components.NPageFooter = NPageFooter;
 }(window, jQuery, React, $pt));
 
 /**
@@ -9340,7 +9341,7 @@
 			});
 
 			return (React.createElement("div", {className: "navbar-form navbar-right", role: "search"}, 
-				React.createElement(NText, {model: this.state.model, layout: layout})
+				React.createElement($pt.Components.NText, {model: this.state.model, layout: layout})
 			));
 		},
 		renderMenuItem: function (item, index, menus, onTopLevel) {
@@ -9472,7 +9473,7 @@
 			);
 		}
 	});
-	window.NPageHeader = NPageHeader;
+	$pt.Components.NPageHeader = NPageHeader;
 }(window, jQuery, React, $pt));
 
 /**
@@ -9792,7 +9793,7 @@
 			}
 		}
 	});
-	window.NPagination = NPagination;
+	$pt.Components.NPagination = NPagination;
 }(window, jQuery, React, $pt));
 
 /**
@@ -9922,7 +9923,7 @@
 			};
 			return (React.createElement("div", null, 
 				"(", 
-				React.createElement(NCheck, {model: this.getModel(), layout: $pt.createCellLayout('check', layout), view: this.isViewMode()}), 
+				React.createElement($pt.Components.NCheck, {model: this.getModel(), layout: $pt.createCellLayout('check', layout), view: this.isViewMode()}), 
 				")"
 			));
 		},
@@ -9962,7 +9963,7 @@
 		renderRow: function (row) {
 			var _this = this;
 			var cells = row.getCells().map(function (cell) {
-				return React.createElement(NFormCell, {layout: cell, 
+				return React.createElement($pt.Components.NFormCell, {layout: cell, 
 				                  model: _this.getModel(), 
 				                  ref: cell.getId(), 
 				                  direction: _this.props.direction, 
@@ -10185,9 +10186,9 @@
 			return true;
 		}
 	}));
-	window.NPanel = NPanel;
+	$pt.Components.NPanel = NPanel;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Panel, function (model, layout, direction, viewMode) {
-		return React.createElement(NPanel, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NPanel, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -10317,7 +10318,7 @@
 					visible: option.visible
 				}
 			};
-			return React.createElement(NFormButton, {model: this.getModel(), layout: $pt.createCellLayout('pseudo-button', layout)});
+			return React.createElement($pt.Components.NFormButton, {model: this.getModel(), layout: $pt.createCellLayout('pseudo-button', layout)});
 		},
 		/**
 		 * render
@@ -10378,7 +10379,7 @@
 			return this.props.view;
 		}
 	});
-	window.NPanelFooter = NPanelFooter;
+	$pt.Components.NPanelFooter = NPanelFooter;
 }(window, jQuery, React, $pt));
 
 /**
@@ -10574,9 +10575,9 @@
 			return this.getComponentOption('labelAtLeft');
 		}
 	}));
-	window.NRadio = NRadio;
+	$pt.Components.NRadio = NRadio;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Radio, function (model, layout, direction, viewMode) {
-		return React.createElement(NRadio, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NRadio, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -10963,9 +10964,9 @@
 			return value;
 		}
 	}));
-	window.NSearchText = NSearchText;
+	$pt.Components.NSearchText = NSearchText;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Search, function (model, layout, direction, viewMode) {
-		return React.createElement(NSearchText, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NSearchText, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -11433,9 +11434,9 @@
 			});
 		};
 	})(jQuery);
-	window.NSelect2 = NSelect2;
+	$pt.Components.NSelect2 = NSelect2;
 	$pt.LayoutHelper.registerComponentRenderer('select2', function (model, layout, direction, viewMode) {
-		return React.createElement(NSelect2, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NSelect2, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -11622,7 +11623,7 @@
 					}
 				});
 				model.addPostChangeListener('text', this.onFilterTextChange);
-				return React.createElement(NText, {model: model, layout: layout});
+				return React.createElement($pt.Components.NText, {model: model, layout: layout});
 			} else {
 				return null;
 			}
@@ -11896,9 +11897,9 @@
 			return value;
 		}
 	}));
-	window.NSelect = NSelect;
+	$pt.Components.NSelect = NSelect;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Select, function (model, layout, direction, viewMode) {
-		return React.createElement(NSelect, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NSelect, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -12002,7 +12003,7 @@
 			var layout = $pt.createCellLayout('values', this.getTreeLayout());
 			var model = $pt.createModel({values: this.getValueFromModel()});
 			model.addPostChangeListener('values', this.onTreeValueChanged);
-			return React.createElement(NTree, {model: model, layout: layout});
+			return React.createElement($pt.Components.NTree, {model: model, layout: layout});
 		},
 		renderSelectionItem: function(codeItem, nodeId) {
 			return (React.createElement("li", null, 
@@ -12428,9 +12429,9 @@
 			return this.getParentModel().get(this.getParentPropertyId());
 		}
 	}));
-	window.NSelectTree = NSelectTree;
+	$pt.Components.NSelectTree = NSelectTree;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.SelectTree, function (model, layout, direction, viewMode) {
-		return React.createElement(NSelectTree, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NSelectTree, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -12461,7 +12462,7 @@
 						$("<div id='" + containerId + "' />").appendTo($(document.body));
 					}
 					$pt.sideMenu[containerId] = React.render(
-						React.createElement(NSideMenu, {menus: menus, 
+						React.createElement($pt.Components.NSideMenu, {menus: menus, 
 						           className: className, 
 						           hover: hover ? true : false}),
 						document.getElementById(containerId));
@@ -12619,7 +12620,7 @@
 			}, 300);
 		}
 	});
-	window.NSideMenu = NSideMenu;
+	$pt.Components.NSideMenu = NSideMenu;
 }(window, jQuery, React, $pt));
 
 /**
@@ -12879,7 +12880,7 @@
 			}
 		}
 	});
-	window.NTab = NTab;
+	$pt.Components.NTab = NTab;
 }(window, jQuery, React, $pt));
 
 /**
@@ -13268,7 +13269,7 @@
 		 */
 		renderSearchBox: function () {
 			if (this.isSearchable()) {
-				return (React.createElement(NText, {model: this.state.searchModel, layout: this.state.searchLayout}));
+				return (React.createElement($pt.Components.NText, {model: this.state.searchModel, layout: this.state.searchLayout}));
 			} else {
 				return null;
 			}
@@ -13285,7 +13286,7 @@
 				           ref: "add-button", style: {
 					display: this.state.expanded ? 'block' : 'none'
 				}}, 
-					React.createElement(NIcon, {icon: NTable.ADD_BUTTON_ICON}), 
+					React.createElement($pt.Components.NIcon, {icon: NTable.ADD_BUTTON_ICON}), 
 					NTable.ADD_BUTTON_TEXT
 				));
 			} else {
@@ -13380,7 +13381,7 @@
 				}
 				return (React.createElement("a", {href: "javascript:void(0);", className: sortClass, 
 				           onClick: this.onSortClicked.bind(this, column)}, 
-					React.createElement(NIcon, {icon: icon})
+					React.createElement($pt.Components.NIcon, {icon: icon})
 				));
 			}
 		},
@@ -13415,7 +13416,7 @@
 					_this.forceUpdate();
 				}
 			});
-			return React.createElement(NCheck, {model: model, layout: layout});
+			return React.createElement($pt.Components.NCheck, {model: model, layout: layout});
 		},
 		/**
 		 * render heading content.
@@ -13472,7 +13473,7 @@
 					comp: 'n-table-op-btn'
 				}
 			});
-			return React.createElement(NFormButton, {model: rowModel, layout: layout});
+			return React.createElement($pt.Components.NFormButton, {model: rowModel, layout: layout});
 		},
 		renderRowRemoveButton: function(rowModel) {
 			var layout = $pt.createCellLayout('removeButton', {
@@ -13487,7 +13488,7 @@
 					comp: 'n-table-op-btn'
 				}
 			});
-			return React.createElement(NFormButton, {model: rowModel, layout: layout});
+			return React.createElement($pt.Components.NFormButton, {model: rowModel, layout: layout});
 		},
 		renderRowOperationButton: function(operation, rowModel) {
 			var layout = $pt.createCellLayout('rowButton', {
@@ -13502,7 +13503,7 @@
 					comp: 'n-table-op-btn'
 				}
 			});
-			return React.createElement(NFormButton, {model: rowModel, layout: layout});
+			return React.createElement($pt.Components.NFormButton, {model: rowModel, layout: layout});
 		},
 		getRowOperations: function(column) {
 			var rowOperations = column.rowOperations;
@@ -13567,7 +13568,7 @@
 					}
 				});
 				return (React.createElement("li", null, 
-					React.createElement(NFormButton, {model: rowModel, layout: layout})
+					React.createElement($pt.Components.NFormButton, {model: rowModel, layout: layout})
 				));
 			};
 			return (React.createElement("ul", {className: "nav"}, moreOperations.map(renderOperation)));
@@ -13650,7 +13651,7 @@
 					comp: 'n-table-op-btn more'
 				}
 			});
-			return React.createElement(NFormButton, {model: rowModel, layout: layout});
+			return React.createElement($pt.Components.NFormButton, {model: rowModel, layout: layout});
 		},
 		/**
 		 * render dropdown operation cell, only buttons which before maxButtonCount are renderred as a line,
@@ -13728,7 +13729,7 @@
 					type: $pt.ComponentConstants.Check
 				}
 			});
-			return (React.createElement(NCheck, {model: model, layout: layout}));
+			return (React.createElement($pt.Components.NCheck, {model: model, layout: layout}));
 		},
 		/**
 		 * render table body rows
@@ -13796,7 +13797,7 @@
 									}
 								}
 								// pre-defined, use with data together
-								data = React.createElement(NFormCell, {model: inlineModel, 
+								data = React.createElement($pt.Components.NFormCell, {model: inlineModel, 
 												  layout: $pt.createCellLayout(column.data, layout), 
 												  direction: "horizontal", 
 												  view: _this.isViewMode()});
@@ -13807,7 +13808,7 @@
 								} else {
 									column.inline.css = {cell: 'inline-editor'};
 								}
-								data = React.createElement(NFormCell, {model: inlineModel, 
+								data = React.createElement($pt.Components.NFormCell, {model: inlineModel, 
 												  layout: $pt.createCellLayout(column.data, column.inline), 
 												  direction: "horizontal", 
 												  view: _this.isViewMode(), 
@@ -13815,7 +13816,7 @@
 							} else {
 								// any other, treat as form layout
 								// column.data is not necessary
-								data = React.createElement(NForm, {model: inlineModel, 
+								data = React.createElement($pt.Components.NForm, {model: inlineModel, 
 											  layout: $pt.createFormLayout(column.inline), 
 											  direction: "horizontal", 
 											  view: _this.isViewMode()});
@@ -14072,7 +14073,7 @@
 		renderPagination: function () {
 			if (this.isPageable() && this.hasDataToDisplay()) {
 				// only show when pageable and has data to display
-				return (React.createElement(NPagination, {className: "n-table-pagination", pageCount: this.state.pageCount, 
+				return (React.createElement($pt.Components.NPagination, {className: "n-table-pagination", pageCount: this.state.pageCount, 
 				                     currentPageIndex: this.state.currentPageIndex, toPage: this.toPage.bind(this)}));
 			} else {
 				return null;
@@ -14912,9 +14913,9 @@
 			this.forceUpdate();
 		}
 	}));
-	window.NTable = NTable;
+	$pt.Components.NTable = NTable;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Table, function (model, layout, direction, viewMode) {
-		return React.createElement(NTable, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NTable, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -15281,9 +15282,9 @@
 			}
 		}
 	}));
-	window.NText = NText;
+	$pt.Components.NText = NText;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Text, function (model, layout, direction, viewMode) {
-		return React.createElement(NText, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NText, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -15477,9 +15478,9 @@
 			return value;
 		}
 	}));
-	window.NTextArea = NTextArea;
+	$pt.Components.NTextArea = NTextArea;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.TextArea, function (model, layout, direction, viewMode) {
-		return React.createElement(NTextArea, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NTextArea, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -15644,9 +15645,9 @@
 			return $(React.findDOMNode(this.refs.txt));
 		}
 	}));
-	window.NToggle = NToggle;
+	$pt.Components.NToggle = NToggle;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Toggle, function (model, layout, direction, viewMode) {
-		return React.createElement(NToggle, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NToggle, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -15812,7 +15813,7 @@
                 }
             });
             model.addPostChangeListener('selected', this.onNodeCheckChanged.bind(this, node, nodeId));
-            return React.createElement(NCheck, {model: model, layout: layout, view: this.isViewMode()});
+            return React.createElement($pt.Components.NCheck, {model: model, layout: layout, view: this.isViewMode()});
         },
         renderNode: function(parentNodeId, node) {
             var nodeId = this.getNodeId(parentNodeId, node);
@@ -15826,7 +15827,7 @@
                 };
                 opIcon = (React.createElement("a", {href: "javascript:void(0);", 
                             onClick: this.onNodeClicked.bind(this, node, nodeId)}, 
-                    React.createElement(NIcon, React.__spread({},  expandableIconAttrs))
+                    React.createElement($pt.Components.NIcon, React.__spread({},  expandableIconAttrs))
                 ));
             }
             var folderIconAttrs = {
@@ -15836,7 +15837,7 @@
             };
             var folderIcon = (React.createElement("a", {href: "javascript:void(0);", 
                             onClick: this.onNodeClicked.bind(this, node, nodeId)}, 
-                React.createElement(NIcon, React.__spread({},  folderIconAttrs))
+                React.createElement($pt.Components.NIcon, React.__spread({},  folderIconAttrs))
             ));
 
             var active = this.isActive(nodeId) ? 'active' : null;
@@ -15877,8 +15878,8 @@
             return this.isRootPaint() ? this.renderRoot() : this.renderNodes(root, this.getNodeId(null, root));
         },
         renderButtons: function() {
-            var expand = this.state.expandButton ? React.createElement(NFormButton, {model: this.getModel(), layout: this.state.expandButton}) : null;
-            var collapse = this.state.collapseButton ? React.createElement(NFormButton, {model: this.getModel(), layout: this.state.collapseButton}) : null;
+            var expand = this.state.expandButton ? React.createElement($pt.Components.NFormButton, {model: this.getModel(), layout: this.state.expandButton}) : null;
+            var collapse = this.state.collapseButton ? React.createElement($pt.Components.NFormButton, {model: this.getModel(), layout: this.state.collapseButton}) : null;
             if (expand || collapse) {
                 return (React.createElement("span", {className: "buttons"}, 
                     expand, collapse
@@ -16357,8 +16358,17 @@
     }));
 
     // expose to global
-    window.NTree = NTree;
+    $pt.Components.NTree = NTree;
     $pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Tree, function (model, layout, direction, viewMode) {
-		return React.createElement(NTree, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NTree, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
+
+// only packaged in browser environment
+(function (window) {
+	var $pt = window.$pt;
+	// expose all components definition to window
+	Object.keys($pt.Components).forEach(function(component) {
+		window[component] = $pt.Components[component];
+	});
+}(window));

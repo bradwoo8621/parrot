@@ -115,7 +115,7 @@
 				show: index == activeIndex,
 				hide: index != activeIndex
 			};
-			return (<NForm model={this.getModel()}
+			return (<$pt.Components.NForm model={this.getModel()}
 			               layout={layout}
 			               direction={this.props.direction}
 						   view={this.isViewMode()}
@@ -129,7 +129,7 @@
 				canActive.bind(this);
 			}
 			return (<div className={this.getComponentCSS('n-form-tab')}>
-				<NTab type={this.getComponentOption('tabType')}
+				<$pt.Components.NTab type={this.getComponentOption('tabType')}
 				      justified={this.getComponentOption('justified')}
 				      direction={this.getComponentOption('titleDirection')}
 				      size={this.getComponentOption('titleIconSize')}
@@ -212,8 +212,8 @@
 			this.forceUpdate();
 		}
 	}));
-	window.NFormTab = NFormTab;
+	$pt.Components.NFormTab = NFormTab;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Tab, function (model, layout, direction, viewMode) {
-		return <NFormTab {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return <$pt.Components.NFormTab {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
 }(window, jQuery, React, $pt));

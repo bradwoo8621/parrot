@@ -386,8 +386,8 @@
 			return format ? format : NDateTime2.FORMAT;
 		}
 	}));
-	window.NDateTime2 = NDateTime2;
+	$pt.Components.NDateTime2 = NDateTime2;
 	$pt.LayoutHelper.registerComponentRenderer('date2', function (model, layout, direction, viewMode) {
-		return <NDateTime2 {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return <$pt.Components.NDateTime2 {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
 }(window, jQuery, moment, React, $pt));

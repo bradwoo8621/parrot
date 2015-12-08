@@ -236,8 +236,8 @@
 			// nothing
 		}
 	}));
-	window.NFormButton = NFormButton;
+	$pt.Components.NFormButton = NFormButton;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Button, function (model, layout, direction, viewMode) {
-		return <NFormButton {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return <$pt.Components.NFormButton {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
 }(window, jQuery, React, $pt));
