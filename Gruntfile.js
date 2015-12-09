@@ -120,6 +120,14 @@ module.exports = function(grunt) {
 					files: {
 						'<%= targetPath %>/parrot/js/<%= pkg.groupId %>.<%= pkg.artifactId %>.min.js': ['<%= concat.js.dest %>']
 					}
+				},
+				webpack: {
+					options: {
+						sourceMap: true
+					},
+					files: {
+						'<%= targetPath %>/parrot/webpack/<%= pkg.groupId %>.<%= pkg.artifactId %>.webpack.min.js': '<%= targetPath %>/parrot/webpack/<%= pkg.groupId %>.<%= pkg.artifactId %>.webpack.js'
+					}
 				}
 			},
 			jshint: {
@@ -139,7 +147,6 @@ module.exports = function(grunt) {
 					files: {
 						src: ['<%= middlePath %>/**/*.js']
 					}
-
 				}
 			},
 			// convert jsx to js
@@ -476,8 +483,9 @@ module.exports = function(grunt) {
 						jsface: 'jsface',
 						'jquery.browser': 'jQuery.browser',
 						'jquery-deparam': 'jQuery.deparam',
-						'jquery-mousewheel': 'jQuery',
-						'bootstrap-fileinput': 'jQuery.fn.fileInput'
+						'jquery-mousewheel': 'jQuery.fn.mousewheel',
+						'bootstrap-fileinput': 'jQuery.fn.fileInput',
+						'bootstrap': 'bootstrap'
 				    },
 					module: {
 					loaders: [
@@ -532,6 +540,6 @@ module.exports = function(grunt) {
 	grunt.registerTask('css-compile', ['bootswatch', 'css-parrot']);
 	grunt.registerTask('deploy', ['clean:all', 'bower-copy', 'js-compile', 'css-compile', 'copy:fonts', 'clean:mid']);
 	grunt.registerTask('default', ['clean:compile', 'js-compile', 'css-parrot', 'clean:mid']);
-	grunt.registerTask('modules', ['clean:webpack', 'concat:webpack', 'react:webpack', 'webpack:parrot']);
+	grunt.registerTask('modules', ['clean:webpack', 'concat:webpack', 'react:webpack', 'webpack:parrot', 'uglify:webpack']);
 	grunt.registerTask('test', ['nodeunit']);
 };

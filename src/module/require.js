@@ -6,6 +6,7 @@ var browser = require('jquery.browser');
 var deparam = require('jquery-deparam');
 var wheel = require('jquery-mousewheel');
 var fileInput = require('bootstrap-fileinput');
+var bootstrap = require('bootstrap');
 
 var oldPT = window.$pt;
 
