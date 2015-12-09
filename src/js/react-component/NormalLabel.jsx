@@ -30,8 +30,8 @@
 				css['n-label-' + this.props.size] = true;
 			}
 			return (<span className={$pt.LayoutHelper.classSet(css)}>
-            {texts.map(function (text) {
-	            return <span>{text}</span>;
+            {texts.map(function (text, textIndex) {
+	            return <span key={textIndex}>{text}</span>;
             })}
         </span>);
 		},

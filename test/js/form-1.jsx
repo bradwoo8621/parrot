@@ -19,6 +19,14 @@
                                 label: 'XYZ'
                             }
                         }
+                    },
+                    b: {
+                        label: 'Section B in Card A',
+                        layout: {
+                            xyz: {
+                                label: 'XYZ'
+                            }
+                        }
                     }
                 }
             },

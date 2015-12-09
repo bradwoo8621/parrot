@@ -56,25 +56,21 @@
 				// render dropdown menu
 				var _this = this;
 				var id = 'item_' + index;
-				return (
-					<li ref={id}>
-						<a href="javascript:void(0);"
-						   onClick={this.onParentMenuClicked.bind(this, id)} ref={id + '_link'}>
-							{item.text}
-							<span className='fa fa-fw fa-angle-double-down n-side-menu-ul' ref={id + '_icon'}/>
-						</a>
-						<ul ref={id + '_child'} style={{
-                    display: 'none'
-                }}>
-							{item.children.map(function (childItem, childIndex, dropdownItems) {
-								return _this.renderMenuItem(childItem, index + '_' + childIndex, dropdownItems, false);
-							})}
-						</ul>
-					</li>
-				);
+				return (<li ref={id} key={index}>
+					<a href="javascript:void(0);"
+					   onClick={this.onParentMenuClicked.bind(this, id)} ref={id + '_link'}>
+						{item.text}
+						<span className='fa fa-fw fa-angle-double-down n-side-menu-ul' ref={id + '_icon'}/>
+					</a>
+					<ul ref={id + '_child'} style={{display: 'none'}}>
+						{item.children.map(function (childItem, childIndex, dropdownItems) {
+							return _this.renderMenuItem(childItem, index + '_' + childIndex, dropdownItems, false);
+						})}
+					</ul>
+				</li>);
 			} else if (item.func !== undefined) {
 				// call javascript function
-				return (<li>
+				return (<li key={index}>
 					<a href="javascript:void(0);"
 					   onClick={this.onMenuClicked.bind(this, item.func, item.value)}>{item.text}</a>
 				</li>);
@@ -82,7 +78,7 @@
 				return null;
 			} else {
 				// jump to url
-				return (<li><a href={item.url}>{item.text}</a></li>);
+				return (<li key={index}><a href={item.url}>{item.text}</a></li>);
 			}
 		},
 		render: function () {
@@ -141,7 +137,7 @@
 			Object.keys(this.refs).forEach(function (key) {
 				if (key.endsWith('_link')) {
 					var linkId = key.substr(0, key.length - 5);
-					if (linkId != id) {
+					if (!id.startsWith(linkId)) {
 						var ul = $(React.findDOMNode(_this.refs[linkId + '_child']));
 						ul.hide('fade', function () {
 							ul.find('ul').hide();

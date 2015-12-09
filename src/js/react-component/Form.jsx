@@ -291,7 +291,7 @@
 				right = right.reverse();
 				footer = (<$pt.Components.NPanelFooter right={right} left={left} model={this.getModel()} view={this.isViewMode()}/>);
 			}
-			return (<div className={$pt.LayoutHelper.classSet(css)}>
+			return (<div className={$pt.LayoutHelper.classSet(css)} key={index}>
 				{this.renderSections(card.getSections())}
 				{footer}
 			</div>);
@@ -324,8 +324,8 @@
 				'n-cards-free': this.isFreeCard()
 			});
 			var _this = this;
-			return (<ul className={css}>
-				{this.getLayout().getCards().map(function (card) {
+			return (<ul className={css} key='wizards'>
+				{this.getLayout().getCards().map(function (card, cardIndex) {
 					var css = {
 						active: card.getId() == _this.state.activeCard,
 						before: _this.isBeforeActiveCard(card.getId()),
@@ -346,7 +346,7 @@
 						iconCSS['fa-' + card.getIcon()] = true;
 						icon = <span className={$pt.LayoutHelper.classSet(iconCSS)}/>;
 					}
-					return (<li className={$pt.LayoutHelper.classSet(css)}>
+					return (<li className={$pt.LayoutHelper.classSet(css)} key={cardIndex}>
 						<a href='javascript:void(0);' onClick={click}>
 							{icon} {card.getLabel()}
 							{_this.renderBadge(card)}

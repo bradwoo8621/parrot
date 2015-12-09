@@ -59,7 +59,7 @@
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
-		renderItem: function(enabled, item) {
+		renderItem: function(enabled, item, itemIndex) {
 			var model = $pt.createModel({
 				id: item.id,
 				checked: this.isCodeChecked(item)
@@ -72,7 +72,7 @@
 				}
 			});
 			model.addPostChangeListener('checked', this.onCodeItemCheckedChanged.bind(this, item));
-			return <$pt.Components.NCheck model={model} layout={layout} />;
+			return <$pt.Components.NCheck model={model} layout={layout} key={itemIndex}/>;
 		},
 		render: function() {
 			var enabled = this.isEnabled();

@@ -548,31 +548,31 @@
 			var columnIndex = 0;
 			var _this = this;
 			return (<thead>
-			<tr>
-				{this.state.columns.map(function (column) {
-					if (columnIndex >= indexToRender.min && columnIndex <= indexToRender.max) {
-						// column is fixed.
-						columnIndex++;
-						var style = {};
-						style.width = column.width;
-						if (!(column.visible === undefined || column.visible === true)) {
-							style.display = "none";
-						}
-						if (column.rowSelectable) {
-							return (<td style={style}>
-								{_this.renderTableHeaderCheckBox(column)}
-							</td>);
+				<tr>
+					{this.state.columns.map(function (column) {
+						if (columnIndex >= indexToRender.min && columnIndex <= indexToRender.max) {
+							// column is fixed.
+							columnIndex++;
+							var style = {};
+							style.width = column.width;
+							if (!(column.visible === undefined || column.visible === true)) {
+								style.display = "none";
+							}
+							if (column.rowSelectable) {
+								return (<td style={style} key={columnIndex}>
+									{_this.renderTableHeaderCheckBox(column)}
+								</td>);
+							} else {
+								return (<td style={style} key={columnIndex}>
+									{column.title}
+									{_this.renderTableHeaderSortButton(column)}
+								</td>);
+							}
 						} else {
-							return (<td style={style}>
-								{column.title}
-								{_this.renderTableHeaderSortButton(column)}
-							</td>);
+							columnIndex++;
 						}
-					} else {
-						columnIndex++;
-					}
-				})}
-			</tr>
+					})}
+				</tr>
 			</thead>);
 		},
 		renderRowEditButton: function(rowModel) {
@@ -605,7 +605,7 @@
 			});
 			return <$pt.Components.NFormButton model={rowModel} layout={layout} />;
 		},
-		renderRowOperationButton: function(operation, rowModel) {
+		renderRowOperationButton: function(operation, rowModel, operationIndex) {
 			var layout = $pt.createCellLayout('rowButton', {
 				comp: {
 					style: 'link',
@@ -618,7 +618,7 @@
 					comp: 'n-table-op-btn'
 				}
 			});
-			return <$pt.Components.NFormButton model={rowModel} layout={layout} />;
+			return <$pt.Components.NFormButton model={rowModel} layout={layout} key={operationIndex}/>;
 		},
 		getRowOperations: function(column) {
 			var rowOperations = column.rowOperations;
@@ -636,8 +636,8 @@
 			var rowOperations = this.getRowOperations(column);
 			var _this = this;
 			return (<div className="btn-group n-table-op-btn-group" role='group'>
-				{rowOperations.map(function (operation) {
-					return _this.renderRowOperationButton(operation, rowModel);
+				{rowOperations.map(function (operation, operationIndex) {
+					return _this.renderRowOperationButton(operation, rowModel, operationIndex);
 				})}
 				{editButton}
 				{removeButton}
@@ -669,7 +669,7 @@
 				return operation.icon != null;
 			});
 			var _this = this;
-			var renderOperation = function(operation) {
+			var renderOperation = function(operation, operationIndex) {
 				var layout = $pt.createCellLayout('rowButton', {
 					label: operation.tooltip,
 					comp: {
@@ -682,15 +682,15 @@
 						comp: 'n-table-op-btn'
 					}
 				});
-				return (<li>
+				return (<li key={operationIndex}>
 					<$pt.Components.NFormButton model={rowModel} layout={layout} />
 				</li>);
 			};
 			return (<ul className='nav'>{moreOperations.map(renderOperation)}</ul>);
 		},
 		renderPopoverAsIcon: function(moreOperations, rowModel) {
-			return moreOperations.map(function(operation) {
-				return _this.renderRowOperationButton(operation, rowModel);
+			return moreOperations.map(function(operation, operationIndex) {
+				return _this.renderRowOperationButton(operation, rowModel, operationIndex);
 			});
 		},
 		renderPopover: function(moreOperations, rowModel, eventTarget) {
@@ -766,7 +766,7 @@
 					comp: 'n-table-op-btn more'
 				}
 			});
-			return <$pt.Components.NFormButton model={rowModel} layout={layout} />;
+			return <$pt.Components.NFormButton model={rowModel} layout={layout} key='more-op'/>;
 		},
 		/**
 		 * render dropdown operation cell, only buttons which before maxButtonCount are renderred as a line,
@@ -784,13 +784,13 @@
 			var _this = this;
 			var used = -1;
 			var buttons = [];
-			rowOperations.some(function(operation) {
+			rowOperations.some(function(operation, operationIndex) {
 				if (operation.editButton) {
 					buttons.push(_this.renderRowEditButton(rowModel));
 				} else if (operation.removeButton) {
 					buttons.push(_this.renderRowRemoveButton(rowModel));
 				} else {
-					buttons.push(_this.renderRowOperationButton(operation, rowModel));
+					buttons.push(_this.renderRowOperationButton(operation, rowModel, operationIndex));
 				}
 				used++;
 				return maxButtonCount - used == 1;
@@ -874,7 +874,7 @@
 			}
 
 			var inlineModel = this.createInlineRowModel(row);
-			return (<tr className={className}>{
+			return (<tr className={className} key={rowIndex}>{
 				this.state.columns.map(function (column) {
 					if (columnIndex >= indexToRender.min && columnIndex <= indexToRender.max) {
 						// column is fixed.
@@ -889,7 +889,7 @@
 						if (column.editable || column.removable || column.rowOperations != null) {
 							// operation column
 							data = _this.renderOperationCell(column, inlineModel);
-							style['text-align'] = "center";
+							style.textAlign = "center";
 						} else if (column.indexable) {
 							// index column
 							data = rowIndex;
@@ -940,7 +940,7 @@
 							// data is property name
 							data = _this.getDisplayTextOfColumn(column, row);
 						}
-						return (<td style={style}>{data}</td>);
+						return (<td style={style} key={columnIndex}>{data}</td>);
 					} else {
 						columnIndex++;
 					}
@@ -997,7 +997,7 @@
 		renderTableScrollY: function () {
 			var style = this.computeTableStyle();
 			var scrolledHeaderDivStyle = {
-				"overflow-y": "scroll"
+				overflowY: "scroll"
 			};
 			var scrolledBodyDivStyle = {
 				maxHeight: this.getComponentOption("scrollY"),
@@ -1189,7 +1189,7 @@
 			if (this.isPageable() && this.hasDataToDisplay()) {
 				// only show when pageable and has data to display
 				return (<$pt.Components.NPagination className="n-table-pagination" pageCount={this.state.pageCount}
-				                     currentPageIndex={this.state.currentPageIndex} toPage={this.toPage.bind(this)}/>);
+				                     currentPageIndex={this.state.currentPageIndex} toPage={this.toPage}/>);
 			} else {
 				return null;
 			}
@@ -1649,7 +1649,7 @@
 							icon: NTable.EDIT_DIALOG_SAVE_BUTTON_ICON,
 							text: NTable.EDIT_DIALOG_SAVE_BUTTON_TEXT,
 							style: "primary",
-							click: this.onAddCompleted.bind(this)
+							click: this.onAddCompleted
 						}],
 						reset: this.getComponentOption('dialogResetVisible'),
 						validate: this.getComponentOption('dialogValidateVisible')
@@ -1693,7 +1693,7 @@
 							icon: NTable.EDIT_DIALOG_SAVE_BUTTON_ICON,
 							text: NTable.EDIT_DIALOG_SAVE_BUTTON_TEXT,
 							style: "primary",
-							click: this.onEditCompleted.bind(this),
+							click: this.onEditCompleted,
 							// show save when editing
 							view: 'edit'
 						}],
@@ -1754,7 +1754,7 @@
 		 */
 		onSearchBoxChanged: function () {
 			var value = this.state.searchModel.get('text');
-			window.console.debug('Searching [text=' + value + '].');
+			// window.console.debug('Searching [text=' + value + '].');
 			if (value == null || value == "") {
 				this.setState({
 					searchText: null
@@ -1896,7 +1896,7 @@
 				// do nothing
 			} else if (evt.type == "change") {
 				// do nothing
-				window.console.log('Table[' + this.getDataId() + '] data changed.');
+				// window.console.log('Table[' + this.getDataId() + '] data changed.');
 			}
 
 			if (this.getModel().getValidator() != null) {

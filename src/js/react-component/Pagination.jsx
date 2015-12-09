@@ -141,7 +141,7 @@
 				if (index == _this.getCurrentPageIndex()) {
 					css.active = true;
 				}
-				return (<li>
+				return (<li key={index}>
 					<a href="javascript:void(0);"
 					   onClick={_this.toPage}
 					   data-index={index}

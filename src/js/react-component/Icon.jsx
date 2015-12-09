@@ -5,7 +5,7 @@
 	var NIcon = React.createClass({
 		displayName: 'NIcon',
 		propTypes: {
-			size: React.PropTypes.oneOf(["lg", "2x", "3x", "4x", "5x"]),
+			size: React.PropTypes.string, //React.PropTypes.oneOf(["lg", "2x", "3x", "4x", "5x"]),
 			fixWidth: React.PropTypes.bool,
 
 			icon: React.PropTypes.string.isRequired,

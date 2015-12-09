@@ -45,6 +45,11 @@
 	};
 	// components
 	$pt.Components = {};
+	$pt.exposeComponents = function(context) {
+		Object.keys($pt.Components).forEach(function(component) {
+			window[component] = $pt.Components[component];
+		});
+	};
 	// component constants
 	$pt.ComponentConstants = {
 		// component types

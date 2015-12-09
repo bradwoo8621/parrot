@@ -96,7 +96,7 @@
 			return (<div>
 				<div className="modal-backdrop fade in" style={{zIndex: NExceptionModal.Z_INDEX}}></div>
 				<div className={$pt.LayoutHelper.classSet(css)}
-					 tabindex="-1"
+					 tabIndex="-1"
 					 role="dialog"
 					 style={{display: 'block', zIndex: NExceptionModal.Z_INDEX + 1}}>
 					<div className="modal-danger modal-dialog">

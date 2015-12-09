@@ -280,7 +280,7 @@
 			} else {
 				$pt.Components.NConfirm.getConfirmModal().show(NModalForm.CANCEL_CONFIRM_TITLE,
 					NModalForm.CANCEL_CONFIRM_MESSAGE,
-					this.hide.bind(this));
+					this.hide);
 			}
 		},
 		/**
@@ -328,7 +328,7 @@
 			} else if (this.isViewMode()) {
 				return null;
 			} else {
-				return this.onValidateClicked.bind(this);
+				return this.onValidateClicked;
 			}
 		},
 		/**
@@ -339,7 +339,7 @@
 			if (this.state.buttons && this.state.buttons.cancel === false) {
 				return null;
 			} else {
-				return this.onCancelClicked.bind(this);
+				return this.onCancelClicked;
 			}
 		},
 		/**
@@ -352,7 +352,7 @@
 			} else if (this.isViewMode()) {
 				return null;
 			} else {
-				return this.onResetClicked.bind(this);
+				return this.onResetClicked;
 			}
 		},
 		/**

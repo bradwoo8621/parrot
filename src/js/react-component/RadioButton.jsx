@@ -107,7 +107,7 @@
 		 * @params option radio option
 		 * @returns {XML}
 		 */
-		renderRadio: function (option) {
+		renderRadio: function (option, optionIndex) {
 			var checked = this.getValueFromModel() == option.id;
 			var enabled = this.isEnabled();
 			var css = {
@@ -116,7 +116,7 @@
 				'radio-container': true
 			};
 			var labelAtLeft = this.isLabelAtLeft();
-			return (<div className='n-radio-option'>
+			return (<div className='n-radio-option' key={optionIndex}>
 				{labelAtLeft ? this.renderLabel(option, true) : null}
 				<div className='radio-container'>
                 <span className={$pt.LayoutHelper.classSet(css)}
@@ -137,11 +137,11 @@
 				'n-disabled': !this.isEnabled(),
 				'n-view-mode': this.isViewMode()
 			};
+			// <input type="hidden" style={{display: "none"}}
+			// 	   onChange={this.onComponentChanged} value={this.getValueFromModel()}
+			// 	   ref='txt'/>
 			return (<div className={this.getComponentCSS($pt.LayoutHelper.classSet(css))}>
 				{this.getComponentOption("data").map(this.renderRadio)}
-				<input type="hidden" style={{display: "none"}}
-				       onChange={this.onComponentChanged} value={this.getValueFromModel()}
-				       ref='txt'/>
 			</div>);
 		},
 		/**
@@ -168,25 +168,25 @@
 		 * on component change
 		 * @param evt
 		 */
-		onComponentChanged: function (evt) {
-			// synchronize value to model
-			this.setValueToModel(evt.target.checked);
-		},
+		// onComponentChanged: function (evt) {
+		// 	// synchronize value to model
+		// 	this.setValueToModel(evt.target.checked);
+		// },
 		/**
 		 * on model changed
 		 * @param evt
 		 */
 		onModelChanged: function (evt) {
-			this.getComponent().val(evt.new);
+			// this.getComponent().val(evt.new);
 			this.forceUpdate();
 		},
 		/**
 		 * get component
 		 * @returns {jQuery}
 		 */
-		getComponent: function () {
-			return $(React.findDOMNode(this.refs.txt));
-		},
+		// getComponent: function () {
+		// 	return $(React.findDOMNode(this.refs.txt));
+		// },
 		isLabelAtLeft: function () {
 			return this.getComponentOption('labelAtLeft');
 		}

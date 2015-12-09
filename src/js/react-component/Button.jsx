@@ -109,15 +109,16 @@
 					disabled={!this.isEnabled()}
 					data-toggle="dropdown"
 					aria-haspopup="true"
-					aria-expanded="false">
+					aria-expanded="false"
+					key='a'>
 				   	<span className="caret"></span>
 				</a>);
 				var emptyFunction = function(){};
 				var _this = this;
-				var menus = (<ul className="dropdown-menu">
-					{more.map(function(menu) {
+				var menus = (<ul className="dropdown-menu" key='ul'>
+					{more.map(function(menu, menuIndex) {
 						if (menu.divider) {
-							return (<li role='separator' className='divider'></li>);
+							return (<li role='separator' className='divider' key={menuIndex}></li>);
 						} else {
 							var click = menu.click ? menu.click : emptyFunction;
 							var label = menu.text;
@@ -125,7 +126,7 @@
 							if (label && icon) {
 								label = ' ' + label;
 							}
-							return (<li>
+							return (<li key={menuIndex}>
 								<a href='javascript:void(0);' onClick={click.bind(_this, _this.getModel())}>
 									{icon}{label}
 								</a>

@@ -58,7 +58,7 @@
 				// render dropdown menu
 				var _this = this;
 				return (
-					<li className={onTopLevel ? "dropdown" : "dropdown-submenu"}>
+					<li className={onTopLevel ? "dropdown" : "dropdown-submenu"} key={index}>
 						<a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button"
 						   aria-expanded="false">
 							{item.text} {onTopLevel ? <span className="caret"></span> : null}
@@ -72,15 +72,15 @@
 				);
 			} else if (item.divider === true) {
 				// render divider
-				return (<li className="divider"></li>);
+				return (<li className="divider" key={index}></li>);
 			} else if (item.func !== undefined) {
 				// call javascript function
 				return (<li>
-					<a href="javascript:void(0);" onClick={this.onMenuClicked.bind(this, item.func)}>{item.text}</a>
+					<a href="javascript:void(0);" onClick={this.onMenuClicked.bind(this, item.func)} key={index}>{item.text}</a>
 				</li>);
 			} else {
 				// jump to url
-				return (<li><a href={item.url}>{item.text}</a></li>);
+				return (<li key={index}><a href={item.url}>{item.text}</a></li>);
 			}
 		},
 		/**

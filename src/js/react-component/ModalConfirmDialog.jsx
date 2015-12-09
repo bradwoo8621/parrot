@@ -83,7 +83,7 @@
 					type: $pt.ComponentConstants.Button,
 					icon: NConfirm.OK_ICON,
 					style: 'primary',
-					click: this.onConfirmClicked.bind(this)
+					click: this.onConfirmClicked
 				}
 			});
 			return <$pt.Components.NFormButton layout={layout}/>;
@@ -102,7 +102,7 @@
 					type: $pt.ComponentConstants.Button,
 					icon: (this.state.options && this.state.options.close) ? NConfirm.CLOSE_ICON : NConfirm.CANCEL_ICON,
 					style: 'danger',
-					click: this.onCancelClicked.bind(this)
+					click: this.onCancelClicked
 				}
 			});
 			return <$pt.Components.NFormButton layout={layout}/>;
@@ -135,8 +135,8 @@
 				}
 			}
 			// string array
-			return messages.map(function (element) {
-				return <h6>{element}</h6>;
+			return messages.map(function (element, index) {
+				return <h6 key={index}>{element}</h6>;
 			});
 		},
 		/**
@@ -159,7 +159,7 @@
 			return (<div>
 				<div className="modal-backdrop fade in" style={{zIndex: NConfirm.Z_INDEX}}></div>
 				<div className={$pt.LayoutHelper.classSet(css)}
-					 tabindex="-1"
+					 tabIndex="-1"
 					 role="dialog"
 					 style={{display: 'block', zIndex: NConfirm.Z_INDEX + 1}}>
 					<div className="modal-dialog">

@@ -155,7 +155,8 @@
 			               layout={$pt.createFormLayout(tab.layout)}
 			               direction={this.props.direction}
 						   view={this.isViewMode()}
-			               className={$pt.LayoutHelper.classSet(css)}/>
+			               className={$pt.LayoutHelper.classSet(css)}
+						   key={tabIndex}/>
 			);
 		},
 		/**

@@ -162,16 +162,17 @@
 		 * render row
 		 * @param row {RowLayout}
 		 */
-		renderRow: function (row) {
+		renderRow: function (row, rowIndex) {
 			var _this = this;
-			var cells = row.getCells().map(function (cell) {
+			var cells = row.getCells().map(function (cell, cellIndex) {
 				return <$pt.Components.NFormCell layout={cell}
 				                  model={_this.getModel()}
 				                  ref={cell.getId()}
 				                  direction={_this.props.direction}
-								  view={_this.isViewMode()}/>;
+								  view={_this.isViewMode()}
+								  key={'' + rowIndex + '-' + cellIndex}/>;
 			});
-			return (<div className="row">{cells}</div>);
+			return (<div className="row" key={rowIndex}>{cells}</div>);
 		},
 		/**
 		 * render

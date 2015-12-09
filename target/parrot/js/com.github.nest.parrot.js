@@ -278,6 +278,11 @@
 	};
 	// components
 	$pt.Components = {};
+	$pt.exposeComponents = function(context) {
+		Object.keys($pt.Components).forEach(function(component) {
+			window[component] = $pt.Components[component];
+		});
+	};
 	// component constants
 	$pt.ComponentConstants = {
 		// component types
@@ -3769,7 +3774,7 @@
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
-		renderItem: function(enabled, item) {
+		renderItem: function(enabled, item, itemIndex) {
 			var model = $pt.createModel({
 				id: item.id,
 				checked: this.isCodeChecked(item)
@@ -3782,7 +3787,7 @@
 				}
 			});
 			model.addPostChangeListener('checked', this.onCodeItemCheckedChanged.bind(this, item));
-			return React.createElement($pt.Components.NCheck, {model: model, layout: layout});
+			return React.createElement($pt.Components.NCheck, {model: model, layout: layout, key: itemIndex});
 		},
 		render: function() {
 			var enabled = this.isEnabled();
@@ -3959,7 +3964,7 @@
 		 * @param item {{}}
 		 * @returns {XML}
 		 */
-		renderItem: function (item) {
+		renderItem: function (item, itemIndex) {
 			var parentModel = this.getModel();
 			var parentValidator = parentModel.getValidator();
 			var validator = null;
@@ -4004,7 +4009,7 @@
 					collapsedLabel: this.getComponentOption('collapsedLabel')
 				}
 			};
-			return (React.createElement("div", {className: "row"}, 
+			return (React.createElement("div", {className: "row", key: itemIndex}, 
 				React.createElement("div", {className: "col-sm-12 col-md-12 col-lg-12"}, 
 					React.createElement($pt.Components.NPanel, {model: model, 
 					        layout: $pt.createCellLayout('pseudo-panel', cellLayout), 
@@ -4251,7 +4256,8 @@
 			               layout: $pt.createFormLayout(tab.layout), 
 			               direction: this.props.direction, 
 						   view: this.isViewMode(), 
-			               className: $pt.LayoutHelper.classSet(css)})
+			               className: $pt.LayoutHelper.classSet(css), 
+						   key: tabIndex})
 			);
 		},
 		/**
@@ -4620,15 +4626,16 @@
 					disabled: !this.isEnabled(), 
 					"data-toggle": "dropdown", 
 					"aria-haspopup": "true", 
-					"aria-expanded": "false"}, 
+					"aria-expanded": "false", 
+					key: "a"}, 
 				   	React.createElement("span", {className: "caret"})
 				));
 				var emptyFunction = function(){};
 				var _this = this;
-				var menus = (React.createElement("ul", {className: "dropdown-menu"}, 
-					more.map(function(menu) {
+				var menus = (React.createElement("ul", {className: "dropdown-menu", key: "ul"}, 
+					more.map(function(menu, menuIndex) {
 						if (menu.divider) {
-							return (React.createElement("li", {role: "separator", className: "divider"}));
+							return (React.createElement("li", {role: "separator", className: "divider", key: menuIndex}));
 						} else {
 							var click = menu.click ? menu.click : emptyFunction;
 							var label = menu.text;
@@ -4636,7 +4643,7 @@
 							if (label && icon) {
 								label = ' ' + label;
 							}
-							return (React.createElement("li", null, 
+							return (React.createElement("li", {key: menuIndex}, 
 								React.createElement("a", {href: "javascript:void(0);", onClick: click.bind(_this, _this.getModel())}, 
 									icon, label
 								)
@@ -4810,7 +4817,7 @@
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
 			// set model value to component
-			this.getComponent().prop("checked", this.getValueFromModel());
+			// this.getComponent().prop("checked", this.getValueFromModel());
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
@@ -4821,7 +4828,7 @@
 		 */
 		componentDidMount: function () {
 			// set model value to component
-			this.getComponent().prop("checked", this.getValueFromModel());
+			// this.getComponent().prop("checked", this.getValueFromModel());
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
@@ -4893,9 +4900,9 @@
 			};
 			css[this.getComponentCSS('n-checkbox')] = true;
 			var isLabelAtLeft = this.isLabelAtLeft();
+			// <input type="checkbox" style={{display: "none"}}
+			// 	   onChange={this.onComponentChanged} ref='txt'/>
 			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
-				React.createElement("input", {type: "checkbox", style: {display: "none"}, 
-				       onChange: this.onComponentChanged, ref: "txt"}), 
 				isLabelAtLeft ? this.renderLabel(true) : null, 
 				this.renderCheckbox(), 
 				!isLabelAtLeft ? this.renderLabel(false) : null
@@ -4923,16 +4930,16 @@
 		 * on component change
 		 * @param evt
 		 */
-		onComponentChanged: function (evt) {
-			// synchronize value to model
-			this.setValueToModel(evt.target.checked);
-		},
+		// onComponentChanged: function (evt) {
+		// 	// synchronize value to model
+		// 	this.setValueToModel(evt.target.checked);
+		// },
 		/**
 		 * on model change
 		 * @param evt
 		 */
 		onModelChanged: function (evt) {
-			this.getComponent().prop("checked", evt.new === true);
+			// this.getComponent().prop("checked", evt.new === true);
 			this.forceUpdate();
 		},
 		/**
@@ -4949,15 +4956,15 @@
 		isLabelAttached: function () {
 			return this.getComponentOption('labelAttached') !== null;
 		},
-		isLabelAtLeft: function () {
-			return this.getComponentOption('labelAttached') === 'left';
-		},
 		/**
 		 * get component
 		 * @returns {jQuery}
 		 */
-		getComponent: function () {
-			return $(React.findDOMNode(this.refs.txt));
+		// getComponent: function () {
+		// 	return $(React.findDOMNode(this.refs.txt));
+		// },
+		isLabelAtLeft: function () {
+			return this.getComponentOption('labelAttached') === 'left';
 		}
 	}));
 	$pt.Components.NCheck = NCheck;
@@ -5102,12 +5109,16 @@
 			));
 		},
 		renderHeaderMonth: function(date) {
-			return (React.createElement("span", {onClick: this.renderPopover.bind(this, {date: date, type: NDateTime.FORMAT_TYPES.MONTH}), className: "header-date-btn"}, 
+			return (React.createElement("span", {onClick: this.renderPopover.bind(this, {date: date, type: NDateTime.FORMAT_TYPES.MONTH}), 
+						  className: "header-date-btn", 
+						  key: "header-month"}, 
 				this.convertValueToString(date, this.getHeaderMonthFormat())
 			));
 		},
 		renderHeaderYear: function(date) {
-			return (React.createElement("span", {onClick: this.renderPopover.bind(this, {date: date, type: NDateTime.FORMAT_TYPES.YEAR}), className: "header-date-btn"}, 
+			return (React.createElement("span", {onClick: this.renderPopover.bind(this, {date: date, type: NDateTime.FORMAT_TYPES.YEAR}), 
+						  className: "header-date-btn", 
+						  key: "header-year"}, 
 				this.convertValueToString(date, this.getHeaderYearFormat())
 			));
 		},
@@ -5197,12 +5208,12 @@
 			var today = this.getToday();
 			return (React.createElement("div", {className: "calendar-body day-view"}, 
 				React.createElement("div", {className: "day-view-body-header row"}, 
-					header.map(function(day) {
-						return React.createElement("div", {className: "cell-7-1"}, day);
+					header.map(function(weekday, weekdayIndex) {
+						return React.createElement("div", {className: "cell-7-1", key: 'weekday-' + weekdayIndex}, weekday);
 					})
 				), 
 				React.createElement("div", {className: "day-view-body-body row"}, 
-					days.map(function(day) {
+					days.map(function(day, dayIndex) {
 						var css = {
 							'cell-7-1': true,
 							'gap-day': (day.month() != currentMonth),
@@ -5210,7 +5221,8 @@
 							'current-value': value != null && day.isSame(value, 'day')
 						};
 						return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
-									 onClick: _this.onDaySelected.bind(_this, day)}, 
+									 onClick: _this.onDaySelected.bind(_this, day), 
+									 key: 'day-' + dayIndex}, 
 							React.createElement("span", null, day.date())
 						));
 					})
@@ -5266,7 +5278,8 @@
 							'current-value': value != null && index == value.month()
 						};
 						return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
-									 onClick: _this.onMonthSelected.bind(_this, selectedDay)}, 
+									 onClick: _this.onMonthSelected.bind(_this, selectedDay), 
+									 key: index}, 
 							month
 						));
 					})
@@ -5319,14 +5332,15 @@
 			}
 			return (React.createElement("div", {className: "calendar-body month-view"}, 
 				React.createElement("div", {className: "year-view-body-body row"}, 
-					years.map(function(year) {
+					years.map(function(year, yearIndex) {
 						var css = {
 							'cell-4-1': true,
 							today: year.year() == today.year(),
 							'current-value': value != null && year.year() == value.year()
 						};
 						return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
-									 onClick: _this.onYearSelected.bind(_this, year)}, 
+									 onClick: _this.onYearSelected.bind(_this, year), 
+									 key: yearIndex}, 
 							year.format(_this.getBodyYearFormat())
 						));
 					})
@@ -5368,13 +5382,14 @@
 						  x1: startLength * Math.cos(Math.PI * 2 * degree / 360) + offset, 
 						  y1: offset - startLength * Math.sin(Math.PI * 2 * degree / 360), 
 						  x2: radius * Math.cos(Math.PI * 2 * degree / 360) + offset, 
-						  y2: offset - radius * Math.sin(Math.PI * 2 * degree / 360)}));
+						  y2: offset - radius * Math.sin(Math.PI * 2 * degree / 360), 
+						  key: degree}));
 		},
 		render12HourDial: function(date, popoverType) {
 			var _this = this;
 			var am = date.hour() <= 11; // 0-23
 			var hourRadius = this.getHourRadius();
-			return (React.createElement("g", null, 
+			return (React.createElement("g", {key: "hour-12-dial"}, 
 				React.createElement("text", {className: 'text hour-12 am' + (am ? ' yes' : ''), 
 					  onClick: this.onAMPMSelected.bind(this, true, popoverType), 
 					  x: 0, 
@@ -5407,7 +5422,7 @@
 		render24HourDial: function() {
 			var _this = this;
 			var hourRadius = this.getHourRadius();
-			return (React.createElement("g", null, 
+			return (React.createElement("g", {key: "hour-24-dial"}, 
 				React.createElement("text", {className: "text hour-24 top-num", 
 					  x: NDateTime.CLOCK_CHAR_POS.TOP.X, 
 					  y: NDateTime.CLOCK_CHAR_POS.TOP.Y + NDateTime.CLOCK_RADIUS - hourRadius}, "0"), 
@@ -5442,7 +5457,7 @@
 				return null;
 			}
 			var _this = this;
-			return (React.createElement("g", null, 
+			return (React.createElement("g", {key: "minute-dial"}, 
 				React.createElement("text", {className: "text minute top-num", 
 					  x: NDateTime.CLOCK_CHAR_POS.TOP.X, 
 					  y: NDateTime.CLOCK_CHAR_POS.TOP.Y}, "0"), 
@@ -6609,7 +6624,7 @@
 			return (React.createElement("div", null, 
 				React.createElement("div", {className: "modal-backdrop fade in", style: {zIndex: NExceptionModal.Z_INDEX}}), 
 				React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
-					 tabindex: "-1", 
+					 tabIndex: "-1", 
 					 role: "dialog", 
 					 style: {display: 'block', zIndex: NExceptionModal.Z_INDEX + 1}}, 
 					React.createElement("div", {className: "modal-danger modal-dialog"}, 
@@ -7151,7 +7166,7 @@
 				right = right.reverse();
 				footer = (React.createElement($pt.Components.NPanelFooter, {right: right, left: left, model: this.getModel(), view: this.isViewMode()}));
 			}
-			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), key: index}, 
 				this.renderSections(card.getSections()), 
 				footer
 			));
@@ -7184,8 +7199,8 @@
 				'n-cards-free': this.isFreeCard()
 			});
 			var _this = this;
-			return (React.createElement("ul", {className: css}, 
-				this.getLayout().getCards().map(function (card) {
+			return (React.createElement("ul", {className: css, key: "wizards"}, 
+				this.getLayout().getCards().map(function (card, cardIndex) {
 					var css = {
 						active: card.getId() == _this.state.activeCard,
 						before: _this.isBeforeActiveCard(card.getId()),
@@ -7206,7 +7221,7 @@
 						iconCSS['fa-' + card.getIcon()] = true;
 						icon = React.createElement("span", {className: $pt.LayoutHelper.classSet(iconCSS)});
 					}
-					return (React.createElement("li", {className: $pt.LayoutHelper.classSet(css)}, 
+					return (React.createElement("li", {className: $pt.LayoutHelper.classSet(css), key: cardIndex}, 
 						React.createElement("a", {href: "javascript:void(0);", onClick: click}, 
 							icon, " ", card.getLabel(), 
 							_this.renderBadge(card)
@@ -8022,7 +8037,7 @@
 	var NIcon = React.createClass({
 		displayName: 'NIcon',
 		propTypes: {
-			size: React.PropTypes.oneOf(["lg", "2x", "3x", "4x", "5x"]),
+			size: React.PropTypes.string, //React.PropTypes.oneOf(["lg", "2x", "3x", "4x", "5x"]),
 			fixWidth: React.PropTypes.bool,
 
 			icon: React.PropTypes.string.isRequired,
@@ -8138,14 +8153,14 @@
 	var NJumbortron = React.createClass({
 		displayName: 'NJumbortron',
 		propTypes: {
-			highlightText: React.PropTypes.oneOfType(
+			highlightText: React.PropTypes.oneOfType([
 				React.PropTypes.string,
-				React.PropTypes.arrayOf(React.PropTypes.string)).isRequired
+				React.PropTypes.arrayOf(React.PropTypes.string)]).isRequired
 		},
 		renderText: function () {
 			if (Array.isArray(this.props.highlightText)) {
-				return this.props.highlightText.map(function (text) {
-					return React.createElement("h4", null, text);
+				return this.props.highlightText.map(function (text, textIndex) {
+					return React.createElement("h4", {key: textIndex}, text);
 				});
 			} else {
 				return React.createElement("h4", null, this.props.highlightText);
@@ -8248,8 +8263,8 @@
 				css['n-label-' + style] = true;
 			}
 			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
-				texts.map(function (text) {
-					return React.createElement("span", null, text);
+				texts.map(function (text, textIndex) {
+					return React.createElement("span", {key: textIndex}, text);
 				})
 			));
 		},
@@ -8355,7 +8370,7 @@
 					type: $pt.ComponentConstants.Button,
 					icon: NConfirm.OK_ICON,
 					style: 'primary',
-					click: this.onConfirmClicked.bind(this)
+					click: this.onConfirmClicked
 				}
 			});
 			return React.createElement($pt.Components.NFormButton, {layout: layout});
@@ -8374,7 +8389,7 @@
 					type: $pt.ComponentConstants.Button,
 					icon: (this.state.options && this.state.options.close) ? NConfirm.CLOSE_ICON : NConfirm.CANCEL_ICON,
 					style: 'danger',
-					click: this.onCancelClicked.bind(this)
+					click: this.onCancelClicked
 				}
 			});
 			return React.createElement($pt.Components.NFormButton, {layout: layout});
@@ -8407,8 +8422,8 @@
 				}
 			}
 			// string array
-			return messages.map(function (element) {
-				return React.createElement("h6", null, element);
+			return messages.map(function (element, index) {
+				return React.createElement("h6", {key: index}, element);
 			});
 		},
 		/**
@@ -8431,7 +8446,7 @@
 			return (React.createElement("div", null, 
 				React.createElement("div", {className: "modal-backdrop fade in", style: {zIndex: NConfirm.Z_INDEX}}), 
 				React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
-					 tabindex: "-1", 
+					 tabIndex: "-1", 
 					 role: "dialog", 
 					 style: {display: 'block', zIndex: NConfirm.Z_INDEX + 1}}, 
 					React.createElement("div", {className: "modal-dialog"}, 
@@ -8835,7 +8850,7 @@
 			} else {
 				$pt.Components.NConfirm.getConfirmModal().show(NModalForm.CANCEL_CONFIRM_TITLE,
 					NModalForm.CANCEL_CONFIRM_MESSAGE,
-					this.hide.bind(this));
+					this.hide);
 			}
 		},
 		/**
@@ -8883,7 +8898,7 @@
 			} else if (this.isViewMode()) {
 				return null;
 			} else {
-				return this.onValidateClicked.bind(this);
+				return this.onValidateClicked;
 			}
 		},
 		/**
@@ -8894,7 +8909,7 @@
 			if (this.state.buttons && this.state.buttons.cancel === false) {
 				return null;
 			} else {
-				return this.onCancelClicked.bind(this);
+				return this.onCancelClicked;
 			}
 		},
 		/**
@@ -8907,7 +8922,7 @@
 			} else if (this.isViewMode()) {
 				return null;
 			} else {
-				return this.onResetClicked.bind(this);
+				return this.onResetClicked;
 			}
 		},
 		/**
@@ -9129,8 +9144,8 @@
 				css['n-label-' + this.props.size] = true;
 			}
 			return (React.createElement("span", {className: $pt.LayoutHelper.classSet(css)}, 
-            texts.map(function (text) {
-	            return React.createElement("span", null, text);
+            texts.map(function (text, textIndex) {
+	            return React.createElement("span", {key: textIndex}, text);
             })
         ));
 		},
@@ -9207,7 +9222,7 @@
 			return (React.createElement("div", null, 
 				React.createElement("div", {className: "modal-backdrop fade in", style: {zIndex: NOnRequestModal.Z_INDEX}}), 
 				React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
-					 tabindex: "-1", 
+					 tabIndex: "-1", 
 					 role: "dialog", 
 					 style: {display: 'block', zIndex: NOnRequestModal.Z_INDEX + 1}}, 
 					React.createElement("div", {className: "modal-danger modal-dialog"}, 
@@ -9349,7 +9364,7 @@
 				// render dropdown menu
 				var _this = this;
 				return (
-					React.createElement("li", {className: onTopLevel ? "dropdown" : "dropdown-submenu"}, 
+					React.createElement("li", {className: onTopLevel ? "dropdown" : "dropdown-submenu", key: index}, 
 						React.createElement("a", {href: "#", className: "dropdown-toggle", "data-toggle": "dropdown", role: "button", 
 						   "aria-expanded": "false"}, 
 							item.text, " ", onTopLevel ? React.createElement("span", {className: "caret"}) : null
@@ -9363,15 +9378,15 @@
 				);
 			} else if (item.divider === true) {
 				// render divider
-				return (React.createElement("li", {className: "divider"}));
+				return (React.createElement("li", {className: "divider", key: index}));
 			} else if (item.func !== undefined) {
 				// call javascript function
 				return (React.createElement("li", null, 
-					React.createElement("a", {href: "javascript:void(0);", onClick: this.onMenuClicked.bind(this, item.func)}, item.text)
+					React.createElement("a", {href: "javascript:void(0);", onClick: this.onMenuClicked.bind(this, item.func), key: index}, item.text)
 				));
 			} else {
 				// jump to url
-				return (React.createElement("li", null, React.createElement("a", {href: item.url}, item.text)));
+				return (React.createElement("li", {key: index}, React.createElement("a", {href: item.url}, item.text)));
 			}
 		},
 		/**
@@ -9619,7 +9634,7 @@
 				if (index == _this.getCurrentPageIndex()) {
 					css.active = true;
 				}
-				return (React.createElement("li", null, 
+				return (React.createElement("li", {key: index}, 
 					React.createElement("a", {href: "javascript:void(0);", 
 					   onClick: _this.toPage, 
 					   "data-index": index, 
@@ -9960,16 +9975,17 @@
 		 * render row
 		 * @param row {RowLayout}
 		 */
-		renderRow: function (row) {
+		renderRow: function (row, rowIndex) {
 			var _this = this;
-			var cells = row.getCells().map(function (cell) {
+			var cells = row.getCells().map(function (cell, cellIndex) {
 				return React.createElement($pt.Components.NFormCell, {layout: cell, 
 				                  model: _this.getModel(), 
 				                  ref: cell.getId(), 
 				                  direction: _this.props.direction, 
-								  view: _this.isViewMode()});
+								  view: _this.isViewMode(), 
+								  key: '' + rowIndex + '-' + cellIndex});
 			});
-			return (React.createElement("div", {className: "row"}, cells));
+			return (React.createElement("div", {className: "row", key: rowIndex}, cells));
 		},
 		/**
 		 * render
@@ -10222,26 +10238,26 @@
 			cancel: React.PropTypes.func,
 			reset: React.PropTypes.func,
 
-			left: React.PropTypes.arrayOf(React.PropTypes.shape({
-				icon: React.PropTypes.string,
-				text: React.PropTypes.string,
-				style: React.PropTypes.string,
-				click: React.PropTypes.func.isRequired,
-				enabled: React.PropTypes.shape({
-					when: React.PropTypes.func,
-					depends: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.arrayOf(React.PropTypes.string)])
-				})
-			})),
-			right: React.PropTypes.arrayOf(React.PropTypes.shape({
-				icon: React.PropTypes.string,
-				text: React.PropTypes.string,
-				style: React.PropTypes.string, // references to bootstrap styles
-				click: React.PropTypes.func.isRequired,
-				enabled: React.PropTypes.shape({
-					when: React.PropTypes.func,
-					depends: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.arrayOf(React.PropTypes.string)])
-				})
-			})),
+			// left: React.PropTypes.arrayOf(React.PropTypes.shape({
+			// 	icon: React.PropTypes.string,
+			// 	text: React.PropTypes.string,
+			// 	style: React.PropTypes.string,
+			// 	click: React.PropTypes.func.isRequired,
+			// 	enabled: React.PropTypes.oneOfType([React.PropTypes.bool, React.PropTypes.shape({
+			// 		when: React.PropTypes.func,
+			// 		depends: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.arrayOf(React.PropTypes.string)])
+			// 	})])
+			// })),
+			// right: React.PropTypes.arrayOf(React.PropTypes.shape({
+			// 	icon: React.PropTypes.string,
+			// 	text: React.PropTypes.string,
+			// 	style: React.PropTypes.string, // references to bootstrap styles
+			// 	click: React.PropTypes.func.isRequired,
+			// 	enabled: React.PropTypes.oneOfType([React.PropTypes.bool, React.PropTypes.shape({
+			// 		when: React.PropTypes.func,
+			// 		depends: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.arrayOf(React.PropTypes.string)])
+			// 	})])
+			// })),
 
 			// model, pass to click
 			model: React.PropTypes.object,
@@ -10301,7 +10317,7 @@
 		/**
 		 * render button
 		 */
-		renderButton: function (option) {
+		renderButton: function (option, buttonIndex) {
 			if (this.isViewMode() && option.view == 'edit') {
 				return null;
 			} else if (!this.isViewMode() && option.view == 'view') {
@@ -10318,7 +10334,9 @@
 					visible: option.visible
 				}
 			};
-			return React.createElement($pt.Components.NFormButton, {model: this.getModel(), layout: $pt.createCellLayout('pseudo-button', layout)});
+			return React.createElement($pt.Components.NFormButton, {model: this.getModel(), 
+											   layout: $pt.createCellLayout('pseudo-button', layout), 
+											   key: buttonIndex});
 		},
 		/**
 		 * render
@@ -10491,7 +10509,7 @@
 		 * @params option radio option
 		 * @returns {XML}
 		 */
-		renderRadio: function (option) {
+		renderRadio: function (option, optionIndex) {
 			var checked = this.getValueFromModel() == option.id;
 			var enabled = this.isEnabled();
 			var css = {
@@ -10500,7 +10518,7 @@
 				'radio-container': true
 			};
 			var labelAtLeft = this.isLabelAtLeft();
-			return (React.createElement("div", {className: "n-radio-option"}, 
+			return (React.createElement("div", {className: "n-radio-option", key: optionIndex}, 
 				labelAtLeft ? this.renderLabel(option, true) : null, 
 				React.createElement("div", {className: "radio-container"}, 
                 React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
@@ -10521,11 +10539,11 @@
 				'n-disabled': !this.isEnabled(),
 				'n-view-mode': this.isViewMode()
 			};
+			// <input type="hidden" style={{display: "none"}}
+			// 	   onChange={this.onComponentChanged} value={this.getValueFromModel()}
+			// 	   ref='txt'/>
 			return (React.createElement("div", {className: this.getComponentCSS($pt.LayoutHelper.classSet(css))}, 
-				this.getComponentOption("data").map(this.renderRadio), 
-				React.createElement("input", {type: "hidden", style: {display: "none"}, 
-				       onChange: this.onComponentChanged, value: this.getValueFromModel(), 
-				       ref: "txt"})
+				this.getComponentOption("data").map(this.renderRadio)
 			));
 		},
 		/**
@@ -10552,25 +10570,25 @@
 		 * on component change
 		 * @param evt
 		 */
-		onComponentChanged: function (evt) {
-			// synchronize value to model
-			this.setValueToModel(evt.target.checked);
-		},
+		// onComponentChanged: function (evt) {
+		// 	// synchronize value to model
+		// 	this.setValueToModel(evt.target.checked);
+		// },
 		/**
 		 * on model changed
 		 * @param evt
 		 */
 		onModelChanged: function (evt) {
-			this.getComponent().val(evt.new);
+			// this.getComponent().val(evt.new);
 			this.forceUpdate();
 		},
 		/**
 		 * get component
 		 * @returns {jQuery}
 		 */
-		getComponent: function () {
-			return $(React.findDOMNode(this.refs.txt));
-		},
+		// getComponent: function () {
+		// 	return $(React.findDOMNode(this.refs.txt));
+		// },
 		isLabelAtLeft: function () {
 			return this.getComponentOption('labelAtLeft');
 		}
@@ -11599,8 +11617,10 @@
 			}
 			var _this = this;
 			return (React.createElement("ul", null, 
-				options.map(function(item) {
-					return (React.createElement("li", {onClick: _this.onOptionClick.bind(_this, item)}, React.createElement("span", null, item.text)));
+				options.map(function(item, itemIndex) {
+					return (React.createElement("li", {onClick: _this.onOptionClick.bind(_this, item), key: itemIndex}, 
+						React.createElement("span", null, item.text)
+					));
 				})
 			));
 		},
@@ -12493,25 +12513,21 @@
 				// render dropdown menu
 				var _this = this;
 				var id = 'item_' + index;
-				return (
-					React.createElement("li", {ref: id}, 
-						React.createElement("a", {href: "javascript:void(0);", 
-						   onClick: this.onParentMenuClicked.bind(this, id), ref: id + '_link'}, 
-							item.text, 
-							React.createElement("span", {className: "fa fa-fw fa-angle-double-down n-side-menu-ul", ref: id + '_icon'})
-						), 
-						React.createElement("ul", {ref: id + '_child', style: {
-                    display: 'none'
-                }}, 
-							item.children.map(function (childItem, childIndex, dropdownItems) {
-								return _this.renderMenuItem(childItem, index + '_' + childIndex, dropdownItems, false);
-							})
-						)
+				return (React.createElement("li", {ref: id, key: index}, 
+					React.createElement("a", {href: "javascript:void(0);", 
+					   onClick: this.onParentMenuClicked.bind(this, id), ref: id + '_link'}, 
+						item.text, 
+						React.createElement("span", {className: "fa fa-fw fa-angle-double-down n-side-menu-ul", ref: id + '_icon'})
+					), 
+					React.createElement("ul", {ref: id + '_child', style: {display: 'none'}}, 
+						item.children.map(function (childItem, childIndex, dropdownItems) {
+							return _this.renderMenuItem(childItem, index + '_' + childIndex, dropdownItems, false);
+						})
 					)
-				);
+				));
 			} else if (item.func !== undefined) {
 				// call javascript function
-				return (React.createElement("li", null, 
+				return (React.createElement("li", {key: index}, 
 					React.createElement("a", {href: "javascript:void(0);", 
 					   onClick: this.onMenuClicked.bind(this, item.func, item.value)}, item.text)
 				));
@@ -12519,7 +12535,7 @@
 				return null;
 			} else {
 				// jump to url
-				return (React.createElement("li", null, React.createElement("a", {href: item.url}, item.text)));
+				return (React.createElement("li", {key: index}, React.createElement("a", {href: item.url}, item.text)));
 			}
 		},
 		render: function () {
@@ -12578,7 +12594,7 @@
 			Object.keys(this.refs).forEach(function (key) {
 				if (key.endsWith('_link')) {
 					var linkId = key.substr(0, key.length - 5);
-					if (linkId != id) {
+					if (!id.startsWith(linkId)) {
 						var ul = $(React.findDOMNode(_this.refs[linkId + '_child']));
 						ul.hide('fade', function () {
 							ul.find('ul').hide();
@@ -13433,31 +13449,31 @@
 			var columnIndex = 0;
 			var _this = this;
 			return (React.createElement("thead", null, 
-			React.createElement("tr", null, 
-				this.state.columns.map(function (column) {
-					if (columnIndex >= indexToRender.min && columnIndex <= indexToRender.max) {
-						// column is fixed.
-						columnIndex++;
-						var style = {};
-						style.width = column.width;
-						if (!(column.visible === undefined || column.visible === true)) {
-							style.display = "none";
-						}
-						if (column.rowSelectable) {
-							return (React.createElement("td", {style: style}, 
-								_this.renderTableHeaderCheckBox(column)
-							));
+				React.createElement("tr", null, 
+					this.state.columns.map(function (column) {
+						if (columnIndex >= indexToRender.min && columnIndex <= indexToRender.max) {
+							// column is fixed.
+							columnIndex++;
+							var style = {};
+							style.width = column.width;
+							if (!(column.visible === undefined || column.visible === true)) {
+								style.display = "none";
+							}
+							if (column.rowSelectable) {
+								return (React.createElement("td", {style: style, key: columnIndex}, 
+									_this.renderTableHeaderCheckBox(column)
+								));
+							} else {
+								return (React.createElement("td", {style: style, key: columnIndex}, 
+									column.title, 
+									_this.renderTableHeaderSortButton(column)
+								));
+							}
 						} else {
-							return (React.createElement("td", {style: style}, 
-								column.title, 
-								_this.renderTableHeaderSortButton(column)
-							));
+							columnIndex++;
 						}
-					} else {
-						columnIndex++;
-					}
-				})
-			)
+					})
+				)
 			));
 		},
 		renderRowEditButton: function(rowModel) {
@@ -13490,7 +13506,7 @@
 			});
 			return React.createElement($pt.Components.NFormButton, {model: rowModel, layout: layout});
 		},
-		renderRowOperationButton: function(operation, rowModel) {
+		renderRowOperationButton: function(operation, rowModel, operationIndex) {
 			var layout = $pt.createCellLayout('rowButton', {
 				comp: {
 					style: 'link',
@@ -13503,7 +13519,7 @@
 					comp: 'n-table-op-btn'
 				}
 			});
-			return React.createElement($pt.Components.NFormButton, {model: rowModel, layout: layout});
+			return React.createElement($pt.Components.NFormButton, {model: rowModel, layout: layout, key: operationIndex});
 		},
 		getRowOperations: function(column) {
 			var rowOperations = column.rowOperations;
@@ -13521,8 +13537,8 @@
 			var rowOperations = this.getRowOperations(column);
 			var _this = this;
 			return (React.createElement("div", {className: "btn-group n-table-op-btn-group", role: "group"}, 
-				rowOperations.map(function (operation) {
-					return _this.renderRowOperationButton(operation, rowModel);
+				rowOperations.map(function (operation, operationIndex) {
+					return _this.renderRowOperationButton(operation, rowModel, operationIndex);
 				}), 
 				editButton, 
 				removeButton
@@ -13554,7 +13570,7 @@
 				return operation.icon != null;
 			});
 			var _this = this;
-			var renderOperation = function(operation) {
+			var renderOperation = function(operation, operationIndex) {
 				var layout = $pt.createCellLayout('rowButton', {
 					label: operation.tooltip,
 					comp: {
@@ -13567,15 +13583,15 @@
 						comp: 'n-table-op-btn'
 					}
 				});
-				return (React.createElement("li", null, 
+				return (React.createElement("li", {key: operationIndex}, 
 					React.createElement($pt.Components.NFormButton, {model: rowModel, layout: layout})
 				));
 			};
 			return (React.createElement("ul", {className: "nav"}, moreOperations.map(renderOperation)));
 		},
 		renderPopoverAsIcon: function(moreOperations, rowModel) {
-			return moreOperations.map(function(operation) {
-				return _this.renderRowOperationButton(operation, rowModel);
+			return moreOperations.map(function(operation, operationIndex) {
+				return _this.renderRowOperationButton(operation, rowModel, operationIndex);
 			});
 		},
 		renderPopover: function(moreOperations, rowModel, eventTarget) {
@@ -13651,7 +13667,7 @@
 					comp: 'n-table-op-btn more'
 				}
 			});
-			return React.createElement($pt.Components.NFormButton, {model: rowModel, layout: layout});
+			return React.createElement($pt.Components.NFormButton, {model: rowModel, layout: layout, key: "more-op"});
 		},
 		/**
 		 * render dropdown operation cell, only buttons which before maxButtonCount are renderred as a line,
@@ -13669,13 +13685,13 @@
 			var _this = this;
 			var used = -1;
 			var buttons = [];
-			rowOperations.some(function(operation) {
+			rowOperations.some(function(operation, operationIndex) {
 				if (operation.editButton) {
 					buttons.push(_this.renderRowEditButton(rowModel));
 				} else if (operation.removeButton) {
 					buttons.push(_this.renderRowRemoveButton(rowModel));
 				} else {
-					buttons.push(_this.renderRowOperationButton(operation, rowModel));
+					buttons.push(_this.renderRowOperationButton(operation, rowModel, operationIndex));
 				}
 				used++;
 				return maxButtonCount - used == 1;
@@ -13759,7 +13775,7 @@
 			}
 
 			var inlineModel = this.createInlineRowModel(row);
-			return (React.createElement("tr", {className: className}, 
+			return (React.createElement("tr", {className: className, key: rowIndex}, 
 				this.state.columns.map(function (column) {
 					if (columnIndex >= indexToRender.min && columnIndex <= indexToRender.max) {
 						// column is fixed.
@@ -13774,7 +13790,7 @@
 						if (column.editable || column.removable || column.rowOperations != null) {
 							// operation column
 							data = _this.renderOperationCell(column, inlineModel);
-							style['text-align'] = "center";
+							style.textAlign = "center";
 						} else if (column.indexable) {
 							// index column
 							data = rowIndex;
@@ -13825,7 +13841,7 @@
 							// data is property name
 							data = _this.getDisplayTextOfColumn(column, row);
 						}
-						return (React.createElement("td", {style: style}, data));
+						return (React.createElement("td", {style: style, key: columnIndex}, data));
 					} else {
 						columnIndex++;
 					}
@@ -13882,7 +13898,7 @@
 		renderTableScrollY: function () {
 			var style = this.computeTableStyle();
 			var scrolledHeaderDivStyle = {
-				"overflow-y": "scroll"
+				overflowY: "scroll"
 			};
 			var scrolledBodyDivStyle = {
 				maxHeight: this.getComponentOption("scrollY"),
@@ -14074,7 +14090,7 @@
 			if (this.isPageable() && this.hasDataToDisplay()) {
 				// only show when pageable and has data to display
 				return (React.createElement($pt.Components.NPagination, {className: "n-table-pagination", pageCount: this.state.pageCount, 
-				                     currentPageIndex: this.state.currentPageIndex, toPage: this.toPage.bind(this)}));
+				                     currentPageIndex: this.state.currentPageIndex, toPage: this.toPage}));
 			} else {
 				return null;
 			}
@@ -14534,7 +14550,7 @@
 							icon: NTable.EDIT_DIALOG_SAVE_BUTTON_ICON,
 							text: NTable.EDIT_DIALOG_SAVE_BUTTON_TEXT,
 							style: "primary",
-							click: this.onAddCompleted.bind(this)
+							click: this.onAddCompleted
 						}],
 						reset: this.getComponentOption('dialogResetVisible'),
 						validate: this.getComponentOption('dialogValidateVisible')
@@ -14578,7 +14594,7 @@
 							icon: NTable.EDIT_DIALOG_SAVE_BUTTON_ICON,
 							text: NTable.EDIT_DIALOG_SAVE_BUTTON_TEXT,
 							style: "primary",
-							click: this.onEditCompleted.bind(this),
+							click: this.onEditCompleted,
 							// show save when editing
 							view: 'edit'
 						}],
@@ -14639,7 +14655,7 @@
 		 */
 		onSearchBoxChanged: function () {
 			var value = this.state.searchModel.get('text');
-			window.console.debug('Searching [text=' + value + '].');
+			// window.console.debug('Searching [text=' + value + '].');
 			if (value == null || value == "") {
 				this.setState({
 					searchText: null
@@ -14781,7 +14797,7 @@
 				// do nothing
 			} else if (evt.type == "change") {
 				// do nothing
-				window.console.log('Table[' + this.getDataId() + '] data changed.');
+				// window.console.log('Table[' + this.getDataId() + '] data changed.');
 			}
 
 			if (this.getModel().getValidator() != null) {
@@ -15121,15 +15137,15 @@
 			if (icon != null) {
 				iconCss['fa-' + icon] = true;
 			}
-			var iconPart = icon == null ? null : (React.createElement("span", {className: $pt.LayoutHelper.classSet(iconCss)}));
+			var iconPart = icon == null ? null : (React.createElement("span", {className: $pt.LayoutHelper.classSet(iconCss), key: "iconPart"}));
 			var textPart = addon.text;
 			var innerParts = addon.iconFirst === false ? [textPart, iconPart] : [iconPart, textPart];
 			return (React.createElement("span", {className: $pt.LayoutHelper.classSet(spanCss), 
 			              onClick: this.onAddonClicked.bind(this, addon.click)}, 
-			innerParts.map(function (part) {
-				return part;
-			})
-		));
+				innerParts.map(function (part) {
+					return part;
+				})
+			));
 		},
 		/**
 		 * render
@@ -16368,7 +16384,5 @@
 (function (window) {
 	var $pt = window.$pt;
 	// expose all components definition to window
-	Object.keys($pt.Components).forEach(function(component) {
-		window[component] = $pt.Components[component];
-	});
+	$pt.exposeComponents(window);
 }(window));

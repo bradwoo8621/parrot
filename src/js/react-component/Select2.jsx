@@ -157,8 +157,10 @@
 			}
 			var _this = this;
 			return (<ul>
-				{options.map(function(item) {
-					return (<li onClick={_this.onOptionClick.bind(_this, item)}><span>{item.text}</span></li>);
+				{options.map(function(item, itemIndex) {
+					return (<li onClick={_this.onOptionClick.bind(_this, item)} key={itemIndex}>
+						<span>{item.text}</span>
+					</li>);
 				})}
 			</ul>);
 		},

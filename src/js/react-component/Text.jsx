@@ -200,15 +200,15 @@
 			if (icon != null) {
 				iconCss['fa-' + icon] = true;
 			}
-			var iconPart = icon == null ? null : (<span className={$pt.LayoutHelper.classSet(iconCss)}/>);
+			var iconPart = icon == null ? null : (<span className={$pt.LayoutHelper.classSet(iconCss)} key='iconPart'/>);
 			var textPart = addon.text;
 			var innerParts = addon.iconFirst === false ? [textPart, iconPart] : [iconPart, textPart];
 			return (<span className={$pt.LayoutHelper.classSet(spanCss)}
 			              onClick={this.onAddonClicked.bind(this, addon.click)}>
-			{innerParts.map(function (part) {
-				return part;
-			})}
-		</span>);
+				{innerParts.map(function (part) {
+					return part;
+				})}
+			</span>);
 		},
 		/**
 		 * render

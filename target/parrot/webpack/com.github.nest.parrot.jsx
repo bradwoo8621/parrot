@@ -293,6 +293,11 @@ window.$pt = $pt;
 	};
 	// components
 	$pt.Components = {};
+	$pt.exposeComponents = function(context) {
+		Object.keys($pt.Components).forEach(function(component) {
+			window[component] = $pt.Components[component];
+		});
+	};
 	// component constants
 	$pt.ComponentConstants = {
 		// component types
@@ -3784,7 +3789,7 @@ window.$pt = $pt;
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
-		renderItem: function(enabled, item) {
+		renderItem: function(enabled, item, itemIndex) {
 			var model = $pt.createModel({
 				id: item.id,
 				checked: this.isCodeChecked(item)
@@ -3797,7 +3802,7 @@ window.$pt = $pt;
 				}
 			});
 			model.addPostChangeListener('checked', this.onCodeItemCheckedChanged.bind(this, item));
-			return <$pt.Components.NCheck model={model} layout={layout} />;
+			return <$pt.Components.NCheck model={model} layout={layout} key={itemIndex}/>;
 		},
 		render: function() {
 			var enabled = this.isEnabled();
@@ -3974,7 +3979,7 @@ window.$pt = $pt;
 		 * @param item {{}}
 		 * @returns {XML}
 		 */
-		renderItem: function (item) {
+		renderItem: function (item, itemIndex) {
 			var parentModel = this.getModel();
 			var parentValidator = parentModel.getValidator();
 			var validator = null;
@@ -4019,7 +4024,7 @@ window.$pt = $pt;
 					collapsedLabel: this.getComponentOption('collapsedLabel')
 				}
 			};
-			return (<div className='row'>
+			return (<div className='row' key={itemIndex}>
 				<div className='col-sm-12 col-md-12 col-lg-12'>
 					<$pt.Components.NPanel model={model}
 					        layout={$pt.createCellLayout('pseudo-panel', cellLayout)}
@@ -4266,7 +4271,8 @@ window.$pt = $pt;
 			               layout={$pt.createFormLayout(tab.layout)}
 			               direction={this.props.direction}
 						   view={this.isViewMode()}
-			               className={$pt.LayoutHelper.classSet(css)}/>
+			               className={$pt.LayoutHelper.classSet(css)}
+						   key={tabIndex}/>
 			);
 		},
 		/**
@@ -4635,15 +4641,16 @@ window.$pt = $pt;
 					disabled={!this.isEnabled()}
 					data-toggle="dropdown"
 					aria-haspopup="true"
-					aria-expanded="false">
+					aria-expanded="false"
+					key='a'>
 				   	<span className="caret"></span>
 				</a>);
 				var emptyFunction = function(){};
 				var _this = this;
-				var menus = (<ul className="dropdown-menu">
-					{more.map(function(menu) {
+				var menus = (<ul className="dropdown-menu" key='ul'>
+					{more.map(function(menu, menuIndex) {
 						if (menu.divider) {
-							return (<li role='separator' className='divider'></li>);
+							return (<li role='separator' className='divider' key={menuIndex}></li>);
 						} else {
 							var click = menu.click ? menu.click : emptyFunction;
 							var label = menu.text;
@@ -4651,7 +4658,7 @@ window.$pt = $pt;
 							if (label && icon) {
 								label = ' ' + label;
 							}
-							return (<li>
+							return (<li key={menuIndex}>
 								<a href='javascript:void(0);' onClick={click.bind(_this, _this.getModel())}>
 									{icon}{label}
 								</a>
@@ -4825,7 +4832,7 @@ window.$pt = $pt;
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
 			// set model value to component
-			this.getComponent().prop("checked", this.getValueFromModel());
+			// this.getComponent().prop("checked", this.getValueFromModel());
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
@@ -4836,7 +4843,7 @@ window.$pt = $pt;
 		 */
 		componentDidMount: function () {
 			// set model value to component
-			this.getComponent().prop("checked", this.getValueFromModel());
+			// this.getComponent().prop("checked", this.getValueFromModel());
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
@@ -4908,9 +4915,9 @@ window.$pt = $pt;
 			};
 			css[this.getComponentCSS('n-checkbox')] = true;
 			var isLabelAtLeft = this.isLabelAtLeft();
+			// <input type="checkbox" style={{display: "none"}}
+			// 	   onChange={this.onComponentChanged} ref='txt'/>
 			return (<div className={$pt.LayoutHelper.classSet(css)}>
-				<input type="checkbox" style={{display: "none"}}
-				       onChange={this.onComponentChanged} ref='txt'/>
 				{isLabelAtLeft ? this.renderLabel(true) : null}
 				{this.renderCheckbox()}
 				{!isLabelAtLeft ? this.renderLabel(false) : null}
@@ -4938,16 +4945,16 @@ window.$pt = $pt;
 		 * on component change
 		 * @param evt
 		 */
-		onComponentChanged: function (evt) {
-			// synchronize value to model
-			this.setValueToModel(evt.target.checked);
-		},
+		// onComponentChanged: function (evt) {
+		// 	// synchronize value to model
+		// 	this.setValueToModel(evt.target.checked);
+		// },
 		/**
 		 * on model change
 		 * @param evt
 		 */
 		onModelChanged: function (evt) {
-			this.getComponent().prop("checked", evt.new === true);
+			// this.getComponent().prop("checked", evt.new === true);
 			this.forceUpdate();
 		},
 		/**
@@ -4964,15 +4971,15 @@ window.$pt = $pt;
 		isLabelAttached: function () {
 			return this.getComponentOption('labelAttached') !== null;
 		},
-		isLabelAtLeft: function () {
-			return this.getComponentOption('labelAttached') === 'left';
-		},
 		/**
 		 * get component
 		 * @returns {jQuery}
 		 */
-		getComponent: function () {
-			return $(React.findDOMNode(this.refs.txt));
+		// getComponent: function () {
+		// 	return $(React.findDOMNode(this.refs.txt));
+		// },
+		isLabelAtLeft: function () {
+			return this.getComponentOption('labelAttached') === 'left';
 		}
 	}));
 	$pt.Components.NCheck = NCheck;
@@ -5117,12 +5124,16 @@ window.$pt = $pt;
 			</div>);
 		},
 		renderHeaderMonth: function(date) {
-			return (<span onClick={this.renderPopover.bind(this, {date: date, type: NDateTime.FORMAT_TYPES.MONTH})} className='header-date-btn'>
+			return (<span onClick={this.renderPopover.bind(this, {date: date, type: NDateTime.FORMAT_TYPES.MONTH})}
+						  className='header-date-btn'
+						  key='header-month'>
 				{this.convertValueToString(date, this.getHeaderMonthFormat())}
 			</span>);
 		},
 		renderHeaderYear: function(date) {
-			return (<span onClick={this.renderPopover.bind(this, {date: date, type: NDateTime.FORMAT_TYPES.YEAR})} className='header-date-btn'>
+			return (<span onClick={this.renderPopover.bind(this, {date: date, type: NDateTime.FORMAT_TYPES.YEAR})}
+						  className='header-date-btn'
+						  key='header-year'>
 				{this.convertValueToString(date, this.getHeaderYearFormat())}
 			</span>);
 		},
@@ -5212,12 +5223,12 @@ window.$pt = $pt;
 			var today = this.getToday();
 			return (<div className='calendar-body day-view'>
 				<div className='day-view-body-header row'>
-					{header.map(function(day) {
-						return <div className='cell-7-1'>{day}</div>;
+					{header.map(function(weekday, weekdayIndex) {
+						return <div className='cell-7-1' key={'weekday-' + weekdayIndex}>{weekday}</div>;
 					})}
 				</div>
 				<div className='day-view-body-body row'>
-					{days.map(function(day) {
+					{days.map(function(day, dayIndex) {
 						var css = {
 							'cell-7-1': true,
 							'gap-day': (day.month() != currentMonth),
@@ -5225,7 +5236,8 @@ window.$pt = $pt;
 							'current-value': value != null && day.isSame(value, 'day')
 						};
 						return (<div className={$pt.LayoutHelper.classSet(css)}
-									 onClick={_this.onDaySelected.bind(_this, day)}>
+									 onClick={_this.onDaySelected.bind(_this, day)}
+									 key={'day-' + dayIndex}>
 							<span>{day.date()}</span>
 						</div>);
 					})}
@@ -5281,7 +5293,8 @@ window.$pt = $pt;
 							'current-value': value != null && index == value.month()
 						};
 						return (<div className={$pt.LayoutHelper.classSet(css)}
-									 onClick={_this.onMonthSelected.bind(_this, selectedDay)}>
+									 onClick={_this.onMonthSelected.bind(_this, selectedDay)}
+									 key={index}>
 							{month}
 						</div>);
 					})}
@@ -5334,14 +5347,15 @@ window.$pt = $pt;
 			}
 			return (<div className='calendar-body month-view'>
 				<div className='year-view-body-body row'>
-					{years.map(function(year) {
+					{years.map(function(year, yearIndex) {
 						var css = {
 							'cell-4-1': true,
 							today: year.year() == today.year(),
 							'current-value': value != null && year.year() == value.year()
 						};
 						return (<div className={$pt.LayoutHelper.classSet(css)}
-									 onClick={_this.onYearSelected.bind(_this, year)}>
+									 onClick={_this.onYearSelected.bind(_this, year)}
+									 key={yearIndex}>
 							{year.format(_this.getBodyYearFormat())}
 						</div>);
 					})}
@@ -5383,13 +5397,14 @@ window.$pt = $pt;
 						  x1={startLength * Math.cos(Math.PI * 2 * degree / 360) + offset}
 						  y1={offset - startLength * Math.sin(Math.PI * 2 * degree / 360)}
 						  x2={radius * Math.cos(Math.PI * 2 * degree / 360) + offset}
-						  y2={offset - radius * Math.sin(Math.PI * 2 * degree / 360)}/>);
+						  y2={offset - radius * Math.sin(Math.PI * 2 * degree / 360)}
+						  key={degree}/>);
 		},
 		render12HourDial: function(date, popoverType) {
 			var _this = this;
 			var am = date.hour() <= 11; // 0-23
 			var hourRadius = this.getHourRadius();
-			return (<g>
+			return (<g key='hour-12-dial'>
 				<text className={'text hour-12 am' + (am ? ' yes' : '')}
 					  onClick={this.onAMPMSelected.bind(this, true, popoverType)}
 					  x={0}
@@ -5422,7 +5437,7 @@ window.$pt = $pt;
 		render24HourDial: function() {
 			var _this = this;
 			var hourRadius = this.getHourRadius();
-			return (<g>
+			return (<g key='hour-24-dial'>
 				<text className='text hour-24 top-num'
 					  x={NDateTime.CLOCK_CHAR_POS.TOP.X}
 					  y={NDateTime.CLOCK_CHAR_POS.TOP.Y + NDateTime.CLOCK_RADIUS - hourRadius}>0</text>
@@ -5457,7 +5472,7 @@ window.$pt = $pt;
 				return null;
 			}
 			var _this = this;
-			return (<g>
+			return (<g key='minute-dial'>
 				<text className='text minute top-num'
 					  x={NDateTime.CLOCK_CHAR_POS.TOP.X}
 					  y={NDateTime.CLOCK_CHAR_POS.TOP.Y}>0</text>
@@ -6624,7 +6639,7 @@ window.$pt = $pt;
 			return (<div>
 				<div className="modal-backdrop fade in" style={{zIndex: NExceptionModal.Z_INDEX}}></div>
 				<div className={$pt.LayoutHelper.classSet(css)}
-					 tabindex="-1"
+					 tabIndex="-1"
 					 role="dialog"
 					 style={{display: 'block', zIndex: NExceptionModal.Z_INDEX + 1}}>
 					<div className="modal-danger modal-dialog">
@@ -7166,7 +7181,7 @@ window.$pt = $pt;
 				right = right.reverse();
 				footer = (<$pt.Components.NPanelFooter right={right} left={left} model={this.getModel()} view={this.isViewMode()}/>);
 			}
-			return (<div className={$pt.LayoutHelper.classSet(css)}>
+			return (<div className={$pt.LayoutHelper.classSet(css)} key={index}>
 				{this.renderSections(card.getSections())}
 				{footer}
 			</div>);
@@ -7199,8 +7214,8 @@ window.$pt = $pt;
 				'n-cards-free': this.isFreeCard()
 			});
 			var _this = this;
-			return (<ul className={css}>
-				{this.getLayout().getCards().map(function (card) {
+			return (<ul className={css} key='wizards'>
+				{this.getLayout().getCards().map(function (card, cardIndex) {
 					var css = {
 						active: card.getId() == _this.state.activeCard,
 						before: _this.isBeforeActiveCard(card.getId()),
@@ -7221,7 +7236,7 @@ window.$pt = $pt;
 						iconCSS['fa-' + card.getIcon()] = true;
 						icon = <span className={$pt.LayoutHelper.classSet(iconCSS)}/>;
 					}
-					return (<li className={$pt.LayoutHelper.classSet(css)}>
+					return (<li className={$pt.LayoutHelper.classSet(css)} key={cardIndex}>
 						<a href='javascript:void(0);' onClick={click}>
 							{icon} {card.getLabel()}
 							{_this.renderBadge(card)}
@@ -8037,7 +8052,7 @@ window.$pt = $pt;
 	var NIcon = React.createClass({
 		displayName: 'NIcon',
 		propTypes: {
-			size: React.PropTypes.oneOf(["lg", "2x", "3x", "4x", "5x"]),
+			size: React.PropTypes.string, //React.PropTypes.oneOf(["lg", "2x", "3x", "4x", "5x"]),
 			fixWidth: React.PropTypes.bool,
 
 			icon: React.PropTypes.string.isRequired,
@@ -8153,14 +8168,14 @@ window.$pt = $pt;
 	var NJumbortron = React.createClass({
 		displayName: 'NJumbortron',
 		propTypes: {
-			highlightText: React.PropTypes.oneOfType(
+			highlightText: React.PropTypes.oneOfType([
 				React.PropTypes.string,
-				React.PropTypes.arrayOf(React.PropTypes.string)).isRequired
+				React.PropTypes.arrayOf(React.PropTypes.string)]).isRequired
 		},
 		renderText: function () {
 			if (Array.isArray(this.props.highlightText)) {
-				return this.props.highlightText.map(function (text) {
-					return <h4>{text}</h4>;
+				return this.props.highlightText.map(function (text, textIndex) {
+					return <h4 key={textIndex}>{text}</h4>;
 				});
 			} else {
 				return <h4>{this.props.highlightText}</h4>;
@@ -8263,8 +8278,8 @@ window.$pt = $pt;
 				css['n-label-' + style] = true;
 			}
 			return (<div className={$pt.LayoutHelper.classSet(css)}>
-				{texts.map(function (text) {
-					return <span>{text}</span>;
+				{texts.map(function (text, textIndex) {
+					return <span key={textIndex}>{text}</span>;
 				})}
 			</div>);
 		},
@@ -8370,7 +8385,7 @@ window.$pt = $pt;
 					type: $pt.ComponentConstants.Button,
 					icon: NConfirm.OK_ICON,
 					style: 'primary',
-					click: this.onConfirmClicked.bind(this)
+					click: this.onConfirmClicked
 				}
 			});
 			return <$pt.Components.NFormButton layout={layout}/>;
@@ -8389,7 +8404,7 @@ window.$pt = $pt;
 					type: $pt.ComponentConstants.Button,
 					icon: (this.state.options && this.state.options.close) ? NConfirm.CLOSE_ICON : NConfirm.CANCEL_ICON,
 					style: 'danger',
-					click: this.onCancelClicked.bind(this)
+					click: this.onCancelClicked
 				}
 			});
 			return <$pt.Components.NFormButton layout={layout}/>;
@@ -8422,8 +8437,8 @@ window.$pt = $pt;
 				}
 			}
 			// string array
-			return messages.map(function (element) {
-				return <h6>{element}</h6>;
+			return messages.map(function (element, index) {
+				return <h6 key={index}>{element}</h6>;
 			});
 		},
 		/**
@@ -8446,7 +8461,7 @@ window.$pt = $pt;
 			return (<div>
 				<div className="modal-backdrop fade in" style={{zIndex: NConfirm.Z_INDEX}}></div>
 				<div className={$pt.LayoutHelper.classSet(css)}
-					 tabindex="-1"
+					 tabIndex="-1"
 					 role="dialog"
 					 style={{display: 'block', zIndex: NConfirm.Z_INDEX + 1}}>
 					<div className="modal-dialog">
@@ -8850,7 +8865,7 @@ window.$pt = $pt;
 			} else {
 				$pt.Components.NConfirm.getConfirmModal().show(NModalForm.CANCEL_CONFIRM_TITLE,
 					NModalForm.CANCEL_CONFIRM_MESSAGE,
-					this.hide.bind(this));
+					this.hide);
 			}
 		},
 		/**
@@ -8898,7 +8913,7 @@ window.$pt = $pt;
 			} else if (this.isViewMode()) {
 				return null;
 			} else {
-				return this.onValidateClicked.bind(this);
+				return this.onValidateClicked;
 			}
 		},
 		/**
@@ -8909,7 +8924,7 @@ window.$pt = $pt;
 			if (this.state.buttons && this.state.buttons.cancel === false) {
 				return null;
 			} else {
-				return this.onCancelClicked.bind(this);
+				return this.onCancelClicked;
 			}
 		},
 		/**
@@ -8922,7 +8937,7 @@ window.$pt = $pt;
 			} else if (this.isViewMode()) {
 				return null;
 			} else {
-				return this.onResetClicked.bind(this);
+				return this.onResetClicked;
 			}
 		},
 		/**
@@ -9144,8 +9159,8 @@ window.$pt = $pt;
 				css['n-label-' + this.props.size] = true;
 			}
 			return (<span className={$pt.LayoutHelper.classSet(css)}>
-            {texts.map(function (text) {
-	            return <span>{text}</span>;
+            {texts.map(function (text, textIndex) {
+	            return <span key={textIndex}>{text}</span>;
             })}
         </span>);
 		},
@@ -9222,7 +9237,7 @@ window.$pt = $pt;
 			return (<div>
 				<div className="modal-backdrop fade in" style={{zIndex: NOnRequestModal.Z_INDEX}}></div>
 				<div className={$pt.LayoutHelper.classSet(css)}
-					 tabindex="-1"
+					 tabIndex="-1"
 					 role="dialog"
 					 style={{display: 'block', zIndex: NOnRequestModal.Z_INDEX + 1}}>
 					<div className="modal-danger modal-dialog">
@@ -9364,7 +9379,7 @@ window.$pt = $pt;
 				// render dropdown menu
 				var _this = this;
 				return (
-					<li className={onTopLevel ? "dropdown" : "dropdown-submenu"}>
+					<li className={onTopLevel ? "dropdown" : "dropdown-submenu"} key={index}>
 						<a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button"
 						   aria-expanded="false">
 							{item.text} {onTopLevel ? <span className="caret"></span> : null}
@@ -9378,15 +9393,15 @@ window.$pt = $pt;
 				);
 			} else if (item.divider === true) {
 				// render divider
-				return (<li className="divider"></li>);
+				return (<li className="divider" key={index}></li>);
 			} else if (item.func !== undefined) {
 				// call javascript function
 				return (<li>
-					<a href="javascript:void(0);" onClick={this.onMenuClicked.bind(this, item.func)}>{item.text}</a>
+					<a href="javascript:void(0);" onClick={this.onMenuClicked.bind(this, item.func)} key={index}>{item.text}</a>
 				</li>);
 			} else {
 				// jump to url
-				return (<li><a href={item.url}>{item.text}</a></li>);
+				return (<li key={index}><a href={item.url}>{item.text}</a></li>);
 			}
 		},
 		/**
@@ -9634,7 +9649,7 @@ window.$pt = $pt;
 				if (index == _this.getCurrentPageIndex()) {
 					css.active = true;
 				}
-				return (<li>
+				return (<li key={index}>
 					<a href="javascript:void(0);"
 					   onClick={_this.toPage}
 					   data-index={index}
@@ -9975,16 +9990,17 @@ window.$pt = $pt;
 		 * render row
 		 * @param row {RowLayout}
 		 */
-		renderRow: function (row) {
+		renderRow: function (row, rowIndex) {
 			var _this = this;
-			var cells = row.getCells().map(function (cell) {
+			var cells = row.getCells().map(function (cell, cellIndex) {
 				return <$pt.Components.NFormCell layout={cell}
 				                  model={_this.getModel()}
 				                  ref={cell.getId()}
 				                  direction={_this.props.direction}
-								  view={_this.isViewMode()}/>;
+								  view={_this.isViewMode()}
+								  key={'' + rowIndex + '-' + cellIndex}/>;
 			});
-			return (<div className="row">{cells}</div>);
+			return (<div className="row" key={rowIndex}>{cells}</div>);
 		},
 		/**
 		 * render
@@ -10237,26 +10253,26 @@ window.$pt = $pt;
 			cancel: React.PropTypes.func,
 			reset: React.PropTypes.func,
 
-			left: React.PropTypes.arrayOf(React.PropTypes.shape({
-				icon: React.PropTypes.string,
-				text: React.PropTypes.string,
-				style: React.PropTypes.string,
-				click: React.PropTypes.func.isRequired,
-				enabled: React.PropTypes.shape({
-					when: React.PropTypes.func,
-					depends: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.arrayOf(React.PropTypes.string)])
-				})
-			})),
-			right: React.PropTypes.arrayOf(React.PropTypes.shape({
-				icon: React.PropTypes.string,
-				text: React.PropTypes.string,
-				style: React.PropTypes.string, // references to bootstrap styles
-				click: React.PropTypes.func.isRequired,
-				enabled: React.PropTypes.shape({
-					when: React.PropTypes.func,
-					depends: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.arrayOf(React.PropTypes.string)])
-				})
-			})),
+			// left: React.PropTypes.arrayOf(React.PropTypes.shape({
+			// 	icon: React.PropTypes.string,
+			// 	text: React.PropTypes.string,
+			// 	style: React.PropTypes.string,
+			// 	click: React.PropTypes.func.isRequired,
+			// 	enabled: React.PropTypes.oneOfType([React.PropTypes.bool, React.PropTypes.shape({
+			// 		when: React.PropTypes.func,
+			// 		depends: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.arrayOf(React.PropTypes.string)])
+			// 	})])
+			// })),
+			// right: React.PropTypes.arrayOf(React.PropTypes.shape({
+			// 	icon: React.PropTypes.string,
+			// 	text: React.PropTypes.string,
+			// 	style: React.PropTypes.string, // references to bootstrap styles
+			// 	click: React.PropTypes.func.isRequired,
+			// 	enabled: React.PropTypes.oneOfType([React.PropTypes.bool, React.PropTypes.shape({
+			// 		when: React.PropTypes.func,
+			// 		depends: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.arrayOf(React.PropTypes.string)])
+			// 	})])
+			// })),
 
 			// model, pass to click
 			model: React.PropTypes.object,
@@ -10316,7 +10332,7 @@ window.$pt = $pt;
 		/**
 		 * render button
 		 */
-		renderButton: function (option) {
+		renderButton: function (option, buttonIndex) {
 			if (this.isViewMode() && option.view == 'edit') {
 				return null;
 			} else if (!this.isViewMode() && option.view == 'view') {
@@ -10333,7 +10349,9 @@ window.$pt = $pt;
 					visible: option.visible
 				}
 			};
-			return <$pt.Components.NFormButton model={this.getModel()} layout={$pt.createCellLayout('pseudo-button', layout)}/>;
+			return <$pt.Components.NFormButton model={this.getModel()}
+											   layout={$pt.createCellLayout('pseudo-button', layout)}
+											   key={buttonIndex}/>;
 		},
 		/**
 		 * render
@@ -10506,7 +10524,7 @@ window.$pt = $pt;
 		 * @params option radio option
 		 * @returns {XML}
 		 */
-		renderRadio: function (option) {
+		renderRadio: function (option, optionIndex) {
 			var checked = this.getValueFromModel() == option.id;
 			var enabled = this.isEnabled();
 			var css = {
@@ -10515,7 +10533,7 @@ window.$pt = $pt;
 				'radio-container': true
 			};
 			var labelAtLeft = this.isLabelAtLeft();
-			return (<div className='n-radio-option'>
+			return (<div className='n-radio-option' key={optionIndex}>
 				{labelAtLeft ? this.renderLabel(option, true) : null}
 				<div className='radio-container'>
                 <span className={$pt.LayoutHelper.classSet(css)}
@@ -10536,11 +10554,11 @@ window.$pt = $pt;
 				'n-disabled': !this.isEnabled(),
 				'n-view-mode': this.isViewMode()
 			};
+			// <input type="hidden" style={{display: "none"}}
+			// 	   onChange={this.onComponentChanged} value={this.getValueFromModel()}
+			// 	   ref='txt'/>
 			return (<div className={this.getComponentCSS($pt.LayoutHelper.classSet(css))}>
 				{this.getComponentOption("data").map(this.renderRadio)}
-				<input type="hidden" style={{display: "none"}}
-				       onChange={this.onComponentChanged} value={this.getValueFromModel()}
-				       ref='txt'/>
 			</div>);
 		},
 		/**
@@ -10567,25 +10585,25 @@ window.$pt = $pt;
 		 * on component change
 		 * @param evt
 		 */
-		onComponentChanged: function (evt) {
-			// synchronize value to model
-			this.setValueToModel(evt.target.checked);
-		},
+		// onComponentChanged: function (evt) {
+		// 	// synchronize value to model
+		// 	this.setValueToModel(evt.target.checked);
+		// },
 		/**
 		 * on model changed
 		 * @param evt
 		 */
 		onModelChanged: function (evt) {
-			this.getComponent().val(evt.new);
+			// this.getComponent().val(evt.new);
 			this.forceUpdate();
 		},
 		/**
 		 * get component
 		 * @returns {jQuery}
 		 */
-		getComponent: function () {
-			return $(React.findDOMNode(this.refs.txt));
-		},
+		// getComponent: function () {
+		// 	return $(React.findDOMNode(this.refs.txt));
+		// },
 		isLabelAtLeft: function () {
 			return this.getComponentOption('labelAtLeft');
 		}
@@ -11614,8 +11632,10 @@ window.$pt = $pt;
 			}
 			var _this = this;
 			return (<ul>
-				{options.map(function(item) {
-					return (<li onClick={_this.onOptionClick.bind(_this, item)}><span>{item.text}</span></li>);
+				{options.map(function(item, itemIndex) {
+					return (<li onClick={_this.onOptionClick.bind(_this, item)} key={itemIndex}>
+						<span>{item.text}</span>
+					</li>);
 				})}
 			</ul>);
 		},
@@ -12508,25 +12528,21 @@ window.$pt = $pt;
 				// render dropdown menu
 				var _this = this;
 				var id = 'item_' + index;
-				return (
-					<li ref={id}>
-						<a href="javascript:void(0);"
-						   onClick={this.onParentMenuClicked.bind(this, id)} ref={id + '_link'}>
-							{item.text}
-							<span className='fa fa-fw fa-angle-double-down n-side-menu-ul' ref={id + '_icon'}/>
-						</a>
-						<ul ref={id + '_child'} style={{
-                    display: 'none'
-                }}>
-							{item.children.map(function (childItem, childIndex, dropdownItems) {
-								return _this.renderMenuItem(childItem, index + '_' + childIndex, dropdownItems, false);
-							})}
-						</ul>
-					</li>
-				);
+				return (<li ref={id} key={index}>
+					<a href="javascript:void(0);"
+					   onClick={this.onParentMenuClicked.bind(this, id)} ref={id + '_link'}>
+						{item.text}
+						<span className='fa fa-fw fa-angle-double-down n-side-menu-ul' ref={id + '_icon'}/>
+					</a>
+					<ul ref={id + '_child'} style={{display: 'none'}}>
+						{item.children.map(function (childItem, childIndex, dropdownItems) {
+							return _this.renderMenuItem(childItem, index + '_' + childIndex, dropdownItems, false);
+						})}
+					</ul>
+				</li>);
 			} else if (item.func !== undefined) {
 				// call javascript function
-				return (<li>
+				return (<li key={index}>
 					<a href="javascript:void(0);"
 					   onClick={this.onMenuClicked.bind(this, item.func, item.value)}>{item.text}</a>
 				</li>);
@@ -12534,7 +12550,7 @@ window.$pt = $pt;
 				return null;
 			} else {
 				// jump to url
-				return (<li><a href={item.url}>{item.text}</a></li>);
+				return (<li key={index}><a href={item.url}>{item.text}</a></li>);
 			}
 		},
 		render: function () {
@@ -12593,7 +12609,7 @@ window.$pt = $pt;
 			Object.keys(this.refs).forEach(function (key) {
 				if (key.endsWith('_link')) {
 					var linkId = key.substr(0, key.length - 5);
-					if (linkId != id) {
+					if (!id.startsWith(linkId)) {
 						var ul = $(React.findDOMNode(_this.refs[linkId + '_child']));
 						ul.hide('fade', function () {
 							ul.find('ul').hide();
@@ -13448,31 +13464,31 @@ window.$pt = $pt;
 			var columnIndex = 0;
 			var _this = this;
 			return (<thead>
-			<tr>
-				{this.state.columns.map(function (column) {
-					if (columnIndex >= indexToRender.min && columnIndex <= indexToRender.max) {
-						// column is fixed.
-						columnIndex++;
-						var style = {};
-						style.width = column.width;
-						if (!(column.visible === undefined || column.visible === true)) {
-							style.display = "none";
-						}
-						if (column.rowSelectable) {
-							return (<td style={style}>
-								{_this.renderTableHeaderCheckBox(column)}
-							</td>);
+				<tr>
+					{this.state.columns.map(function (column) {
+						if (columnIndex >= indexToRender.min && columnIndex <= indexToRender.max) {
+							// column is fixed.
+							columnIndex++;
+							var style = {};
+							style.width = column.width;
+							if (!(column.visible === undefined || column.visible === true)) {
+								style.display = "none";
+							}
+							if (column.rowSelectable) {
+								return (<td style={style} key={columnIndex}>
+									{_this.renderTableHeaderCheckBox(column)}
+								</td>);
+							} else {
+								return (<td style={style} key={columnIndex}>
+									{column.title}
+									{_this.renderTableHeaderSortButton(column)}
+								</td>);
+							}
 						} else {
-							return (<td style={style}>
-								{column.title}
-								{_this.renderTableHeaderSortButton(column)}
-							</td>);
+							columnIndex++;
 						}
-					} else {
-						columnIndex++;
-					}
-				})}
-			</tr>
+					})}
+				</tr>
 			</thead>);
 		},
 		renderRowEditButton: function(rowModel) {
@@ -13505,7 +13521,7 @@ window.$pt = $pt;
 			});
 			return <$pt.Components.NFormButton model={rowModel} layout={layout} />;
 		},
-		renderRowOperationButton: function(operation, rowModel) {
+		renderRowOperationButton: function(operation, rowModel, operationIndex) {
 			var layout = $pt.createCellLayout('rowButton', {
 				comp: {
 					style: 'link',
@@ -13518,7 +13534,7 @@ window.$pt = $pt;
 					comp: 'n-table-op-btn'
 				}
 			});
-			return <$pt.Components.NFormButton model={rowModel} layout={layout} />;
+			return <$pt.Components.NFormButton model={rowModel} layout={layout} key={operationIndex}/>;
 		},
 		getRowOperations: function(column) {
 			var rowOperations = column.rowOperations;
@@ -13536,8 +13552,8 @@ window.$pt = $pt;
 			var rowOperations = this.getRowOperations(column);
 			var _this = this;
 			return (<div className="btn-group n-table-op-btn-group" role='group'>
-				{rowOperations.map(function (operation) {
-					return _this.renderRowOperationButton(operation, rowModel);
+				{rowOperations.map(function (operation, operationIndex) {
+					return _this.renderRowOperationButton(operation, rowModel, operationIndex);
 				})}
 				{editButton}
 				{removeButton}
@@ -13569,7 +13585,7 @@ window.$pt = $pt;
 				return operation.icon != null;
 			});
 			var _this = this;
-			var renderOperation = function(operation) {
+			var renderOperation = function(operation, operationIndex) {
 				var layout = $pt.createCellLayout('rowButton', {
 					label: operation.tooltip,
 					comp: {
@@ -13582,15 +13598,15 @@ window.$pt = $pt;
 						comp: 'n-table-op-btn'
 					}
 				});
-				return (<li>
+				return (<li key={operationIndex}>
 					<$pt.Components.NFormButton model={rowModel} layout={layout} />
 				</li>);
 			};
 			return (<ul className='nav'>{moreOperations.map(renderOperation)}</ul>);
 		},
 		renderPopoverAsIcon: function(moreOperations, rowModel) {
-			return moreOperations.map(function(operation) {
-				return _this.renderRowOperationButton(operation, rowModel);
+			return moreOperations.map(function(operation, operationIndex) {
+				return _this.renderRowOperationButton(operation, rowModel, operationIndex);
 			});
 		},
 		renderPopover: function(moreOperations, rowModel, eventTarget) {
@@ -13666,7 +13682,7 @@ window.$pt = $pt;
 					comp: 'n-table-op-btn more'
 				}
 			});
-			return <$pt.Components.NFormButton model={rowModel} layout={layout} />;
+			return <$pt.Components.NFormButton model={rowModel} layout={layout} key='more-op'/>;
 		},
 		/**
 		 * render dropdown operation cell, only buttons which before maxButtonCount are renderred as a line,
@@ -13684,13 +13700,13 @@ window.$pt = $pt;
 			var _this = this;
 			var used = -1;
 			var buttons = [];
-			rowOperations.some(function(operation) {
+			rowOperations.some(function(operation, operationIndex) {
 				if (operation.editButton) {
 					buttons.push(_this.renderRowEditButton(rowModel));
 				} else if (operation.removeButton) {
 					buttons.push(_this.renderRowRemoveButton(rowModel));
 				} else {
-					buttons.push(_this.renderRowOperationButton(operation, rowModel));
+					buttons.push(_this.renderRowOperationButton(operation, rowModel, operationIndex));
 				}
 				used++;
 				return maxButtonCount - used == 1;
@@ -13774,7 +13790,7 @@ window.$pt = $pt;
 			}
 
 			var inlineModel = this.createInlineRowModel(row);
-			return (<tr className={className}>{
+			return (<tr className={className} key={rowIndex}>{
 				this.state.columns.map(function (column) {
 					if (columnIndex >= indexToRender.min && columnIndex <= indexToRender.max) {
 						// column is fixed.
@@ -13789,7 +13805,7 @@ window.$pt = $pt;
 						if (column.editable || column.removable || column.rowOperations != null) {
 							// operation column
 							data = _this.renderOperationCell(column, inlineModel);
-							style['text-align'] = "center";
+							style.textAlign = "center";
 						} else if (column.indexable) {
 							// index column
 							data = rowIndex;
@@ -13840,7 +13856,7 @@ window.$pt = $pt;
 							// data is property name
 							data = _this.getDisplayTextOfColumn(column, row);
 						}
-						return (<td style={style}>{data}</td>);
+						return (<td style={style} key={columnIndex}>{data}</td>);
 					} else {
 						columnIndex++;
 					}
@@ -13897,7 +13913,7 @@ window.$pt = $pt;
 		renderTableScrollY: function () {
 			var style = this.computeTableStyle();
 			var scrolledHeaderDivStyle = {
-				"overflow-y": "scroll"
+				overflowY: "scroll"
 			};
 			var scrolledBodyDivStyle = {
 				maxHeight: this.getComponentOption("scrollY"),
@@ -14089,7 +14105,7 @@ window.$pt = $pt;
 			if (this.isPageable() && this.hasDataToDisplay()) {
 				// only show when pageable and has data to display
 				return (<$pt.Components.NPagination className="n-table-pagination" pageCount={this.state.pageCount}
-				                     currentPageIndex={this.state.currentPageIndex} toPage={this.toPage.bind(this)}/>);
+				                     currentPageIndex={this.state.currentPageIndex} toPage={this.toPage}/>);
 			} else {
 				return null;
 			}
@@ -14549,7 +14565,7 @@ window.$pt = $pt;
 							icon: NTable.EDIT_DIALOG_SAVE_BUTTON_ICON,
 							text: NTable.EDIT_DIALOG_SAVE_BUTTON_TEXT,
 							style: "primary",
-							click: this.onAddCompleted.bind(this)
+							click: this.onAddCompleted
 						}],
 						reset: this.getComponentOption('dialogResetVisible'),
 						validate: this.getComponentOption('dialogValidateVisible')
@@ -14593,7 +14609,7 @@ window.$pt = $pt;
 							icon: NTable.EDIT_DIALOG_SAVE_BUTTON_ICON,
 							text: NTable.EDIT_DIALOG_SAVE_BUTTON_TEXT,
 							style: "primary",
-							click: this.onEditCompleted.bind(this),
+							click: this.onEditCompleted,
 							// show save when editing
 							view: 'edit'
 						}],
@@ -14654,7 +14670,7 @@ window.$pt = $pt;
 		 */
 		onSearchBoxChanged: function () {
 			var value = this.state.searchModel.get('text');
-			window.console.debug('Searching [text=' + value + '].');
+			// window.console.debug('Searching [text=' + value + '].');
 			if (value == null || value == "") {
 				this.setState({
 					searchText: null
@@ -14796,7 +14812,7 @@ window.$pt = $pt;
 				// do nothing
 			} else if (evt.type == "change") {
 				// do nothing
-				window.console.log('Table[' + this.getDataId() + '] data changed.');
+				// window.console.log('Table[' + this.getDataId() + '] data changed.');
 			}
 
 			if (this.getModel().getValidator() != null) {
@@ -15136,15 +15152,15 @@ window.$pt = $pt;
 			if (icon != null) {
 				iconCss['fa-' + icon] = true;
 			}
-			var iconPart = icon == null ? null : (<span className={$pt.LayoutHelper.classSet(iconCss)}/>);
+			var iconPart = icon == null ? null : (<span className={$pt.LayoutHelper.classSet(iconCss)} key='iconPart'/>);
 			var textPart = addon.text;
 			var innerParts = addon.iconFirst === false ? [textPart, iconPart] : [iconPart, textPart];
 			return (<span className={$pt.LayoutHelper.classSet(spanCss)}
 			              onClick={this.onAddonClicked.bind(this, addon.click)}>
-			{innerParts.map(function (part) {
-				return part;
-			})}
-		</span>);
+				{innerParts.map(function (part) {
+					return part;
+				})}
+			</span>);
 		},
 		/**
 		 * render

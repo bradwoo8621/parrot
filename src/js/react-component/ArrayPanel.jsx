@@ -110,7 +110,7 @@
 		 * @param item {{}}
 		 * @returns {XML}
 		 */
-		renderItem: function (item) {
+		renderItem: function (item, itemIndex) {
 			var parentModel = this.getModel();
 			var parentValidator = parentModel.getValidator();
 			var validator = null;
@@ -155,7 +155,7 @@
 					collapsedLabel: this.getComponentOption('collapsedLabel')
 				}
 			};
-			return (<div className='row'>
+			return (<div className='row' key={itemIndex}>
 				<div className='col-sm-12 col-md-12 col-lg-12'>
 					<$pt.Components.NPanel model={model}
 					        layout={$pt.createCellLayout('pseudo-panel', cellLayout)}

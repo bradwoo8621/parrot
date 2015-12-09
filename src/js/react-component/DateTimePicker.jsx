@@ -134,12 +134,16 @@
 			</div>);
 		},
 		renderHeaderMonth: function(date) {
-			return (<span onClick={this.renderPopover.bind(this, {date: date, type: NDateTime.FORMAT_TYPES.MONTH})} className='header-date-btn'>
+			return (<span onClick={this.renderPopover.bind(this, {date: date, type: NDateTime.FORMAT_TYPES.MONTH})}
+						  className='header-date-btn'
+						  key='header-month'>
 				{this.convertValueToString(date, this.getHeaderMonthFormat())}
 			</span>);
 		},
 		renderHeaderYear: function(date) {
-			return (<span onClick={this.renderPopover.bind(this, {date: date, type: NDateTime.FORMAT_TYPES.YEAR})} className='header-date-btn'>
+			return (<span onClick={this.renderPopover.bind(this, {date: date, type: NDateTime.FORMAT_TYPES.YEAR})}
+						  className='header-date-btn'
+						  key='header-year'>
 				{this.convertValueToString(date, this.getHeaderYearFormat())}
 			</span>);
 		},
@@ -229,12 +233,12 @@
 			var today = this.getToday();
 			return (<div className='calendar-body day-view'>
 				<div className='day-view-body-header row'>
-					{header.map(function(day) {
-						return <div className='cell-7-1'>{day}</div>;
+					{header.map(function(weekday, weekdayIndex) {
+						return <div className='cell-7-1' key={'weekday-' + weekdayIndex}>{weekday}</div>;
 					})}
 				</div>
 				<div className='day-view-body-body row'>
-					{days.map(function(day) {
+					{days.map(function(day, dayIndex) {
 						var css = {
 							'cell-7-1': true,
 							'gap-day': (day.month() != currentMonth),
@@ -242,7 +246,8 @@
 							'current-value': value != null && day.isSame(value, 'day')
 						};
 						return (<div className={$pt.LayoutHelper.classSet(css)}
-									 onClick={_this.onDaySelected.bind(_this, day)}>
+									 onClick={_this.onDaySelected.bind(_this, day)}
+									 key={'day-' + dayIndex}>
 							<span>{day.date()}</span>
 						</div>);
 					})}
@@ -298,7 +303,8 @@
 							'current-value': value != null && index == value.month()
 						};
 						return (<div className={$pt.LayoutHelper.classSet(css)}
-									 onClick={_this.onMonthSelected.bind(_this, selectedDay)}>
+									 onClick={_this.onMonthSelected.bind(_this, selectedDay)}
+									 key={index}>
 							{month}
 						</div>);
 					})}
@@ -351,14 +357,15 @@
 			}
 			return (<div className='calendar-body month-view'>
 				<div className='year-view-body-body row'>
-					{years.map(function(year) {
+					{years.map(function(year, yearIndex) {
 						var css = {
 							'cell-4-1': true,
 							today: year.year() == today.year(),
 							'current-value': value != null && year.year() == value.year()
 						};
 						return (<div className={$pt.LayoutHelper.classSet(css)}
-									 onClick={_this.onYearSelected.bind(_this, year)}>
+									 onClick={_this.onYearSelected.bind(_this, year)}
+									 key={yearIndex}>
 							{year.format(_this.getBodyYearFormat())}
 						</div>);
 					})}
@@ -400,13 +407,14 @@
 						  x1={startLength * Math.cos(Math.PI * 2 * degree / 360) + offset}
 						  y1={offset - startLength * Math.sin(Math.PI * 2 * degree / 360)}
 						  x2={radius * Math.cos(Math.PI * 2 * degree / 360) + offset}
-						  y2={offset - radius * Math.sin(Math.PI * 2 * degree / 360)}/>);
+						  y2={offset - radius * Math.sin(Math.PI * 2 * degree / 360)}
+						  key={degree}/>);
 		},
 		render12HourDial: function(date, popoverType) {
 			var _this = this;
 			var am = date.hour() <= 11; // 0-23
 			var hourRadius = this.getHourRadius();
-			return (<g>
+			return (<g key='hour-12-dial'>
 				<text className={'text hour-12 am' + (am ? ' yes' : '')}
 					  onClick={this.onAMPMSelected.bind(this, true, popoverType)}
 					  x={0}
@@ -439,7 +447,7 @@
 		render24HourDial: function() {
 			var _this = this;
 			var hourRadius = this.getHourRadius();
-			return (<g>
+			return (<g key='hour-24-dial'>
 				<text className='text hour-24 top-num'
 					  x={NDateTime.CLOCK_CHAR_POS.TOP.X}
 					  y={NDateTime.CLOCK_CHAR_POS.TOP.Y + NDateTime.CLOCK_RADIUS - hourRadius}>0</text>
@@ -474,7 +482,7 @@
 				return null;
 			}
 			var _this = this;
-			return (<g>
+			return (<g key='minute-dial'>
 				<text className='text minute top-num'
 					  x={NDateTime.CLOCK_CHAR_POS.TOP.X}
 					  y={NDateTime.CLOCK_CHAR_POS.TOP.Y}>0</text>

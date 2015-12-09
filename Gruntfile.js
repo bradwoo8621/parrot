@@ -488,13 +488,16 @@ module.exports = function(grunt) {
 						'bootstrap': 'bootstrap'
 				    },
 					module: {
-					loaders: [
-						{
-							test: /\.js$/,
-							exclude: /node_modules/,
-							loaders: ["babel-loader"],
-						}
-					],
+						loaders: [
+							{
+								test: /\.js$/,
+								exclude: /node_modules/,
+								loader: "babel-loader",
+								query: {
+									compact: false
+								}
+							}
+						],
 					},
 					stats: {
 				        // Configure the console output
