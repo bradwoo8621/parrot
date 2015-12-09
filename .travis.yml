@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - 0.12
+  - 4.1
 install:
   - npm install -g grunt-cli
   - npm install grunt
@@ -16,7 +16,7 @@ install:
   - npm install grunt-replace
   - npm install grunt-webpack
 
-  # - npm install jsdom
+  - npm install jsdom
   - npm install jquery
   - npm install jsface
   - npm install moment
