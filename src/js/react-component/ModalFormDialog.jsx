@@ -260,7 +260,7 @@
 				this.getModel().reset();
 				this.refs.form.forceUpdate();
 			};
-			NConfirm.getConfirmModal().show(NModalForm.RESET_CONFIRM_TITLE,
+			$pt.Components.NConfirm.getConfirmModal().show(NModalForm.RESET_CONFIRM_TITLE,
 				NModalForm.RESET_CONFIRM_MESSAGE,
 				reset.bind(this));
 		},
@@ -278,7 +278,7 @@
 			if (this.state.buttons && (typeof this.state.buttons.cancel === 'function')) {
 				this.hide();
 			} else {
-				NConfirm.getConfirmModal().show(NModalForm.CANCEL_CONFIRM_TITLE,
+				$pt.Components.NConfirm.getConfirmModal().show(NModalForm.CANCEL_CONFIRM_TITLE,
 					NModalForm.CANCEL_CONFIRM_MESSAGE,
 					this.hide.bind(this));
 			}

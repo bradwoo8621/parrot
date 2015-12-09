@@ -9,7 +9,8 @@ module.exports = function(grunt) {
 			clean: {
 				all: ['<%= targetPath %>/parrot/', '<%= middlePath %>'],
 				mid: ['<%= middlePath %>'],
-				compile: ['<%= targetPath %>/parrot/']
+				compile: ['<%= targetPath %>/parrot/'],
+				webpack: ['<%= targetPath %>/parrot/webpack']
 			},
 			replace: {
 				// remove the @import from bootswatch css
@@ -95,6 +96,19 @@ module.exports = function(grunt) {
 						'<%= middlePath %>/js/react-component/*.js',
 						'<%= middlePath %>/js/parrot-post-define.js'],
 					dest: '<%= targetPath %>/parrot/js/<%= pkg.groupId %>.<%= pkg.artifactId %>.js'
+				},
+				webpack: {
+					src: ['src/module/require.js',
+						'src/js/browser-patch.jsx',
+						'src/js/parrot-jsface.jsx',
+						'src/js/parrot-pre-define.jsx',
+						'src/js/parrot-ajax.jsx',
+						'src/js/parrot-codetable.jsx',
+						'src/js/parrot-model.jsx',
+						'src/js/parrot-component.jsx',
+						'src/js/react-component/*.jsx',
+						'src/module/exports.js'],
+					dest: '<%= targetPath %>/parrot/webpack/<%= pkg.groupId %>.<%= pkg.artifactId %>.jsx'
 				}
 			},
 			uglify: {
@@ -138,6 +152,10 @@ module.exports = function(grunt) {
 						dest: '<%= middlePath %>/js/',
 						ext: '.js'
 					}]
+				},
+				webpack: {
+					src: '<%= concat.webpack.dest %>',
+					dest: '<%= targetPath %>/parrot/webpack/<%= pkg.groupId %>.<%= pkg.artifactId %>.js'
 				}
 			},
 			copy: {
@@ -443,42 +461,55 @@ module.exports = function(grunt) {
 			// Unit tests.
 	        nodeunit: {
 	            tests: ['unit-test/test.js']
-	        }
-			// webpack: {
-			// 	parrot: {
-			// 		// entry: './<%= concat.js.dest %>',
-			// 		entry: './temp-test/webpack-test.js',
-			// 		output: {
-			// 			// path: '<%= targetPath %>/parrot/js/',
-			// 			// filename: '<%= pkg.groupId %>.<%= pkg.artifactId %>.[hash].js'
-			// 			path: './temp-test',
-			// 			filename: 'bundle.js'
-			// 		},
-			// 		externals: {
-			// 	        "jquery": "jQuery"
-			// 	    },
-			// 		stats: {
-			// 	        // Configure the console output
-			// 	        colors: false,
-			// 	        modules: true,
-			// 	        reasons: true
-			// 	    },
-			// 	    storeStatsTo: "xyz", // writes the status to a variable named xyz
-			// 	    // you may use it later in grunt i.e. <%= xyz.hash %>
-			// 	    progress: false, // Don't show progress
-			// 	    // Defaults to true
-			// 	    failOnError: true, // don't report error to grunt if webpack find errors
-			// 	    // Use this if webpack errors are tolerable and grunt should continue
-			// 	    watch: false, // use webpacks watcher
-			// 	    // You need to keep the grunt process alive
-			// 	    keepalive: false, // don't finish the grunt task
-			// 	    // Use this in combination with the watch option
-			// 	    inline: false,  // embed the webpack-dev-server runtime into the bundle
-			// 	    // Defaults to false
-			// 	    hot: false, // adds the HotModuleReplacementPlugin and switch the server to hot mode
-			// 	    // Use this in combination with the inline option
-			// 	}
-			// }
+	        },
+			webpack: {
+				parrot: {
+					entry: './<%= react.webpack.dest %>',
+					output: {
+						path: '<%= targetPath %>/parrot/webpack/',
+						filename: '<%= pkg.groupId %>.<%= pkg.artifactId %>.webpack.js'
+					},
+					externals: {
+				        jquery: 'jQuery',
+						react: 'React',
+						moment: 'moment',
+						jsface: 'jsface',
+						'jquery.browser': 'jQuery.browser',
+						'jquery-deparam': 'jQuery.deparam',
+						'jquery-mousewheel': 'jQuery',
+						'bootstrap-fileinput': 'jQuery.fn.fileInput'
+				    },
+					module: {
+					loaders: [
+						{
+							test: /\.js$/,
+							exclude: /node_modules/,
+							loaders: ["babel-loader"],
+						}
+					],
+					},
+					stats: {
+				        // Configure the console output
+				        colors: false,
+				        modules: true,
+				        reasons: true
+				    },
+				    storeStatsTo: "xyz", // writes the status to a variable named xyz
+				    // you may use it later in grunt i.e. <%= xyz.hash %>
+				    progress: false, // Don't show progress
+				    // Defaults to true
+				    failOnError: true, // don't report error to grunt if webpack find errors
+				    // Use this if webpack errors are tolerable and grunt should continue
+				    watch: false, // use webpacks watcher
+				    // You need to keep the grunt process alive
+				    keepalive: false, // don't finish the grunt task
+				    // Use this in combination with the watch option
+				    inline: false,  // embed the webpack-dev-server runtime into the bundle
+				    // Defaults to false
+				    hot: false, // adds the HotModuleReplacementPlugin and switch the server to hot mode
+				    // Use this in combination with the inline option
+				}
+			}
 		});
 
 	grunt.loadNpmTasks('grunt-contrib-copy');
@@ -501,6 +532,6 @@ module.exports = function(grunt) {
 	grunt.registerTask('css-compile', ['bootswatch', 'css-parrot']);
 	grunt.registerTask('deploy', ['clean:all', 'bower-copy', 'js-compile', 'css-compile', 'copy:fonts', 'clean:mid']);
 	grunt.registerTask('default', ['clean:compile', 'js-compile', 'css-parrot', 'clean:mid']);
-	grunt.registerTask('modules', ['webpack:parrot']);
+	grunt.registerTask('modules', ['clean:webpack', 'concat:webpack', 'react:webpack', 'webpack:parrot']);
 	grunt.registerTask('test', ['nodeunit']);
 };

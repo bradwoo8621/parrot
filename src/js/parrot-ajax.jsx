@@ -29,7 +29,7 @@
 		// show
 		if (quiet === true) {
 		} else {
-			NOnRequestModal.getOnRequestModal().show();
+			$pt.Components.NOnRequestModal.getOnRequestModal().show();
 		}
 
 		return $.ajax(url, options)
@@ -49,17 +49,17 @@
 					if (callback != null) {
 						callback(jqXHR, textStatus, errorThrown);
 					} else {
-						NExceptionModal.getExceptionModal().show("" + jqXHR.status, jqXHR.responseText);
+						$pt.Components.NExceptionModal.getExceptionModal().show("" + jqXHR.status, jqXHR.responseText);
 					}
 				} else {
-					NExceptionModal.getExceptionModal().show("" + jqXHR.status, jqXHR.responseText);
+					$pt.Components.NExceptionModal.getExceptionModal().show("" + jqXHR.status, jqXHR.responseText);
 				}
 			})
 			.always(function () {
 				// hide
 				if (quiet === true) {
 				} else {
-					NOnRequestModal.getOnRequestModal().hide();
+					$pt.Components.NOnRequestModal.getOnRequestModal().hide();
 				}
 			});
 	};

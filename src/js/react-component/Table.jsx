@@ -1735,9 +1735,9 @@
 				if (!canRemove || canRemove.call(this, this.getModel(), data)) {
 					this.getModel().remove(this.getDataId(), data);
 				}
-				NConfirm.getConfirmModal().hide();
+				$pt.Components.NConfirm.getConfirmModal().hide();
 			};
-			NConfirm.getConfirmModal().show(NTable.REMOVE_CONFIRM_TITLE,
+			$pt.Components.NConfirm.getConfirmModal().show(NTable.REMOVE_CONFIRM_TITLE,
 				NTable.REMOVE_CONFIRM_MESSAGE,
 				removeRow.bind(this, data));
 		},
@@ -1853,7 +1853,7 @@
 		 */
 		getEditDialog: function () {
 			if (this.state.editDialog === undefined || this.state.editDialog === null) {
-				this.state.editDialog = NModalForm.createFormModal(this.getLayout().getLabel());
+				this.state.editDialog = $pt.Components.NModalForm.createFormModal(this.getLayout().getLabel());
 			}
 			return this.state.editDialog;
 		},

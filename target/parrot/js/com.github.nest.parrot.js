@@ -2,7 +2,7 @@
 (function (window, $, browser) {
 	var patches = {
 		console: function () {
-			if (browser.msie && browser.versionNumber <= 10) {
+			if (browser && browser.msie && browser.versionNumber <= 10) {
 				var method;
 				var noop = function () {
 				};
@@ -384,7 +384,7 @@
 		// show
 		if (quiet === true) {
 		} else {
-			NOnRequestModal.getOnRequestModal().show();
+			$pt.Components.NOnRequestModal.getOnRequestModal().show();
 		}
 
 		return $.ajax(url, options)
@@ -404,17 +404,17 @@
 					if (callback != null) {
 						callback(jqXHR, textStatus, errorThrown);
 					} else {
-						NExceptionModal.getExceptionModal().show("" + jqXHR.status, jqXHR.responseText);
+						$pt.Components.NExceptionModal.getExceptionModal().show("" + jqXHR.status, jqXHR.responseText);
 					}
 				} else {
-					NExceptionModal.getExceptionModal().show("" + jqXHR.status, jqXHR.responseText);
+					$pt.Components.NExceptionModal.getExceptionModal().show("" + jqXHR.status, jqXHR.responseText);
 				}
 			})
 			.always(function () {
 				// hide
 				if (quiet === true) {
 				} else {
-					NOnRequestModal.getOnRequestModal().hide();
+					$pt.Components.NOnRequestModal.getOnRequestModal().hide();
 				}
 			});
 	};
@@ -8815,7 +8815,7 @@
 				this.getModel().reset();
 				this.refs.form.forceUpdate();
 			};
-			NConfirm.getConfirmModal().show(NModalForm.RESET_CONFIRM_TITLE,
+			$pt.Components.NConfirm.getConfirmModal().show(NModalForm.RESET_CONFIRM_TITLE,
 				NModalForm.RESET_CONFIRM_MESSAGE,
 				reset.bind(this));
 		},
@@ -8833,7 +8833,7 @@
 			if (this.state.buttons && (typeof this.state.buttons.cancel === 'function')) {
 				this.hide();
 			} else {
-				NConfirm.getConfirmModal().show(NModalForm.CANCEL_CONFIRM_TITLE,
+				$pt.Components.NConfirm.getConfirmModal().show(NModalForm.CANCEL_CONFIRM_TITLE,
 					NModalForm.CANCEL_CONFIRM_MESSAGE,
 					this.hide.bind(this));
 			}
@@ -10724,7 +10724,7 @@
 		 */
 		showAdvancedSearchDialog: function () {
 			if (!this.state.searchDialog) {
-				this.state.searchDialog = NModalForm.createFormModal(this.getLayout().getLabel(), 'advanced-search-dialog');
+				this.state.searchDialog = $pt.Components.NModalForm.createFormModal(this.getLayout().getLabel(), 'advanced-search-dialog');
 			}
 			this.state.searchDialog.show({
 				model: this.getAdvancedSearchDialogModel(),
@@ -14620,9 +14620,9 @@
 				if (!canRemove || canRemove.call(this, this.getModel(), data)) {
 					this.getModel().remove(this.getDataId(), data);
 				}
-				NConfirm.getConfirmModal().hide();
+				$pt.Components.NConfirm.getConfirmModal().hide();
 			};
-			NConfirm.getConfirmModal().show(NTable.REMOVE_CONFIRM_TITLE,
+			$pt.Components.NConfirm.getConfirmModal().show(NTable.REMOVE_CONFIRM_TITLE,
 				NTable.REMOVE_CONFIRM_MESSAGE,
 				removeRow.bind(this, data));
 		},
@@ -14738,7 +14738,7 @@
 		 */
 		getEditDialog: function () {
 			if (this.state.editDialog === undefined || this.state.editDialog === null) {
-				this.state.editDialog = NModalForm.createFormModal(this.getLayout().getLabel());
+				this.state.editDialog = $pt.Components.NModalForm.createFormModal(this.getLayout().getLabel());
 			}
 			return this.state.editDialog;
 		},
