@@ -3,6 +3,18 @@
 var jsdom = require('jsdom').jsdom;
 global.document = jsdom('<html></html>', {});
 global.window = document.defaultView;
+propagateToGlobal(window);
+
+function propagateToGlobal (window) {
+	for (let key in window) {
+		if (!window.hasOwnProperty(key))
+			continue;
+		if (key in global)
+			continue;
+
+		global[key] = window[key];
+	}
+}
 
 global.jQuery = global.$ = require('jquery');
 console.log('jQuery loaded: ' + (global.jQuery != null && global.jQuery === jQuery));
@@ -25,8 +37,8 @@ console.log('bootstrap-fileinput loaded: ' + (jQuery.fn.fileinput != null));
 global.moment = require('moment');
 console.log('moment loaded: ' + (global.moment != null));
 
-// global.React = require('react');
-// console.log('react loaded: ' + (global.React != null));
+global.React = require('react');
+console.log('react loaded: ' + (global.React != null));
 
 global.jsface = require('jsface');
 console.log('jsface loaded: ' + (global.jsface != null));
