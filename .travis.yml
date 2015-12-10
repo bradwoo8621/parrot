@@ -14,7 +14,6 @@ install:
   - npm install grunt-contrib-less
   - npm install grunt-react
   - npm install grunt-replace
-  - npm install grunt-webpack
 
   - npm install jsdom
   - npm install jquery
