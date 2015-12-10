@@ -137,7 +137,7 @@
 			Object.keys(this.refs).forEach(function (key) {
 				if (key.endsWith('_link')) {
 					var linkId = key.substr(0, key.length - 5);
-					if (!id.startsWith(linkId)) {
+					if (!id || !id.startsWith(linkId)) {
 						var ul = $(React.findDOMNode(_this.refs[linkId + '_child']));
 						ul.hide('fade', function () {
 							ul.find('ul').hide();
