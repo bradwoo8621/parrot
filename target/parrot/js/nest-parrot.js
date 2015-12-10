@@ -1,4 +1,4 @@
-/** com.github.nest.parrot.V0.0.6 2015-12-09 */
+/** nest-parrot.V0.0.6 2015-12-10 */
 (function (window, $, browser) {
 	var patches = {
 		console: function () {
@@ -16381,8 +16381,9 @@
 }(window, jQuery, React, $pt));
 
 // only packaged in browser environment
-(function (window) {
-	var $pt = window.$pt;
+(function (window, $pt) {
 	// expose all components definition to window
-	$pt.exposeComponents(window);
-}(window));
+	if (typeof DONT_EXPOSE_PARROT_TO_GLOBAL === 'undefined' || DONT_EXPOSE_PARROT_TO_GLOBAL !== true) {
+		$pt.exposeComponents(window);
+	}
+}(window, $pt));

@@ -1,6 +1,7 @@
 // only packaged in browser environment
-(function (window) {
-	var $pt = window.$pt;
+(function (window, $pt) {
 	// expose all components definition to window
-	$pt.exposeComponents(window);
-}(window));
+	if (typeof DONT_EXPOSE_PARROT_TO_GLOBAL === 'undefined' || DONT_EXPOSE_PARROT_TO_GLOBAL !== true) {
+		$pt.exposeComponents(window);
+	}
+}(window, $pt));

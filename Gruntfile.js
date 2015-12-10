@@ -9,8 +9,7 @@ module.exports = function(grunt) {
 			clean: {
 				all: ['<%= targetPath %>/parrot/', '<%= middlePath %>'],
 				mid: ['<%= middlePath %>'],
-				compile: ['<%= targetPath %>/parrot/'],
-				webpack: ['<%= targetPath %>/parrot/webpack']
+				compile: ['<%= targetPath %>/parrot/']
 			},
 			replace: {
 				// remove the @import from bootswatch css
@@ -52,6 +51,24 @@ module.exports = function(grunt) {
 							}
 						}
 					]
+				},
+				module: {
+					options: {
+						patterns: [
+							{
+								match: /\/\/ parrot body here/,
+								replacement: '<%= grunt.file.read("target/parrot/js/nest-parrot.js") %>'
+							}
+						]
+					},
+					files: [
+						{
+							expand: true,
+							cwd: 'src/module/',
+							src: ['nest-parrot.js'],
+							dest: '<%= targetPath %>/parrot/module/'
+						}
+					]
 				}
 			},
 			cssmin: {
@@ -83,9 +100,9 @@ module.exports = function(grunt) {
 			concat: {
 				options: {
 					separator: '\n',
-					banner: '/** <%= pkg.groupId %>.<%= pkg.artifactId %>.V<%= pkg.version %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+					banner: '/** <%= pkg.name %>.V<%= pkg.version %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
 				},
-				js: {
+				parrot: {
 					src: ['<%= middlePath %>/js/browser-patch.js',
 						'<%= middlePath %>/js/parrot-jsface.js',
 						'<%= middlePath %>/js/parrot-pre-define.js',
@@ -95,38 +112,25 @@ module.exports = function(grunt) {
 						'<%= middlePath %>/js/parrot-component.js',
 						'<%= middlePath %>/js/react-component/*.js',
 						'<%= middlePath %>/js/parrot-post-define.js'],
-					dest: '<%= targetPath %>/parrot/js/<%= pkg.groupId %>.<%= pkg.artifactId %>.js'
-				},
-				webpack: {
-					src: ['src/module/require.js',
-						'src/js/browser-patch.jsx',
-						'src/js/parrot-jsface.jsx',
-						'src/js/parrot-pre-define.jsx',
-						'src/js/parrot-ajax.jsx',
-						'src/js/parrot-codetable.jsx',
-						'src/js/parrot-model.jsx',
-						'src/js/parrot-component.jsx',
-						'src/js/react-component/*.jsx',
-						'src/module/exports.js'],
-					dest: '<%= targetPath %>/parrot/webpack/<%= pkg.groupId %>.<%= pkg.artifactId %>.jsx'
+					dest: '<%= targetPath %>/parrot/js/<%= pkg.name %>.js'
 				}
 			},
 			uglify: {
 				parrot: {
 					options: {
-						banner: '/** <%= pkg.groupId %>.<%= pkg.artifactId %>.V<%= pkg.version %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
+						banner: '/** <%= pkg.name %>.V<%= pkg.version %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
 						sourceMap: true
 					},
 					files: {
-						'<%= targetPath %>/parrot/js/<%= pkg.groupId %>.<%= pkg.artifactId %>.min.js': ['<%= concat.js.dest %>']
+						'<%= targetPath %>/parrot/js/<%= pkg.name %>.min.js': ['<%= concat.parrot.dest %>']
 					}
 				},
-				webpack: {
+				module: {
 					options: {
 						sourceMap: true
 					},
 					files: {
-						'<%= targetPath %>/parrot/webpack/<%= pkg.groupId %>.<%= pkg.artifactId %>.webpack.min.js': '<%= targetPath %>/parrot/webpack/<%= pkg.groupId %>.<%= pkg.artifactId %>.webpack.js'
+						'<%= targetPath %>/parrot/module/<%= pkg.name %>.min.js': ['<%= targetPath %>/parrot/module/<%= pkg.name %>.js']
 					}
 				}
 			},
@@ -159,10 +163,6 @@ module.exports = function(grunt) {
 						dest: '<%= middlePath %>/js/',
 						ext: '.js'
 					}]
-				},
-				webpack: {
-					src: '<%= concat.webpack.dest %>',
-					dest: '<%= targetPath %>/parrot/webpack/<%= pkg.groupId %>.<%= pkg.artifactId %>.js'
 				}
 			},
 			copy: {
@@ -367,15 +367,6 @@ module.exports = function(grunt) {
 				},
 				'parrot-min-css-pre': {
 					files: [
-						//{
-						//    expand: true,
-						//    cwd: 'src/css/',
-						//    src: 'parrot.*.css',
-						//    dest: '<%= middlePath %>/parrot/css/temp/',
-						//    rename: function (dest, src) {
-						//        return dest + src.replace('parrot.', 'parrot_');
-						//    }
-						//},
 						{
 							expand: true,
 							cwd: 'src/css/',
@@ -410,7 +401,7 @@ module.exports = function(grunt) {
 							cwd: '<%= middlePath %>/parrot/css/',
 							src: ['*.css', '*.map'],
 							dest: '<%= targetPath %>/parrot/css/',
-							newName: '<%= pkg.groupId %>.<%= pkg.artifactId %>',
+							newName: '<%= pkg.name %>',
 							versionName: '<%= pkg.version %>',
 							rename: function(dest, src, options) {
 								return dest + src.replace('parrot', options.newName);
@@ -468,59 +459,7 @@ module.exports = function(grunt) {
 			// Unit tests.
 	        nodeunit: {
 	            tests: ['unit-test/test.js']
-	        },
-			webpack: {
-				parrot: {
-					entry: './<%= react.webpack.dest %>',
-					output: {
-						path: '<%= targetPath %>/parrot/webpack/',
-						filename: '<%= pkg.groupId %>.<%= pkg.artifactId %>.webpack.js'
-					},
-					externals: {
-				        jquery: 'jQuery',
-						react: 'React',
-						moment: 'moment',
-						jsface: 'jsface',
-						'jquery.browser': 'jQuery.browser',
-						'jquery-deparam': 'jQuery.deparam',
-						'jquery-mousewheel': 'jQuery.fn.mousewheel',
-						'bootstrap-fileinput': 'jQuery.fn.fileInput',
-						'bootstrap': 'bootstrap'
-				    },
-					module: {
-						loaders: [
-							{
-								test: /\.js$/,
-								exclude: /node_modules/,
-								loader: "babel-loader",
-								query: {
-									compact: false
-								}
-							}
-						],
-					},
-					stats: {
-				        // Configure the console output
-				        colors: false,
-				        modules: true,
-				        reasons: true
-				    },
-				    storeStatsTo: "xyz", // writes the status to a variable named xyz
-				    // you may use it later in grunt i.e. <%= xyz.hash %>
-				    progress: false, // Don't show progress
-				    // Defaults to true
-				    failOnError: true, // don't report error to grunt if webpack find errors
-				    // Use this if webpack errors are tolerable and grunt should continue
-				    watch: false, // use webpacks watcher
-				    // You need to keep the grunt process alive
-				    keepalive: false, // don't finish the grunt task
-				    // Use this in combination with the watch option
-				    inline: false,  // embed the webpack-dev-server runtime into the bundle
-				    // Defaults to false
-				    hot: false, // adds the HotModuleReplacementPlugin and switch the server to hot mode
-				    // Use this in combination with the inline option
-				}
-			}
+	        }
 		});
 
 	grunt.loadNpmTasks('grunt-contrib-copy');
@@ -533,16 +472,15 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-less');
 	grunt.loadNpmTasks('grunt-react');
 	grunt.loadNpmTasks('grunt-replace');
-	grunt.loadNpmTasks('grunt-webpack');
 
 	// copy bower files to target
 	grunt.registerTask('bower-copy', ['copy:bower-dependency']);
-	grunt.registerTask('js-compile', ['react:parrot', 'jshint:parrot', 'concat:js', 'uglify:parrot']);
+	grunt.registerTask('js-compile', ['react:parrot', 'jshint:parrot', 'concat:parrot', 'uglify:parrot']);
 	grunt.registerTask('bootswatch', ['copy:bootswatch-pre', 'replace:bootswatch', 'cssmin:bootswatch', 'copy:bootswatch-post']);
 	grunt.registerTask('css-parrot', ['less:parrot', 'copy:parrot-min-css-pre', 'cssmin:parrot', 'copy:parrot-min-css-post', 'copy:parrot-css']);
 	grunt.registerTask('css-compile', ['bootswatch', 'css-parrot']);
-	grunt.registerTask('deploy', ['clean:all', 'bower-copy', 'js-compile', 'css-compile', 'copy:fonts', 'clean:mid']);
-	grunt.registerTask('default', ['clean:compile', 'js-compile', 'css-parrot', 'clean:mid']);
-	grunt.registerTask('modules', ['clean:webpack', 'concat:webpack', 'react:webpack', 'webpack:parrot', 'uglify:webpack']);
+	grunt.registerTask('deploy', ['clean:all', 'bower-copy', 'js-compile', 'module', 'css-compile', 'copy:fonts', 'clean:mid']);
+	grunt.registerTask('module', ['replace:module', 'uglify:module']);
+	grunt.registerTask('default', ['clean:compile', 'js-compile', 'module', 'css-parrot', 'clean:mid']);
 	grunt.registerTask('test', ['nodeunit']);
 };

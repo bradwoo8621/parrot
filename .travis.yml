@@ -22,7 +22,7 @@ install:
   - npm install moment
   - npm install jquery.browser
   - npm install jquery-deparam
-  - npm install jquery.mousewheel
+  - npm install jquery-mousewheel
   - npm install react
-  - npm install bootstrap-fileinput
+  - npm install bootstrap-fileinput-npm
   - npm install bootstrap

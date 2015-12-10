@@ -989,7 +989,7 @@ div.n-form-cell {
   padding-bottom: 3px;
 }
 div.n-form-cell .n-form-cell-tooltip {
-  color: #90a4ae;
+  color: #90A4AE;
   font-size: 0.95em;
   margin-left: 3px;
 }
@@ -2099,7 +2099,7 @@ div.n-toggle span.n-toggle-false:before {
   outline: 0;
 }
 div.n-toggle.n-disabled > div.toggle-container.checked > span.n-toggle-true {
-  background-color: #eeeeee;
+  background-color: #EEEEEE;
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);
   -o-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);
   -webkit-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);
@@ -3196,10 +3196,10 @@ div.has-error div.n-toggle.n-disabled > div.toggle-container > span.n-toggle-lin
 }
 div.has-error div.n-toggle span.n-toggle-true,
 div.has-error div.n-toggle.n-disabled > div.toggle-container.checked > span.n-toggle-true {
-  background-color: #d32f2f;
+  background-color: #D32F2F;
 }
 div.has-error div.n-toggle span.n-toggle-true:before {
-  background-color: #d32f2f;
+  background-color: #D32F2F;
 }
 div.has-error div.n-select-tree .form-control {
   color: #f44336;

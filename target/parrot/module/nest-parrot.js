@@ -1,19 +1,35 @@
-/** com.github.nest.parrot.V0.0.6 2015-12-09 */
-var jQuery = require('jquery');
-var React = require('react');
-var moment = require('moment');
-var jsface = require('jsface');
-var browser = require('jquery.browser');
-var deparam = require('jquery-deparam');
-var wheel = require('jquery-mousewheel');
-var fileInput = require('bootstrap-fileinput');
-var bootstrap = require('bootstrap');
+(function( global, factory ) {
+	if ( typeof module === "object" && typeof module.exports === "object" ) {
+		// CMD
+		// all dependencies need to passed as parameters manually,
+		// will not require here.
+		module.exports = factory;
+	} else if ( typeof define === 'function' && define.amd ) {
+        // AMD. Register as parrot
+		// TODO how to define the jquery plugin here?
+        define('parrot', ['jquery', 'jsface', 'moment', 'react'], factory);
+	} else {
+		// in browser, global is window.
+		// all dependencies were loaded already.
+		// bootstrap and jquery's plugin are all attached to jquery,
+		// expose $pt and all components to window.
+		factory(global, jQuery, jsface, moment, React);
+	}
+}(typeof window !== "undefined" ? window : this, function(window, jQuery, jsface, moment, React, DONT_EXPOSE_PARROT_TO_GLOBAL) {
+	var _pt = window.$pt;
+	var $pt = {};
+	window.$pt = $pt;
 
-var oldPT = window.$pt;
+	var browser = jQuery.browser;
+	var deparam = jQuery.deparam;
 
-var $pt = {};
-window.$pt = $pt;
+	$pt.noConflict = function() {
+		window.$pt = _pt;
+		return $pt;
+	};
 
+	// insert all source code here
+	/** nest-parrot.V0.0.6 2015-12-10 */
 (function (window, $, browser) {
 	var patches = {
 		console: function () {
@@ -3258,7 +3274,7 @@ window.$pt = $pt;
 			var parameters = $pt.LayoutHelper.transformParameters(
 				this.getModel(), labelLayout, this.props.direction, true);
 			parameters.ref = 'viewLabel';
-			return <$pt.Components.NLabel {...parameters} />;
+			return React.createElement($pt.Components.NLabel, React.__spread({},  parameters));
 		},
 		/**
 		 * get id of component
@@ -3458,14 +3474,14 @@ window.$pt = $pt;
 				disabled: !this.isEnabled()
 			};
 			css[this.getAdditionalCSS('normal-line', 'normal-line')] = true;
-			return <hr className={$pt.LayoutHelper.classSet(css)} ref='normalLine'/>;
+			return React.createElement("hr", {className: $pt.LayoutHelper.classSet(css), ref: "normalLine"});
 		},
 		/**
 		 * render focus bottom border
 		 * @returns {XML}
 		 */
 		renderFocusLine: function () {
-			return <hr className={this.getAdditionalCSS('focus-line', 'focus-line')} ref='focusLine'/>;
+			return React.createElement("hr", {className: this.getAdditionalCSS('focus-line', 'focus-line'), ref: "focusLine"});
 		},
 		/**
 		 * add dependencies monitor
@@ -3802,7 +3818,7 @@ window.$pt = $pt;
 				}
 			});
 			model.addPostChangeListener('checked', this.onCodeItemCheckedChanged.bind(this, item));
-			return <$pt.Components.NCheck model={model} layout={layout} key={itemIndex}/>;
+			return React.createElement($pt.Components.NCheck, {model: model, layout: layout, key: itemIndex});
 		},
 		render: function() {
 			var enabled = this.isEnabled();
@@ -3811,9 +3827,9 @@ window.$pt = $pt;
 				vertical: this.getComponentOption('direction') === 'vertical'
 			};
 			css[this.getComponentCSS('n-array-check')] = true;
-			return (<div className={$pt.LayoutHelper.classSet(css)}>
-				{this.getCodeTable().list().map(this.renderItem.bind(this, enabled))}
-			</div>);
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
+				this.getCodeTable().list().map(this.renderItem.bind(this, enabled))
+			));
 		},
 		onModelChanged: function() {
 			this.forceUpdate();
@@ -3863,7 +3879,7 @@ window.$pt = $pt;
 	}));
 	$pt.Components.NArrayCheck = NArrayCheck;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayCheck, function (model, layout, direction, viewMode) {
-		return <$pt.Components.NArrayCheck {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return React.createElement($pt.Components.NArrayCheck, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -4024,23 +4040,23 @@ window.$pt = $pt;
 					collapsedLabel: this.getComponentOption('collapsedLabel')
 				}
 			};
-			return (<div className='row' key={itemIndex}>
-				<div className='col-sm-12 col-md-12 col-lg-12'>
-					<$pt.Components.NPanel model={model}
-					        layout={$pt.createCellLayout('pseudo-panel', cellLayout)}
-					        direction={this.props.direction}
-							view={this.isViewMode()}/>
-				</div>
-			</div>);
+			return (React.createElement("div", {className: "row", key: itemIndex}, 
+				React.createElement("div", {className: "col-sm-12 col-md-12 col-lg-12"}, 
+					React.createElement($pt.Components.NPanel, {model: model, 
+					        layout: $pt.createCellLayout('pseudo-panel', cellLayout), 
+					        direction: this.props.direction, 
+							view: this.isViewMode()})
+				)
+			));
 		},
 		/**
 		 * render
 		 * @returns {XML}
 		 */
 		render: function () {
-			return (<div className={this.getComponentCSS('n-array-panel')}>
-				{this.getValueFromModel().map(this.renderItem)}
-			</div>);
+			return (React.createElement("div", {className: this.getComponentCSS('n-array-panel')}, 
+				this.getValueFromModel().map(this.renderItem)
+			));
 		},
 		/**
 		 * return [] when is null
@@ -4110,7 +4126,7 @@ window.$pt = $pt;
 	}));
 	$pt.Components.NArrayPanel = NArrayPanel;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayPanel, function (model, layout, direction, viewMode) {
-		return <$pt.Components.NArrayPanel {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return React.createElement($pt.Components.NArrayPanel, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -4267,12 +4283,12 @@ window.$pt = $pt;
 					});
 				}
 			}
-			return (<$pt.Components.NForm model={tab.data}
-			               layout={$pt.createFormLayout(tab.layout)}
-			               direction={this.props.direction}
-						   view={this.isViewMode()}
-			               className={$pt.LayoutHelper.classSet(css)}
-						   key={tabIndex}/>
+			return (React.createElement($pt.Components.NForm, {model: tab.data, 
+			               layout: $pt.createFormLayout(tab.layout), 
+			               direction: this.props.direction, 
+						   view: this.isViewMode(), 
+			               className: $pt.LayoutHelper.classSet(css), 
+						   key: tabIndex})
 			);
 		},
 		/**
@@ -4293,22 +4309,22 @@ window.$pt = $pt;
 					}
 				}
 			}.bind(this);
-			return (<div className={this.getComponentCSS('n-array-tab')}>
-				<$pt.Components.NTab type={this.getComponentOption('tabType')}
-				      justified={this.getComponentOption('justified')}
-				      direction={this.getComponentOption('titleDirection')}
-				      size={this.getComponentOption('titleIconSize')}
-				      tabClassName={this.getAdditionalCSS('tabs')}
-				      tabs={tabs}
-				      canActive={canActiveProxy}
-				      onActive={this.onTabClicked}
-				      ref='tabs'>
-				</$pt.Components.NTab>
+			return (React.createElement("div", {className: this.getComponentCSS('n-array-tab')}, 
+				React.createElement($pt.Components.NTab, {type: this.getComponentOption('tabType'), 
+				      justified: this.getComponentOption('justified'), 
+				      direction: this.getComponentOption('titleDirection'), 
+				      size: this.getComponentOption('titleIconSize'), 
+				      tabClassName: this.getAdditionalCSS('tabs'), 
+				      tabs: tabs, 
+				      canActive: canActiveProxy, 
+				      onActive: this.onTabClicked, 
+				      ref: "tabs"}
+				), 
 
-				<div className='n-array-tab-content' ref='content'>
-					{tabs.map(this.renderTabContent)}
-				</div>
-			</div>);
+				React.createElement("div", {className: "n-array-tab-content", ref: "content"}, 
+					tabs.map(this.renderTabContent)
+				)
+			));
 		},
 		createItemModel: function(item) {
 			var parentModel = this.getModel();
@@ -4526,7 +4542,7 @@ window.$pt = $pt;
 	}));
 	$pt.Components.NArrayTab = NArrayTab;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayTab, function (model, layout, direction, viewMode) {
-		return <$pt.Components.NArrayTab {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return React.createElement($pt.Components.NArrayTab, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -4622,7 +4638,7 @@ window.$pt = $pt;
 					'fa-fw': true
 				};
 				css['fa-' + icon] = true;
-				return <span className={$pt.LayoutHelper.classSet(css)}/>;
+				return React.createElement("span", {className: $pt.LayoutHelper.classSet(css)});
 			}
 		},
 		/**
@@ -4635,22 +4651,22 @@ window.$pt = $pt;
 		renderMoreButtons: function(css) {
 			var more = this.getComponentOption('more');
 			if (more) {
-				var dropdown = (<a href='javascript:void(0);'
-					className={$pt.LayoutHelper.classSet(css) + ' dropdown-toggle'}
-					onClick={this.onClicked}
-					disabled={!this.isEnabled()}
-					data-toggle="dropdown"
-					aria-haspopup="true"
-					aria-expanded="false"
-					key='a'>
-				   	<span className="caret"></span>
-				</a>);
+				var dropdown = (React.createElement("a", {href: "javascript:void(0);", 
+					className: $pt.LayoutHelper.classSet(css) + ' dropdown-toggle', 
+					onClick: this.onClicked, 
+					disabled: !this.isEnabled(), 
+					"data-toggle": "dropdown", 
+					"aria-haspopup": "true", 
+					"aria-expanded": "false", 
+					key: "a"}, 
+				   	React.createElement("span", {className: "caret"})
+				));
 				var emptyFunction = function(){};
 				var _this = this;
-				var menus = (<ul className="dropdown-menu" key='ul'>
-					{more.map(function(menu, menuIndex) {
+				var menus = (React.createElement("ul", {className: "dropdown-menu", key: "ul"}, 
+					more.map(function(menu, menuIndex) {
 						if (menu.divider) {
-							return (<li role='separator' className='divider' key={menuIndex}></li>);
+							return (React.createElement("li", {role: "separator", className: "divider", key: menuIndex}));
 						} else {
 							var click = menu.click ? menu.click : emptyFunction;
 							var label = menu.text;
@@ -4658,14 +4674,14 @@ window.$pt = $pt;
 							if (label && icon) {
 								label = ' ' + label;
 							}
-							return (<li key={menuIndex}>
-								<a href='javascript:void(0);' onClick={click.bind(_this, _this.getModel())}>
-									{icon}{label}
-								</a>
-							</li>);
+							return (React.createElement("li", {key: menuIndex}, 
+								React.createElement("a", {href: "javascript:void(0);", onClick: click.bind(_this, _this.getModel())}, 
+									icon, label
+								)
+							));
 						}
-					})}
-				</ul>);
+					})
+				));
 				return [dropdown, menus];
 			} else {
 				return null;
@@ -4690,37 +4706,37 @@ window.$pt = $pt;
 					label = label + ' ';
 				}
 				// label in left
-				return (<div className={$pt.LayoutHelper.classSet(compCSS)}>
-					<div className='btn-group'>
-						<a href='javascript:void(0);'
-						   className={$pt.LayoutHelper.classSet(css)}
-						   onClick={this.onClicked}
-						   disabled={!this.isEnabled()}
-						   title={this.getComponentOption('tooltip')}
-						   ref='a'>
-							{label}{icon}
-						</a>
-						{this.renderMoreButtons(css)}
-					</div>
-				</div>);
+				return (React.createElement("div", {className: $pt.LayoutHelper.classSet(compCSS)}, 
+					React.createElement("div", {className: "btn-group"}, 
+						React.createElement("a", {href: "javascript:void(0);", 
+						   className: $pt.LayoutHelper.classSet(css), 
+						   onClick: this.onClicked, 
+						   disabled: !this.isEnabled(), 
+						   title: this.getComponentOption('tooltip'), 
+						   ref: "a"}, 
+							label, icon
+						), 
+						this.renderMoreButtons(css)
+					)
+				));
 			} else {
 				if (label && icon) {
 					label = ' ' + label;
 				}
 				// default label in right
-				return (<div className={$pt.LayoutHelper.classSet(compCSS)}>
-					<div className='btn-group'>
-						<a href='javascript:void(0);'
-						   className={$pt.LayoutHelper.classSet(css)}
-						   onClick={this.onClicked}
-						   disabled={!this.isEnabled()}
-						   title={this.getComponentOption('tooltip')}
-						   ref='a'>
-							{icon}{label}
-						</a>
-						{this.renderMoreButtons(css)}
-					</div>
-				</div>);
+				return (React.createElement("div", {className: $pt.LayoutHelper.classSet(compCSS)}, 
+					React.createElement("div", {className: "btn-group"}, 
+						React.createElement("a", {href: "javascript:void(0);", 
+						   className: $pt.LayoutHelper.classSet(css), 
+						   onClick: this.onClicked, 
+						   disabled: !this.isEnabled(), 
+						   title: this.getComponentOption('tooltip'), 
+						   ref: "a"}, 
+							icon, label
+						), 
+						this.renderMoreButtons(css)
+					)
+				));
 			}
 		},
 		onClicked: function (evt) {
@@ -4771,7 +4787,7 @@ window.$pt = $pt;
 	}));
 	$pt.Components.NFormButton = NFormButton;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Button, function (model, layout, direction, viewMode) {
-		return <$pt.Components.NFormButton {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return React.createElement($pt.Components.NFormButton, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -4875,10 +4891,10 @@ window.$pt = $pt;
 					disabled: !this.isEnabled(),
 					'check-label-left': labelInLeft
 				};
-				return (<span className={$pt.LayoutHelper.classSet(css)}
-				             onClick={(enabled && !this.isViewMode()) ? this.onButtonClicked : null}>
-                	{this.getLayout().getLabel()}
-            	</span>);
+				return (React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
+				             onClick: (enabled && !this.isViewMode()) ? this.onButtonClicked : null}, 
+                	this.getLayout().getLabel()
+            	));
 			}
 			return null;
 		},
@@ -4894,15 +4910,15 @@ window.$pt = $pt;
 				checked: checked,
 				'check-container': true
 			};
-			return (<div className='check-container'>
-	            <span className={$pt.LayoutHelper.classSet(css)}
-	                  onClick={(enabled && !this.isViewMode()) ? this.onButtonClicked : null}
-	                  onKeyUp={(enabled && !this.isViewMode()) ? this.onKeyUp: null}
-	                  tabIndex='0'
-	                  ref='out'>
-	            	<span className='check' onClick={this.onInnerClicked}/>
-	        	</span>
-			</div>);
+			return (React.createElement("div", {className: "check-container"}, 
+	            React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
+	                  onClick: (enabled && !this.isViewMode()) ? this.onButtonClicked : null, 
+	                  onKeyUp: (enabled && !this.isViewMode()) ? this.onKeyUp: null, 
+	                  tabIndex: "0", 
+	                  ref: "out"}, 
+	            	React.createElement("span", {className: "check", onClick: this.onInnerClicked})
+	        	)
+			));
 		},
 		/**
 		 * render
@@ -4917,11 +4933,11 @@ window.$pt = $pt;
 			var isLabelAtLeft = this.isLabelAtLeft();
 			// <input type="checkbox" style={{display: "none"}}
 			// 	   onChange={this.onComponentChanged} ref='txt'/>
-			return (<div className={$pt.LayoutHelper.classSet(css)}>
-				{isLabelAtLeft ? this.renderLabel(true) : null}
-				{this.renderCheckbox()}
-				{!isLabelAtLeft ? this.renderLabel(false) : null}
-			</div>);
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
+				isLabelAtLeft ? this.renderLabel(true) : null, 
+				this.renderCheckbox(), 
+				!isLabelAtLeft ? this.renderLabel(false) : null
+			));
 		},
 		/**
 		 * inner span clicked, force focus to outer span
@@ -4984,7 +5000,7 @@ window.$pt = $pt;
 	}));
 	$pt.Components.NCheck = NCheck;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Check, function (model, layout, direction, viewMode) {
-		return <$pt.Components.NCheck {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return React.createElement($pt.Components.NCheck, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -5091,7 +5107,7 @@ window.$pt = $pt;
 			if (options.className) {
 				css[options.className] = true;
 			}
-			return <span className={$pt.LayoutHelper.classSet(css)} onClick={options.click}/>;
+			return React.createElement("span", {className: $pt.LayoutHelper.classSet(css), onClick: options.click});
 		},
 		render: function() {
 			if (this.isViewMode()) {
@@ -5106,63 +5122,63 @@ window.$pt = $pt;
 				'n-datetime': true,
 				'n-disabled': !this.isEnabled()
 			};
-			return (<div className={$pt.LayoutHelper.classSet(divCSS)}>
-				<div className='input-group' ref='comp'>
-					<input type='text'
-					       className='form-control'
-					       disabled={!this.isEnabled()}
-						   onChange={this.onTextInputChange}
-					       onFocus={this.onTextInputFocused}
-					       onBlur={this.onTextInputBlurred}
-						   ref='text'/>
-	                <span className={$pt.LayoutHelper.classSet(css)}>
-	                    {this.renderIcon({icon: this.getIcon('calendar'), click: this.onCalendarButtonClicked})}
-	                </span>
-				</div>
-				{this.renderNormalLine()}
-				{this.renderFocusLine()}
-			</div>);
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(divCSS)}, 
+				React.createElement("div", {className: "input-group", ref: "comp"}, 
+					React.createElement("input", {type: "text", 
+					       className: "form-control", 
+					       disabled: !this.isEnabled(), 
+						   onChange: this.onTextInputChange, 
+					       onFocus: this.onTextInputFocused, 
+					       onBlur: this.onTextInputBlurred, 
+						   ref: "text"}), 
+	                React.createElement("span", {className: $pt.LayoutHelper.classSet(css)}, 
+	                    this.renderIcon({icon: this.getIcon('calendar'), click: this.onCalendarButtonClicked})
+	                )
+				), 
+				this.renderNormalLine(), 
+				this.renderFocusLine()
+			));
 		},
 		renderHeaderMonth: function(date) {
-			return (<span onClick={this.renderPopover.bind(this, {date: date, type: NDateTime.FORMAT_TYPES.MONTH})}
-						  className='header-date-btn'
-						  key='header-month'>
-				{this.convertValueToString(date, this.getHeaderMonthFormat())}
-			</span>);
+			return (React.createElement("span", {onClick: this.renderPopover.bind(this, {date: date, type: NDateTime.FORMAT_TYPES.MONTH}), 
+						  className: "header-date-btn", 
+						  key: "header-month"}, 
+				this.convertValueToString(date, this.getHeaderMonthFormat())
+			));
 		},
 		renderHeaderYear: function(date) {
-			return (<span onClick={this.renderPopover.bind(this, {date: date, type: NDateTime.FORMAT_TYPES.YEAR})}
-						  className='header-date-btn'
-						  key='header-year'>
-				{this.convertValueToString(date, this.getHeaderYearFormat())}
-			</span>);
+			return (React.createElement("span", {onClick: this.renderPopover.bind(this, {date: date, type: NDateTime.FORMAT_TYPES.YEAR}), 
+						  className: "header-date-btn", 
+						  key: "header-year"}, 
+				this.convertValueToString(date, this.getHeaderYearFormat())
+			));
 		},
 		renderDayHeader: function(date) {
 			var mainHeader = [this.renderHeaderMonth(date), ' ', this.renderHeaderYear(date)];
 			var monthFirst = this.getComponentOption('headerMonthFirst');
-			return (<div className='calendar-header day-view'>
-				{this.renderIcon({
+			return (React.createElement("div", {className: "calendar-header day-view"}, 
+				this.renderIcon({
 					icon: 'angle-double-left',
 					className: 'header-btn left',
 					click: this.renderPopover.bind(this, {date: date.clone().subtract(1, 'y'), type: NDateTime.FORMAT_TYPES.DAY})
-				})}
-				{this.renderIcon({
+				}), 
+				this.renderIcon({
 					icon: 'angle-left',
 					className: 'header-btn left',
 					click: this.renderPopover.bind(this, {date: date.clone().subtract(1, 'M'), type: NDateTime.FORMAT_TYPES.DAY})
-				})}
-				{monthFirst ? mainHeader : mainHeader.reverse()}
-				{this.renderIcon({
+				}), 
+				monthFirst ? mainHeader : mainHeader.reverse(), 
+				this.renderIcon({
 					icon: 'angle-double-right',
 					className: 'header-btn right',
 					click: this.renderPopover.bind(this, {date: date.clone().add(1, 'y'), type: NDateTime.FORMAT_TYPES.DAY})
-				})}
-				{this.renderIcon({
+				}), 
+				this.renderIcon({
 					icon: 'angle-right',
 					className: 'header-btn right',
 					click: this.renderPopover.bind(this, {date: date.clone().add(1, 'M'), type: NDateTime.FORMAT_TYPES.DAY})
-				})}
-			</div>);
+				})
+			));
 		},
 		getWeekdayHeader: function(date) {
 			var orgLocale = moment.locale();
@@ -5221,53 +5237,53 @@ window.$pt = $pt;
 			var currentMonth = date.month();
 			var value = this.getValueFromModel();
 			var today = this.getToday();
-			return (<div className='calendar-body day-view'>
-				<div className='day-view-body-header row'>
-					{header.map(function(weekday, weekdayIndex) {
-						return <div className='cell-7-1' key={'weekday-' + weekdayIndex}>{weekday}</div>;
-					})}
-				</div>
-				<div className='day-view-body-body row'>
-					{days.map(function(day, dayIndex) {
+			return (React.createElement("div", {className: "calendar-body day-view"}, 
+				React.createElement("div", {className: "day-view-body-header row"}, 
+					header.map(function(weekday, weekdayIndex) {
+						return React.createElement("div", {className: "cell-7-1", key: 'weekday-' + weekdayIndex}, weekday);
+					})
+				), 
+				React.createElement("div", {className: "day-view-body-body row"}, 
+					days.map(function(day, dayIndex) {
 						var css = {
 							'cell-7-1': true,
 							'gap-day': (day.month() != currentMonth),
 							today: day.isSame(today, 'day'),
 							'current-value': value != null && day.isSame(value, 'day')
 						};
-						return (<div className={$pt.LayoutHelper.classSet(css)}
-									 onClick={_this.onDaySelected.bind(_this, day)}
-									 key={'day-' + dayIndex}>
-							<span>{day.date()}</span>
-						</div>);
-					})}
-				</div>
-			</div>);
+						return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
+									 onClick: _this.onDaySelected.bind(_this, day), 
+									 key: 'day-' + dayIndex}, 
+							React.createElement("span", null, day.date())
+						));
+					})
+				)
+			));
 		},
 		renderMonthHeader: function(date) {
-			return (<div className='calendar-header month-view'>
-				{this.renderIcon({
+			return (React.createElement("div", {className: "calendar-header month-view"}, 
+				this.renderIcon({
 					icon: 'angle-double-left',
 					className: 'header-btn left',
 					click: this.renderPopover.bind(this, {date: date.clone().subtract(10, 'y'), type: NDateTime.FORMAT_TYPES.MONTH})
-				})}
-				{this.renderIcon({
+				}), 
+				this.renderIcon({
 					icon: 'angle-left',
 					className: 'header-btn left',
 					click: this.renderPopover.bind(this, {date: date.clone().subtract(1, 'y'), type: NDateTime.FORMAT_TYPES.MONTH})
-				})}
-				{this.renderHeaderYear(date)}
-				{this.renderIcon({
+				}), 
+				this.renderHeaderYear(date), 
+				this.renderIcon({
 					icon: 'angle-double-right',
 					className: 'header-btn right',
 					click: this.renderPopover.bind(this, {date: date.clone().add(10, 'y'), type: NDateTime.FORMAT_TYPES.MONTH})
-				})}
-				{this.renderIcon({
+				}), 
+				this.renderIcon({
 					icon: 'angle-right',
 					className: 'header-btn right',
 					click: this.renderPopover.bind(this, {date: date.clone().add(1, 'y'), type: NDateTime.FORMAT_TYPES.MONTH})
-				})}
-			</div>);
+				})
+			));
 		},
 		renderMonthBody: function(date) {
 			var _this = this;
@@ -5281,9 +5297,9 @@ window.$pt = $pt;
 			}
 			var value = this.getValueFromModel();
 			var today = this.getToday();
-			return (<div className='calendar-body month-view'>
-				<div className='month-view-body-body row'>
-					{months.map(function(month, index) {
+			return (React.createElement("div", {className: "calendar-body month-view"}, 
+				React.createElement("div", {className: "month-view-body-body row"}, 
+					months.map(function(month, index) {
 						var selectedDay = day.clone();
 						selectedDay.year(date.year());
 						selectedDay.month(index);
@@ -5292,14 +5308,14 @@ window.$pt = $pt;
 							today: index == today.month(),
 							'current-value': value != null && index == value.month()
 						};
-						return (<div className={$pt.LayoutHelper.classSet(css)}
-									 onClick={_this.onMonthSelected.bind(_this, selectedDay)}
-									 key={index}>
-							{month}
-						</div>);
-					})}
-				</div>
-			</div>);
+						return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
+									 onClick: _this.onMonthSelected.bind(_this, selectedDay), 
+									 key: index}, 
+							month
+						));
+					})
+				)
+			));
 		},
 		renderYearHeader: function(date) {
 			var yearHeader = [
@@ -5307,29 +5323,29 @@ window.$pt = $pt;
 				' - ',
 				this.convertValueToString(date.clone().add(9, 'y'), this.getHeaderYearFormat())
 			];
-			return (<div className='calendar-header year-view'>
-				{this.renderIcon({
+			return (React.createElement("div", {className: "calendar-header year-view"}, 
+				this.renderIcon({
 					icon: 'angle-double-left',
 					className: 'header-btn left',
 					click: this.renderPopover.bind(this, {date: date.clone().subtract(40, 'y'), type: NDateTime.FORMAT_TYPES.YEAR})
-				})}
-				{this.renderIcon({
+				}), 
+				this.renderIcon({
 					icon: 'angle-left',
 					className: 'header-btn left',
 					click: this.renderPopover.bind(this, {date: date.clone().subtract(20, 'y'), type: NDateTime.FORMAT_TYPES.YEAR})
-				})}
-				{yearHeader}
-				{this.renderIcon({
+				}), 
+				yearHeader, 
+				this.renderIcon({
 					icon: 'angle-double-right',
 					className: 'header-btn right',
 					click: this.renderPopover.bind(this, {date: date.clone().add(40, 'y'), type: NDateTime.FORMAT_TYPES.YEAR})
-				})}
-				{this.renderIcon({
+				}), 
+				this.renderIcon({
 					icon: 'angle-right',
 					className: 'header-btn right',
 					click: this.renderPopover.bind(this, {date: date.clone().add(20, 'y'), type: NDateTime.FORMAT_TYPES.YEAR})
-				})}
-			</div>);
+				})
+			));
 		},
 		renderYearBody: function(date) {
 			var _this = this;
@@ -5345,126 +5361,126 @@ window.$pt = $pt;
 				year.add(index, 'y');
 				years.push(year);
 			}
-			return (<div className='calendar-body month-view'>
-				<div className='year-view-body-body row'>
-					{years.map(function(year, yearIndex) {
+			return (React.createElement("div", {className: "calendar-body month-view"}, 
+				React.createElement("div", {className: "year-view-body-body row"}, 
+					years.map(function(year, yearIndex) {
 						var css = {
 							'cell-4-1': true,
 							today: year.year() == today.year(),
 							'current-value': value != null && year.year() == value.year()
 						};
-						return (<div className={$pt.LayoutHelper.classSet(css)}
-									 onClick={_this.onYearSelected.bind(_this, year)}
-									 key={yearIndex}>
-							{year.format(_this.getBodyYearFormat())}
-						</div>);
-					})}
-				</div>
-			</div>);
+						return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
+									 onClick: _this.onYearSelected.bind(_this, year), 
+									 key: yearIndex}, 
+							year.format(_this.getBodyYearFormat())
+						));
+					})
+				)
+			));
 		},
 		renderPopoverContentFooterButton: function(options) {
-			return (<div className='cell-3-1' onClick={options.click}>
-				{this.renderIcon({icon: this.getIcon(options.icon)})}
-			</div>);
+			return (React.createElement("div", {className: "cell-3-1", onClick: options.click}, 
+				this.renderIcon({icon: this.getIcon(options.icon)})
+			));
 		},
 		renderPopoverContentFooter: function(today, type) {
-			return (<div className='calendar-footer row'>
-				{this.renderPopoverContentFooterButton({
+			return (React.createElement("div", {className: "calendar-footer row"}, 
+				this.renderPopoverContentFooterButton({
 					icon: 'today',
 					click: this.renderPopover.bind(this, {
 						date: today,
 						type: type,
 						set: true
 					})
-				})}
-				{this.renderPopoverContentFooterButton({
+				}), 
+				this.renderPopoverContentFooterButton({
 					icon: 'clear',
 					click: this.renderPopover.bind(this, {
 						date: null,
 						type: type,
 						set: true
 					})
-				})}
-				{this.renderPopoverContentFooterButton({
+				}), 
+				this.renderPopoverContentFooterButton({
 					icon: 'close',
 					click: this.hidePopover
-				})}
-			</div>);
+				})
+			));
 		},
 		renderEngrave: function(degree, radius, length, className, offset) {
 			var startLength = radius - length;
-			return (<line className={className}
-						  x1={startLength * Math.cos(Math.PI * 2 * degree / 360) + offset}
-						  y1={offset - startLength * Math.sin(Math.PI * 2 * degree / 360)}
-						  x2={radius * Math.cos(Math.PI * 2 * degree / 360) + offset}
-						  y2={offset - radius * Math.sin(Math.PI * 2 * degree / 360)}
-						  key={degree}/>);
+			return (React.createElement("line", {className: className, 
+						  x1: startLength * Math.cos(Math.PI * 2 * degree / 360) + offset, 
+						  y1: offset - startLength * Math.sin(Math.PI * 2 * degree / 360), 
+						  x2: radius * Math.cos(Math.PI * 2 * degree / 360) + offset, 
+						  y2: offset - radius * Math.sin(Math.PI * 2 * degree / 360), 
+						  key: degree}));
 		},
 		render12HourDial: function(date, popoverType) {
 			var _this = this;
 			var am = date.hour() <= 11; // 0-23
 			var hourRadius = this.getHourRadius();
-			return (<g key='hour-12-dial'>
-				<text className={'text hour-12 am' + (am ? ' yes' : '')}
-					  onClick={this.onAMPMSelected.bind(this, true, popoverType)}
-					  x={0}
-					  y={0}>AM</text>
-				<text className={'text hour-12 pm' + (am ? '' : ' yes')}
-					  onClick={this.onAMPMSelected.bind(this, false, popoverType)}
-					  x={NDateTime.CLOCK_RADIUS * 2}
-					  y={0}>PM</text>
-				<text className='text hour-12 top-num'
-					  x={NDateTime.CLOCK_CHAR_POS.TOP.X}
-					  y={NDateTime.CLOCK_CHAR_POS.TOP.Y + NDateTime.CLOCK_RADIUS - hourRadius}>0</text>
-				<text className='text hour-12 left-num'
-					  x={NDateTime.CLOCK_CHAR_POS.LEFT.X + NDateTime.CLOCK_RADIUS - hourRadius}
-					  y={NDateTime.CLOCK_CHAR_POS.LEFT.Y}>9</text>
-				<text className='text hour-12 right-num'
-					  x={NDateTime.CLOCK_CHAR_POS.RIGHT.X - NDateTime.CLOCK_RADIUS + hourRadius}
-					  y={NDateTime.CLOCK_CHAR_POS.RIGHT.Y}>3</text>
-				<text className='text hour-12 bottom-num'
-					  x={NDateTime.CLOCK_CHAR_POS.BOTTOM.X}
-					  y={NDateTime.CLOCK_CHAR_POS.BOTTOM.Y - NDateTime.CLOCK_RADIUS + hourRadius}>6</text>
-				{[30, 60, 120, 150, 210, 240, 300, 330].map(function(degree) {
+			return (React.createElement("g", {key: "hour-12-dial"}, 
+				React.createElement("text", {className: 'text hour-12 am' + (am ? ' yes' : ''), 
+					  onClick: this.onAMPMSelected.bind(this, true, popoverType), 
+					  x: 0, 
+					  y: 0}, "AM"), 
+				React.createElement("text", {className: 'text hour-12 pm' + (am ? '' : ' yes'), 
+					  onClick: this.onAMPMSelected.bind(this, false, popoverType), 
+					  x: NDateTime.CLOCK_RADIUS * 2, 
+					  y: 0}, "PM"), 
+				React.createElement("text", {className: "text hour-12 top-num", 
+					  x: NDateTime.CLOCK_CHAR_POS.TOP.X, 
+					  y: NDateTime.CLOCK_CHAR_POS.TOP.Y + NDateTime.CLOCK_RADIUS - hourRadius}, "0"), 
+				React.createElement("text", {className: "text hour-12 left-num", 
+					  x: NDateTime.CLOCK_CHAR_POS.LEFT.X + NDateTime.CLOCK_RADIUS - hourRadius, 
+					  y: NDateTime.CLOCK_CHAR_POS.LEFT.Y}, "9"), 
+				React.createElement("text", {className: "text hour-12 right-num", 
+					  x: NDateTime.CLOCK_CHAR_POS.RIGHT.X - NDateTime.CLOCK_RADIUS + hourRadius, 
+					  y: NDateTime.CLOCK_CHAR_POS.RIGHT.Y}, "3"), 
+				React.createElement("text", {className: "text hour-12 bottom-num", 
+					  x: NDateTime.CLOCK_CHAR_POS.BOTTOM.X, 
+					  y: NDateTime.CLOCK_CHAR_POS.BOTTOM.Y - NDateTime.CLOCK_RADIUS + hourRadius}, "6"), 
+				[30, 60, 120, 150, 210, 240, 300, 330].map(function(degree) {
 					return _this.renderEngrave(degree,
 						hourRadius,
 						NDateTime.CLOCK_SMALL_ENGRAVE_LENGTH,
 						'big',
 						NDateTime.CLOCK_RADIUS);
-				})}
-			</g>);
+				})
+			));
 		},
 		render24HourDial: function() {
 			var _this = this;
 			var hourRadius = this.getHourRadius();
-			return (<g key='hour-24-dial'>
-				<text className='text hour-24 top-num'
-					  x={NDateTime.CLOCK_CHAR_POS.TOP.X}
-					  y={NDateTime.CLOCK_CHAR_POS.TOP.Y + NDateTime.CLOCK_RADIUS - hourRadius}>0</text>
-				<text className='text hour-24 left-num'
-					  x={NDateTime.CLOCK_CHAR_POS.LEFT.X + NDateTime.CLOCK_RADIUS - hourRadius}
-					  y={NDateTime.CLOCK_CHAR_POS.LEFT.Y}>18</text>
-				<text className='text hour-24 right-num'
-					  x={NDateTime.CLOCK_CHAR_POS.RIGHT.X - NDateTime.CLOCK_RADIUS + hourRadius}
-					  y={NDateTime.CLOCK_CHAR_POS.RIGHT.Y}>6</text>
-				<text className='text hour-24 bottom-num'
-					  x={NDateTime.CLOCK_CHAR_POS.BOTTOM.X}
-					  y={NDateTime.CLOCK_CHAR_POS.BOTTOM.Y - NDateTime.CLOCK_RADIUS + hourRadius}>12</text>
-				{[45, 135, 225, 315].map(function(degree) {
+			return (React.createElement("g", {key: "hour-24-dial"}, 
+				React.createElement("text", {className: "text hour-24 top-num", 
+					  x: NDateTime.CLOCK_CHAR_POS.TOP.X, 
+					  y: NDateTime.CLOCK_CHAR_POS.TOP.Y + NDateTime.CLOCK_RADIUS - hourRadius}, "0"), 
+				React.createElement("text", {className: "text hour-24 left-num", 
+					  x: NDateTime.CLOCK_CHAR_POS.LEFT.X + NDateTime.CLOCK_RADIUS - hourRadius, 
+					  y: NDateTime.CLOCK_CHAR_POS.LEFT.Y}, "18"), 
+				React.createElement("text", {className: "text hour-24 right-num", 
+					  x: NDateTime.CLOCK_CHAR_POS.RIGHT.X - NDateTime.CLOCK_RADIUS + hourRadius, 
+					  y: NDateTime.CLOCK_CHAR_POS.RIGHT.Y}, "6"), 
+				React.createElement("text", {className: "text hour-24 bottom-num", 
+					  x: NDateTime.CLOCK_CHAR_POS.BOTTOM.X, 
+					  y: NDateTime.CLOCK_CHAR_POS.BOTTOM.Y - NDateTime.CLOCK_RADIUS + hourRadius}, "12"), 
+				[45, 135, 225, 315].map(function(degree) {
 					return _this.renderEngrave(degree,
 						hourRadius,
 						NDateTime.CLOCK_BIG_ENGRAVE_LENGTH,
 						'big',
 						NDateTime.CLOCK_RADIUS);
-				})}
-				{[15, 30, 60, 75, 105, 120, 150, 165, 195, 210, 240, 255, 285, 300, 330, 345].map(function(degree) {
+				}), 
+				[15, 30, 60, 75, 105, 120, 150, 165, 195, 210, 240, 255, 285, 300, 330, 345].map(function(degree) {
 					return _this.renderEngrave(degree,
 						hourRadius,
 						NDateTime.CLOCK_SMALL_ENGRAVE_LENGTH,
 						'small',
 						NDateTime.CLOCK_RADIUS);
-				})}
-			</g>);
+				})
+			));
 		},
 		renderMinuteDial: function() {
 			if (!this.hasMinute()) {
@@ -5472,27 +5488,27 @@ window.$pt = $pt;
 				return null;
 			}
 			var _this = this;
-			return (<g key='minute-dial'>
-				<text className='text minute top-num'
-					  x={NDateTime.CLOCK_CHAR_POS.TOP.X}
-					  y={NDateTime.CLOCK_CHAR_POS.TOP.Y}>0</text>
-				<text className='text minute left-num'
-					  x={NDateTime.CLOCK_CHAR_POS.LEFT.X}
-					  y={NDateTime.CLOCK_CHAR_POS.LEFT.Y}>45</text>
-				<text className='text minute right-num'
-					  x={NDateTime.CLOCK_CHAR_POS.RIGHT.X}
-					  y={NDateTime.CLOCK_CHAR_POS.RIGHT.Y}>15</text>
-				<text className='text minute bottom-num'
-					  x={NDateTime.CLOCK_CHAR_POS.BOTTOM.X}
-					  y={NDateTime.CLOCK_CHAR_POS.BOTTOM.Y}>30</text>
-				{[30, 60, 120, 150, 210, 240, 300, 330].map(function(degree) {
+			return (React.createElement("g", {key: "minute-dial"}, 
+				React.createElement("text", {className: "text minute top-num", 
+					  x: NDateTime.CLOCK_CHAR_POS.TOP.X, 
+					  y: NDateTime.CLOCK_CHAR_POS.TOP.Y}, "0"), 
+				React.createElement("text", {className: "text minute left-num", 
+					  x: NDateTime.CLOCK_CHAR_POS.LEFT.X, 
+					  y: NDateTime.CLOCK_CHAR_POS.LEFT.Y}, "45"), 
+				React.createElement("text", {className: "text minute right-num", 
+					  x: NDateTime.CLOCK_CHAR_POS.RIGHT.X, 
+					  y: NDateTime.CLOCK_CHAR_POS.RIGHT.Y}, "15"), 
+				React.createElement("text", {className: "text minute bottom-num", 
+					  x: NDateTime.CLOCK_CHAR_POS.BOTTOM.X, 
+					  y: NDateTime.CLOCK_CHAR_POS.BOTTOM.Y}, "30"), 
+				[30, 60, 120, 150, 210, 240, 300, 330].map(function(degree) {
 					return _this.renderEngrave(degree,
 						NDateTime.CLOCK_RADIUS,
 						NDateTime.CLOCK_BIG_ENGRAVE_LENGTH,
 						'big',
 						NDateTime.CLOCK_RADIUS);
-				})}
-				{[6, 12, 18, 24, 36, 42, 48, 54, 66, 72, 78, 84,
+				}), 
+				[6, 12, 18, 24, 36, 42, 48, 54, 66, 72, 78, 84,
 					96, 102, 108, 114, 126, 132, 138, 144, 156, 162, 168, 174,
 					186, 192, 198, 204, 216, 222, 228, 234, 246, 252, 258, 264,
 					276, 282, 288, 294, 306, 312, 318, 324, 336, 342, 348, 354].map(function(degree) {
@@ -5501,8 +5517,8 @@ window.$pt = $pt;
 						NDateTime.CLOCK_SMALL_ENGRAVE_LENGTH,
 						'small',
 						NDateTime.CLOCK_RADIUS);
-				})}
-			</g>);
+				})
+			));
 		},
 		renderHourHand: function(date, offset) {
 			var hour = date.hour();
@@ -5513,11 +5529,11 @@ window.$pt = $pt;
 				degree = 450 - hour * 15;
 			}
 			var hourRadius = this.getHourRadius();
-			return (<line x1={offset + NDateTime.CLOCK_HAND_OFFSET * Math.cos(Math.PI * 2 * (degree - 180) / 360)}
-						  y1={offset - NDateTime.CLOCK_HAND_OFFSET * Math.sin(Math.PI * 2 * (degree - 180) / 360)}
-						  x2={offset + (hourRadius - NDateTime.CLOCK_HAND_OFFSET) * Math.cos(Math.PI * 2 * (degree) / 360)}
-						  y2={offset - (hourRadius - NDateTime.CLOCK_HAND_OFFSET) * Math.sin(Math.PI * 2 * (degree) / 360)}
-						  className='hour-hand' />);
+			return (React.createElement("line", {x1: offset + NDateTime.CLOCK_HAND_OFFSET * Math.cos(Math.PI * 2 * (degree - 180) / 360), 
+						  y1: offset - NDateTime.CLOCK_HAND_OFFSET * Math.sin(Math.PI * 2 * (degree - 180) / 360), 
+						  x2: offset + (hourRadius - NDateTime.CLOCK_HAND_OFFSET) * Math.cos(Math.PI * 2 * (degree) / 360), 
+						  y2: offset - (hourRadius - NDateTime.CLOCK_HAND_OFFSET) * Math.sin(Math.PI * 2 * (degree) / 360), 
+						  className: "hour-hand"}));
 		},
 		renderMinuteHand: function(date, radius, offset) {
 			if (!this.hasMinute()) {
@@ -5526,11 +5542,11 @@ window.$pt = $pt;
 			}
 			var minute = date.minute();
 			var degree = 450 - minute * 6;
-			return (<line x1={offset + NDateTime.CLOCK_HAND_OFFSET * Math.cos(Math.PI * 2 * (degree - 180) / 360)}
-						  y1={offset - NDateTime.CLOCK_HAND_OFFSET * Math.sin(Math.PI * 2 * (degree - 180) / 360)}
-						  x2={offset + (radius - NDateTime.CLOCK_HAND_OFFSET) * Math.cos(Math.PI * 2 * (degree) / 360)}
-						  y2={offset - (radius - NDateTime.CLOCK_HAND_OFFSET) * Math.sin(Math.PI * 2 * (degree) / 360)}
-						  className='minute-hand' />);
+			return (React.createElement("line", {x1: offset + NDateTime.CLOCK_HAND_OFFSET * Math.cos(Math.PI * 2 * (degree - 180) / 360), 
+						  y1: offset - NDateTime.CLOCK_HAND_OFFSET * Math.sin(Math.PI * 2 * (degree - 180) / 360), 
+						  x2: offset + (radius - NDateTime.CLOCK_HAND_OFFSET) * Math.cos(Math.PI * 2 * (degree) / 360), 
+						  y2: offset - (radius - NDateTime.CLOCK_HAND_OFFSET) * Math.sin(Math.PI * 2 * (degree) / 360), 
+						  className: "minute-hand"}));
 		},
 		renderSecondHand: function(date, radius, offset) {
 			var popoverType = this.guessDisplayFormatType();
@@ -5541,11 +5557,11 @@ window.$pt = $pt;
 			var _this = this;
 			var second = date.second();
 			var degree = 450 - second * 6;
-			return (<line x1={offset + NDateTime.CLOCK_HAND_OFFSET * Math.cos(Math.PI * 2 * (degree - 180) / 360)}
-						  y1={offset - NDateTime.CLOCK_HAND_OFFSET * Math.sin(Math.PI * 2 * (degree - 180) / 360)}
-						  x2={offset + (radius) * Math.cos(Math.PI * 2 * (degree) / 360)}
-						  y2={offset - (radius) * Math.sin(Math.PI * 2 * (degree) / 360)}
-						  className='second-hand' />);
+			return (React.createElement("line", {x1: offset + NDateTime.CLOCK_HAND_OFFSET * Math.cos(Math.PI * 2 * (degree - 180) / 360), 
+						  y1: offset - NDateTime.CLOCK_HAND_OFFSET * Math.sin(Math.PI * 2 * (degree - 180) / 360), 
+						  x2: offset + (radius) * Math.cos(Math.PI * 2 * (degree) / 360), 
+						  y2: offset - (radius) * Math.sin(Math.PI * 2 * (degree) / 360), 
+						  className: "second-hand"}));
 		},
 		renderTime: function(date, popoverType) {
 			var _this = this;
@@ -5563,33 +5579,33 @@ window.$pt = $pt;
 			} else if (this.hasMinute()) {
 				titleFormat = 'HH:mm';
 			}
-			return (<div className='time-view' style={styles}>
-				<div className='calendar-header'>
-					{date.format(titleFormat)}
-				</div>
-				<div className='calendar-body'>
-					<div className='time-view-body-body'>
-						<div style={{height: NDateTime.CLOCK_RADIUS * 2, width: NDateTime.CLOCK_RADIUS * 2, position: 'relative'}}>
-							<svg className='clock'
-								 height={NDateTime.CLOCK_RADIUS * 2}
-								 width={NDateTime.CLOCK_RADIUS * 2}>
-								{this.renderMinuteDial()}
-								{this.is12Hour() ? this.render12HourDial(date, popoverType) : this.render24HourDial()}
-								{this.renderHourHand(date, NDateTime.CLOCK_RADIUS)}
-								{this.renderMinuteHand(date, NDateTime.CLOCK_RADIUS, NDateTime.CLOCK_RADIUS)}
-								{this.renderSecondHand(date, NDateTime.CLOCK_RADIUS, NDateTime.CLOCK_RADIUS)}
-							</svg>
-							<div style={{position: 'absolute',
+			return (React.createElement("div", {className: "time-view", style: styles}, 
+				React.createElement("div", {className: "calendar-header"}, 
+					date.format(titleFormat)
+				), 
+				React.createElement("div", {className: "calendar-body"}, 
+					React.createElement("div", {className: "time-view-body-body"}, 
+						React.createElement("div", {style: {height: NDateTime.CLOCK_RADIUS * 2, width: NDateTime.CLOCK_RADIUS * 2, position: 'relative'}}, 
+							React.createElement("svg", {className: "clock", 
+								 height: NDateTime.CLOCK_RADIUS * 2, 
+								 width: NDateTime.CLOCK_RADIUS * 2}, 
+								this.renderMinuteDial(), 
+								this.is12Hour() ? this.render12HourDial(date, popoverType) : this.render24HourDial(), 
+								this.renderHourHand(date, NDateTime.CLOCK_RADIUS), 
+								this.renderMinuteHand(date, NDateTime.CLOCK_RADIUS, NDateTime.CLOCK_RADIUS), 
+								this.renderSecondHand(date, NDateTime.CLOCK_RADIUS, NDateTime.CLOCK_RADIUS)
+							), 
+							React.createElement("div", {style: {position: 'absolute',
 										 backgroundColor: 'transparent',
 										 top: 0,
 										 left: 0,
 										 height: NDateTime.CLOCK_RADIUS * 2,
-										 width: NDateTime.CLOCK_RADIUS * 2}}
-								 onClick={this.onClockClicked.bind(this, popoverType)}/>
-						</div>
-					</div>
-				</div>
-			</div>);
+										 width: NDateTime.CLOCK_RADIUS * 2}, 
+								 onClick: this.onClockClicked.bind(this, popoverType)})
+						)
+					)
+				)
+			));
 		},
 		/**
 		 * render popover content
@@ -5609,42 +5625,42 @@ window.$pt = $pt;
 			if ((popoverType & NDateTime.FORMAT_TYPES.DAY) != 0) {
 				// has day, YMD
 				this.startClockInterval(NDateTime.FORMAT_TYPES.DAY);
-				return (<div className="popover-content row">
-					<div className='date-view' style={styles}>
-						{this.renderDayHeader(date)}
-						{this.renderDayBody(date)}
-						{this.renderPopoverContentFooter(this.getToday(), NDateTime.FORMAT_TYPES.DAY)}
-					</div>
-					{this.renderTime(date, NDateTime.FORMAT_TYPES.DAY)}
-				</div>);
+				return (React.createElement("div", {className: "popover-content row"}, 
+					React.createElement("div", {className: "date-view", style: styles}, 
+						this.renderDayHeader(date), 
+						this.renderDayBody(date), 
+						this.renderPopoverContentFooter(this.getToday(), NDateTime.FORMAT_TYPES.DAY)
+					), 
+					this.renderTime(date, NDateTime.FORMAT_TYPES.DAY)
+				));
 			} else if ((popoverType & NDateTime.FORMAT_TYPES.MONTH) != 0) {
 				// has month, YM
 				this.startClockInterval(NDateTime.FORMAT_TYPES.MONTH);
-				return (<div className="popover-content row">
-					<div className='date-view' style={styles}>
-						{this.renderMonthHeader(date)}
-						{this.renderMonthBody(date)}
-						{this.renderPopoverContentFooter(this.getToday(), NDateTime.FORMAT_TYPES.MONTH)}
-					</div>
-					{this.renderTime(date, NDateTime.FORMAT_TYPES.MONTH)}
-				</div>);
+				return (React.createElement("div", {className: "popover-content row"}, 
+					React.createElement("div", {className: "date-view", style: styles}, 
+						this.renderMonthHeader(date), 
+						this.renderMonthBody(date), 
+						this.renderPopoverContentFooter(this.getToday(), NDateTime.FORMAT_TYPES.MONTH)
+					), 
+					this.renderTime(date, NDateTime.FORMAT_TYPES.MONTH)
+				));
 			} else if ((popoverType & NDateTime.FORMAT_TYPES.YEAR) != 0) {
 				// has year, YEAR
 				this.startClockInterval(NDateTime.FORMAT_TYPES.YEAR);
-				return (<div className="popover-content row">
-					<div className='date-view' style={styles}>
-						{this.renderYearHeader(date)}
-						{this.renderYearBody(date)}
-						{this.renderPopoverContentFooter(this.getToday(), NDateTime.FORMAT_TYPES.YEAR)}
-					</div>
-					{this.renderTime(date, NDateTime.FORMAT_TYPES.YEAR)}
-				</div>);
+				return (React.createElement("div", {className: "popover-content row"}, 
+					React.createElement("div", {className: "date-view", style: styles}, 
+						this.renderYearHeader(date), 
+						this.renderYearBody(date), 
+						this.renderPopoverContentFooter(this.getToday(), NDateTime.FORMAT_TYPES.YEAR)
+					), 
+					this.renderTime(date, NDateTime.FORMAT_TYPES.YEAR)
+				));
 			} else {
 				this.startClockInterval(popoverType);
 				// only time
-				return (<div className="popover-content row">
-					{this.renderTime(date, this.guessDisplayFormatType())}
-				</div>);
+				return (React.createElement("div", {className: "popover-content row"}, 
+					this.renderTime(date, this.guessDisplayFormatType())
+				));
 			}
 		},
 		/**
@@ -5715,10 +5731,10 @@ window.$pt = $pt;
 				}
 			}
 
-			var popover = (<div role="tooltip" className={$pt.LayoutHelper.classSet(popoverCSS)} style={styles}>
-				<div className="arrow"></div>
-				{this.renderPopoverContent(options.date, options.type)}
-			</div>);
+			var popover = (React.createElement("div", {role: "tooltip", className: $pt.LayoutHelper.classSet(popoverCSS), style: styles}, 
+				React.createElement("div", {className: "arrow"}), 
+				this.renderPopoverContent(options.date, options.type)
+			));
 			React.render(popover, this.state.popover.get(0));
 		},
 		renderPopoverContainer: function() {
@@ -6143,7 +6159,7 @@ window.$pt = $pt;
 
 	$pt.Components.NDateTime = NDateTime;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Date, function (model, layout, direction, viewMode) {
-		return <$pt.Components.NDateTime {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return React.createElement($pt.Components.NDateTime, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, moment, React, $pt));
 
@@ -6438,21 +6454,21 @@ window.$pt = $pt;
 				'n-datetime': true,
 				'n-disabled': !this.isEnabled()
 			};
-			return (<div className={$pt.LayoutHelper.classSet(divCSS)}>
-				<div className='input-group' ref='div'>
-					<input type='text'
-					       className='form-control'
-					       disabled={!this.isEnabled()}
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(divCSS)}, 
+				React.createElement("div", {className: "input-group", ref: "div"}, 
+					React.createElement("input", {type: "text", 
+					       className: "form-control", 
+					       disabled: !this.isEnabled(), 
 
-					       onFocus={this.onComponentFocused}
-					       onBlur={this.onComponentBlurred}/>
-                <span className={$pt.LayoutHelper.classSet(css)}>
-                    <span className='fa fa-fw fa-calendar'/>
-                </span>
-				</div>
-				{this.renderNormalLine()}
-				{this.renderFocusLine()}
-			</div>);
+					       onFocus: this.onComponentFocused, 
+					       onBlur: this.onComponentBlurred}), 
+                React.createElement("span", {className: $pt.LayoutHelper.classSet(css)}, 
+                    React.createElement("span", {className: "fa fa-fw fa-calendar"})
+                )
+				), 
+				this.renderNormalLine(), 
+				this.renderFocusLine()
+			));
 		},
 		onComponentFocused: function () {
 			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
@@ -6537,7 +6553,7 @@ window.$pt = $pt;
 	}));
 	$pt.Components.NDateTime2 = NDateTime2;
 	$pt.LayoutHelper.registerComponentRenderer('date2', function (model, layout, direction, viewMode) {
-		return <$pt.Components.NDateTime2 {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return React.createElement($pt.Components.NDateTime2, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, moment, React, $pt));
 
@@ -6557,7 +6573,7 @@ window.$pt = $pt;
 					if (exceptionContainer.length == 0) {
 						$("<div id='exception_modal_container' />").appendTo($(document.body));
 					}
-					$pt.exceptionDialog = React.render(<$pt.Components.NExceptionModal className={className}/>,
+					$pt.exceptionDialog = React.render(React.createElement($pt.Components.NExceptionModal, {className: className}),
 						document.getElementById("exception_modal_container"));
 				}
 				return $pt.exceptionDialog;
@@ -6613,10 +6629,10 @@ window.$pt = $pt;
 			var status = this.state.status;
 			var statusMessage = $pt.ComponentConstants.Http_Status[status];
 			var message = this.state.message;
-			return (<div>
-				<h6>{status}: {statusMessage}</h6>
-				{message != null ? (<pre>{message}</pre>) : null}
-			</div>);
+			return (React.createElement("div", null, 
+				React.createElement("h6", null, status, ": ", statusMessage), 
+				message != null ? (React.createElement("pre", null, message)) : null
+			));
 		},
 		/**
 		 * render
@@ -6636,30 +6652,30 @@ window.$pt = $pt;
 			if (this.props.className) {
 				css[this.props.className] = true;
 			}
-			return (<div>
-				<div className="modal-backdrop fade in" style={{zIndex: NExceptionModal.Z_INDEX}}></div>
-				<div className={$pt.LayoutHelper.classSet(css)}
-					 tabIndex="-1"
-					 role="dialog"
-					 style={{display: 'block', zIndex: NExceptionModal.Z_INDEX + 1}}>
-					<div className="modal-danger modal-dialog">
-						<div className="modal-content" role="document">
-							<div className="modal-header">
-								<button className="close"
-										onClick={this.hide}
-										aria-label="Close"
-										style={{marginTop: '-2px'}}>
-									<span aria-hidden="true">×</span>
-								</button>
-								<h4 className="modal-title">{NExceptionModal.TITLE}</h4>
-							</div>
-							<div className="modal-body">
-								{this.renderContent()}
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>);
+			return (React.createElement("div", null, 
+				React.createElement("div", {className: "modal-backdrop fade in", style: {zIndex: NExceptionModal.Z_INDEX}}), 
+				React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
+					 tabIndex: "-1", 
+					 role: "dialog", 
+					 style: {display: 'block', zIndex: NExceptionModal.Z_INDEX + 1}}, 
+					React.createElement("div", {className: "modal-danger modal-dialog"}, 
+						React.createElement("div", {className: "modal-content", role: "document"}, 
+							React.createElement("div", {className: "modal-header"}, 
+								React.createElement("button", {className: "close", 
+										onClick: this.hide, 
+										"aria-label": "Close", 
+										style: {marginTop: '-2px'}}, 
+									React.createElement("span", {"aria-hidden": "true"}, "×")
+								), 
+								React.createElement("h4", {className: "modal-title"}, NExceptionModal.TITLE)
+							), 
+							React.createElement("div", {className: "modal-body"}, 
+								this.renderContent()
+							)
+						)
+					)
+				)
+			));
 		},
 		onDocumentKeyUp: function(evt) {
 			if (evt.keyCode === 27) { // escape
@@ -6850,15 +6866,15 @@ window.$pt = $pt;
 			var inputCSS = {
 				file: true
 			};
-			return (<div className={$pt.LayoutHelper.classSet(css)} ref='comp'>
-				<input type='file'
-				       className={$pt.LayoutHelper.classSet(inputCSS)}
-				       multiple={this.allowMultipleFiles()}
-				       disabled={!this.isEnabled()}
-				       ref='file'/>
-				{this.renderNormalLine()}
-				{this.renderFocusLine()}
-			</div>);
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), ref: "comp"}, 
+				React.createElement("input", {type: "file", 
+				       className: $pt.LayoutHelper.classSet(inputCSS), 
+				       multiple: this.allowMultipleFiles(), 
+				       disabled: !this.isEnabled(), 
+				       ref: "file"}), 
+				this.renderNormalLine(), 
+				this.renderFocusLine()
+			));
 		},
 		createDisplayOptions: function (options) {
 			var _this = this;
@@ -6884,7 +6900,7 @@ window.$pt = $pt;
 	}));
 	$pt.Components.NFile = NFile;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.File, function (model, layout, direction, viewMode) {
-		return <$pt.Components.NFile {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return React.createElement($pt.Components.NFile, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -7062,10 +7078,10 @@ window.$pt = $pt;
 					width: 12
 				}
 			};
-			return <$pt.Components.NPanel model={this.getModel()}
-			               layout={$pt.createCellLayout(sections[0].getParentCard().getId() + '-body', sectionLayout)}
-			               direction={this.getLabelDirection()}
-						   view={this.isViewMode()}/>;
+			return React.createElement($pt.Components.NPanel, {model: this.getModel(), 
+			               layout: $pt.createCellLayout(sections[0].getParentCard().getId() + '-body', sectionLayout), 
+			               direction: this.getLabelDirection(), 
+						   view: this.isViewMode()});
 		},
 		/**
 		 * attach previous button
@@ -7179,12 +7195,12 @@ window.$pt = $pt;
 			}
 			if (right.length != 0 || left.length != 0) {
 				right = right.reverse();
-				footer = (<$pt.Components.NPanelFooter right={right} left={left} model={this.getModel()} view={this.isViewMode()}/>);
+				footer = (React.createElement($pt.Components.NPanelFooter, {right: right, left: left, model: this.getModel(), view: this.isViewMode()}));
 			}
-			return (<div className={$pt.LayoutHelper.classSet(css)} key={index}>
-				{this.renderSections(card.getSections())}
-				{footer}
-			</div>);
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), key: index}, 
+				this.renderSections(card.getSections()), 
+				footer
+			));
 		},
 		/**
 		 * render badge
@@ -7195,7 +7211,7 @@ window.$pt = $pt;
 			if (card.hasBadge()) {
 				var badgeRender = card.getBadgeRender();
 				var badge = badgeRender ? badgeRender.call(this, this.getModel().get(card.getBadgeId()), this.getModel()) : this.getModel().get(card.getBadgeId());
-				return (<span className='badge'> {badge}</span>);
+				return (React.createElement("span", {className: "badge"}, " ", badge));
 			} else {
 				return null;
 			}
@@ -7214,8 +7230,8 @@ window.$pt = $pt;
 				'n-cards-free': this.isFreeCard()
 			});
 			var _this = this;
-			return (<ul className={css} key='wizards'>
-				{this.getLayout().getCards().map(function (card, cardIndex) {
+			return (React.createElement("ul", {className: css, key: "wizards"}, 
+				this.getLayout().getCards().map(function (card, cardIndex) {
 					var css = {
 						active: card.getId() == _this.state.activeCard,
 						before: _this.isBeforeActiveCard(card.getId()),
@@ -7234,16 +7250,16 @@ window.$pt = $pt;
 							'fa-fw': true
 						};
 						iconCSS['fa-' + card.getIcon()] = true;
-						icon = <span className={$pt.LayoutHelper.classSet(iconCSS)}/>;
+						icon = React.createElement("span", {className: $pt.LayoutHelper.classSet(iconCSS)});
 					}
-					return (<li className={$pt.LayoutHelper.classSet(css)} key={cardIndex}>
-						<a href='javascript:void(0);' onClick={click}>
-							{icon} {card.getLabel()}
-							{_this.renderBadge(card)}
-						</a>
-					</li>);
-				})}
-			</ul>);
+					return (React.createElement("li", {className: $pt.LayoutHelper.classSet(css), key: cardIndex}, 
+						React.createElement("a", {href: "javascript:void(0);", onClick: click}, 
+							icon, " ", card.getLabel(), 
+							_this.renderBadge(card)
+						)
+					));
+				})
+			));
 		},
 		/**
 		 * render cards
@@ -7298,7 +7314,7 @@ window.$pt = $pt;
 			if (this.props.className) {
 				css[this.props.className] = true;
 			}
-			return (<div className={$pt.LayoutHelper.classSet(css)}>{this.renderCards()}</div>);
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, this.renderCards()));
 		},
 		/**
 		 * on model changed
@@ -7432,7 +7448,7 @@ window.$pt = $pt;
 	$pt.Components.NForm = NForm;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Form, function (model, layout, direction, viewMode) {
 		var formLayout = $pt.createFormLayout(layout.getComponentOption('editLayout'));
-		return <$pt.Components.NForm {...$pt.LayoutHelper.transformParameters(model, formLayout, direction, viewMode)}/>;
+		return React.createElement($pt.Components.NForm, React.__spread({},  $pt.LayoutHelper.transformParameters(model, formLayout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -7462,14 +7478,14 @@ window.$pt = $pt;
 		},
 		render: function () {
 			var buttonLayout = this.getButtonLayout();
-			return <$pt.Components.NPanelFooter model={this.props.model}
-								 view={this.isViewMode()}
-			                     save={buttonLayout.save}
-			                     validate={buttonLayout.validate}
-			                     cancel={buttonLayout.cancel}
-			                     reset={buttonLayout.reset}
-			                     left={buttonLayout.left}
-			                     right={buttonLayout.right}/>;
+			return React.createElement($pt.Components.NPanelFooter, {model: this.props.model, 
+								 view: this.isViewMode(), 
+			                     save: buttonLayout.save, 
+			                     validate: buttonLayout.validate, 
+			                     cancel: buttonLayout.cancel, 
+			                     reset: buttonLayout.reset, 
+			                     left: buttonLayout.left, 
+			                     right: buttonLayout.right});
 		},
 		getButtonLayout: function () {
 			return this.getComponentOption('buttonLayout');
@@ -7477,7 +7493,7 @@ window.$pt = $pt;
 	}));
 	$pt.Components.NFormButtonFooter = NFormButtonFooter;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ButtonFooter, function (model, layout, direction, viewMode) {
-		return <$pt.Components.NFormButtonFooter {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return React.createElement($pt.Components.NFormButtonFooter, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -7632,9 +7648,9 @@ window.$pt = $pt;
 			if (!type) {
 				type = "text";
 			}
-			return (<div ref="comp">
-				{$pt.LayoutHelper.getComponentRenderer(type).call(this, this.getFormModel(), this.getLayout(), direction, this.isViewMode())}
-			</div>);
+			return (React.createElement("div", {ref: "comp"}, 
+				$pt.LayoutHelper.getComponentRenderer(type).call(this, this.getFormModel(), this.getLayout(), direction, this.isViewMode())
+			));
 		},
 		/**
 		 * render label
@@ -7649,7 +7665,7 @@ window.$pt = $pt;
 			};
 			requireIconCSS['fa-' + NFormCell.REQUIRED_ICON] = true;
 			var requiredLabel = requiredPaint && this.getModel().isRequired(this.getDataId()) ?
-				(<span className={$pt.LayoutHelper.classSet(requireIconCSS)}/>) : null;
+				(React.createElement("span", {className: $pt.LayoutHelper.classSet(requireIconCSS)})) : null;
 			//var showColon = !this.getLayout().getLabel().endsWith('?')
 			//{showColon ? ':' : null}
 			var tooltip = this.getComponentOption('tooltip');
@@ -7661,13 +7677,13 @@ window.$pt = $pt;
 					'n-form-cell-tooltip': true
 				};
 				tooltipCSS['fa-' + NFormCell.TOOLTIP_ICON] = true;
-				tooltipIcon = <span className={$pt.LayoutHelper.classSet(tooltipCSS)} title={tooltip}/>;
+				tooltipIcon = React.createElement("span", {className: $pt.LayoutHelper.classSet(tooltipCSS), title: tooltip});
 			}
-			return (<span className={this.getLayout().getLabelCSS()} onClick={this.onLabelClicked} ref="label">
-			{this.getLayout().getLabel()}
-				{tooltipIcon}
-				{requiredLabel}
-		</span>);
+			return (React.createElement("span", {className: this.getLayout().getLabelCSS(), onClick: this.onLabelClicked, ref: "label"}, 
+			this.getLayout().getLabel(), 
+				tooltipIcon, 
+				requiredLabel
+		));
 		},
 		/**
 		 * render
@@ -7688,7 +7704,7 @@ window.$pt = $pt;
 			}
 
 			if (!visible) {
-				return (<div className={this.getCSSClassName() + ' n-form-cell-invisible'}/>);
+				return (React.createElement("div", {className: this.getCSSClassName() + ' n-form-cell-invisible'}));
 			} else {
 				var css = this.getCSSClassName();
 				if (this.getModel().hasError(this.getDataId())) {
@@ -7700,30 +7716,30 @@ window.$pt = $pt;
 				// read component definition
 				var type = this.getLayout().getComponentType();
 				if (type.label === false) {
-					return (<div className={css} ref='div'>
-						{this.renderInputComponent(type)}
-					</div>);
+					return (React.createElement("div", {className: css, ref: "div"}, 
+						this.renderInputComponent(type)
+					));
 				} else {
 					var labelDirection = this.getComponentOption("labelDirection");
 					if (labelDirection == null) {
 						labelDirection = this.props.direction ? this.props.direction : 'vertical';
 					}
 					if (labelDirection != 'vertical') {
-						return (<div className={css + ' horizontal-label'} ref='div'>
-							<div className='row'>
-								<div className={this.getHorizontalLabelCSS()}>
-									{this.renderLabel()}
-								</div>
-								<div className={this.getHorizontalComponentCSS()}>
-									{this.renderInputComponent(type)}
-								</div>
-							</div>
-						</div>);
+						return (React.createElement("div", {className: css + ' horizontal-label', ref: "div"}, 
+							React.createElement("div", {className: "row"}, 
+								React.createElement("div", {className: this.getHorizontalLabelCSS()}, 
+									this.renderLabel()
+								), 
+								React.createElement("div", {className: this.getHorizontalComponentCSS()}, 
+									this.renderInputComponent(type)
+								)
+							)
+						));
 					} else {
-						return (<div className={css + ' vertical-label'} ref='div'>
-							{this.renderLabel()}
-							{this.renderInputComponent(type)}
-						</div>);
+						return (React.createElement("div", {className: css + ' vertical-label', ref: "div"}, 
+							this.renderLabel(), 
+							this.renderInputComponent(type)
+						));
 					}
 				}
 			}
@@ -7942,12 +7958,12 @@ window.$pt = $pt;
 				show: index == activeIndex,
 				hide: index != activeIndex
 			};
-			return (<$pt.Components.NForm model={this.getModel()}
-			               layout={layout}
-			               direction={this.props.direction}
-						   view={this.isViewMode()}
-			               className={$pt.LayoutHelper.classSet(css)}
-			               key={'form-' + index}/>);
+			return (React.createElement($pt.Components.NForm, {model: this.getModel(), 
+			               layout: layout, 
+			               direction: this.props.direction, 
+						   view: this.isViewMode(), 
+			               className: $pt.LayoutHelper.classSet(css), 
+			               key: 'form-' + index}));
 		},
 		render: function () {
 			var tabs = this.initializeTabs();
@@ -7955,21 +7971,21 @@ window.$pt = $pt;
 			if (canActive) {
 				canActive.bind(this);
 			}
-			return (<div className={this.getComponentCSS('n-form-tab')}>
-				<$pt.Components.NTab type={this.getComponentOption('tabType')}
-				      justified={this.getComponentOption('justified')}
-				      direction={this.getComponentOption('titleDirection')}
-				      size={this.getComponentOption('titleIconSize')}
-				      tabClassName={this.getAdditionalCSS('tabs')}
-				      tabs={tabs}
-				      canActive={canActive}
-				      onActive={this.onTabClicked}
-					  ref='tabs'/>
+			return (React.createElement("div", {className: this.getComponentCSS('n-form-tab')}, 
+				React.createElement($pt.Components.NTab, {type: this.getComponentOption('tabType'), 
+				      justified: this.getComponentOption('justified'), 
+				      direction: this.getComponentOption('titleDirection'), 
+				      size: this.getComponentOption('titleIconSize'), 
+				      tabClassName: this.getAdditionalCSS('tabs'), 
+				      tabs: tabs, 
+				      canActive: canActive, 
+				      onActive: this.onTabClicked, 
+					  ref: "tabs"}), 
 
-				<div className='n-form-tab-content' ref='content'>
-					{this.getTabLayouts().map(this.renderTabContent)}
-				</div>
-			</div>);
+				React.createElement("div", {className: "n-form-tab-content", ref: "content"}, 
+					this.getTabLayouts().map(this.renderTabContent)
+				)
+			));
 		},
 		getTabs: function() {
 			return this.getComponentOption('tabs');
@@ -8041,7 +8057,7 @@ window.$pt = $pt;
 	}));
 	$pt.Components.NFormTab = NFormTab;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Tab, function (model, layout, direction, viewMode) {
-		return <$pt.Components.NFormTab {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return React.createElement($pt.Components.NFormTab, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -8149,13 +8165,13 @@ window.$pt = $pt;
 				iconClasses['fa-stack-1x'] = true;
 				var backIconClasses = this.getBackIcon();
 				backIconClasses['fa-stack-2x'] = true;
-				return (<span className={$pt.LayoutHelper.classSet(size)} title={this.props.tooltip}>
-                <i className={$pt.LayoutHelper.classSet(iconClasses)}/>
-                <i className={$pt.LayoutHelper.classSet(backIconClasses)}/>
-            </span>);
+				return (React.createElement("span", {className: $pt.LayoutHelper.classSet(size), title: this.props.tooltip}, 
+                React.createElement("i", {className: $pt.LayoutHelper.classSet(iconClasses)}), 
+                React.createElement("i", {className: $pt.LayoutHelper.classSet(backIconClasses)})
+            ));
 			}
-			return <span className={$pt.LayoutHelper.classSet($.extend(iconClasses, size))}
-			             title={this.props.tooltip}/>;
+			return React.createElement("span", {className: $pt.LayoutHelper.classSet($.extend(iconClasses, size)), 
+			             title: this.props.tooltip});
 		}
 	});
 	$pt.Components.NIcon = NIcon;
@@ -8175,17 +8191,17 @@ window.$pt = $pt;
 		renderText: function () {
 			if (Array.isArray(this.props.highlightText)) {
 				return this.props.highlightText.map(function (text, textIndex) {
-					return <h4 key={textIndex}>{text}</h4>;
+					return React.createElement("h4", {key: textIndex}, text);
 				});
 			} else {
-				return <h4>{this.props.highlightText}</h4>;
+				return React.createElement("h4", null, this.props.highlightText);
 			}
 		},
 		render: function () {
 			return (
-				<div className="n-jumbotron jumbotron">
-					{this.renderText()}
-				</div>
+				React.createElement("div", {className: "n-jumbotron jumbotron"}, 
+					this.renderText()
+				)
 			);
 		}
 	});
@@ -8277,11 +8293,11 @@ window.$pt = $pt;
 			if (style) {
 				css['n-label-' + style] = true;
 			}
-			return (<div className={$pt.LayoutHelper.classSet(css)}>
-				{texts.map(function (text, textIndex) {
-					return <span key={textIndex}>{text}</span>;
-				})}
-			</div>);
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
+				texts.map(function (text, textIndex) {
+					return React.createElement("span", {key: textIndex}, text);
+				})
+			));
 		},
 		getText: function () {
 			if (this.isTextFromModel()) {
@@ -8296,7 +8312,7 @@ window.$pt = $pt;
 	}));
 	$pt.Components.NLabel = NLabel;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Label, function (model, layout, direction, viewMode) {
-		return <$pt.Components.NLabel {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return React.createElement($pt.Components.NLabel, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -8316,7 +8332,7 @@ window.$pt = $pt;
 					if (confirmContainer.length == 0) {
 						$("<div id='confirm_modal_container' />").appendTo($(document.body));
 					}
-					$pt.confirmDialog = React.render(<$pt.Components.NConfirm className={className}/>,
+					$pt.confirmDialog = React.render(React.createElement($pt.Components.NConfirm, {className: className}),
 						document.getElementById("confirm_modal_container"));
 				}
 				return $pt.confirmDialog;
@@ -8388,7 +8404,7 @@ window.$pt = $pt;
 					click: this.onConfirmClicked
 				}
 			});
-			return <$pt.Components.NFormButton layout={layout}/>;
+			return React.createElement($pt.Components.NFormButton, {layout: layout});
 		},
 		/**
 		 * render close button
@@ -8407,7 +8423,7 @@ window.$pt = $pt;
 					click: this.onCancelClicked
 				}
 			});
-			return <$pt.Components.NFormButton layout={layout}/>;
+			return React.createElement($pt.Components.NFormButton, {layout: layout});
 		},
 		/**
 		 * render footer
@@ -8415,12 +8431,12 @@ window.$pt = $pt;
 		 */
 		renderFooter: function () {
 			if (this.state.options && this.state.options.disableButtons) {
-				return <div className='modal-footer-empty'/>;
+				return React.createElement("div", {className: "modal-footer-empty"});
 			}
-			return (<div className="modal-footer">
-				{this.renderCloseButton()}
-				{this.renderConfirmButton()}
-			</div>);
+			return (React.createElement("div", {className: "modal-footer"}, 
+				this.renderCloseButton(), 
+				this.renderConfirmButton()
+			));
 		},
 		/**
 		 * render content
@@ -8438,7 +8454,7 @@ window.$pt = $pt;
 			}
 			// string array
 			return messages.map(function (element, index) {
-				return <h6 key={index}>{element}</h6>;
+				return React.createElement("h6", {key: index}, element);
 			});
 		},
 		/**
@@ -8458,31 +8474,31 @@ window.$pt = $pt;
 			if (this.props.className) {
 				css[this.props.className] = true;
 			}
-			return (<div>
-				<div className="modal-backdrop fade in" style={{zIndex: NConfirm.Z_INDEX}}></div>
-				<div className={$pt.LayoutHelper.classSet(css)}
-					 tabIndex="-1"
-					 role="dialog"
-					 style={{display: 'block', zIndex: NConfirm.Z_INDEX + 1}}>
-					<div className="modal-dialog">
-						<div className="modal-content" role="document">
-							<div className="modal-header">
-								<button className="close"
-										onClick={this.onCancelClicked}
-										aria-label="Close"
-										style={{marginTop: '-2px'}}>
-									<span aria-hidden="true">×</span>
-								</button>
-								<h4 className="modal-title">{this.state.title}</h4>
-							</div>
-							<div className="modal-body">
-								{this.renderContent()}
-							</div>
-							{this.renderFooter()}
-						</div>
-					</div>
-				</div>
-			</div>);
+			return (React.createElement("div", null, 
+				React.createElement("div", {className: "modal-backdrop fade in", style: {zIndex: NConfirm.Z_INDEX}}), 
+				React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
+					 tabIndex: "-1", 
+					 role: "dialog", 
+					 style: {display: 'block', zIndex: NConfirm.Z_INDEX + 1}}, 
+					React.createElement("div", {className: "modal-dialog"}, 
+						React.createElement("div", {className: "modal-content", role: "document"}, 
+							React.createElement("div", {className: "modal-header"}, 
+								React.createElement("button", {className: "close", 
+										onClick: this.onCancelClicked, 
+										"aria-label": "Close", 
+										style: {marginTop: '-2px'}}, 
+									React.createElement("span", {"aria-hidden": "true"}, "×")
+								), 
+								React.createElement("h4", {className: "modal-title"}, this.state.title)
+							), 
+							React.createElement("div", {className: "modal-body"}, 
+								this.renderContent()
+							), 
+							this.renderFooter()
+						)
+					)
+				)
+			));
 		},
 		onDocumentKeyUp: function(evt) {
 			if (evt.keyCode === 27) { // escape
@@ -8615,8 +8631,8 @@ window.$pt = $pt;
 				if (className) {
 					css[className] = true;
 				}
-				return React.render(<$pt.Components.NModalForm title={title} className={$pt.LayoutHelper.classSet(css)}
-				                                zIndex={$pt.formModalIndex}/>,
+				return React.render(React.createElement($pt.Components.NModalForm, {title: title, className: $pt.LayoutHelper.classSet(css), 
+				                                zIndex: $pt.formModalIndex}),
 					document.getElementById(containerId));
 			},
 			RESET_CONFIRM_TITLE: "Reset Data",
@@ -8747,18 +8763,18 @@ window.$pt = $pt;
 		 */
 		renderFooter: function () {
 			if (this.state.footer === false || !this.state.expanded) {
-				return <div ref='footer'/>;
+				return React.createElement("div", {ref: "footer"});
 			} else {
-				return (<div className="n-modal-form-footer modal-footer" ref='footer'>
-					<$pt.Components.NPanelFooter reset={this.getResetButton()}
-					              validate={this.getValidationButton()}
-					              save={this.getSaveButton()}
-					              cancel={this.getCancelButton()}
-					              left={this.getLeftButton()}
-					              right={this.getRightButton()}
-					              model={this.getModel()}
-								  view={this.isViewMode()}/>
-				</div>);
+				return (React.createElement("div", {className: "n-modal-form-footer modal-footer", ref: "footer"}, 
+					React.createElement($pt.Components.NPanelFooter, {reset: this.getResetButton(), 
+					              validate: this.getValidationButton(), 
+					              save: this.getSaveButton(), 
+					              cancel: this.getCancelButton(), 
+					              left: this.getLeftButton(), 
+					              right: this.getRightButton(), 
+					              model: this.getModel(), 
+								  view: this.isViewMode()})
+				));
 			}
 		},
 		renderBody: function() {
@@ -8766,22 +8782,22 @@ window.$pt = $pt;
 				'modal-body': true,
 				hide: !this.state.expanded
 			};
-			return (<div className={$pt.LayoutHelper.classSet(css)}>
-				<$pt.Components.NForm model={this.getModel()}
-					   layout={this.getLayout()}
-					   direction={this.getDirection()}
-					   view={this.isViewMode()}
-				       ref="form"/>
-			</div>);
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
+				React.createElement($pt.Components.NForm, {model: this.getModel(), 
+					   layout: this.getLayout(), 
+					   direction: this.getDirection(), 
+					   view: this.isViewMode(), 
+				       ref: "form"})
+			));
 		},
 		renderCloseButton: function() {
 			if (this.isDialogCloseShown()) {
-				return (<button className="close"
-						onClick={this.hide}
-						aria-label="Close"
-						style={{marginTop: '-2px'}}>
-					<span aria-hidden="true">×</span>
-				</button>);
+				return (React.createElement("button", {className: "close", 
+						onClick: this.hide, 
+						"aria-label": "Close", 
+						style: {marginTop: '-2px'}}, 
+					React.createElement("span", {"aria-hidden": "true"}, "×")
+				));
 			}
 			return null;
 		},
@@ -8795,7 +8811,7 @@ window.$pt = $pt;
 			}
 			var title = this.state.title ? this.state.title : this.props.title;
 			if (this.isCollapsible()) {
-				title = (<a href='javascript:void(0);' onClick={this.onTitleClicked}>{title}</a>);
+				title = (React.createElement("a", {href: "javascript:void(0);", onClick: this.onTitleClicked}, title));
 			}
 			var css = {
 				'n-confirm': true,
@@ -8807,23 +8823,23 @@ window.$pt = $pt;
 				css[this.props.className] = true;
 			}
 			// tabindex="0"
-			return (<div ref='top'>
-				<div className="modal-backdrop fade in" style={{zIndex: this.props.zIndex * 1}}></div>
-				<div className={$pt.LayoutHelper.classSet(css)}
-					 role="dialog"
-					 style={{display: 'block', zIndex: this.props.zIndex * 1 + 1}}>
-					<div className="modal-dialog">
-						<div className="modal-content" role="document">
-							<div className="modal-header">
-								{this.renderCloseButton()}
-								<h4 className="modal-title">{title}</h4>
-							</div>
-							{this.renderBody()}
-							{this.renderFooter()}
-						</div>
-					</div>
-				</div>
-			</div>);
+			return (React.createElement("div", {ref: "top"}, 
+				React.createElement("div", {className: "modal-backdrop fade in", style: {zIndex: this.props.zIndex * 1}}), 
+				React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
+					 role: "dialog", 
+					 style: {display: 'block', zIndex: this.props.zIndex * 1 + 1}}, 
+					React.createElement("div", {className: "modal-dialog"}, 
+						React.createElement("div", {className: "modal-content", role: "document"}, 
+							React.createElement("div", {className: "modal-header"}, 
+								this.renderCloseButton(), 
+								React.createElement("h4", {className: "modal-title"}, title)
+							), 
+							this.renderBody(), 
+							this.renderFooter()
+						)
+					)
+				)
+			));
 		},
 		onDocumentKeyUp: function(evt) {
 			if (evt.keyCode === 27) { // escape
@@ -9158,11 +9174,11 @@ window.$pt = $pt;
 			if (this.props.size) {
 				css['n-label-' + this.props.size] = true;
 			}
-			return (<span className={$pt.LayoutHelper.classSet(css)}>
-            {texts.map(function (text, textIndex) {
-	            return <span key={textIndex}>{text}</span>;
-            })}
-        </span>);
+			return (React.createElement("span", {className: $pt.LayoutHelper.classSet(css)}, 
+            texts.map(function (text, textIndex) {
+	            return React.createElement("span", {key: textIndex}, text);
+            })
+        ));
 		},
 		getText: function () {
 			return this.props.text;
@@ -9186,7 +9202,7 @@ window.$pt = $pt;
 						$("<div id='onrequest_modal_container' />").appendTo($(document.body));
 					}
 					$pt.onRequestDialog = React.render(
-						<$pt.Components.NOnRequestModal className={className}/>, document.getElementById("onrequest_modal_container"));
+						React.createElement($pt.Components.NOnRequestModal, {className: className}), document.getElementById("onrequest_modal_container"));
 				}
 				return $pt.onRequestDialog;
 			},
@@ -9234,21 +9250,21 @@ window.$pt = $pt;
 			if (this.props.className) {
 				css[this.props.className] = true;
 			}
-			return (<div>
-				<div className="modal-backdrop fade in" style={{zIndex: NOnRequestModal.Z_INDEX}}></div>
-				<div className={$pt.LayoutHelper.classSet(css)}
-					 tabIndex="-1"
-					 role="dialog"
-					 style={{display: 'block', zIndex: NOnRequestModal.Z_INDEX + 1}}>
-					<div className="modal-danger modal-dialog">
-						<div className="modal-content" role="document">
-							<div className="modal-body" ref='body'>
-								<span className='fa fa-fw fa-lg fa-spin fa-spinner'/> {NOnRequestModal.WAITING_MESSAGE}
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>);
+			return (React.createElement("div", null, 
+				React.createElement("div", {className: "modal-backdrop fade in", style: {zIndex: NOnRequestModal.Z_INDEX}}), 
+				React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
+					 tabIndex: "-1", 
+					 role: "dialog", 
+					 style: {display: 'block', zIndex: NOnRequestModal.Z_INDEX + 1}}, 
+					React.createElement("div", {className: "modal-danger modal-dialog"}, 
+						React.createElement("div", {className: "modal-content", role: "document"}, 
+							React.createElement("div", {className: "modal-body", ref: "body"}, 
+								React.createElement("span", {className: "fa fa-fw fa-lg fa-spin fa-spinner"}), " ", NOnRequestModal.WAITING_MESSAGE
+							)
+						)
+					)
+				)
+			));
 		},
 		/**
 		 * hide dialog
@@ -9288,32 +9304,32 @@ window.$pt = $pt;
 		renderTech: function () {
 			if (NPageFooter.TECH_BASE != null && !NPageFooter.TECH_BASE.isBlank()) {
 				return (
-					<span>, on <a href={NPageFooter.TECH_URL} target='_blank' tabIndex='-1'>{NPageFooter.TECH_BASE}</a></span>);
+					React.createElement("span", null, ", on ", React.createElement("a", {href: NPageFooter.TECH_URL, target: "_blank", tabIndex: "-1"}, NPageFooter.TECH_BASE)));
 			}
 			return null;
 		},
 		renderCompany: function () {
 			if (NPageFooter.COMPANY != null && !NPageFooter.COMPANY.isBlank()) {
 				return (
-					<span>, by <a href={NPageFooter.COMPANY_URL} target="_blank" tabIndex='-1'>{NPageFooter.COMPANY}</a></span>);
+					React.createElement("span", null, ", by ", React.createElement("a", {href: NPageFooter.COMPANY_URL, target: "_blank", tabIndex: "-1"}, NPageFooter.COMPANY)));
 			}
 			return null;
 		},
 		render: function () {
 			return (
-				<footer className="footer">
-					<div className="container">
-						<p className='text-muted' style={{display: 'inline-block'}}>
-							<span>{NPageFooter.LEFT_TEXT}</span>
-						</p>
+				React.createElement("footer", {className: "footer"}, 
+					React.createElement("div", {className: "container"}, 
+						React.createElement("p", {className: "text-muted", style: {display: 'inline-block'}}, 
+							React.createElement("span", null, NPageFooter.LEFT_TEXT)
+						), 
 
-						<p className="text-muted pull-right" style={{display: 'inline-block'}}>
-							{this.props.name}
-							{this.renderTech()}
-							{this.renderCompany()}.
-						</p>
-					</div>
-				</footer>);
+						React.createElement("p", {className: "text-muted pull-right", style: {display: 'inline-block'}}, 
+							this.props.name, 
+							this.renderTech(), 
+							this.renderCompany(), "."
+						)
+					)
+				));
 		}
 	});
 	$pt.Components.NPageFooter = NPageFooter;
@@ -9370,38 +9386,38 @@ window.$pt = $pt;
 				}
 			});
 
-			return (<div className="navbar-form navbar-right" role="search">
-				<$pt.Components.NText model={this.state.model} layout={layout}/>
-			</div>);
+			return (React.createElement("div", {className: "navbar-form navbar-right", role: "search"}, 
+				React.createElement($pt.Components.NText, {model: this.state.model, layout: layout})
+			));
 		},
 		renderMenuItem: function (item, index, menus, onTopLevel) {
 			if (item.children !== undefined) {
 				// render dropdown menu
 				var _this = this;
 				return (
-					<li className={onTopLevel ? "dropdown" : "dropdown-submenu"} key={index}>
-						<a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button"
-						   aria-expanded="false">
-							{item.text} {onTopLevel ? <span className="caret"></span> : null}
-						</a>
-						<ul className="dropdown-menu" role="menu">
-							{item.children.map(function (childItem, childIndex, dropdownItems) {
+					React.createElement("li", {className: onTopLevel ? "dropdown" : "dropdown-submenu", key: index}, 
+						React.createElement("a", {href: "#", className: "dropdown-toggle", "data-toggle": "dropdown", role: "button", 
+						   "aria-expanded": "false"}, 
+							item.text, " ", onTopLevel ? React.createElement("span", {className: "caret"}) : null
+						), 
+						React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
+							item.children.map(function (childItem, childIndex, dropdownItems) {
 								return _this.renderMenuItem(childItem, childIndex, dropdownItems, false);
-							})}
-						</ul>
-					</li>
+							})
+						)
+					)
 				);
 			} else if (item.divider === true) {
 				// render divider
-				return (<li className="divider" key={index}></li>);
+				return (React.createElement("li", {className: "divider", key: index}));
 			} else if (item.func !== undefined) {
 				// call javascript function
-				return (<li>
-					<a href="javascript:void(0);" onClick={this.onMenuClicked.bind(this, item.func)} key={index}>{item.text}</a>
-				</li>);
+				return (React.createElement("li", null, 
+					React.createElement("a", {href: "javascript:void(0);", onClick: this.onMenuClicked.bind(this, item.func), key: index}, item.text)
+				));
 			} else {
 				// jump to url
-				return (<li key={index}><a href={item.url}>{item.text}</a></li>);
+				return (React.createElement("li", {key: index}, React.createElement("a", {href: item.url}, item.text)));
 			}
 		},
 		/**
@@ -9420,25 +9436,25 @@ window.$pt = $pt;
 				css['nav-side'] = true;
 			}
 			return (
-				<ul className={$pt.LayoutHelper.classSet(css)}>
-					{this.props.menus.map(function (item, index, menu) {
+				React.createElement("ul", {className: $pt.LayoutHelper.classSet(css)}, 
+					this.props.menus.map(function (item, index, menu) {
 						return _this.renderMenuItem(item, index, menu, true);
-					})}
-				</ul>
+					})
+				)
 			);
 		},
 		renderBrand: function () {
 			if (this.props.brandUrl) {
-				return <a href={this.props.brandUrl}><span className="navbar-brand">{this.props.brand}</span></a>;
+				return React.createElement("a", {href: this.props.brandUrl}, React.createElement("span", {className: "navbar-brand"}, this.props.brand));
 			} else if (this.props.brandFunc || this.props.side) {
-				return (<a href="javascript:void(0);"
-				           onMouseEnter={this.onBrandMouseEnter}
-				           onMouseLeave={this.onBrandMouseLeave}
-				           onClick={this.onBrandClicked}>
-					<span className="navbar-brand">{this.props.brand}</span>
-				</a>);
+				return (React.createElement("a", {href: "javascript:void(0);", 
+				           onMouseEnter: this.onBrandMouseEnter, 
+				           onMouseLeave: this.onBrandMouseLeave, 
+				           onClick: this.onBrandClicked}, 
+					React.createElement("span", {className: "navbar-brand"}, this.props.brand)
+				));
 			} else {
-				return <span className="navbar-brand">{this.props.brand}</span>;
+				return React.createElement("span", {className: "navbar-brand"}, this.props.brand);
 			}
 		},
 		onBrandMouseEnter: function () {
@@ -9482,24 +9498,24 @@ window.$pt = $pt;
 		 */
 		render: function () {
 			return (
-				<nav className="navbar navbar-default navbar-fixed-top">
-					<div className="container-fluid">
-						<div className="navbar-header">
-							<button type="button" className="navbar-toggle collapsed" data-toggle="collapse"
-							        data-target="#navbar-1">
-								<span className="sr-only">Toggle navigation</span>
-								<span className="icon-bar"></span>
-								<span className="icon-bar"></span>
-								<span className="icon-bar"></span>
-							</button>
-							{this.renderBrand()}
-						</div>
-						<div className="collapse navbar-collapse" id="navbar-1">
-							{this.props.menus ? this.renderMenus() : null}
-							{this.props.search ? this.renderSearchBox() : null}
-						</div>
-					</div>
-				</nav>
+				React.createElement("nav", {className: "navbar navbar-default navbar-fixed-top"}, 
+					React.createElement("div", {className: "container-fluid"}, 
+						React.createElement("div", {className: "navbar-header"}, 
+							React.createElement("button", {type: "button", className: "navbar-toggle collapsed", "data-toggle": "collapse", 
+							        "data-target": "#navbar-1"}, 
+								React.createElement("span", {className: "sr-only"}, "Toggle navigation"), 
+								React.createElement("span", {className: "icon-bar"}), 
+								React.createElement("span", {className: "icon-bar"}), 
+								React.createElement("span", {className: "icon-bar"})
+							), 
+							this.renderBrand()
+						), 
+						React.createElement("div", {className: "collapse navbar-collapse", id: "navbar-1"}, 
+							this.props.menus ? this.renderMenus() : null, 
+							this.props.search ? this.renderSearchBox() : null
+						)
+					)
+				)
 			);
 		}
 	});
@@ -9603,11 +9619,11 @@ window.$pt = $pt;
 		 * @returns {XML}
 		 */
 		renderFirst: function (buttonsRange) {
-			return (<li>
-				<a href="javascript:void(0);" aria-label="First" onClick={this.toFirst}>
-					<span className='fa fa-fw fa-fast-backward'/>
-				</a>
-			</li>);
+			return (React.createElement("li", null, 
+				React.createElement("a", {href: "javascript:void(0);", "aria-label": "First", onClick: this.toFirst}, 
+					React.createElement("span", {className: "fa fa-fw fa-fast-backward"})
+				)
+			));
 		},
 		/**
 		 * render button which jump to previous page section
@@ -9615,11 +9631,11 @@ window.$pt = $pt;
 		 * @returns {XML}
 		 */
 		renderPreviousSection: function (buttonsRange) {
-			return (<li>
-				<a href="javascript:void(0);" aria-label="PreviousSection" onClick={this.toPreviousSection}>
-					<span className='fa fa-fw fa-backward'/>
-				</a>
-			</li>);
+			return (React.createElement("li", null, 
+				React.createElement("a", {href: "javascript:void(0);", "aria-label": "PreviousSection", onClick: this.toPreviousSection}, 
+					React.createElement("span", {className: "fa fa-fw fa-backward"})
+				)
+			));
 		},
 		/**
 		 * render button which jump to previous page
@@ -9627,11 +9643,11 @@ window.$pt = $pt;
 		 * @returns {XML}
 		 */
 		renderPrevious: function (buttonsRange) {
-			return (<li>
-				<a href="javascript:void(0);" aria-label="Previous" onClick={this.toPrevious}>
-					<span className='fa fa-fw fa-chevron-left'/>
-				</a>
-			</li>);
+			return (React.createElement("li", null, 
+				React.createElement("a", {href: "javascript:void(0);", "aria-label": "Previous", onClick: this.toPrevious}, 
+					React.createElement("span", {className: "fa fa-fw fa-chevron-left"})
+				)
+			));
 		},
 		/**
 		 * render buttons
@@ -9649,12 +9665,12 @@ window.$pt = $pt;
 				if (index == _this.getCurrentPageIndex()) {
 					css.active = true;
 				}
-				return (<li key={index}>
-					<a href="javascript:void(0);"
-					   onClick={_this.toPage}
-					   data-index={index}
-					   className={$pt.LayoutHelper.classSet(css)}>{index}</a>
-				</li>);
+				return (React.createElement("li", {key: index}, 
+					React.createElement("a", {href: "javascript:void(0);", 
+					   onClick: _this.toPage, 
+					   "data-index": index, 
+					   className: $pt.LayoutHelper.classSet(css)}, index)
+				));
 			});
 		},
 		/**
@@ -9663,11 +9679,11 @@ window.$pt = $pt;
 		 * @returns {XML}
 		 */
 		renderNext: function (buttonsRange) {
-			return (<li>
-				<a href="javascript:void(0);" aria-label="Next" onClick={this.toNext}>
-					<span className='fa fa-fw fa-chevron-right'/>
-				</a>
-			</li>);
+			return (React.createElement("li", null, 
+				React.createElement("a", {href: "javascript:void(0);", "aria-label": "Next", onClick: this.toNext}, 
+					React.createElement("span", {className: "fa fa-fw fa-chevron-right"})
+				)
+			));
 		},
 		/**
 		 * render button which jump to next page section
@@ -9675,11 +9691,11 @@ window.$pt = $pt;
 		 * @returns {XML}
 		 */
 		renderNextSection: function (buttonsRange) {
-			return (<li>
-				<a href="javascript:void(0);" aria-label="NextSection" onClick={this.toNextSection}>
-					<span className='fa fa-fw fa-forward'/>
-				</a>
-			</li>);
+			return (React.createElement("li", null, 
+				React.createElement("a", {href: "javascript:void(0);", "aria-label": "NextSection", onClick: this.toNextSection}, 
+					React.createElement("span", {className: "fa fa-fw fa-forward"})
+				)
+			));
 		},
 		/**
 		 * render button which jump to last page
@@ -9687,11 +9703,11 @@ window.$pt = $pt;
 		 * @returns {XML}
 		 */
 		renderLast: function (buttonsRange) {
-			return (<li>
-				<a href="javascript:void(0);" aria-label="Last" onClick={this.toLast}>
-					<span className='fa fa-fw fa-fast-forward'/>
-				</a>
-			</li>);
+			return (React.createElement("li", null, 
+				React.createElement("a", {href: "javascript:void(0);", "aria-label": "Last", onClick: this.toLast}, 
+					React.createElement("span", {className: "fa fa-fw fa-fast-forward"})
+				)
+			));
 		},
 		/**
 		 * render status
@@ -9699,11 +9715,11 @@ window.$pt = $pt;
 		 */
 		renderStatus: function () {
 			if (this.props.showStatus) {
-				return (<div className="n-pagination-status col-sm-2 col-md-2 col-lg-2">
-					<div>
-						Page: {this.getCurrentPageIndex()} / {this.getPageCount()}
-					</div>
-				</div>);
+				return (React.createElement("div", {className: "n-pagination-status col-sm-2 col-md-2 col-lg-2"}, 
+					React.createElement("div", null, 
+						"Page: ", this.getCurrentPageIndex(), " / ", this.getPageCount()
+					)
+				));
 			} else {
 				return null;
 			}
@@ -9727,20 +9743,20 @@ window.$pt = $pt;
 				'col-sm-10 col-md-10 col-lg-10': this.props.showStatus,
 				'col-sm-12 col-md-12 col-lg-12': !this.props.showStatus
 			};
-			return (<div className={$pt.LayoutHelper.classSet(css)}>
-				{this.renderStatus()}
-				<div className={$pt.LayoutHelper.classSet(buttonCSS)}>
-					<ul className="pagination">
-						{this.renderFirst(buttonsRange)}
-						{this.renderPreviousSection(buttonsRange)}
-						{this.renderPrevious(buttonsRange)}
-						{this.renderButtons(buttonsRange)}
-						{this.renderNext(buttonsRange)}
-						{this.renderNextSection(buttonsRange)}
-						{this.renderLast(buttonsRange)}
-					</ul>
-				</div>
-			</div>);
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
+				this.renderStatus(), 
+				React.createElement("div", {className: $pt.LayoutHelper.classSet(buttonCSS)}, 
+					React.createElement("ul", {className: "pagination"}, 
+						this.renderFirst(buttonsRange), 
+						this.renderPreviousSection(buttonsRange), 
+						this.renderPrevious(buttonsRange), 
+						this.renderButtons(buttonsRange), 
+						this.renderNext(buttonsRange), 
+						this.renderNextSection(buttonsRange), 
+						this.renderLast(buttonsRange)
+					)
+				)
+			));
 		},
 		/**
 		 * get current page index
@@ -9951,11 +9967,11 @@ window.$pt = $pt;
 					labelDirection: 'horizontal'
 				})
 			};
-			return (<div>
-				(
-				<$pt.Components.NCheck model={this.getModel()} layout={$pt.createCellLayout('check', layout)} view={this.isViewMode()}/>
-				)
-			</div>);
+			return (React.createElement("div", null, 
+				"(", 
+				React.createElement($pt.Components.NCheck, {model: this.getModel(), layout: $pt.createCellLayout('check', layout), view: this.isViewMode()}), 
+				")"
+			));
 		},
 		/**
 		 * render heading
@@ -9968,22 +9984,22 @@ window.$pt = $pt;
 			};
 			if (this.isCollapsible()) {
 				css['n-collapsible-title-check'] = this.hasCheckInTitle();
-				return (<div className='panel-heading'>
-					<h4 className={$pt.LayoutHelper.classSet(css)}>
-						<a href='javascript:void(0);' onClick={this.onTitleClicked} ref='head'>{label}</a>
-						{this.renderCheckInTitle()}
-					</h4>
-				</div>);
+				return (React.createElement("div", {className: "panel-heading"}, 
+					React.createElement("h4", {className: $pt.LayoutHelper.classSet(css)}, 
+						React.createElement("a", {href: "javascript:void(0);", onClick: this.onTitleClicked, ref: "head"}, label), 
+						this.renderCheckInTitle()
+					)
+				));
 			} else if (this.hasCheckInTitle()) {
 				css['n-normal-title-check'] = this.hasCheckInTitle();
-				return (<div className='panel-heading'>
-					<h4 className={$pt.LayoutHelper.classSet(css)}>
-						<span ref='head'>{label}</span>
-						{this.renderCheckInTitle()}
-					</h4>
-				</div>);
+				return (React.createElement("div", {className: "panel-heading"}, 
+					React.createElement("h4", {className: $pt.LayoutHelper.classSet(css)}, 
+						React.createElement("span", {ref: "head"}, label), 
+						this.renderCheckInTitle()
+					)
+				));
 			} else {
-				return <div className='panel-heading' ref='head'>{label}</div>;
+				return React.createElement("div", {className: "panel-heading", ref: "head"}, label);
 			}
 		},
 		/**
@@ -9993,14 +10009,14 @@ window.$pt = $pt;
 		renderRow: function (row, rowIndex) {
 			var _this = this;
 			var cells = row.getCells().map(function (cell, cellIndex) {
-				return <$pt.Components.NFormCell layout={cell}
-				                  model={_this.getModel()}
-				                  ref={cell.getId()}
-				                  direction={_this.props.direction}
-								  view={_this.isViewMode()}
-								  key={'' + rowIndex + '-' + cellIndex}/>;
+				return React.createElement($pt.Components.NFormCell, {layout: cell, 
+				                  model: _this.getModel(), 
+				                  ref: cell.getId(), 
+				                  direction: _this.props.direction, 
+								  view: _this.isViewMode(), 
+								  key: '' + rowIndex + '-' + cellIndex});
 			});
-			return (<div className="row" key={rowIndex}>{cells}</div>);
+			return (React.createElement("div", {className: "row", key: rowIndex}, cells));
 		},
 		/**
 		 * render
@@ -10009,9 +10025,9 @@ window.$pt = $pt;
 		render: function () {
 			var label = this.getLayout().getLabel();
 			if (label == null) {
-				return (<div ref='panel'>
-					{this.getInnerLayout().getRows().map(this.renderRow)}
-				</div>);
+				return (React.createElement("div", {ref: "panel"}, 
+					this.getInnerLayout().getRows().map(this.renderRow)
+				));
 			}
 			var css = {
 				panel: true
@@ -10021,12 +10037,12 @@ window.$pt = $pt;
 			var bodyStyle = {
 				display: this.isInitExpanded() ? 'block' : 'none'
 			};
-			return (<div className={$pt.LayoutHelper.classSet(css)} ref='panel'>
-				{this.renderHeading()}
-				<div className='panel-body' style={bodyStyle} ref='body'>
-					{this.getInnerLayout().getRows().map(this.renderRow)}
-				</div>
-			</div>);
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), ref: "panel"}, 
+				this.renderHeading(), 
+				React.createElement("div", {className: "panel-body", style: bodyStyle, ref: "body"}, 
+					this.getInnerLayout().getRows().map(this.renderRow)
+				)
+			));
 		},
 		/**
 		 * get inner layout
@@ -10219,7 +10235,7 @@ window.$pt = $pt;
 	}));
 	$pt.Components.NPanel = NPanel;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Panel, function (model, layout, direction, viewMode) {
-		return <$pt.Components.NPanel {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return React.createElement($pt.Components.NPanel, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -10349,57 +10365,57 @@ window.$pt = $pt;
 					visible: option.visible
 				}
 			};
-			return <$pt.Components.NFormButton model={this.getModel()}
-											   layout={$pt.createCellLayout('pseudo-button', layout)}
-											   key={buttonIndex}/>;
+			return React.createElement($pt.Components.NFormButton, {model: this.getModel(), 
+											   layout: $pt.createCellLayout('pseudo-button', layout), 
+											   key: buttonIndex});
 		},
 		/**
 		 * render
 		 * @returns {XML}
 		 */
 		render: function () {
-			return (<div className="row n-panel-footer">
-				<div className="col-sm-12 col-md-12 col-lg-12">
-					<div className="btn-toolbar n-panel-footer-left" role='toolbar'>
-						{this.props.reset ? this.renderButton({
+			return (React.createElement("div", {className: "row n-panel-footer"}, 
+				React.createElement("div", {className: "col-sm-12 col-md-12 col-lg-12"}, 
+					React.createElement("div", {className: "btn-toolbar n-panel-footer-left", role: "toolbar"}, 
+						this.props.reset ? this.renderButton({
 							icon: NPanelFooter.RESET_ICON,
 							text: NPanelFooter.RESET_TEXT,
 							style: NPanelFooter.RESET_STYLE,
 							click: this.props.reset.click ? this.props.reset.click : this.props.reset,
 							enabled: this.props.reset.enabled ? this.props.reset.enabled : true,
 							visible: this.props.reset.visible ? this.props.reset.visible : true
-						}) : null}
-						{this.props.validate ? this.renderButton({
+						}) : null, 
+						this.props.validate ? this.renderButton({
 							icon: NPanelFooter.VALIDATE_ICON,
 							text: NPanelFooter.VALIDATE_TEXT,
 							style: NPanelFooter.VALIDATE_STYLE,
 							click: this.props.validate.click ? this.props.validate.click : this.props.validate,
 							enabled: this.props.validate.enabled ? this.props.validate.enabled : true,
 							visible: this.props.validate.visible ? this.props.validate.visible : true
-						}) : null}
-						{this.renderLeftButtons()}
-					</div>
-					<div className="btn-toolbar n-panel-footer-right" role='toolbar'>
-						{this.props.cancel ? this.renderButton({
+						}) : null, 
+						this.renderLeftButtons()
+					), 
+					React.createElement("div", {className: "btn-toolbar n-panel-footer-right", role: "toolbar"}, 
+						this.props.cancel ? this.renderButton({
 							icon: NPanelFooter.CANCEL_ICON,
 							text: NPanelFooter.CANCEL_TEXT,
 							style: NPanelFooter.CANCEL_STYLE,
 							click: this.props.cancel.click ? this.props.cancel.click : this.props.cancel,
 							enabled: this.props.cancel.enabled ? this.props.cancel.enabled : true,
 							visible: this.props.cancel.visible ? this.props.cancel.visible : true
-						}) : null}
-						{this.props.save ? this.renderButton({
+						}) : null, 
+						this.props.save ? this.renderButton({
 							icon: NPanelFooter.SAVE_ICON,
 							text: NPanelFooter.SAVE_TEXT,
 							style: NPanelFooter.SAVE_STYLE,
 							click: this.props.save.click ? this.props.save.click : this.props.save,
 							enabled: this.props.save.enabled ? this.props.save.enabled : true,
 							visible: this.props.save.visible ? this.props.save.visible : true
-						}) : null}
-						{this.renderRightButtons()}
-					</div>
-				</div>
-			</div>);
+						}) : null, 
+						this.renderRightButtons()
+					)
+				)
+			));
 		},
 		/**
 		 * get model
@@ -10514,10 +10530,10 @@ window.$pt = $pt;
 				disabled: !this.isEnabled(),
 				'radio-label-left': labelInLeft
 			};
-			return (<span className={$pt.LayoutHelper.classSet(css)}
-			             onClick={(this.isEnabled() && !this.isViewMode()) ? this.onButtonClicked.bind(this, option) : null}>
-            	{option.text}
-        	</span>);
+			return (React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
+			             onClick: (this.isEnabled() && !this.isViewMode()) ? this.onButtonClicked.bind(this, option) : null}, 
+            	option.text
+        	));
 		},
 		/**
 		 * render radio button, using font awesome instead
@@ -10533,19 +10549,19 @@ window.$pt = $pt;
 				'radio-container': true
 			};
 			var labelAtLeft = this.isLabelAtLeft();
-			return (<div className='n-radio-option' key={optionIndex}>
-				{labelAtLeft ? this.renderLabel(option, true) : null}
-				<div className='radio-container'>
-                <span className={$pt.LayoutHelper.classSet(css)}
-                      onClick={(enabled && !this.isViewMode()) ? this.onButtonClicked.bind(this, option) : null}
-                      onKeyUp={(enabled && !this.isViewMode()) ? this.onKeyUp.bind(this, option): null}
-                      tabIndex='0'
-                      ref={'out-' + option.id}>
-                    <span className='check' onClick={this.onInnerClicked.bind(this, option)}/>
-                </span>
-				</div>
-				{labelAtLeft ? null : this.renderLabel(option, false)}
-			</div>);
+			return (React.createElement("div", {className: "n-radio-option", key: optionIndex}, 
+				labelAtLeft ? this.renderLabel(option, true) : null, 
+				React.createElement("div", {className: "radio-container"}, 
+                React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
+                      onClick: (enabled && !this.isViewMode()) ? this.onButtonClicked.bind(this, option) : null, 
+                      onKeyUp: (enabled && !this.isViewMode()) ? this.onKeyUp.bind(this, option): null, 
+                      tabIndex: "0", 
+                      ref: 'out-' + option.id}, 
+                    React.createElement("span", {className: "check", onClick: this.onInnerClicked.bind(this, option)})
+                )
+				), 
+				labelAtLeft ? null : this.renderLabel(option, false)
+			));
 		},
 		render: function () {
 			var css = {
@@ -10557,9 +10573,9 @@ window.$pt = $pt;
 			// <input type="hidden" style={{display: "none"}}
 			// 	   onChange={this.onComponentChanged} value={this.getValueFromModel()}
 			// 	   ref='txt'/>
-			return (<div className={this.getComponentCSS($pt.LayoutHelper.classSet(css))}>
-				{this.getComponentOption("data").map(this.renderRadio)}
-			</div>);
+			return (React.createElement("div", {className: this.getComponentCSS($pt.LayoutHelper.classSet(css))}, 
+				this.getComponentOption("data").map(this.renderRadio)
+			));
 		},
 		/**
 		 * inner span clicked, force focus to outer span
@@ -10610,7 +10626,7 @@ window.$pt = $pt;
 	}));
 	$pt.Components.NRadio = NRadio;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Radio, function (model, layout, direction, viewMode) {
-		return <$pt.Components.NRadio {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return React.createElement($pt.Components.NRadio, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -10705,21 +10721,21 @@ window.$pt = $pt;
 			var middleSpanStyle = {
 				width: '0'
 			};
-			return (<div className={this.getComponentCSS($pt.LayoutHelper.classSet(css))}>
-				<div className="input-group">
-					<input type="text" className="form-control search-code" onKeyUp={this.onComponentChange} ref="code"
-					       disabled={!enabled} onFocus={this.onComponentFocused} onBlur={this.onComponentBlurred}/>
-					<span className="input-group-btn" style={middleSpanStyle}/>
-					<input type="text" className="form-control search-label" onFocus={this.onLabelFocused} ref="label"
-					       disabled={!enabled}/>
-				<span className="input-group-addon advanced-search-btn"
-				      onClick={enabled ? this.showAdvancedSearchDialog : null}>
-					<span className={'fa fa-fw fa-' + NSearchText.ADVANCED_SEARCH_BUTTON_ICON}/>
-				</span>
-					{this.renderNormalLine()}
-					{this.renderFocusLine()}
-				</div>
-			</div>);
+			return (React.createElement("div", {className: this.getComponentCSS($pt.LayoutHelper.classSet(css))}, 
+				React.createElement("div", {className: "input-group"}, 
+					React.createElement("input", {type: "text", className: "form-control search-code", onKeyUp: this.onComponentChange, ref: "code", 
+					       disabled: !enabled, onFocus: this.onComponentFocused, onBlur: this.onComponentBlurred}), 
+					React.createElement("span", {className: "input-group-btn", style: middleSpanStyle}), 
+					React.createElement("input", {type: "text", className: "form-control search-label", onFocus: this.onLabelFocused, ref: "label", 
+					       disabled: !enabled}), 
+				React.createElement("span", {className: "input-group-addon advanced-search-btn", 
+				      onClick: enabled ? this.showAdvancedSearchDialog : null}, 
+					React.createElement("span", {className: 'fa fa-fw fa-' + NSearchText.ADVANCED_SEARCH_BUTTON_ICON})
+				), 
+					this.renderNormalLine(), 
+					this.renderFocusLine()
+				)
+			));
 		},
 		/**
 		 * transfer focus to first text input
@@ -10999,7 +11015,7 @@ window.$pt = $pt;
 	}));
 	$pt.Components.NSearchText = NSearchText;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Search, function (model, layout, direction, viewMode) {
-		return <$pt.Components.NSearchText {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return React.createElement($pt.Components.NSearchText, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -11232,12 +11248,12 @@ window.$pt = $pt;
 				'n-disabled': !this.isEnabled()
 			};
 			css[this.getComponentCSS('n-select')] = true;
-			return (<div className={$pt.LayoutHelper.classSet(css)}
-			            ref='div'>
-				<select style={{width: this.getComponentOption("width")}}
-				        disabled={!this.isEnabled()}
-				        ref='select'/>
-			</div>);
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
+			            ref: "div"}, 
+				React.createElement("select", {style: {width: this.getComponentOption("width")}, 
+				        disabled: !this.isEnabled(), 
+				        ref: "select"})
+			));
 		},
 		/**
 		 * on component change
@@ -11469,7 +11485,7 @@ window.$pt = $pt;
 	})(jQuery);
 	$pt.Components.NSelect2 = NSelect2;
 	$pt.LayoutHelper.registerComponentRenderer('select2', function (model, layout, direction, viewMode) {
-		return <$pt.Components.NSelect2 {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return React.createElement($pt.Components.NSelect2, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -11568,8 +11584,8 @@ window.$pt = $pt;
 			if (!this.getComponentOption('allowClear')) {
 				return null;
 			}
-			return (<span className='fa fa-fw fa-close clear'
-						  onClick={this.onClearClick} />);
+			return (React.createElement("span", {className: "fa fa-fw fa-close clear", 
+						  onClick: this.onClearClick}));
 		},
 		renderText: function() {
 			var value = this.getValueFromModel();
@@ -11585,11 +11601,11 @@ window.$pt = $pt;
 			if (itemText == null) {
 				itemText = NSelect.PLACEHOLDER;
 			}
-			return (<div className='input-group form-control' onClick={this.onComponentClicked} ref='comp'>
-				<span className='text'>{itemText}</span>
-				{this.renderClear()}
-				<span className='fa fa-fw fa-sort-down drop' />
-			</div>);
+			return (React.createElement("div", {className: "input-group form-control", onClick: this.onComponentClicked, ref: "comp"}, 
+				React.createElement("span", {className: "text"}, itemText), 
+				this.renderClear(), 
+				React.createElement("span", {className: "fa fa-fw fa-sort-down drop"})
+			));
 		},
 		/**
 		 * render
@@ -11604,11 +11620,11 @@ window.$pt = $pt;
 				'n-view-mode': this.isViewMode()
 			};
 			css[this.getComponentCSS('n-select')] = true;
-			return (<div className={$pt.LayoutHelper.classSet(css)} tabIndex='0'>
-				{this.renderText()}
-				{this.renderNormalLine()}
-				{this.renderFocusLine()}
-			</div>);
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), tabIndex: "0"}, 
+				this.renderText(), 
+				this.renderNormalLine(), 
+				this.renderFocusLine()
+			));
 		},
 		renderPopoverContainer: function() {
 			if (this.state.popoverDiv == null) {
@@ -11631,17 +11647,17 @@ window.$pt = $pt;
 				});
 			}
 			var _this = this;
-			return (<ul>
-				{options.map(function(item, itemIndex) {
-					return (<li onClick={_this.onOptionClick.bind(_this, item)} key={itemIndex}>
-						<span>{item.text}</span>
-					</li>);
-				})}
-			</ul>);
+			return (React.createElement("ul", null, 
+				options.map(function(item, itemIndex) {
+					return (React.createElement("li", {onClick: _this.onOptionClick.bind(_this, item), key: itemIndex}, 
+						React.createElement("span", null, item.text)
+					));
+				})
+			));
 		},
 		renderNoOption: function(options) {
 			if (options == null || options.length == 0) {
-				return <div className='no-option'><span>{NSelect.NO_OPTION_FOUND}</span></div>;
+				return React.createElement("div", {className: "no-option"}, React.createElement("span", null, NSelect.NO_OPTION_FOUND));
 			}
 			return null;
 		},
@@ -11658,18 +11674,18 @@ window.$pt = $pt;
 					}
 				});
 				model.addPostChangeListener('text', this.onFilterTextChange);
-				return <$pt.Components.NText model={model} layout={layout} />;
+				return React.createElement($pt.Components.NText, {model: model, layout: layout});
 			} else {
 				return null;
 			}
 		},
 		renderPopoverContent: function(filterText) {
 			var options = this.getAvailableOptions();
-			return (<div>
-				{this.renderFilterText(options, filterText)}
-				{this.renderNoOption(options)}
-				{this.renderOptions(options, filterText)}
-			</div>);
+			return (React.createElement("div", null, 
+				this.renderFilterText(options, filterText), 
+				this.renderNoOption(options), 
+				this.renderOptions(options, filterText)
+			));
 		},
 		renderPopover: function(filterText) {
 			var styles = {display: 'block'};
@@ -11678,12 +11694,12 @@ window.$pt = $pt;
 			var offset = component.offset();
 			styles.top = -10000; // let it out of screen
 			styles.left = 0;
-			var popover = (<div role="tooltip" className="n-select-popover popover bottom in" style={styles}>
-				<div className="arrow"></div>
-				<div className="popover-content">
-					{this.renderPopoverContent(filterText)}
-				</div>
-			</div>);
+			var popover = (React.createElement("div", {role: "tooltip", className: "n-select-popover popover bottom in", style: styles}, 
+				React.createElement("div", {className: "arrow"}), 
+				React.createElement("div", {className: "popover-content"}, 
+					this.renderPopoverContent(filterText)
+				)
+			));
 			React.render(popover, this.state.popoverDiv.get(0), this.onPopoverRenderComplete);
 		},
 		showPopover: function(filterText) {
@@ -11934,7 +11950,7 @@ window.$pt = $pt;
 	}));
 	$pt.Components.NSelect = NSelect;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Select, function (model, layout, direction, viewMode) {
-		return <$pt.Components.NSelect {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return React.createElement($pt.Components.NSelect, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -12038,13 +12054,13 @@ window.$pt = $pt;
 			var layout = $pt.createCellLayout('values', this.getTreeLayout());
 			var model = $pt.createModel({values: this.getValueFromModel()});
 			model.addPostChangeListener('values', this.onTreeValueChanged);
-			return <$pt.Components.NTree model={model} layout={layout}/>;
+			return React.createElement($pt.Components.NTree, {model: model, layout: layout});
 		},
 		renderSelectionItem: function(codeItem, nodeId) {
-			return (<li>
-				<span className='fa fa-fw fa-remove' onClick={this.onSelectionItemRemove.bind(this, nodeId)}></span>
-				{codeItem.text}
-			</li>);
+			return (React.createElement("li", null, 
+				React.createElement("span", {className: "fa fa-fw fa-remove", onClick: this.onSelectionItemRemove.bind(this, nodeId)}), 
+				codeItem.text
+			));
 		},
 		renderSelectionWhenValueAsArray: function(values) {
 			var _this = this;
@@ -12136,12 +12152,12 @@ window.$pt = $pt;
 			}
 		},
 		renderText: function() {
-			return (<div className='input-group form-control' onClick={this.onComponentClicked} ref='comp'>
-				<ul className='selection'>
-					{this.renderSelection()}
-				</ul>
-				<span className='fa fa-fw fa-sort-down pull-right' />
-			</div>);
+			return (React.createElement("div", {className: "input-group form-control", onClick: this.onComponentClicked, ref: "comp"}, 
+				React.createElement("ul", {className: "selection"}, 
+					this.renderSelection()
+				), 
+				React.createElement("span", {className: "fa fa-fw fa-sort-down pull-right"})
+			));
 		},
 		render: function() {
 			var css = {
@@ -12149,11 +12165,11 @@ window.$pt = $pt;
 				'n-view-mode': this.isViewMode()
 			};
 			css[this.getComponentCSS('n-select-tree')] = true;
-			return (<div className={$pt.LayoutHelper.classSet(css)} tabIndex='0'>
-				{this.renderText()}
-				{this.renderNormalLine()}
-				{this.renderFocusLine()}
-			</div>);
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), tabIndex: "0"}, 
+				this.renderText(), 
+				this.renderNormalLine(), 
+				this.renderFocusLine()
+			));
 		},
 		renderPopoverContainer: function() {
 			if (this.state.popoverDiv == null) {
@@ -12173,12 +12189,12 @@ window.$pt = $pt;
 			var offset = component.offset();
 			styles.top = -10000; // let it out of screen
 			styles.left = 0;
-			var popover = (<div role="tooltip" className="n-select-tree-popover popover bottom in" style={styles}>
-				<div className="arrow"></div>
-				<div className="popover-content">
-					{this.renderTree()}
-				</div>
-			</div>);
+			var popover = (React.createElement("div", {role: "tooltip", className: "n-select-tree-popover popover bottom in", style: styles}, 
+				React.createElement("div", {className: "arrow"}), 
+				React.createElement("div", {className: "popover-content"}, 
+					this.renderTree()
+				)
+			));
 			React.render(popover, this.state.popoverDiv.get(0), this.onPopoverRenderComplete);
 		},
 		showPopover: function() {
@@ -12466,7 +12482,7 @@ window.$pt = $pt;
 	}));
 	$pt.Components.NSelectTree = NSelectTree;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.SelectTree, function (model, layout, direction, viewMode) {
-		return <$pt.Components.NSelectTree {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return React.createElement($pt.Components.NSelectTree, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -12497,9 +12513,9 @@ window.$pt = $pt;
 						$("<div id='" + containerId + "' />").appendTo($(document.body));
 					}
 					$pt.sideMenu[containerId] = React.render(
-						<$pt.Components.NSideMenu menus={menus}
-						           className={className}
-						           hover={hover ? true : false}/>,
+						React.createElement($pt.Components.NSideMenu, {menus: menus, 
+						           className: className, 
+						           hover: hover ? true : false}),
 						document.getElementById(containerId));
 				}
 				return $pt.sideMenu[containerId];
@@ -12528,46 +12544,46 @@ window.$pt = $pt;
 				// render dropdown menu
 				var _this = this;
 				var id = 'item_' + index;
-				return (<li ref={id} key={index}>
-					<a href="javascript:void(0);"
-					   onClick={this.onParentMenuClicked.bind(this, id)} ref={id + '_link'}>
-						{item.text}
-						<span className='fa fa-fw fa-angle-double-down n-side-menu-ul' ref={id + '_icon'}/>
-					</a>
-					<ul ref={id + '_child'} style={{display: 'none'}}>
-						{item.children.map(function (childItem, childIndex, dropdownItems) {
+				return (React.createElement("li", {ref: id, key: index}, 
+					React.createElement("a", {href: "javascript:void(0);", 
+					   onClick: this.onParentMenuClicked.bind(this, id), ref: id + '_link'}, 
+						item.text, 
+						React.createElement("span", {className: "fa fa-fw fa-angle-double-down n-side-menu-ul", ref: id + '_icon'})
+					), 
+					React.createElement("ul", {ref: id + '_child', style: {display: 'none'}}, 
+						item.children.map(function (childItem, childIndex, dropdownItems) {
 							return _this.renderMenuItem(childItem, index + '_' + childIndex, dropdownItems, false);
-						})}
-					</ul>
-				</li>);
+						})
+					)
+				));
 			} else if (item.func !== undefined) {
 				// call javascript function
-				return (<li key={index}>
-					<a href="javascript:void(0);"
-					   onClick={this.onMenuClicked.bind(this, item.func, item.value)}>{item.text}</a>
-				</li>);
+				return (React.createElement("li", {key: index}, 
+					React.createElement("a", {href: "javascript:void(0);", 
+					   onClick: this.onMenuClicked.bind(this, item.func, item.value)}, item.text)
+				));
 			} else if (item.divider === true) {
 				return null;
 			} else {
 				// jump to url
-				return (<li key={index}><a href={item.url}>{item.text}</a></li>);
+				return (React.createElement("li", {key: index}, React.createElement("a", {href: item.url}, item.text)));
 			}
 		},
 		render: function () {
 			var _this = this;
-			return (<div className="n-side-menu" ref='menus'
-			             onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave}>
-				<ul className="nav navbar-nav">
-					{this.props.menus.map(function (item, index, menu) {
+			return (React.createElement("div", {className: "n-side-menu", ref: "menus", 
+			             onMouseEnter: this.onMouseEnter, onMouseLeave: this.onMouseLeave}, 
+				React.createElement("ul", {className: "nav navbar-nav"}, 
+					this.props.menus.map(function (item, index, menu) {
 						return _this.renderMenuItem(item, index, menu, true);
-					})}
-					<li className="n-side-menu-close">
-						<a href='javascript:void(0);' onClick={this.onCloseClicked}>
-							<span className='fa fa-fw fa-arrow-circle-left'/>
-						</a>
-					</li>
-				</ul>
-			</div>);
+					}), 
+					React.createElement("li", {className: "n-side-menu-close"}, 
+						React.createElement("a", {href: "javascript:void(0);", onClick: this.onCloseClicked}, 
+							React.createElement("span", {className: "fa fa-fw fa-arrow-circle-left"})
+						)
+					)
+				)
+			));
 		},
 		onMouseEnter: function () {
 			if (this.props.hover) {
@@ -12725,7 +12741,7 @@ window.$pt = $pt;
 				if (size) {
 					css['fa-' + size] = true;
 				}
-				return <span className={$pt.LayoutHelper.classSet(css)}/>;
+				return React.createElement("span", {className: $pt.LayoutHelper.classSet(css)});
 			} else {
 				return icon;
 			}
@@ -12737,14 +12753,14 @@ window.$pt = $pt;
 		 */
 		renderLabel: function (label) {
 			if (label) {
-				return <span>{' ' + label}</span>;
+				return React.createElement("span", null, ' ' + label);
 			} else {
 				return null;
 			}
 		},
 		renderBadge: function (badge) {
 			if (badge) {
-				return <span className='badge'>{badge}</span>;
+				return React.createElement("span", {className: "badge"}, badge);
 			} else {
 				return null;
 			}
@@ -12761,18 +12777,18 @@ window.$pt = $pt;
 				hide: tab.visible === false
 			});
 			var removeButton = (
-				<a href='javascript:void(0);' className='n-tab-delete'
-				   onClick={this.onRemoveClicked}>
-					<span className='fa fa-fw fa-times'/>
-				</a>);
-			return (<li role="presentation" className={css} key={index}>
-				<a href='javascript:void(0);' onClick={this.onClicked}>
-					{this.renderIcon(tab.icon, this.props.size)}
-					{this.renderLabel(tab.label)}
-					{this.renderBadge(tab.badge)}
-				</a>
-				{this.canRemove(tab) ? removeButton : null}
-			</li>);
+				React.createElement("a", {href: "javascript:void(0);", className: "n-tab-delete", 
+				   onClick: this.onRemoveClicked}, 
+					React.createElement("span", {className: "fa fa-fw fa-times"})
+				));
+			return (React.createElement("li", {role: "presentation", className: css, key: index}, 
+				React.createElement("a", {href: "javascript:void(0);", onClick: this.onClicked}, 
+					this.renderIcon(tab.icon, this.props.size), 
+					this.renderLabel(tab.label), 
+					this.renderBadge(tab.badge)
+				), 
+				this.canRemove(tab) ? removeButton : null
+			));
 		},
 		/**
 		 * render
@@ -12789,11 +12805,11 @@ window.$pt = $pt;
 			if (this.props.tabClassName) {
 				css[this.props.tabClassName] = true;
 			}
-			return (<div className='n-tab'>
-				<ul className={$pt.LayoutHelper.classSet(css)} ref='tabs'>
-					{this.props.tabs.map(this.renderTab)}
-				</ul>
-			</div>);
+			return (React.createElement("div", {className: "n-tab"}, 
+				React.createElement("ul", {className: $pt.LayoutHelper.classSet(css), ref: "tabs"}, 
+					this.props.tabs.map(this.renderTab)
+				)
+			));
 		},
 		/**
 		 * check the given tab can be removed or not
@@ -13300,7 +13316,7 @@ window.$pt = $pt;
 		 */
 		renderSearchBox: function () {
 			if (this.isSearchable()) {
-				return (<$pt.Components.NText model={this.state.searchModel} layout={this.state.searchLayout}/>);
+				return (React.createElement($pt.Components.NText, {model: this.state.searchModel, layout: this.state.searchLayout}));
 			} else {
 				return null;
 			}
@@ -13311,15 +13327,15 @@ window.$pt = $pt;
 		 */
 		renderHeadingButtons: function () {
 			if (this.isAddable()) {
-				return (<a href="javascript:void(0);"
-				           onClick={this.onAddClicked}
-				           className="n-table-heading-buttons pull-right"
-				           ref='add-button' style={{
+				return (React.createElement("a", {href: "javascript:void(0);", 
+				           onClick: this.onAddClicked, 
+				           className: "n-table-heading-buttons pull-right", 
+				           ref: "add-button", style: {
 					display: this.state.expanded ? 'block' : 'none'
-				}}>
-					<$pt.Components.NIcon icon={NTable.ADD_BUTTON_ICON}/>
-					{NTable.ADD_BUTTON_TEXT}
-				</a>);
+				}}, 
+					React.createElement($pt.Components.NIcon, {icon: NTable.ADD_BUTTON_ICON}), 
+					NTable.ADD_BUTTON_TEXT
+				));
 			} else {
 				return null;
 			}
@@ -13340,12 +13356,12 @@ window.$pt = $pt;
 			if (this.isCollapsible()) {
 				spanCSS['n-table-heading-label-collapsible'] = true;
 			}
-			return (<div className={css}>
-				<span className={this.getAdditionalCSS("headingLabel", $pt.LayoutHelper.classSet(spanCSS))}
-				      ref={this.getHeaderLabelId()} onClick={this.isCollapsible() ? this.onTitleClicked : null}>
-					{this.getLayout().getLabel()}
-				</span>
-			</div>);
+			return (React.createElement("div", {className: css}, 
+				React.createElement("span", {className: this.getAdditionalCSS("headingLabel", $pt.LayoutHelper.classSet(spanCSS)), 
+				      ref: this.getHeaderLabelId(), onClick: this.isCollapsible() ? this.onTitleClicked : null}, 
+					this.getLayout().getLabel()
+				)
+			));
 		},
 		/**
 		 * render header popover
@@ -13383,15 +13399,15 @@ window.$pt = $pt;
 			if (!this.isHeading()) {
 				return null;
 			}
-			return (<div className={this.getAdditionalCSS("heading", "panel-heading n-table-heading")}>
-				<div className="row">
-					{this.renderPanelHeadingLabel()}
-					<div className="col-sm-9 col-md-9 col-lg-9">
-						{this.renderHeadingButtons()}
-						{this.renderSearchBox()}
-					</div>
-				</div>
-			</div>);
+			return (React.createElement("div", {className: this.getAdditionalCSS("heading", "panel-heading n-table-heading")}, 
+				React.createElement("div", {className: "row"}, 
+					this.renderPanelHeadingLabel(), 
+					React.createElement("div", {className: "col-sm-9 col-md-9 col-lg-9"}, 
+						this.renderHeadingButtons(), 
+						this.renderSearchBox()
+					)
+				)
+			));
 		},
 		/**
 		 * render sort button
@@ -13410,10 +13426,10 @@ window.$pt = $pt;
 						icon = NTable.SORT_DESC_ICON;
 					}
 				}
-				return (<a href="javascript:void(0);" className={sortClass}
-				           onClick={this.onSortClicked.bind(this, column)}>
-					<$pt.Components.NIcon icon={icon}/>
-				</a>);
+				return (React.createElement("a", {href: "javascript:void(0);", className: sortClass, 
+				           onClick: this.onSortClicked.bind(this, column)}, 
+					React.createElement($pt.Components.NIcon, {icon: icon})
+				));
 			}
 		},
 		/**
@@ -13447,7 +13463,7 @@ window.$pt = $pt;
 					_this.forceUpdate();
 				}
 			});
-			return <$pt.Components.NCheck model={model} layout={layout}/>;
+			return React.createElement($pt.Components.NCheck, {model: model, layout: layout});
 		},
 		/**
 		 * render heading content.
@@ -13463,9 +13479,9 @@ window.$pt = $pt;
 			var indexToRender = this.getRenderColumnIndexRange(all, leftFixed, rightFixed);
 			var columnIndex = 0;
 			var _this = this;
-			return (<thead>
-				<tr>
-					{this.state.columns.map(function (column) {
+			return (React.createElement("thead", null, 
+				React.createElement("tr", null, 
+					this.state.columns.map(function (column) {
 						if (columnIndex >= indexToRender.min && columnIndex <= indexToRender.max) {
 							// column is fixed.
 							columnIndex++;
@@ -13475,21 +13491,21 @@ window.$pt = $pt;
 								style.display = "none";
 							}
 							if (column.rowSelectable) {
-								return (<td style={style} key={columnIndex}>
-									{_this.renderTableHeaderCheckBox(column)}
-								</td>);
+								return (React.createElement("td", {style: style, key: columnIndex}, 
+									_this.renderTableHeaderCheckBox(column)
+								));
 							} else {
-								return (<td style={style} key={columnIndex}>
-									{column.title}
-									{_this.renderTableHeaderSortButton(column)}
-								</td>);
+								return (React.createElement("td", {style: style, key: columnIndex}, 
+									column.title, 
+									_this.renderTableHeaderSortButton(column)
+								));
 							}
 						} else {
 							columnIndex++;
 						}
-					})}
-				</tr>
-			</thead>);
+					})
+				)
+			));
 		},
 		renderRowEditButton: function(rowModel) {
 			var layout = $pt.createCellLayout('editButton', {
@@ -13504,7 +13520,7 @@ window.$pt = $pt;
 					comp: 'n-table-op-btn'
 				}
 			});
-			return <$pt.Components.NFormButton model={rowModel} layout={layout} />;
+			return React.createElement($pt.Components.NFormButton, {model: rowModel, layout: layout});
 		},
 		renderRowRemoveButton: function(rowModel) {
 			var layout = $pt.createCellLayout('removeButton', {
@@ -13519,7 +13535,7 @@ window.$pt = $pt;
 					comp: 'n-table-op-btn'
 				}
 			});
-			return <$pt.Components.NFormButton model={rowModel} layout={layout} />;
+			return React.createElement($pt.Components.NFormButton, {model: rowModel, layout: layout});
 		},
 		renderRowOperationButton: function(operation, rowModel, operationIndex) {
 			var layout = $pt.createCellLayout('rowButton', {
@@ -13534,7 +13550,7 @@ window.$pt = $pt;
 					comp: 'n-table-op-btn'
 				}
 			});
-			return <$pt.Components.NFormButton model={rowModel} layout={layout} key={operationIndex}/>;
+			return React.createElement($pt.Components.NFormButton, {model: rowModel, layout: layout, key: operationIndex});
 		},
 		getRowOperations: function(column) {
 			var rowOperations = column.rowOperations;
@@ -13551,13 +13567,13 @@ window.$pt = $pt;
 			var removeButton = column.removable ? this.renderRowRemoveButton(rowModel) : null;
 			var rowOperations = this.getRowOperations(column);
 			var _this = this;
-			return (<div className="btn-group n-table-op-btn-group" role='group'>
-				{rowOperations.map(function (operation, operationIndex) {
+			return (React.createElement("div", {className: "btn-group n-table-op-btn-group", role: "group"}, 
+				rowOperations.map(function (operation, operationIndex) {
 					return _this.renderRowOperationButton(operation, rowModel, operationIndex);
-				})}
-				{editButton}
-				{removeButton}
-			</div>);
+				}), 
+				editButton, 
+				removeButton
+			));
 		},
 		renderPopoverContainer: function() {
 			if (this.state.popoverDiv == null) {
@@ -13598,11 +13614,11 @@ window.$pt = $pt;
 						comp: 'n-table-op-btn'
 					}
 				});
-				return (<li key={operationIndex}>
-					<$pt.Components.NFormButton model={rowModel} layout={layout} />
-				</li>);
+				return (React.createElement("li", {key: operationIndex}, 
+					React.createElement($pt.Components.NFormButton, {model: rowModel, layout: layout})
+				));
 			};
-			return (<ul className='nav'>{moreOperations.map(renderOperation)}</ul>);
+			return (React.createElement("ul", {className: "nav"}, moreOperations.map(renderOperation)));
 		},
 		renderPopoverAsIcon: function(moreOperations, rowModel) {
 			return moreOperations.map(function(operation, operationIndex) {
@@ -13617,14 +13633,14 @@ window.$pt = $pt;
 			styles.left = offset.left;
 
 			var _this = this;
-			React.render((<div role="tooltip" className="n-table-op-btn-popover popover bottom in" style={styles}>
-				<div className="arrow"></div>
-				<div className="popover-content">
-					{this.isRenderMoreOperationButtonsAsIcon(moreOperations) ?
+			React.render((React.createElement("div", {role: "tooltip", className: "n-table-op-btn-popover popover bottom in", style: styles}, 
+				React.createElement("div", {className: "arrow"}), 
+				React.createElement("div", {className: "popover-content"}, 
+					this.isRenderMoreOperationButtonsAsIcon(moreOperations) ?
 						this.renderPopoverAsIcon(moreOperations, rowModel) :
-						this.renderPopoverAsMenu(moreOperations, rowModel)}
-				</div>
-			</div>), this.state.popoverDiv.get(0));
+						this.renderPopoverAsMenu(moreOperations, rowModel)
+				)
+			)), this.state.popoverDiv.get(0));
 		},
 		showPopover: function(moreOperations, rowModel, eventTarget) {
 			this.renderPopoverContainer();
@@ -13643,7 +13659,7 @@ window.$pt = $pt;
 		hidePopover: function() {
 			if (this.state.popoverDiv && this.state.popoverDiv.is(':visible')) {
 				this.state.popoverDiv.hide();
-				React.render(<noscript/>, this.state.popoverDiv.get(0));
+				React.render(React.createElement("noscript", null), this.state.popoverDiv.get(0));
 			}
 		},
 		destroyPopover: function() {
@@ -13682,7 +13698,7 @@ window.$pt = $pt;
 					comp: 'n-table-op-btn more'
 				}
 			});
-			return <$pt.Components.NFormButton model={rowModel} layout={layout} key='more-op'/>;
+			return React.createElement($pt.Components.NFormButton, {model: rowModel, layout: layout, key: "more-op"});
 		},
 		/**
 		 * render dropdown operation cell, only buttons which before maxButtonCount are renderred as a line,
@@ -13717,9 +13733,9 @@ window.$pt = $pt;
 				buttons.push(this.renderRowOperationMoreButton(rowOperations.slice(used + 1), rowModel));
 			}
 
-			return (<div className="btn-group n-table-op-btn-group" role='group'>
-				{buttons}{dropdown}
-			</div>);
+			return (React.createElement("div", {className: "btn-group n-table-op-btn-group", role: "group"}, 
+				buttons, dropdown
+			));
 		},
 		/**
 		 * render operation cell
@@ -13760,7 +13776,7 @@ window.$pt = $pt;
 					type: $pt.ComponentConstants.Check
 				}
 			});
-			return (<$pt.Components.NCheck model={model} layout={layout}/>);
+			return (React.createElement($pt.Components.NCheck, {model: model, layout: layout}));
 		},
 		/**
 		 * render table body rows
@@ -13790,7 +13806,7 @@ window.$pt = $pt;
 			}
 
 			var inlineModel = this.createInlineRowModel(row);
-			return (<tr className={className} key={rowIndex}>{
+			return (React.createElement("tr", {className: className, key: rowIndex}, 
 				this.state.columns.map(function (column) {
 					if (columnIndex >= indexToRender.min && columnIndex <= indexToRender.max) {
 						// column is fixed.
@@ -13828,10 +13844,10 @@ window.$pt = $pt;
 									}
 								}
 								// pre-defined, use with data together
-								data = <$pt.Components.NFormCell model={inlineModel}
-												  layout={$pt.createCellLayout(column.data, layout)}
-												  direction='horizontal'
-												  view={_this.isViewMode()}/>;
+								data = React.createElement($pt.Components.NFormCell, {model: inlineModel, 
+												  layout: $pt.createCellLayout(column.data, layout), 
+												  direction: "horizontal", 
+												  view: _this.isViewMode()});
 							} else if (column.inline.inlineType == 'cell') {
 								column.inline.pos = {width: 12};
 								if (column.inline.css) {
@@ -13839,29 +13855,29 @@ window.$pt = $pt;
 								} else {
 									column.inline.css = {cell: 'inline-editor'};
 								}
-								data = <$pt.Components.NFormCell model={inlineModel}
-												  layout={$pt.createCellLayout(column.data, column.inline)}
-												  direction='horizontal'
-												  view={_this.isViewMode()}
-												  className={column.inline.__className} />;
+								data = React.createElement($pt.Components.NFormCell, {model: inlineModel, 
+												  layout: $pt.createCellLayout(column.data, column.inline), 
+												  direction: "horizontal", 
+												  view: _this.isViewMode(), 
+												  className: column.inline.__className});
 							} else {
 								// any other, treat as form layout
 								// column.data is not necessary
-								data = <$pt.Components.NForm model={inlineModel}
-											  layout={$pt.createFormLayout(column.inline)}
-											  direction='horizontal'
-											  view={_this.isViewMode()} />;
+								data = React.createElement($pt.Components.NForm, {model: inlineModel, 
+											  layout: $pt.createFormLayout(column.inline), 
+											  direction: "horizontal", 
+											  view: _this.isViewMode()});
 							}
 						} else {
 							// data is property name
 							data = _this.getDisplayTextOfColumn(column, row);
 						}
-						return (<td style={style} key={columnIndex}>{data}</td>);
+						return (React.createElement("td", {style: style, key: columnIndex}, data));
 					} else {
 						columnIndex++;
 					}
 				})
-			}</tr>);
+			));
 		},
 		/**
 		 * render table body
@@ -13881,30 +13897,30 @@ window.$pt = $pt;
 			var rowIndex = 1;
 			var _this = this;
 			var range = this.computePagination(data);
-			return (<tbody>
-			{data.map(function (element) {
+			return (React.createElement("tbody", null, 
+			data.map(function (element) {
 				if (rowIndex >= range.min && rowIndex <= range.max) {
 					return _this.renderTableBodyRow(element, rowIndex++, all, leftFixed, rightFixed);
 				} else {
 					rowIndex++;
 					return null;
 				}
-			})}
-			</tbody>);
+			})
+			));
 		},
 		/**
 		 * render table with no scroll Y
 		 * @returns {XML}
 		 */
 		renderTableNoScrollY: function () {
-			return (<div className={this.getAdditionalCSS("panelBody", "n-table-panel-body")}>
-				<table cellSpacing="0" className={this.getAdditionalCSS("table", "n-table cell-border")}
-				       style={this.computeTableStyle()}
-				       ref='table'>
-					{this.renderTableHeading(true)}
-					{this.renderTableBody(true)}
-				</table>
-			</div>);
+			return (React.createElement("div", {className: this.getAdditionalCSS("panelBody", "n-table-panel-body")}, 
+				React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border"), 
+				       style: this.computeTableStyle(), 
+				       ref: "table"}, 
+					this.renderTableHeading(true), 
+					this.renderTableBody(true)
+				)
+			));
 		},
 		/**
 		 * render table with scroll Y
@@ -13919,23 +13935,23 @@ window.$pt = $pt;
 				maxHeight: this.getComponentOption("scrollY"),
 				overflowY: "scroll"
 			};
-			return (<div className={this.getAdditionalCSS("panelBody", "n-table-panel-body")}>
-				<div className="n-table-scroll-head" ref={this.getScrolledHeaderDivId()} style={scrolledHeaderDivStyle}>
-					<div className="n-table-scroll-head-inner" style={style}>
-						<table cellSpacing="0" className={this.getAdditionalCSS("table", "n-table cell-border")}
-						       style={style}>
-							{this.renderTableHeading(true)}
-						</table>
-					</div>
-				</div>
-				<div className="n-table-scroll-body" style={scrolledBodyDivStyle} ref={this.getScrolledBodyDivId()}>
-					<table cellSpacing="0" className={this.getAdditionalCSS("table", "n-table cell-border")}
-					       style={style}
-					       ref='table'>
-						{this.renderTableBody(true)}
-					</table>
-				</div>
-			</div>);
+			return (React.createElement("div", {className: this.getAdditionalCSS("panelBody", "n-table-panel-body")}, 
+				React.createElement("div", {className: "n-table-scroll-head", ref: this.getScrolledHeaderDivId(), style: scrolledHeaderDivStyle}, 
+					React.createElement("div", {className: "n-table-scroll-head-inner", style: style}, 
+						React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border"), 
+						       style: style}, 
+							this.renderTableHeading(true)
+						)
+					)
+				), 
+				React.createElement("div", {className: "n-table-scroll-body", style: scrolledBodyDivStyle, ref: this.getScrolledBodyDivId()}, 
+					React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border"), 
+					       style: style, 
+					       ref: "table"}, 
+						this.renderTableBody(true)
+					)
+				)
+			));
 		},
 		/**
 		 * render table
@@ -13968,18 +13984,18 @@ window.$pt = $pt;
 				width: "100%"
 			};
 			return (
-				<div className="n-table-fix-left" style={divStyle}>
-					<table cellSpacing="0" style={tableStyle}
-					       className={this.getAdditionalCSS("table", "n-table cell-border")}>
-						{this.renderTableHeading(false, true)}
-					</table>
-					<div ref={this.getFixedLeftBodyDivId()} style={bodyDivStyle}>
-						<table cellSpacing="0" className={this.getAdditionalCSS("table", "n-table cell-border")}
-						       style={tableStyle}>
-							{this.renderTableBody(false, true)}
-						</table>
-					</div>
-				</div>
+				React.createElement("div", {className: "n-table-fix-left", style: divStyle}, 
+					React.createElement("table", {cellSpacing: "0", style: tableStyle, 
+					       className: this.getAdditionalCSS("table", "n-table cell-border")}, 
+						this.renderTableHeading(false, true)
+					), 
+					React.createElement("div", {ref: this.getFixedLeftBodyDivId(), style: bodyDivStyle}, 
+						React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border"), 
+						       style: tableStyle}, 
+							this.renderTableBody(false, true)
+						)
+					)
+				)
 			);
 		},
 		/**
@@ -13993,13 +14009,13 @@ window.$pt = $pt;
 			var tableStyle = {
 				width: "100%"
 			};
-			return (<div className="n-table-fix-left" style={divStyle}>
-				<table cellSpacing="0" className={this.getAdditionalCSS("table", "n-table cell-border")}
-				       style={tableStyle}>
-					{this.renderTableHeading(false, true)}
-					{this.renderTableBody(false, true)}
-				</table>
-			</div>);
+			return (React.createElement("div", {className: "n-table-fix-left", style: divStyle}, 
+				React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border"), 
+				       style: tableStyle}, 
+					this.renderTableHeading(false, true), 
+					this.renderTableBody(false, true)
+				)
+			));
 		},
 		/**
 		 * render fixed left columns
@@ -14026,13 +14042,13 @@ window.$pt = $pt;
 			var tableStyle = {
 				width: "100%"
 			};
-			return (<div className="n-table-fix-right" style={divStyle}>
-				<table cellSpacing="0" className={this.getAdditionalCSS("table", "n-table cell-border")}
-				       style={tableStyle}>
-					{this.renderTableHeading(false, false, true)}
-					{this.renderTableBody(false, false, true)}
-				</table>
-			</div>);
+			return (React.createElement("div", {className: "n-table-fix-right", style: divStyle}, 
+				React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border"), 
+				       style: tableStyle}, 
+					this.renderTableHeading(false, false, true), 
+					this.renderTableBody(false, false, true)
+				)
+			));
 		},
 		/**
 		 * render fixed right columns with scroll Y
@@ -14056,20 +14072,20 @@ window.$pt = $pt;
 				width: "100%"
 			};
 			return (
-				<div className="n-table-fix-right" style={divStyle}>
-					<div className="n-table-fix-right-head-wrapper">
-						<div className="n-table-fix-right-top-corner"/>
-						<table cellSpacing="0" style={tableStyle}
-						       className={this.getAdditionalCSS("table", "n-table cell-border")}>
-							{this.renderTableHeading(false, false, true)}
-						</table>
-					</div>
-					<div ref={this.getFixedRightBodyDivId()} style={bodyDivStyle}>
-						<table cellSpacing="0" className={this.getAdditionalCSS("table", "n-table cell-border")}>
-							{this.renderTableBody(false, false, true)}
-						</table>
-					</div>
-				</div>
+				React.createElement("div", {className: "n-table-fix-right", style: divStyle}, 
+					React.createElement("div", {className: "n-table-fix-right-head-wrapper"}, 
+						React.createElement("div", {className: "n-table-fix-right-top-corner"}), 
+						React.createElement("table", {cellSpacing: "0", style: tableStyle, 
+						       className: this.getAdditionalCSS("table", "n-table cell-border")}, 
+							this.renderTableHeading(false, false, true)
+						)
+					), 
+					React.createElement("div", {ref: this.getFixedRightBodyDivId(), style: bodyDivStyle}, 
+						React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border")}, 
+							this.renderTableBody(false, false, true)
+						)
+					)
+				)
 			);
 		},
 		/**
@@ -14094,7 +14110,7 @@ window.$pt = $pt;
 			if (this.hasDataToDisplay()) {
 				return null;
 			} else {
-				return (<div className="n-table-no-data"><span>{NTable.NO_DATA_LABEL}</span></div>);
+				return (React.createElement("div", {className: "n-table-no-data"}, React.createElement("span", null, NTable.NO_DATA_LABEL)));
 			}
 		},
 		/**
@@ -14104,8 +14120,8 @@ window.$pt = $pt;
 		renderPagination: function () {
 			if (this.isPageable() && this.hasDataToDisplay()) {
 				// only show when pageable and has data to display
-				return (<$pt.Components.NPagination className="n-table-pagination" pageCount={this.state.pageCount}
-				                     currentPageIndex={this.state.currentPageIndex} toPage={this.toPage}/>);
+				return (React.createElement($pt.Components.NPagination, {className: "n-table-pagination", pageCount: this.state.pageCount, 
+				                     currentPageIndex: this.state.currentPageIndex, toPage: this.toPage}));
 			} else {
 				return null;
 			}
@@ -14126,11 +14142,11 @@ window.$pt = $pt;
 					// ie>8 or chrome, scrollbar is in height.
 					bodyDivStyle.maxHeight = this.getComponentOption("scrollY") - ((this.isIE8()) ? 0 : 18);
 				}
-				rightCorner = (<div className="n-table-fix-right" style={divStyle}>
-					<div className="n-table-fix-right-head-wrapper">
-						<div className="n-table-fix-right-top-corner"/>
-					</div>
-				</div>);
+				rightCorner = (React.createElement("div", {className: "n-table-fix-right", style: divStyle}, 
+					React.createElement("div", {className: "n-table-fix-right-head-wrapper"}, 
+						React.createElement("div", {className: "n-table-fix-right-top-corner"})
+					)
+				));
 			}
 			return rightCorner;
 		},
@@ -14156,18 +14172,18 @@ window.$pt = $pt;
 			var expandedStyle = {
 				display: this.isExpanded() ? 'block' : 'none'
 			};
-			return (<div className={this.getComponentCSS($pt.LayoutHelper.classSet(css))} ref='div'>
-				{this.renderPanelHeading()}
-				<div ref='table-panel-body' style={expandedStyle}>
-					<div className={this.getAdditionalCSS("body", "n-table-body-container panel-body")}>
-						{this.renderTable()}
-						{this.renderFixedLeftColumns()}
-						{this.renderFixedRightColumns()}
-						{this.renderRightTopCorner()}
-					</div>
-					{this.renderPagination()}
-				</div>
-			</div>);
+			return (React.createElement("div", {className: this.getComponentCSS($pt.LayoutHelper.classSet(css)), ref: "div"}, 
+				this.renderPanelHeading(), 
+				React.createElement("div", {ref: "table-panel-body", style: expandedStyle}, 
+					React.createElement("div", {className: this.getAdditionalCSS("body", "n-table-body-container panel-body")}, 
+						this.renderTable(), 
+						this.renderFixedLeftColumns(), 
+						this.renderFixedRightColumns(), 
+						this.renderRightTopCorner()
+					), 
+					this.renderPagination()
+				)
+			));
 		},
 		/**
 		 * has vertical scroll bar
@@ -14946,7 +14962,7 @@ window.$pt = $pt;
 	}));
 	$pt.Components.NTable = NTable;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Table, function (model, layout, direction, viewMode) {
-		return <$pt.Components.NTable {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return React.createElement($pt.Components.NTable, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -15103,18 +15119,18 @@ window.$pt = $pt;
 			var css = {
 				'form-control': true
 			};
-			return (<input type={this.getComponentOption('pwd', false) ? 'password' : 'text'}
-			               className={$pt.LayoutHelper.classSet(css)}
-			               disabled={!this.isEnabled()}
-			               placeholder={this.getComponentOption('placeholder')}
+			return (React.createElement("input", {type: this.getComponentOption('pwd', false) ? 'password' : 'text', 
+			               className: $pt.LayoutHelper.classSet(css), 
+			               disabled: !this.isEnabled(), 
+			               placeholder: this.getComponentOption('placeholder'), 
 
-			               onKeyPress={this.onComponentChanged}
-			               onChange={this.onComponentChanged}
-			               onFocus={this.onComponentFocused}
-			               onBlur={this.onComponentBlurred}
-			               onKeyUp={this.onKeyUp}
+			               onKeyPress: this.onComponentChanged, 
+			               onChange: this.onComponentChanged, 
+			               onFocus: this.onComponentFocused, 
+			               onBlur: this.onComponentBlurred, 
+			               onKeyUp: this.onKeyUp, 
 
-			               ref='txt'/>);
+			               ref: "txt"}));
 		},
 		/**
 		 * render right add-on
@@ -15152,15 +15168,15 @@ window.$pt = $pt;
 			if (icon != null) {
 				iconCss['fa-' + icon] = true;
 			}
-			var iconPart = icon == null ? null : (<span className={$pt.LayoutHelper.classSet(iconCss)} key='iconPart'/>);
+			var iconPart = icon == null ? null : (React.createElement("span", {className: $pt.LayoutHelper.classSet(iconCss), key: "iconPart"}));
 			var textPart = addon.text;
 			var innerParts = addon.iconFirst === false ? [textPart, iconPart] : [iconPart, textPart];
-			return (<span className={$pt.LayoutHelper.classSet(spanCss)}
-			              onClick={this.onAddonClicked.bind(this, addon.click)}>
-				{innerParts.map(function (part) {
+			return (React.createElement("span", {className: $pt.LayoutHelper.classSet(spanCss), 
+			              onClick: this.onAddonClicked.bind(this, addon.click)}, 
+				innerParts.map(function (part) {
 					return part;
-				})}
-			</span>);
+				})
+			));
 		},
 		/**
 		 * render
@@ -15174,15 +15190,15 @@ window.$pt = $pt;
 				'n-disabled': !this.isEnabled()
 			};
 			css[this.getComponentCSS('n-text')] = true;
-			return (<div className={$pt.LayoutHelper.classSet(css)}>
-				<div className='input-group'>
-					{this.renderLeftAddon()}
-					{this.renderText()}
-					{this.renderRightAddon()}
-				</div>
-				{this.renderNormalLine()}
-				{this.renderFocusLine()}
-			</div>);
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
+				React.createElement("div", {className: "input-group"}, 
+					this.renderLeftAddon(), 
+					this.renderText(), 
+					this.renderRightAddon()
+				), 
+				this.renderNormalLine(), 
+				this.renderFocusLine()
+			));
 		},
 		onComponentFocused: function () {
 			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
@@ -15315,7 +15331,7 @@ window.$pt = $pt;
 	}));
 	$pt.Components.NText = NText;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Text, function (model, layout, direction, viewMode) {
-		return <$pt.Components.NText {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return React.createElement($pt.Components.NText, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -15428,16 +15444,16 @@ window.$pt = $pt;
 				'form-control': true
 			};
 			css['l' + this.getComponentOption('lines')] = true;
-			return (<textarea className={$pt.LayoutHelper.classSet(css)}
-			                  disabled={!this.isEnabled()}
-			                  placeholder={this.getComponentOption('placeholder')}
+			return (React.createElement("textarea", {className: $pt.LayoutHelper.classSet(css), 
+			                  disabled: !this.isEnabled(), 
+			                  placeholder: this.getComponentOption('placeholder'), 
 
-			                  onKeyPress={this.onComponentChanged}
-			                  onChange={this.onComponentChanged}
-			                  onFocus={this.onComponentFocused}
-			                  onBlur={this.onComponentBlurred}
+			                  onKeyPress: this.onComponentChanged, 
+			                  onChange: this.onComponentChanged, 
+			                  onFocus: this.onComponentFocused, 
+			                  onBlur: this.onComponentBlurred, 
 
-			                  ref='txt'/>);
+			                  ref: "txt"}));
 		},
 		/**
 		 * render
@@ -15451,11 +15467,11 @@ window.$pt = $pt;
 				'n-disabled': !this.isEnabled()
 			};
 			css[this.getComponentCSS('n-textarea')] = true;
-			return (<div className={$pt.LayoutHelper.classSet(css)}>
-				{this.renderText()}
-				{this.renderNormalLine()}
-				{this.renderFocusLine()}
-			</div>);
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
+				this.renderText(), 
+				this.renderNormalLine(), 
+				this.renderFocusLine()
+			));
 		},
 		onComponentFocused: function () {
 			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
@@ -15511,7 +15527,7 @@ window.$pt = $pt;
 	}));
 	$pt.Components.NTextArea = NTextArea;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.TextArea, function (model, layout, direction, viewMode) {
-		return <$pt.Components.NTextArea {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return React.createElement($pt.Components.NTextArea, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -15580,9 +15596,9 @@ window.$pt = $pt;
 				disabled: !this.isEnabled()
 			};
 			css[className] = true;
-			return (<span className={$pt.LayoutHelper.classSet(css)}>
-	            {label}
-	        </span>);
+			return (React.createElement("span", {className: $pt.LayoutHelper.classSet(css)}, 
+	            label
+	        ));
 		},
 		renderLeftLabel: function () {
 			var labelAttached = this.getComponentOption('labelAttached');
@@ -15608,15 +15624,15 @@ window.$pt = $pt;
 				unchecked: !checked,
 				'toggle-container': true
 			};
-			return (<div className={$pt.LayoutHelper.classSet(css)}>
-				<span className='n-toggle-line'/>
-            <span className='n-toggle-true'
-                  tabIndex='-1'
-                  onClick={this.onButtonClicked.bind(this, true)}/>
-            <span className='n-toggle-false'
-                  tabIndex='-1'
-                  onClick={this.onButtonClicked.bind(this, false)}/>
-			</div>);
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
+				React.createElement("span", {className: "n-toggle-line"}), 
+            React.createElement("span", {className: "n-toggle-true", 
+                  tabIndex: "-1", 
+                  onClick: this.onButtonClicked.bind(this, true)}), 
+            React.createElement("span", {className: "n-toggle-false", 
+                  tabIndex: "-1", 
+                  onClick: this.onButtonClicked.bind(this, false)})
+			));
 		},
 		/**
 		 * render
@@ -15629,13 +15645,13 @@ window.$pt = $pt;
 			};
 			css[this.getComponentCSS('n-toggle')] = true;
 
-			return (<div className={$pt.LayoutHelper.classSet(css)}>
-				<input type="checkbox" style={{display: "none"}}
-				       onChange={this.onComponentChanged} ref='txt'/>
-				{this.renderLeftLabel()}
-				{this.renderToggleButton()}
-				{this.renderRightLabel()}
-			</div>);
+			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
+				React.createElement("input", {type: "checkbox", style: {display: "none"}, 
+				       onChange: this.onComponentChanged, ref: "txt"}), 
+				this.renderLeftLabel(), 
+				this.renderToggleButton(), 
+				this.renderRightLabel()
+			));
 		},
 		/**
 		 * handle button clicked event
@@ -15678,7 +15694,7 @@ window.$pt = $pt;
 	}));
 	$pt.Components.NToggle = NToggle;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Toggle, function (model, layout, direction, viewMode) {
-		return <$pt.Components.NToggle {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return React.createElement($pt.Components.NToggle, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
@@ -15844,7 +15860,7 @@ window.$pt = $pt;
                 }
             });
             model.addPostChangeListener('selected', this.onNodeCheckChanged.bind(this, node, nodeId));
-            return <$pt.Components.NCheck model={model} layout={layout} view={this.isViewMode()}/>;
+            return React.createElement($pt.Components.NCheck, {model: model, layout: layout, view: this.isViewMode()});
         },
         renderNode: function(parentNodeId, node) {
             var nodeId = this.getNodeId(parentNodeId, node);
@@ -15856,52 +15872,52 @@ window.$pt = $pt;
                     fixWidth: true,
                     icon: this.getNodeOperationIcon(node, nodeId)
                 };
-                opIcon = (<a href='javascript:void(0);'
-                            onClick={this.onNodeClicked.bind(this, node, nodeId)}>
-                    <$pt.Components.NIcon {...expandableIconAttrs} />
-                </a>);
+                opIcon = (React.createElement("a", {href: "javascript:void(0);", 
+                            onClick: this.onNodeClicked.bind(this, node, nodeId)}, 
+                    React.createElement($pt.Components.NIcon, React.__spread({},  expandableIconAttrs))
+                ));
             }
             var folderIconAttrs = {
                 icon: this.getNodeIcon(node, nodeId),
                 fixWidth: true,
                 iconClassName: 'node-icon'
             };
-            var folderIcon = (<a href='javascript:void(0);'
-                            onClick={this.onNodeClicked.bind(this, node, nodeId)}>
-                <$pt.Components.NIcon {...folderIconAttrs}/>
-            </a>);
+            var folderIcon = (React.createElement("a", {href: "javascript:void(0);", 
+                            onClick: this.onNodeClicked.bind(this, node, nodeId)}, 
+                React.createElement($pt.Components.NIcon, React.__spread({},  folderIconAttrs))
+            ));
 
             var active = this.isActive(nodeId) ? 'active' : null;
             return (
-                <li className={active} key={nodeId}>
-                    {opIcon}
-                    {folderIcon}
-                    {this.renderCheck(node, nodeId)}
-                    <a
-                        href='javascript:void(0);'
-                        onClick={this.onNodeClicked.bind(this, node, nodeId)}>
-                        <span className='node-text'>{this.getNodeText(node)}</span>
-                    </a>
-                    {this.renderNodes(node, nodeId)}
-                </li>
+                React.createElement("li", {className: active, key: nodeId}, 
+                    opIcon, 
+                    folderIcon, 
+                    this.renderCheck(node, nodeId), 
+                    React.createElement("a", {
+                        href: "javascript:void(0);", 
+                        onClick: this.onNodeClicked.bind(this, node, nodeId)}, 
+                        React.createElement("span", {className: "node-text"}, this.getNodeText(node))
+                    ), 
+                    this.renderNodes(node, nodeId)
+                )
             );
         },
         renderNodes: function(parent, parentNodeId) {
             var children =  parent.children;
             if (children && children.length > 0) {
                 return (
-                    <ul className='nav'>
-                        {children.map(this.renderNode.bind(this, parentNodeId))}
-                    </ul>
+                    React.createElement("ul", {className: "nav"}, 
+                        children.map(this.renderNode.bind(this, parentNodeId))
+                    )
                 );
             } else {
                 return null;
             }
         },
         renderRoot: function() {
-            return (<ul className='nav'>
-                {this.renderNode(null, this.state.root)}
-            </ul>);
+            return (React.createElement("ul", {className: "nav"}, 
+                this.renderNode(null, this.state.root)
+            ));
         },
         renderTopLevel: function() {
             var root = this.state.root;
@@ -15909,12 +15925,12 @@ window.$pt = $pt;
             return this.isRootPaint() ? this.renderRoot() : this.renderNodes(root, this.getNodeId(null, root));
         },
         renderButtons: function() {
-            var expand = this.state.expandButton ? <$pt.Components.NFormButton model={this.getModel()} layout={this.state.expandButton}/> : null;
-            var collapse = this.state.collapseButton ? <$pt.Components.NFormButton model={this.getModel()} layout={this.state.collapseButton}/> : null;
+            var expand = this.state.expandButton ? React.createElement($pt.Components.NFormButton, {model: this.getModel(), layout: this.state.expandButton}) : null;
+            var collapse = this.state.collapseButton ? React.createElement($pt.Components.NFormButton, {model: this.getModel(), layout: this.state.collapseButton}) : null;
             if (expand || collapse) {
-                return (<span className='buttons'>
-                    {expand}{collapse}
-                </span>);
+                return (React.createElement("span", {className: "buttons"}, 
+                    expand, collapse
+                ));
             } else {
                 return null;
             }
@@ -15932,10 +15948,10 @@ window.$pt = $pt;
                 css += ' border';
             }
             return (
-                <div className={css} style={styles}>
-                    {this.renderTopLevel()}
-                    {this.renderButtons()}
-                </div>
+                React.createElement("div", {className: css, style: styles}, 
+                    this.renderTopLevel(), 
+                    this.renderButtons()
+                )
             );
         },
         onNodeClicked: function(node, nodeId) {
@@ -16391,9 +16407,22 @@ window.$pt = $pt;
     // expose to global
     $pt.Components.NTree = NTree;
     $pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Tree, function (model, layout, direction, viewMode) {
-		return <$pt.Components.NTree {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return React.createElement($pt.Components.NTree, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
 	});
 }(window, jQuery, React, $pt));
 
-window.$pt = oldPT;
-module.exports = $pt;
+// only packaged in browser environment
+(function (window, $pt) {
+	// expose all components definition to window
+	if (typeof DONT_EXPOSE_PARROT_TO_GLOBAL === 'undefined' || DONT_EXPOSE_PARROT_TO_GLOBAL !== true) {
+		$pt.exposeComponents(window);
+	}
+}(window, $pt));
+
+
+	// reset to old $pt
+	if (typeof DONT_EXPOSE_PARROT_TO_GLOBAL != 'undefined' && DONT_EXPOSE_PARROT_TO_GLOBAL === true) {
+		window.$pt = _pt;
+	}
+	return $pt;
+}));
