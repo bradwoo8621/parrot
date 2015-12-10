@@ -25,8 +25,8 @@ console.log('bootstrap-fileinput loaded: ' + (jQuery.fn.fileinput != null));
 global.moment = require('moment');
 console.log('moment loaded: ' + (global.moment != null));
 
-global.React = require('react');
-console.log('react loaded: ' + (global.React != null));
+// global.React = require('react');
+// console.log('react loaded: ' + (global.React != null));
 
 global.jsface = require('jsface');
 console.log('jsface loaded: ' + (global.jsface != null));
