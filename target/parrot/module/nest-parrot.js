@@ -258,10 +258,6 @@
 	patches.array();
 })(window, jQuery, jQuery.browser);
 
-(function (jsface) {
-	jsface.noConflict();
-})(jsface);
-
 (function (window) {
 	var $pt = window.$pt;
 	if ($pt == null) {

@@ -104,7 +104,6 @@ module.exports = function(grunt) {
 				},
 				parrot: {
 					src: ['<%= middlePath %>/js/browser-patch.js',
-						'<%= middlePath %>/js/parrot-jsface.js',
 						'<%= middlePath %>/js/parrot-pre-define.js',
 						'<%= middlePath %>/js/parrot-ajax.js',
 						'<%= middlePath %>/js/parrot-codetable.js',

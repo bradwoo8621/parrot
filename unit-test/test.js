@@ -47,10 +47,12 @@ exports.unit_test = {
 	setUp: function(done) {
 		done();
 	},
-	defaultOptions: function(test) {
+	setProperty: function(test) {
 		test.expect(1);
-
-		test.equal(true, true, 'Never occurs.');
+		var parrot = require('../target/parrot/module/nest-parrot')(window, jQuery, jsface, moment, React, true);
+		var model = parrot.createModel({});
+		model.set('name', 'test');
+		test.equal(model.get('name'), 'test', "Didn't set property value correctly.");
 		test.done();
 	}
 };
