@@ -61,5 +61,5 @@
             <NTextArea model={model} layout={l2PlainText} view={true}/>
         </div>
     </div>);
-    React.render(panel, document.getElementById('main'));
+    ReactDOM.render(panel, document.getElementById('main'));
 })();

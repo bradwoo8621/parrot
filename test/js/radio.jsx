@@ -100,5 +100,5 @@
             <NRadio model={model} layout={verticalRadioButton} view={true}/>
         </div>
     </div>);
-    React.render(panel, document.getElementById('main'));
+    ReactDOM.render(panel, document.getElementById('main'));
 })();

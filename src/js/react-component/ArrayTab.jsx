@@ -38,7 +38,7 @@
  *      }
  * }
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NArrayTab = React.createClass($pt.defineCellComponent({
 		displayName: 'NArrayTab',
 		statics: {
@@ -229,7 +229,7 @@
 			var _this = this;
 			if (this.state.tabs) {
 				this.state.tabs.forEach(function(tab, tabIndex) {
-					if (_this.isAddable() && (tabIndex != _this.state.tabs.length - 1)) {
+					if ((_this.isAddable() && (tabIndex != _this.state.tabs.length - 1)) || !_this.isAddable()) {
 						var model = tab.data;
 						tab.label = _this.getTabTitle(model);
 						tab.icon = _this.getTabIcon(model);
@@ -412,4 +412,4 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayTab, function (model, layout, direction, viewMode) {
 		return <$pt.Components.NArrayTab {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(window, jQuery, React, $pt));
+}(window, jQuery, React, ReactDOM, $pt));

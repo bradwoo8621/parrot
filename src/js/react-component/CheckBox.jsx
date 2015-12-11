@@ -29,7 +29,7 @@
  *      }
  * }
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NCheck = React.createClass($pt.defineCellComponent({
 		displayName: 'NCheck',
 		propTypes: {
@@ -151,7 +151,7 @@
 		 * for fix the outer span cannot gain focus in IE11
 		 */
 		onInnerClicked: function () {
-			$(React.findDOMNode(this.refs.out)).focus();
+			$(ReactDOM.findDOMNode(this.refs.out)).focus();
 		},
 		/**
 		 * handle button clicked event
@@ -199,7 +199,7 @@
 		 * @returns {jQuery}
 		 */
 		// getComponent: function () {
-		// 	return $(React.findDOMNode(this.refs.txt));
+		// 	return $(ReactDOM.findDOMNode(this.refs.txt));
 		// },
 		isLabelAtLeft: function () {
 			return this.getComponentOption('labelAttached') === 'left';
@@ -209,4 +209,4 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Check, function (model, layout, direction, viewMode) {
 		return <$pt.Components.NCheck {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(window, jQuery, React, $pt));
+}(window, jQuery, React, ReactDOM, $pt));

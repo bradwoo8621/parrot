@@ -32,7 +32,7 @@
  *      }
  * }
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NFormButton = React.createClass($pt.defineCellComponent({
 		displayName: 'NFormButton',
 		propTypes: {
@@ -193,7 +193,7 @@
 		},
 		onClicked: function (evt) {
 			if (this.isEnabled()) {
-				$(React.findDOMNode(this.refs.a)).toggleClass('effect');
+				$(ReactDOM.findDOMNode(this.refs.a)).toggleClass('effect');
 				var onclick = this.getComponentOption("click");
 				if (onclick) {
 					onclick.call(this, this.getModel(), evt.target);
@@ -241,4 +241,4 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Button, function (model, layout, direction, viewMode) {
 		return <$pt.Components.NFormButton {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(window, jQuery, React, $pt));
+}(window, jQuery, React, ReactDOM, $pt));

@@ -657,5 +657,5 @@
         </div>
         <div style={{height: "500px"}}/>
     </div>);
-    React.render(panel, document.getElementById('main'));
+    ReactDOM.render(panel, document.getElementById('main'));
 })();

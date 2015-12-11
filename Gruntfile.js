@@ -8,6 +8,7 @@ module.exports = function(grunt) {
 			middlePath: 'intermediate',
 			bowerPath: 'bower_components',
 			nodeModulePath: 'node_modules',
+			babelVersion: '5.8.34',
 			clean: {
 				all: ['<%= targetPath %>/parrot/', '<%= middlePath %>'],
 				mid: ['<%= middlePath %>'],
@@ -154,12 +155,15 @@ module.exports = function(grunt) {
 					}
 				}
 			},
-			// convert jsx to js
-			react: {
+			babel: {
 				parrot: {
+					options: {
+						"presets": ["react"],
+						"plugins": ["transform-react-jsx"]
+					},
 					files: [{
 						expand: true,
-						cwd: 'src/js/',
+						cwd: '<%= sourcePath %>/js/',
 						src: ['**/*.jsx'],
 						dest: '<%= middlePath %>/js/',
 						ext: '.js'
@@ -239,7 +243,7 @@ module.exports = function(grunt) {
 						expand: true,
 						cwd: '<%= nodeModulePath %>/font-awesome/fonts/',
 						src: ['**/*'],
-						dest: '<%= targetPath %>/font-awesome/fonts/'
+						dest: '<%= targetPath %>/fontawesome/fonts/'
 					}]
 				},
 				es5_shim: {
@@ -342,8 +346,21 @@ module.exports = function(grunt) {
 					files: [{
 						expand: true,
 						cwd: '<%= nodeModulePath %>/react/dist/',
-						src: ['JSXTransformer.js', 'react-with-addons.js', 'react-with-addons.min.js'],
+						src: ['react-with-addons.js', 'react-with-addons.min.js'],
 						dest: '<%= targetPath %>/react/'
+					}, {
+						expand: true,
+						cwd: '<%= nodeModulePath %>/react-dom/dist/',
+						src: ['react-dom.js', 'react-dom.min.js'],
+						dest: '<%= targetPath %>/react/'
+					}, {
+						expand: true,
+						cwd: '<%= sourcePath %>/babel-browser-support/<%= babelVersion %>/',
+						src: ['*.js'],
+						dest: '<%= targetPath %>/react/',
+						rename: function(dest, src) {
+							return dest + src.replace('browser', 'babel-browser');
+						}
 					}]
 				},
 				respond_js: {
@@ -475,8 +492,9 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.loadNpmTasks('grunt-contrib-nodeunit');
 	grunt.loadNpmTasks('grunt-contrib-less');
-	grunt.loadNpmTasks('grunt-react');
+	// grunt.loadNpmTasks('grunt-react');
 	grunt.loadNpmTasks('grunt-replace');
+	grunt.loadNpmTasks('grunt-babel');
 
 	// copy bower files to target
 	grunt.registerTask('dependency-copy',
@@ -491,7 +509,7 @@ module.exports = function(grunt) {
 			'copy:react',
 			'copy:respond_js',
 			'copy:select2']);
-	grunt.registerTask('parrot-browser-compile', ['react:parrot', 'jshint:parrot', 'concat:parrot', 'uglify:parrot']);
+	grunt.registerTask('parrot-browser-compile', ['babel:parrot', 'jshint:parrot', 'concat:parrot', 'uglify:parrot']);
 	grunt.registerTask('bootswatch', ['copy:bootswatch-pre', 'replace:bootswatch', 'cssmin:bootswatch', 'copy:bootswatch-post']);
 	grunt.registerTask('css-parrot', ['less:parrot', 'copy:parrot-min-css-pre', 'cssmin:parrot', 'copy:parrot-min-css-post', 'copy:parrot-css']);
 	grunt.registerTask('css-compile', ['bootswatch', 'css-parrot']);

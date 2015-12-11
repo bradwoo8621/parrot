@@ -5,7 +5,7 @@
  * 		2.3 mouse wheel
  *		2.4 window resize
  */
-(function(window, $, React, $pt) {
+(function(window, $, React, ReactDOM, $pt) {
 	var NSelectTree = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelectTree',
 		statics: {
@@ -239,7 +239,7 @@
 					{this.renderTree()}
 				</div>
 			</div>);
-			React.render(popover, this.state.popoverDiv.get(0), this.onPopoverRenderComplete);
+			ReactDOM.render(popover, this.state.popoverDiv.get(0), this.onPopoverRenderComplete);
 		},
 		showPopover: function() {
 			this.renderPopoverContainer();
@@ -314,7 +314,7 @@
 		hidePopover: function() {
 			// if (this.state.popoverDiv && this.state.popoverDiv.is(':visible')) {
 			// 	this.state.popoverDiv.hide();
-			// 	React.render(<noscript/>, this.state.popoverDiv.get(0));
+			// 	ReactDOM.render(<noscript/>, this.state.popoverDiv.get(0));
 			// }
 			this.destroyPopover();
 		},
@@ -444,7 +444,7 @@
 			}
 		},
 		getComponent: function() {
-			return $(React.findDOMNode(this.refs.comp));
+			return $(ReactDOM.findDOMNode(this.refs.comp));
 		},
 		/**
 		 * get tree model
@@ -528,4 +528,4 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.SelectTree, function (model, layout, direction, viewMode) {
 		return <$pt.Components.NSelectTree {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(window, jQuery, React, $pt));
+}(window, jQuery, React, ReactDOM, $pt));

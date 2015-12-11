@@ -1,4 +1,4 @@
-(function(window, $, React, $pt) {
+(function(window, $, React, ReactDOM, $pt) {
     var NTree = React.createClass($pt.defineCellComponent({
         displayName: 'NTree',
         statics: {
@@ -709,4 +709,4 @@
     $pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Tree, function (model, layout, direction, viewMode) {
 		return <$pt.Components.NTree {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(window, jQuery, React, $pt));
+}(window, jQuery, React, ReactDOM, $pt));

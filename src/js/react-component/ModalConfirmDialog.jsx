@@ -4,7 +4,7 @@
  *
  * depends NFormButton
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NConfirm = React.createClass({
 		displayName: 'NConfirm',
 		statics: {
@@ -14,7 +14,7 @@
 					if (confirmContainer.length == 0) {
 						$("<div id='confirm_modal_container' />").appendTo($(document.body));
 					}
-					$pt.confirmDialog = React.render(<$pt.Components.NConfirm className={className}/>,
+					$pt.confirmDialog = ReactDOM.render(<$pt.Components.NConfirm className={className}/>,
 						document.getElementById("confirm_modal_container"));
 				}
 				return $pt.confirmDialog;
@@ -279,4 +279,4 @@
 		}
 	});
 	$pt.Components.NConfirm = NConfirm;
-}(window, jQuery, React, $pt));
+}(window, jQuery, React, ReactDOM, $pt));

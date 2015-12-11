@@ -157,5 +157,5 @@
         <div style={{height: 2000}} />
         <NFormButton layout={floatingWithPos}/>
     </div>);
-    React.render(panel, document.getElementById('main'));
+    ReactDOM.render(panel, document.getElementById('main'));
 })();

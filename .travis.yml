@@ -23,5 +23,6 @@ install:
   - npm install jquery-deparam
   - npm install jquery-mousewheel
   - npm install react
+  - npm install react-dom
   - npm install bootstrap-fileinput-npm
   - npm install bootstrap

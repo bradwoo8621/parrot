@@ -32,7 +32,7 @@
  *      }
  * }
  */
-(function (window, $, moment, React, $pt) {
+(function (window, $, moment, React, ReactDOM, $pt) {
 	var NDateTime2 = React.createClass($pt.defineCellComponent({
 		displayName: 'NDateTime2',
 		statics: {
@@ -306,12 +306,12 @@
 			</div>);
 		},
 		onComponentFocused: function () {
-			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 		},
 		onComponentBlurred: function () {
-			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 		},
 		/**
 		 * on component change
@@ -339,7 +339,7 @@
 		 * @override
 		 */
 		getComponent: function () {
-			return $(React.findDOMNode(this.refs.div));
+			return $(ReactDOM.findDOMNode(this.refs.div));
 		},
 		/**
 		 * get value from model
@@ -390,4 +390,4 @@
 	$pt.LayoutHelper.registerComponentRenderer('date2', function (model, layout, direction, viewMode) {
 		return <$pt.Components.NDateTime2 {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(window, jQuery, moment, React, $pt));
+}(window, jQuery, moment, React, ReactDOM, $pt));

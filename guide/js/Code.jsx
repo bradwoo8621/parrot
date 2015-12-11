@@ -1,9 +1,9 @@
-var Code = React.createClass({
+window.Code = React.createClass({
 	propTypes: {
 		code: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.arrayOf(React.PropTypes.string)])
 	},
 	componentDidMount: function () {
-		hljs.highlightBlock($(React.findDOMNode(this.refs.code))[0]);
+		// hljs.highlightBlock($(React.findDOMNode(this.refs.code))[0]);
 	},
 	render: function () {
 		return (<pre><code className='javascript xml json' ref='code'>
@@ -12,7 +12,7 @@ var Code = React.createClass({
 	}
 });
 
-var Example = React.createClass({
+window.Example = React.createClass({
 	statics: {
 		DEFAULT_WIDTH: 3
 	},
@@ -126,7 +126,7 @@ var Example = React.createClass({
 	}
 });
 
-var ExampleList = React.createClass({
+window.ExampleList = React.createClass({
 	propTypes: {
 		title: React.PropTypes.string,
 		formType: React.PropTypes.string,
@@ -229,7 +229,7 @@ var ExampleList = React.createClass({
 	}
 });
 
-var APIList = React.createClass({
+window.APIList = React.createClass({
 	getInitialState: function () {
 		return {}
 	},

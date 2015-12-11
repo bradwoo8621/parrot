@@ -61,8 +61,8 @@
         }
     ];
 
-    React.render(<NPageHeader brand='Parrot' menus={menus}/>,
+    ReactDOM.render(<NPageHeader brand='Parrot' menus={menus}/>,
         document.getElementById("page-header"));
     // render page footer
-    React.render(<NPageFooter name='Demo'/>, document.getElementById("page-footer"));
+    ReactDOM.render(<NPageFooter name='Demo'/>, document.getElementById("page-footer"));
 }());

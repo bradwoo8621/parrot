@@ -77,5 +77,5 @@
             <NSelect model={model} layout={normal} view={true}/>
         </div>
     </div>);
-    React.render(panel, document.getElementById('main'));
+    ReactDOM.render(panel, document.getElementById('main'));
 })();

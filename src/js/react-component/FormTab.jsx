@@ -35,7 +35,7 @@
  *      }
  * }
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NFormTab = React.createClass($pt.defineCellComponent({
 		displayName: 'NFormTab',
 		propTypes: {
@@ -216,4 +216,4 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Tab, function (model, layout, direction, viewMode) {
 		return <$pt.Components.NFormTab {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(window, jQuery, React, $pt));
+}(window, jQuery, React, ReactDOM, $pt));

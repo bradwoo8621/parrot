@@ -1,7 +1,7 @@
 /**
  * search text
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NSearchText = React.createClass($pt.defineCellComponent({
 		displayName: 'NSearchText',
 		statics: {
@@ -112,12 +112,12 @@
 			this.getComponent().focus();
 		},
 		onComponentFocused: function () {
-			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 		},
 		onComponentBlurred: function () {
-			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 		},
 		/**
 		 * on component changed
@@ -178,7 +178,7 @@
 			if (this.isViewMode()) {
 				var value = this.getValueFromModel();
 				if (value == null) {
-					$(React.findDOMNode(this.refs.viewLabel)).text('');
+					$(ReactDOM.findDOMNode(this.refs.viewLabel)).text('');
 				} else {
 					var label = value;
 					if (text == null) {
@@ -186,10 +186,10 @@
 					} else {
 						label += ' - ' + text;
 					}
-					$(React.findDOMNode(this.refs.viewLabel)).text(label);
+					$(ReactDOM.findDOMNode(this.refs.viewLabel)).text(label);
 				}
 			} else {
-				$(React.findDOMNode(this.refs.label)).val(text);
+				$(ReactDOM.findDOMNode(this.refs.label)).val(text);
 			}
 		},
 		/**
@@ -257,7 +257,7 @@
 			return this.getComponentOption("searchTriggerDigits");
 		},
 		getComponent: function () {
-			return $(React.findDOMNode(this.refs.code));
+			return $(ReactDOM.findDOMNode(this.refs.code));
 		},
 		// search dialog
 		getAdvancedSearchDialogModel: function () {
@@ -385,4 +385,4 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Search, function (model, layout, direction, viewMode) {
 		return <$pt.Components.NSearchText {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(window, jQuery, React, $pt));
+}(window, jQuery, React, ReactDOM, $pt));

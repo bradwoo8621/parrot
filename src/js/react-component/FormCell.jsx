@@ -16,7 +16,7 @@
  *      }
  * }
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NFormCell = React.createClass($pt.defineCellComponent({
 		displayName: 'NFormCell',
 		statics: {
@@ -100,7 +100,7 @@
 		destroyPopover: function () {
 			var comp = this.refs.comp;
 			if (comp != null) {
-				$(React.findDOMNode(comp)).popover("destroy");
+				$(ReactDOM.findDOMNode(comp)).popover("destroy");
 			}
 		},
 		/**
@@ -127,7 +127,7 @@
 
 				var comp = this.refs.comp;
 				if (comp != null) {
-					$(React.findDOMNode(comp)).popover(popover);
+					$(ReactDOM.findDOMNode(comp)).popover(popover);
 				}
 			}
 		},
@@ -264,13 +264,13 @@
 				this.renderPopover();
 				div = this.refs.div;
 				if (div != null) {
-					$(React.findDOMNode(div)).addClass('has-error');
+					$(ReactDOM.findDOMNode(div)).addClass('has-error');
 				}
 			} else {
 				this.destroyPopover();
 				div = this.refs.div;
 				if (div != null) {
-					$(React.findDOMNode(div)).removeClass('has-error');
+					$(ReactDOM.findDOMNode(div)).removeClass('has-error');
 				}
 			}
 		},
@@ -278,7 +278,7 @@
 		 * on label clicked
 		 */
 		onLabelClicked: function () {
-			$(React.findDOMNode(this.refs.comp)).focus();
+			$(ReactDOM.findDOMNode(this.refs.comp)).focus();
 		},
 		/**
 		 * get css class
@@ -340,4 +340,4 @@
 		}
 	}));
 	$pt.Components.NFormCell = NFormCell;
-}(window, jQuery, React, $pt));
+}(window, jQuery, React, ReactDOM, $pt));

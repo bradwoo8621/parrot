@@ -3,7 +3,7 @@
  *
  * depends NIcon, NText, NModalForm, NConfirm, NPagination
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NTable = React.createClass($pt.defineCellComponent({
 		displayName: 'NTable',
 		statics: {
@@ -188,7 +188,7 @@
 		detachListeners: function () {
 			this.getScrollBodyComponent().off("scroll");
 			this.getDivComponent().off("mouseenter", "tbody tr").off("mouseleave", "tbody tr");
-			$(React.findDOMNode(this.refs[this.getHeaderLabelId()])).popover("destroy");
+			$(ReactDOM.findDOMNode(this.refs[this.getHeaderLabelId()])).popover("destroy");
 			this.removePostChangeListener(this.onModelChanged);
 			this.state.searchModel.removePostChangeListener('text', this.onSearchBoxChanged);
 			this.removePostRemoveListener(this.onModelChanged);
@@ -445,7 +445,7 @@
 						return "<span style='display:block'>" + NTable.DETAIL_ERROR_MESSAGE + "</span>";
 					}
 				});
-				$(React.findDOMNode(this.refs[this.getHeaderLabelId()])).popover({
+				$(ReactDOM.findDOMNode(this.refs[this.getHeaderLabelId()])).popover({
 					placement: 'top',
 					trigger: 'hover',
 					html: true,
@@ -701,7 +701,7 @@
 			styles.left = offset.left;
 
 			var _this = this;
-			React.render((<div role="tooltip" className="n-table-op-btn-popover popover bottom in" style={styles}>
+			ReactDOM.render((<div role="tooltip" className="n-table-op-btn-popover popover bottom in" style={styles}>
 				<div className="arrow"></div>
 				<div className="popover-content">
 					{this.isRenderMoreOperationButtonsAsIcon(moreOperations) ?
@@ -727,7 +727,7 @@
 		hidePopover: function() {
 			if (this.state.popoverDiv && this.state.popoverDiv.is(':visible')) {
 				this.state.popoverDiv.hide();
-				React.render(<noscript/>, this.state.popoverDiv.get(0));
+				ReactDOM.render(<noscript/>, this.state.popoverDiv.get(0));
 			}
 		},
 		destroyPopover: function() {
@@ -1622,11 +1622,11 @@
 		onTitleClicked: function () {
 			this.state.expanded = !this.state.expanded;
 			if (this.state.expanded) {
-				$(React.findDOMNode(this.refs['table-panel-body'])).slideDown(300);
-				$(React.findDOMNode(this.refs['add-button'])).show();
+				$(ReactDOM.findDOMNode(this.refs['table-panel-body'])).slideDown(300);
+				$(ReactDOM.findDOMNode(this.refs['add-button'])).show();
 			} else {
-				$(React.findDOMNode(this.refs['table-panel-body'])).slideUp(300);
-				$(React.findDOMNode(this.refs['add-button'])).hide();
+				$(ReactDOM.findDOMNode(this.refs['table-panel-body'])).slideUp(300);
+				$(ReactDOM.findDOMNode(this.refs['add-button'])).hide();
 			}
 		},
 		/**
@@ -1952,10 +1952,10 @@
 			}
 		},
 		getDivComponent: function () {
-			return $(React.findDOMNode(this.refs.div));
+			return $(ReactDOM.findDOMNode(this.refs.div));
 		},
 		getComponent: function () {
-			return $(React.findDOMNode(this.refs.table));
+			return $(ReactDOM.findDOMNode(this.refs.table));
 		},
 		/**
 		 * get header label id
@@ -1966,7 +1966,7 @@
 		},
 		getScrollHeaderComponent: function () {
 			if (this.refs[this.getScrolledHeaderDivId()]) {
-				return $(React.findDOMNode(this.refs[this.getScrolledHeaderDivId()]));
+				return $(ReactDOM.findDOMNode(this.refs[this.getScrolledHeaderDivId()]));
 			} else {
 				return $("#___");
 			}
@@ -1980,7 +1980,7 @@
 		},
 		getScrollBodyComponent: function () {
 			if (this.refs[this.getScrolledBodyDivId()]) {
-				return $(React.findDOMNode(this.refs[this.getScrolledBodyDivId()]));
+				return $(ReactDOM.findDOMNode(this.refs[this.getScrolledBodyDivId()]));
 			} else {
 				return $("#___");
 			}
@@ -1994,7 +1994,7 @@
 		},
 		getFixedLeftBodyComponent: function () {
 			if (this.refs[this.getFixedLeftBodyDivId()]) {
-				return $(React.findDOMNode(this.refs[this.getFixedLeftBodyDivId()]));
+				return $(ReactDOM.findDOMNode(this.refs[this.getFixedLeftBodyDivId()]));
 			} else {
 				return $("#___");
 			}
@@ -2008,7 +2008,7 @@
 		},
 		getFixedRightBodyComponent: function () {
 			if (this.refs[this.getFixedRightBodyDivId()]) {
-				return $(React.findDOMNode(this.refs[this.getFixedRightBodyDivId()]));
+				return $(ReactDOM.findDOMNode(this.refs[this.getFixedRightBodyDivId()]));
 			} else {
 				return $("#___");
 			}
@@ -2032,4 +2032,4 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Table, function (model, layout, direction, viewMode) {
 		return <$pt.Components.NTable {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(window, jQuery, React, $pt));
+}(window, jQuery, React, ReactDOM, $pt));

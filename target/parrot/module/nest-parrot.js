@@ -7,15 +7,15 @@
 	} else if ( typeof define === 'function' && define.amd ) {
         // AMD. Register as parrot
 		// TODO how to define the jquery plugin here?
-        define('parrot', ['jquery', 'jsface', 'moment', 'react'], factory);
+        define('parrot', ['jquery', 'jsface', 'moment', 'react', 'react-dom'], factory);
 	} else {
 		// in browser, global is window.
 		// all dependencies were loaded already.
 		// bootstrap and jquery's plugin are all attached to jquery,
 		// expose $pt and all components to window.
-		factory(global, jQuery, jsface, moment, React);
+		factory(global, jQuery, jsface, moment, React, ReactDOM);
 	}
-}(typeof window !== "undefined" ? window : this, function(window, jQuery, jsface, moment, React, DONT_EXPOSE_PARROT_TO_GLOBAL) {
+}(typeof window !== "undefined" ? window : this, function(window, jQuery, jsface, moment, React, ReactDOM, DONT_EXPOSE_PARROT_TO_GLOBAL) {
 	var _pt = window.$pt;
 	var $pt = {};
 	window.$pt = $pt;
@@ -35,13 +35,10 @@
 		console: function () {
 			if (browser && browser.msie && browser.versionNumber <= 10) {
 				var method;
-				var noop = function () {
-				};
-				var methods = ['assert', 'clear', 'count', 'debug', 'dir', 'dirxml', 'error', 'exception', 'group',
-					'groupCollapsed', 'groupEnd', 'info', 'log', 'markTimeline', 'profile', 'profileEnd', 'table', 'time',
-					'timeEnd', 'timeStamp', 'trace', 'warn'];
+				var noop = function () {};
+				var methods = ['assert', 'clear', 'count', 'debug', 'dir', 'dirxml', 'error', 'exception', 'group', 'groupCollapsed', 'groupEnd', 'info', 'log', 'markTimeline', 'profile', 'profileEnd', 'table', 'time', 'timeEnd', 'timeStamp', 'trace', 'warn'];
 				var length = methods.length;
-				var console = (window.console = window.console || {});
+				var console = window.console = window.console || {};
 
 				while (length--) {
 					method = methods[length];
@@ -95,11 +92,11 @@
 				};
 			}
 			/**
-			 * replace place holders %1, %2, etc with given string array
-			 *
-			 * @param strArray
-			 * @returns
-			 */
+    * replace place holders %1, %2, etc with given string array
+    *
+    * @param strArray
+    * @returns
+    */
 			if (String.prototype.format === undefined) {
 				String.prototype.format = function (strArray) {
 					return this.replace(/%(\d+)/g, function (_, m) {
@@ -115,70 +112,70 @@
 				};
 			}
 			if (String.prototype.padLeft === undefined) {
-				String.prototype.padLeft = function(nSize, ch){
-				    var len = 0;
-				    var s = this ? this : "";
-				    ch = ch ? ch : '0';//默认补0
-				    len = s.length;
-				    while(len < nSize){
-				        s = ch + s;
-				        len++;
-				    }
-				    return s;
+				String.prototype.padLeft = function (nSize, ch) {
+					var len = 0;
+					var s = this ? this : "";
+					ch = ch ? ch : '0'; //默认补0
+					len = s.length;
+					while (len < nSize) {
+						s = ch + s;
+						len++;
+					}
+					return s;
 				};
 			}
 			if (String.prototype.padRight === undefined) {
-				String.prototype.padRight = function(nSize, ch){
-				    var len = 0 ;
-				    var s = this ? this : "";
-				    ch = ch ? ch : '0'; // default add 0
-				    len = s.length;
-				    while(len<nSize){
-				        s = s + ch;
-				        len++;
-				    }
-				    return s;
+				String.prototype.padRight = function (nSize, ch) {
+					var len = 0;
+					var s = this ? this : "";
+					ch = ch ? ch : '0'; // default add 0
+					len = s.length;
+					while (len < nSize) {
+						s = s + ch;
+						len++;
+					}
+					return s;
 				};
 			}
 			if (String.prototype.movePointLeft === undefined) {
-				String.prototype.movePointLeft = function(scale){
-				    var s,s1,s2,ch,ps,sign;
-				    ch = ".";
-				    sign = '';
-				    s = this ? this : "";
-				    if(scale <= 0){
-				        return s;
-				    }
-				    ps = s.split('.');
-				    s1 = ps[0] ? ps[0] : "";
-				    s2 = ps[1] ? ps[1] : "";
-				    if(s1.slice(0, 1) == '-') {
-				        s1 = s1.slice(1);
-				        sign = '-';
-				    }
-				    if(s1.length <= scale) {
-				        ch = "0.";
-				        s1 = s1.padLeft(scale);
-				    }
-				    return sign + s1.slice(0, -scale) + ch + s1.slice(-scale) + s2;
+				String.prototype.movePointLeft = function (scale) {
+					var s, s1, s2, ch, ps, sign;
+					ch = ".";
+					sign = '';
+					s = this ? this : "";
+					if (scale <= 0) {
+						return s;
+					}
+					ps = s.split('.');
+					s1 = ps[0] ? ps[0] : "";
+					s2 = ps[1] ? ps[1] : "";
+					if (s1.slice(0, 1) == '-') {
+						s1 = s1.slice(1);
+						sign = '-';
+					}
+					if (s1.length <= scale) {
+						ch = "0.";
+						s1 = s1.padLeft(scale);
+					}
+					return sign + s1.slice(0, -scale) + ch + s1.slice(-scale) + s2;
 				};
 			}
 			if (String.prototype.movePointRight === undefined) {
-				String.prototype.movePointRight = function(scale){
-				    var s,s1,s2,ch,ps,sign;
-				    ch = '.';
-				    s = this ? this : "";
-				    if(scale <= 0){
-				        return s;
-				    }
-				    ps = s.split('.');
-				    s1 = ps[0] ? ps[0] : "";
-				    s2 = ps[1] ? ps[1] : "";
-				    if(s2.length <= scale) {
-				        ch = '';
-				        s2 = s2.padRight(scale);
-				    }
-					if(s1.slice(0, 1) == '-') {
+				String.prototype.movePointRight = function (scale) {
+					var s, s1, s2, ch, ps, sign;
+					ch = '.';
+					s = this ? this : "";
+					if (scale <= 0) {
+						return s;
+					}
+					ps = s.split('.');
+					s1 = ps[0] ? ps[0] : "";
+					s2 = ps[1] ? ps[1] : "";
+					if (s2.length <= scale) {
+						ch = '';
+						s2 = s2.padRight(scale);
+					}
+					if (s1.slice(0, 1) == '-') {
 						s1 = s1.slice(1);
 						sign = '-';
 					} else {
@@ -192,7 +189,7 @@
 					if (integral.isEmpty()) {
 						integral = '0';
 					}
-				    return sign + integral + ch + s2.slice(scale, s2.length);
+					return sign + integral + ch + s2.slice(scale, s2.length);
 				};
 			}
 		},
@@ -267,10 +264,10 @@
 
 	// exceptions
 	/**
-	 * component exception
-	 * @param code {string} exception code
-	 * @param message {string} exception message
-	 */
+  * component exception
+  * @param code {string} exception code
+  * @param message {string} exception message
+  */
 	var ComponentException = function (code, message) {
 		this.value = code;
 		this.message = message;
@@ -280,11 +277,11 @@
 	};
 
 	/**
-	 * create component exception
-	 * @param code {string} exception code
-	 * @param message {string} exception message
-	 * @returns {ComponentException}
-	 */
+  * create component exception
+  * @param code {string} exception code
+  * @param message {string} exception message
+  * @returns {ComponentException}
+  */
 	$pt.createComponentException = function (code, message) {
 		return new ComponentException(code, message);
 	};
@@ -305,8 +302,8 @@
 	};
 	// components
 	$pt.Components = {};
-	$pt.exposeComponents = function(context) {
-		Object.keys($pt.Components).forEach(function(component) {
+	$pt.exposeComponents = function (context) {
+		Object.keys($pt.Components).forEach(function (component) {
 			window[component] = $pt.Components[component];
 		});
 	};
@@ -320,21 +317,21 @@
 		ArrayCheck: 'acheck',
 		Toggle: 'toggle',
 		Radio: "radio",
-		Table: {type: "table", label: false, popover: false},
-		Tree: {type: "tree", label: false, popover: false},
+		Table: { type: "table", label: false, popover: false },
+		Tree: { type: "tree", label: false, popover: false },
 		SelectTree: "seltree",
 		Date: "date",
 		Search: "search",
-		Button: {type: "button", label: false},
-		Tab: {type: 'tab', label: false},
-		ArrayTab: {type: 'atab', label: false},
-		Panel: {type: 'panel', label: false},
-		ArrayPanel: {type: 'apanel', label: false},
-		Label: {type: 'label', label: false},
-		Form: {type: 'form', label: false},
-		ButtonFooter: {type: 'buttonfooter', label: false},
+		Button: { type: "button", label: false },
+		Tab: { type: 'tab', label: false },
+		ArrayTab: { type: 'atab', label: false },
+		Panel: { type: 'panel', label: false },
+		ArrayPanel: { type: 'apanel', label: false },
+		Label: { type: 'label', label: false },
+		Form: { type: 'form', label: false },
+		ButtonFooter: { type: 'buttonfooter', label: false },
 		File: "file",
-		Nothing: {type: "nothing", label: false},
+		Nothing: { type: "nothing", label: false },
 		// date format
 		Default_Date_Format: "YYYY/MM/DD HH:mm:ss.SSS", // see momentjs
 		// exception codes
@@ -393,15 +390,15 @@
 	}
 
 	/**
-	 * submit to server
-	 * @param options {*} same as jquery ajax options, three more properties
-	 *          url: string
-	 *          done: same as jquery ajax done callback function
-	 *          fail: function or json object
-	 *              function: same as jquery ajax fail callback function
-	 *              json: key is return status, value is function which is same as jquery ajax fail callback function
-	 * @returns {jqXHR}
-	 */
+  * submit to server
+  * @param options {*} same as jquery ajax options, three more properties
+  *          url: string
+  *          done: same as jquery ajax done callback function
+  *          fail: function or json object
+  *              function: same as jquery ajax fail callback function
+  *              json: key is return status, value is function which is same as jquery ajax fail callback function
+  * @returns {jqXHR}
+  */
 	var submit = function (options) {
 		var url = options.url;
 		var done = options.done;
@@ -414,50 +411,45 @@
 
 		// build on request dialog
 		// show
-		if (quiet === true) {
-		} else {
+		if (quiet === true) {} else {
 			$pt.Components.NOnRequestModal.getOnRequestModal().show();
 		}
 
-		return $.ajax(url, options)
-			.done(function (data, textStatus, jqXHR) {
-				if (done !== undefined && done !== null) {
-					done(data, textStatus, jqXHR);
+		return $.ajax(url, options).done(function (data, textStatus, jqXHR) {
+			if (done !== undefined && done !== null) {
+				done(data, textStatus, jqXHR);
+			}
+		}).fail(function (jqXHR, textStatus, errorThrown) {
+			if (fail !== undefined && fail !== null) {
+				var callback = null;
+				if (typeof fail === 'function') {
+					callback = fail;
+				} else {
+					callback = fail["" + jqXHR.status];
 				}
-			})
-			.fail(function (jqXHR, textStatus, errorThrown) {
-				if (fail !== undefined && fail !== null) {
-					var callback = null;
-					if (typeof fail === 'function') {
-						callback = fail;
-					} else {
-						callback = fail["" + jqXHR.status];
-					}
-					if (callback != null) {
-						callback(jqXHR, textStatus, errorThrown);
-					} else {
-						$pt.Components.NExceptionModal.getExceptionModal().show("" + jqXHR.status, jqXHR.responseText);
-					}
+				if (callback != null) {
+					callback(jqXHR, textStatus, errorThrown);
 				} else {
 					$pt.Components.NExceptionModal.getExceptionModal().show("" + jqXHR.status, jqXHR.responseText);
 				}
-			})
-			.always(function () {
-				// hide
-				if (quiet === true) {
-				} else {
-					$pt.Components.NOnRequestModal.getOnRequestModal().hide();
-				}
-			});
+			} else {
+				$pt.Components.NExceptionModal.getExceptionModal().show("" + jqXHR.status, jqXHR.responseText);
+			}
+		}).always(function () {
+			// hide
+			if (quiet === true) {} else {
+				$pt.Components.NOnRequestModal.getOnRequestModal().hide();
+			}
+		});
 	};
 
 	/**
-	 * http post
-	 * @param url {string}
-	 * @param data {*}
-	 * @param settings {*} optional jquery ajax settings
-	 * @returns {jqXHR}
-	 */
+  * http post
+  * @param url {string}
+  * @param data {*}
+  * @param settings {*} optional jquery ajax settings
+  * @returns {jqXHR}
+  */
 	$pt.doPost = function (url, data, settings) {
 		return submit($.extend({
 			method: "POST",
@@ -469,12 +461,12 @@
 		}));
 	};
 	/**
-	 * http put
-	 * @param url {string}
-	 * @param data {*}
-	 * @param settings {*} optional jquery ajax settings
-	 * @returns {jqXHR}
-	 */
+  * http put
+  * @param url {string}
+  * @param data {*}
+  * @param settings {*} optional jquery ajax settings
+  * @returns {jqXHR}
+  */
 	$pt.doPut = function (url, data, settings) {
 		return submit($.extend({
 			method: "PUT",
@@ -486,12 +478,12 @@
 		}));
 	};
 	/**
-	 * http get
-	 * @param url {string}
-	 * @param data {*}
-	 * @param settings {*} optional jquery ajax settings
-	 * @returns {jqXHR}
-	 */
+  * http get
+  * @param url {string}
+  * @param data {*}
+  * @param settings {*} optional jquery ajax settings
+  * @returns {jqXHR}
+  */
 	$pt.doGet = function (url, data, settings) {
 		return submit($.extend({
 			method: "GET",
@@ -503,12 +495,12 @@
 		}));
 	};
 	/**
-	 * http delete
-	 * @param url {string}
-	 * @param data {*}
-	 * @param settings {*} optional jquery ajax settings
-	 * @returns {jqXHR}
-	 */
+  * http delete
+  * @param url {string}
+  * @param data {*}
+  * @param settings {*} optional jquery ajax settings
+  * @returns {jqXHR}
+  */
 	$pt.doDelete = function (url, data, settings) {
 		return submit($.extend({
 			method: "DELETE",
@@ -520,10 +512,10 @@
 		}));
 	};
 	/**
-	 * relocate page, use window.location
-	 * @param url {string}
-	 * @param data {*}
-	 */
+  * relocate page, use window.location
+  * @param url {string}
+  * @param data {*}
+  */
 	$pt.relocatePage = function (url, data) {
 		var finalURL = url;
 		if (data) {
@@ -536,9 +528,9 @@
 		window.location = finalURL;
 	};
 	/**
-	 * get data from url parameters
-	 * @returns {*}
-	 */
+  * get data from url parameters
+  * @returns {*}
+  */
 	$pt.getUrlData = function (params) {
 		var paramsString = '';
 		if (params !== undefined) {
@@ -558,10 +550,10 @@
 		return deparam(paramsString);
 	};
 	/**
-	 * mock ajax
-	 * include jquery-mockjax when call this method, or do nothing
-	 * parameters are same as mockjax
-	 */
+  * mock ajax
+  * include jquery-mockjax when call this method, or do nothing
+  * parameters are same as mockjax
+  */
 	$pt.mock = function () {
 		if (!$.mockjax) {
 			return;
@@ -577,18 +569,18 @@
 	};
 	$pt.routes = routes;
 	/**
-	 * define web context
-	 * @param webContext {string}
-	 */
+  * define web context
+  * @param webContext {string}
+  */
 	$pt.defineWebContext = function (webContext) {
 		routes.context = webContext;
 		return $pt;
 	};
 	/**
-	 * define url with given key
-	 * @param key {string} key of url
-	 * @param urlRelateToWebContext {string} related url with no web context
-	 */
+  * define url with given key
+  * @param key {string} key of url
+  * @param urlRelateToWebContext {string} related url with no web context
+  */
 	$pt.defineURL = function (key, urlRelateToWebContext) {
 		if (routes.urls[key] != null) {
 			window.console.warn('URL[' + key + '=' + routes.urls[key] + '] was replaced by [' + routes.context + urlRelateToWebContext + ']');
@@ -597,13 +589,13 @@
 		return $pt;
 	};
 	/**
-	 * get url by given key
-	 * @param key {string} key of url
-	 * @returns {string} return null when not found, or url with web context
-	 */
+  * get url by given key
+  * @param key {string} key of url
+  * @returns {string} return null when not found, or url with web context
+  */
 	$pt.getURL = function (key) {
 		var url = routes.urls[key];
-		return url == null ? null : (routes.context + url);
+		return url == null ? null : routes.context + url;
 	};
 })(window, jQuery, jQuery.deparam);
 
@@ -615,17 +607,17 @@
 	}
 
 	/**
-	 * code table sorter
-	 * @type {class}
-	 */
+  * code table sorter
+  * @type {class}
+  */
 	var CodeTableSorter = jsface.Class({
 		constructor: function (otherId) {
 			this._otherId = otherId;
 		},
 		/**
-		 * sort code table element array
-		 * @param codes
-		 */
+   * sort code table element array
+   * @param codes
+   */
 		sort: function (codes) {
 			var _this = this;
 			codes.sort(function (a, b) {
@@ -636,27 +628,27 @@
 						return -1;
 					}
 				}
-				return a.text < b.text ? -1 : (a.text > b.text ? 1 : 0);
+				return a.text < b.text ? -1 : a.text > b.text ? 1 : 0;
 			});
 		}
 	});
 
 	/**
-	 * code table
-	 * @type {class}
-	 */
+  * code table
+  * @type {class}
+  */
 	var CodeTable = jsface.Class({
 		/**
-		 * construct code table
-		 * @param data {{id:string, text:string}[]|{url:string, data:*}}
-		 *          array of json object, eg: {id:"1", text:"text"}.
-		 *          id is required,
-		 *          text is optional when renderer is defined.
-		 * @param renderer {function} optional
-		 *          param: element of code table,
-		 *          returns: string, put as text property into code table element
-		 * @param sorter {CodeTableSorter} optional
-		 */
+   * construct code table
+   * @param data {{id:string, text:string}[]|{url:string, data:*}}
+   *          array of json object, eg: {id:"1", text:"text"}.
+   *          id is required,
+   *          text is optional when renderer is defined.
+   * @param renderer {function} optional
+   *          param: element of code table,
+   *          returns: string, put as text property into code table element
+   * @param sorter {CodeTableSorter} optional
+   */
 		constructor: function (data, renderer, sorter) {
 			if (Array.isArray(data)) {
 				// construct with array, local data
@@ -672,23 +664,23 @@
 			this._sorter = sorter;
 		},
 		/**
-		 * get renderer of code table
-		 */
-		getRenderer: function() {
+   * get renderer of code table
+   */
+		getRenderer: function () {
 			return this._renderer;
 		},
 		/**
-		 * initialize code table element array
-		 * @param codeTableArray {{id:string, text:string}[]}
-		 *          array of json object, eg: {id:"1", text:"text"}.
-		 *          id is required,
-		 *          text is optional when renderer is defined.
-		 * @param renderer {function} optional
-		 *          param: element of code table,
-		 *          returns: string, put as text property into code table element
-		 * @param sorter {CodeTableSorter} optional
-		 * @private
-		 */
+   * initialize code table element array
+   * @param codeTableArray {{id:string, text:string}[]}
+   *          array of json object, eg: {id:"1", text:"text"}.
+   *          id is required,
+   *          text is optional when renderer is defined.
+   * @param renderer {function} optional
+   *          param: element of code table,
+   *          returns: string, put as text property into code table element
+   * @param sorter {CodeTableSorter} optional
+   * @private
+   */
 		__initCodesArray: function (codeTableArray, renderer, sorter) {
 			this._codes = codeTableArray;
 			if (this._codes == null) {
@@ -696,7 +688,7 @@
 			}
 			var map = {};
 			// render element
-			var render = function(code) {
+			var render = function (code) {
 				if (renderer) {
 					code.text = renderer(code);
 					if (code.children) {
@@ -711,9 +703,9 @@
 			this._map = map;
 			// sort elements
 			if (sorter) {
-				var sort = function(codes) {
+				var sort = function (codes) {
 					sorter.sort(codes);
-					codes.forEach(function(code) {
+					codes.forEach(function (code) {
 						if (code.children) {
 							sort(code.children);
 						}
@@ -723,9 +715,9 @@
 			}
 		},
 		/**
-		 * load remote code table, quiet and synchronized
-		 * @private
-		 */
+   * load remote code table, quiet and synchronized
+   * @private
+   */
 		__loadRemoteCodes: function () {
 			var _this = this;
 			$pt.doPost(this._url, this._postData, {
@@ -743,10 +735,10 @@
 			});
 		},
 		/**
-		 * get code table element array
-		 * @returns {{id: string, text: string}[]}
-		 * @private
-		 */
+   * get code table element array
+   * @returns {{id: string, text: string}[]}
+   * @private
+   */
 		__getCodes: function () {
 			if (this._codes === undefined || this._initialized !== true) {
 				if (this._local) {
@@ -763,32 +755,32 @@
 			return this._codes;
 		},
 		/**
-		 * get code table element map, key is id of element, value is element
-		 * @returns {*}
-		 * @private
-		 */
+   * get code table element map, key is id of element, value is element
+   * @returns {*}
+   * @private
+   */
 		__getMap: function () {
 			this.__getCodes();
 			return this._map;
 		},
 		/**
-		 * filter code table elements by given function or json object.
-		 * when parameter is a json object and data is from remote, check the given value was loaded or not,
-		 * if not loaded, loaded the code table elements by given parameter first and merge into the client elements.
-		 * @param func {function|{value:string, name:string}}
-		 *      function: same as function definition Array.filter()
-		 *      json:
-		 *          value: value to filter code table elements
-		 *          name: property name to match the given value
-		 *          eg. code table element is
-		 *              {id: '1', text: 'Text', parentId: '1'}
-		 *              {id: '2', text: 'Text', parentId: '1'}
-		 *              {id: '3', text: 'Text', parentId: '2'}
-		 *              when the json object is {value: '1', name: 'parentId'},
-		 *              then the first and second items returned, third item filtered
-		 * @returns {{id: string, text: string}[]} maybe contain other properties, depends on initial data.
-		 *      return empty array when no data
-		 */
+   * filter code table elements by given function or json object.
+   * when parameter is a json object and data is from remote, check the given value was loaded or not,
+   * if not loaded, loaded the code table elements by given parameter first and merge into the client elements.
+   * @param func {function|{value:string, name:string}}
+   *      function: same as function definition Array.filter()
+   *      json:
+   *          value: value to filter code table elements
+   *          name: property name to match the given value
+   *          eg. code table element is
+   *              {id: '1', text: 'Text', parentId: '1'}
+   *              {id: '2', text: 'Text', parentId: '1'}
+   *              {id: '3', text: 'Text', parentId: '2'}
+   *              when the json object is {value: '1', name: 'parentId'},
+   *              then the first and second items returned, third item filtered
+   * @returns {{id: string, text: string}[]} maybe contain other properties, depends on initial data.
+   *      return empty array when no data
+   */
 		filter: function (func) {
 			if (typeof func === 'function') {
 				// parameter is function
@@ -799,9 +791,9 @@
 					// no local data, and loaded keys don't contain current value
 					// reset post data
 					if (this._postData) {
-						this._postData = $.extend({}, this._postData, {value: func.value});
+						this._postData = $.extend({}, this._postData, { value: func.value });
 					} else {
-						this._postData = {value: func.value};
+						this._postData = { value: func.value };
 					}
 					// store current local data
 					var existedCodes = this._codes != null ? this._codes : [];
@@ -825,91 +817,91 @@
 			}
 		},
 		/**
-		 * get element by given code
-		 * @param code {string} code
-		 * @returns {{id:string, text:string}} maybe contain other properties, depends on initial data.
-		 *          return null when not found
-		 */
+   * get element by given code
+   * @param code {string} code
+   * @returns {{id:string, text:string}} maybe contain other properties, depends on initial data.
+   *          return null when not found
+   */
 		get: function (code) {
 			var item = this.__getMap()[code];
 			return item == null ? null : item;
 		},
 		/**
-		 * get element text by given code
-		 * @param code {string} code
-		 * @returns {string} element text, return null when not found
-		 */
+   * get element text by given code
+   * @param code {string} code
+   * @returns {string} element text, return null when not found
+   */
 		getText: function (code) {
 			var item = this.get(code);
 			return item == null ? null : item.text;
 		},
 		/**
-		 * get code table element array
-		 * @returns {{id: string, text: string}[]} maybe contain other properties, depends on initial data.
-		 *      return empty array when no data
-		 */
+   * get code table element array
+   * @returns {{id: string, text: string}[]} maybe contain other properties, depends on initial data.
+   *      return empty array when no data
+   */
 		list: function () {
 			return this.__getCodes();
 		},
 		/**
-		 * get code table element array, with hierarchy keys.
-		 * no duplicate id allowed when call this method.
-		 * @returns {{codeId: codeItem}};
-		 */
-		listAllChildren: function() {
+   * get code table element array, with hierarchy keys.
+   * no duplicate id allowed when call this method.
+   * @returns {{codeId: codeItem}};
+   */
+		listAllChildren: function () {
 			var items = {};
-			var fetchItem = function(item) {
+			var fetchItem = function (item) {
 				items[item.id] = item;
 				if (item.children) {
-					item.children.forEach(function(child) {
+					item.children.forEach(function (child) {
 						fetchItem(child);
 					});
 				}
 			};
-			this.list().forEach(function(item) {
+			this.list().forEach(function (item) {
 				fetchItem(item);
 			});
 			return items;
 		},
 		/**
-		 * get code table element array, with hierarchy keys
-		 * @param {rootId: string, separtor: string}
-		 * @returns {{codeId: codeItem}};
-		 */
-		listWithHierarchyKeys: function(options) {
-			var separator = (options && options.separator) ? options.separator : '|';
-			var rootId = (options && options.rootId != null) ? options.rootId : '0';
+   * get code table element array, with hierarchy keys
+   * @param {rootId: string, separtor: string}
+   * @returns {{codeId: codeItem}};
+   */
+		listWithHierarchyKeys: function (options) {
+			var separator = options && options.separator ? options.separator : '|';
+			var rootId = options && options.rootId != null ? options.rootId : '0';
 			var items = {};
-			var fetchItem = function(item, parentId) {
+			var fetchItem = function (item, parentId) {
 				items[parentId + separator + item.id] = item;
 				if (item.children) {
-					item.children.forEach(function(child) {
+					item.children.forEach(function (child) {
 						fetchItem(child, parentId + separator + item.id);
 					});
 				}
 			};
-			this.list().forEach(function(item) {
+			this.list().forEach(function (item) {
 				fetchItem(item, rootId);
 			});
 			return items;
 		},
 		/**
-		 * check code table element by given function
-		 * @param func {function} same as function definition Array.some()
-		 * @returns {boolean}
-		 */
+   * check code table element by given function
+   * @param func {function} same as function definition Array.some()
+   * @returns {boolean}
+   */
 		some: function (func) {
 			return this.__getCodes().some(func);
 		},
 		/**
-		 * run each code table element by given function
-		 * @param func {function} same as function definition Array.map()
-		 * @returns {[]} element of array depends on the parameter
-		 */
+   * run each code table element by given function
+   * @param func {function} same as function definition Array.map()
+   * @returns {[]} element of array depends on the parameter
+   */
 		map: function (func) {
 			return this.__getCodes().map(func);
 		},
-		name: function(name) {
+		name: function (name) {
 			if (name) {
 				this.__name = name;
 			} else {
@@ -919,24 +911,24 @@
 	});
 
 	/**
-	 * create default code table sorter by given other id
-	 * @param otherId {string} optional. item with this id will be last one when given
-	 * @returns {CodeTableSorter}
-	 */
+  * create default code table sorter by given other id
+  * @param otherId {string} optional. item with this id will be last one when given
+  * @returns {CodeTableSorter}
+  */
 	$pt.createDefaultCodeTableSorter = function (otherId) {
 		return new CodeTableSorter(otherId);
 	};
 	/**
-	 * construct code table
-	 * @param items {{id:string, text:string}[]|{url:string, data:*}}
-	 *          array of json object, eg: {id:"1", text:"text"}.
-	 *          id is required,
-	 *          text is optional when renderer is defined.
-	 * @param renderer {function} optional
-	 *          param: element of code table,
-	 *          returns: string, put as text property into code table element
-	 * @param sorter {CodeTableSorter} optional
-	 */
+  * construct code table
+  * @param items {{id:string, text:string}[]|{url:string, data:*}}
+  *          array of json object, eg: {id:"1", text:"text"}.
+  *          id is required,
+  *          text is optional when renderer is defined.
+  * @param renderer {function} optional
+  *          param: element of code table,
+  *          returns: string, put as text property into code table element
+  * @param sorter {CodeTableSorter} optional
+  */
 	$pt.createCodeTable = function (items, renderer, sorter) {
 		return new CodeTable(items, renderer, sorter);
 	};
@@ -957,18 +949,18 @@
 	$pt.PROPERTY_SEPARATOR = '_';
 
 	/**
-	 * clone json object
-	 * @param jsonObject {{}}
-	 */
+  * clone json object
+  * @param jsonObject {{}}
+  */
 	$pt.cloneJSON = function (jsonObject) {
 		return $.extend(true, {}, jsonObject);
 	};
 	/**
-	 * get value from json object
-	 * @param jsonObject {{}}
-	 * @param id {string} key of property, can be linked by underline
-	 * @returns {*}
-	 */
+  * get value from json object
+  * @param jsonObject {{}}
+  * @param id {string} key of property, can be linked by underline
+  * @returns {*}
+  */
 	$pt.getValueFromJSON = function (jsonObject, id) {
 		if (id.indexOf($pt.PROPERTY_SEPARATOR) != -1) {
 			// hierarchy id
@@ -1008,9 +1000,9 @@
 	};
 
 	/**
-	 * table validation result
-	 * @type {class}
-	 */
+  * table validation result
+  * @type {class}
+  */
 	var TableValidationResult = jsface.Class({
 		constructor: function () {
 			this.__errors = {};
@@ -1018,10 +1010,10 @@
 			this.__startKeyIndex = 1;
 		},
 		/**
-		 * push error
-		 * @param model {{}} element of array
-		 * @param error {{}} error messages
-		 */
+   * push error
+   * @param model {{}} element of array
+   * @param error {{}} error messages
+   */
 		push: function (model, error) {
 			this.__errors[this.__startKeyIndex] = error;
 			this.__models[this.__startKeyIndex] = model;
@@ -1029,9 +1021,9 @@
 			return this;
 		},
 		/**
-		 * remove error
-		 * @param model {{}} element of array
-		 */
+   * remove error
+   * @param model {{}} element of array
+   */
 		remove: function (model) {
 			var _this = this;
 			Object.keys(this.__models).forEach(function (key) {
@@ -1044,17 +1036,17 @@
 			return this;
 		},
 		/**
-		 * has error
-		 * @returns {boolean}
-		 */
+   * has error
+   * @returns {boolean}
+   */
 		hasError: function () {
 			return Object.keys(this.__models).length !== 0;
 		},
 		/**
-		 * get error
-		 * @param model {{}} element of array
-		 * @returns {{}}
-		 */
+   * get error
+   * @param model {{}} element of array
+   * @returns {{}}
+   */
 		getError: function (model) {
 			var keys = Object.keys(this.__models);
 			for (var index = 0, count = keys.length; index < count; index++) {
@@ -1067,9 +1059,9 @@
 		}
 	});
 	/**
-	 * create table validation result
-	 * @returns {TableValidationResult}
-	 */
+  * create table validation result
+  * @returns {TableValidationResult}
+  */
 	$pt.createTableValidationResult = function () {
 		return new TableValidationResult();
 	};
@@ -1083,17 +1075,17 @@
 	$pt.defineMessage('validate.date.before', 'Value of "%1" must be before than %2.');
 	$pt.defineMessage('validate.date.after', 'Value of "%1" must be after than %2.');
 	/**
-	 * validate rules
-	 * @type {class}
-	 */
+  * validate rules
+  * @type {class}
+  */
 	$pt.ValidateRules = {
 		/**
-		 * check null or empty string
-		 * @param model model itself
-		 * @param value {*} property value
-		 * @param settings {{}}
-		 * @returns {string|boolean} return true when pass the validation
-		 */
+   * check null or empty string
+   * @param model model itself
+   * @param value {*} property value
+   * @param settings {{}}
+   * @returns {string|boolean} return true when pass the validation
+   */
 		required: function (model, value, settings) {
 			if (settings === false) {
 				// close the required check
@@ -1106,12 +1098,12 @@
 			}
 		},
 		/**
-		 * length check
-		 * @param model model itself
-		 * @param value {string} property value
-		 * @param length {number}
-		 * @returns {string|boolean} return true when pass the validation
-		 */
+   * length check
+   * @param model model itself
+   * @param value {string} property value
+   * @param length {number}
+   * @returns {string|boolean} return true when pass the validation
+   */
 		length: function (model, value, length) {
 			if (value == null || value.length == 0) {
 				return true;
@@ -1120,12 +1112,12 @@
 			}
 		},
 		/**
-		 * max length check
-		 * @param model model itself
-		 * @param value {string} property value
-		 * @param length {number}
-		 * @returns {string|boolean} return true when pass the validation
-		 */
+   * max length check
+   * @param model model itself
+   * @param value {string} property value
+   * @param length {number}
+   * @returns {string|boolean} return true when pass the validation
+   */
 		maxlength: function (model, value, length) {
 			if (value == null || value.length == 0) {
 				return true;
@@ -1134,12 +1126,12 @@
 			}
 		},
 		/**
-		 * min length check
-		 * @param model model itself
-		 * @param value {string} property value
-		 * @param length {number}
-		 * @returns {string|boolean} return true when pass the validation
-		 */
+   * min length check
+   * @param model model itself
+   * @param value {string} property value
+   * @param length {number}
+   * @returns {string|boolean} return true when pass the validation
+   */
 		minlength: function (model, value, length) {
 			if (value == null || value.length == 0) {
 				return true;
@@ -1148,12 +1140,12 @@
 			}
 		},
 		/**
-		 * max size check
-		 * @param model model itself
-		 * @param value {{}[]} property value, should be an array
-		 * @param size {number}
-		 * @returns {string|boolean} return true when pass the validation
-		 */
+   * max size check
+   * @param model model itself
+   * @param value {{}[]} property value, should be an array
+   * @param size {number}
+   * @returns {string|boolean} return true when pass the validation
+   */
 		maxsize: function (model, value, size) {
 			if (value == null || value.length == 0) {
 				return true;
@@ -1162,12 +1154,12 @@
 			}
 		},
 		/**
-		 * min size check
-		 * @param model model itself
-		 * @param value {{}[]} property value, should be an array
-		 * @param size {number}
-		 * @returns {string|boolean} return true when pass the validation
-		 */
+   * min size check
+   * @param model model itself
+   * @param value {{}[]} property value, should be an array
+   * @param size {number}
+   * @returns {string|boolean} return true when pass the validation
+   */
 		minsize: function (model, value, size) {
 			if (value == null || value.length < size) {
 				return $pt.getMessage('validate.size.min').format(['%1', '' + size]);
@@ -1176,25 +1168,25 @@
 			}
 		},
 		/**
-		 * before special date check
-		 * @param model model itself
-		 * @param value {momentjs} date
-		 * @param settings {{}} check rules
-		 * @returns {string[]|string|boolean}
-		 */
+   * before special date check
+   * @param model model itself
+   * @param value {momentjs} date
+   * @param settings {{}} check rules
+   * @returns {string[]|string|boolean}
+   */
 		before: function (model, value, settings) {
 			return $pt.ValidateRules.__dateCompare(value, model, settings, $pt.ValidateRules.__beforeSpecial);
 		},
 		/**
-		 * before or equals special date
-		 * @param momentValue {momentjs} datetime momentjs
-		 * @param model {{}} model itself
-		 * @param check {{}}
-		 * @param format {string} datetime format, momentjs
-		 * @param label {string} label in error message
-		 * @returns {string|string[]|boolean}
-		 * @private
-		 */
+   * before or equals special date
+   * @param momentValue {momentjs} datetime momentjs
+   * @param model {{}} model itself
+   * @param check {{}}
+   * @param format {string} datetime format, momentjs
+   * @param label {string} label in error message
+   * @returns {string|string[]|boolean}
+   * @private
+   */
 		__beforeSpecial: function (momentValue, model, check, format, label) {
 			var compareValue = $pt.ValidateRules.__convertToMomentValue(check, model, format);
 			if (compareValue !== null) {
@@ -1211,15 +1203,15 @@
 			return $pt.ValidateRules.__dateCompare(value, model, settings, $pt.ValidateRules.__afterSpecial);
 		},
 		/**
-		 * after or equals special date
-		 * @param momentValue {momentjs} datetime momentjs
-		 * @param model {{}} model itself
-		 * @param check {{}}
-		 * @param format {string} datetime format, momentjs
-		 * @param label {string} label in error message
-		 * @returns {string|string[]|boolean}
-		 * @private
-		 */
+   * after or equals special date
+   * @param momentValue {momentjs} datetime momentjs
+   * @param model {{}} model itself
+   * @param check {{}}
+   * @param format {string} datetime format, momentjs
+   * @param label {string} label in error message
+   * @returns {string|string[]|boolean}
+   * @private
+   */
 		__afterSpecial: function (momentValue, model, check, format, label) {
 			var compareValue = $pt.ValidateRules.__convertToMomentValue(check, model, format);
 			if (compareValue !== null) {
@@ -1233,13 +1225,13 @@
 			return true;
 		},
 		/**
-		 * convert value to momentjs object
-		 * @param value {string|momentjs|function}
-		 * @param model {{}} model itself
-		 * @param format {string} datetime format, momentjs
-		 * @returns {momentjs}
-		 * @private
-		 */
+   * convert value to momentjs object
+   * @param value {string|momentjs|function}
+   * @param model {{}} model itself
+   * @param format {string} datetime format, momentjs
+   * @returns {momentjs}
+   * @private
+   */
 		__convertToMomentValue: function (value, model, format) {
 			var compareValue = null;
 			if (value === "now") {
@@ -1247,7 +1239,7 @@
 			} else if (value.unix !== undefined) {
 				// value is a moment value
 				compareValue = value;
-			} else if (typeof (value) === "function") {
+			} else if (typeof value === "function") {
 				compareValue = value();
 			} else if (model.get(value) !== undefined) {
 				// value from another property
@@ -1261,23 +1253,23 @@
 			return compareValue;
 		},
 		/**
-		 * compare data
-		 * @param value {momentjs} property value
-		 * @param model {{}} model itself
-		 * @param settings {{format: string, rule: string|function|momentjs, label:string}|string|function|momentjs}
-		 *      can be JSON object
-		 *          format: momentjs format
-		 *          rule: check rule, string or function or momentjs or array of three types.
-		 *                  can be 'now' if it is a string,
-		 *                  or be property id of model if it is a string.
-		 *          label: label in error message, optional.
-		 *              if rule is an array, and label declared, it must be an array which same length with rule property.
-		 *      can be string or function or momentjs or array of three types.
-		 *      if check rule is function, return a momentjs object
-		 * @param checkFunc {function}
-		 * @returns {string[]|string|boolean}
-		 * @private
-		 */
+   * compare data
+   * @param value {momentjs} property value
+   * @param model {{}} model itself
+   * @param settings {{format: string, rule: string|function|momentjs, label:string}|string|function|momentjs}
+   *      can be JSON object
+   *          format: momentjs format
+   *          rule: check rule, string or function or momentjs or array of three types.
+   *                  can be 'now' if it is a string,
+   *                  or be property id of model if it is a string.
+   *          label: label in error message, optional.
+   *              if rule is an array, and label declared, it must be an array which same length with rule property.
+   *      can be string or function or momentjs or array of three types.
+   *      if check rule is function, return a momentjs object
+   * @param checkFunc {function}
+   * @returns {string[]|string|boolean}
+   * @private
+   */
 		__dateCompare: function (value, model, settings, checkFunc) {
 			if (value == null) {
 				return true;
@@ -1299,15 +1291,15 @@
 			var messages = results.filter(function (result) {
 				return result !== true;
 			});
-			return messages.length === 0 ? true : (messages.length == 1 ? messages[0] : messages);
+			return messages.length === 0 ? true : messages.length == 1 ? messages[0] : messages;
 		},
 		/**
-		 * table detail validate method
-		 * @param model {{}} model itself
-		 * @param value {{}[]} value of property, must be an array
-		 * @param config {{}} validate rules config
-		 * @returns {TableValidationResult|boolean}
-		 */
+   * table detail validate method
+   * @param model {{}} model itself
+   * @param value {{}[]} value of property, must be an array
+   * @param config {{}} validate rules config
+   * @returns {TableValidationResult|boolean}
+   */
 		table: function (model, value, config) {
 			if (value == null || value.length == 0) {
 				// no data
@@ -1333,9 +1325,9 @@
 	};
 
 	/**
-	 * model validator
-	 * @type {class}
-	 */
+  * model validator
+  * @type {class}
+  */
 	var ModelValidator = jsface.Class({
 		constructor: function (validatorConfigs, rules) {
 			if (Array.isArray(validatorConfigs)) {
@@ -1352,10 +1344,10 @@
 			}
 		},
 		/**
-		 * get configuration
-		 * @param id {string} optional
-		 * @returns {*}
-		 */
+   * get configuration
+   * @param id {string} optional
+   * @returns {*}
+   */
 		getConfig: function (id) {
 			if (id) {
 				return this.__validator[id];
@@ -1363,23 +1355,23 @@
 			return this.__validator;
 		},
 		/**
-		 * get rule
-		 * @param ruleName
-		 * @returns {*}
-		 */
+   * get rule
+   * @param ruleName
+   * @returns {*}
+   */
 		getRule: function (ruleName) {
 			return this.__rules[ruleName];
 		},
 		/**
-		 * validate by phase
-		 * @param model {ModelInterface}
-		 * @param value {*}
-		 * @param ruleKey {string}
-		 * @param phase {string}
-		 * @param ruleBody {function|{_phase:string|string[], _when: function, rule: *}|{}[]}
-		 * @returns {*}
-		 * @private
-		 */
+   * validate by phase
+   * @param model {ModelInterface}
+   * @param value {*}
+   * @param ruleKey {string}
+   * @param phase {string}
+   * @param ruleBody {function|{_phase:string|string[], _when: function, rule: *}|{}[]}
+   * @returns {*}
+   * @private
+   */
 		_validateByPhase: function (model, value, ruleKey, phase, ruleBody) {
 			var ret = null;
 			if (typeof ruleBody === "function") {
@@ -1445,11 +1437,11 @@
 			return ret;
 		},
 		/**
-		 * validate by phase
-		 * @param model
-		 * @param phase
-		 * @param id
-		 */
+   * validate by phase
+   * @param model
+   * @param phase
+   * @param id
+   */
 		validateByPhase: function (model, phase, id) {
 			var _this = this;
 			var result = null;
@@ -1463,7 +1455,7 @@
 						var ruleBody = config[rule];
 						var value = model.get(id);
 						var ret = _this._validateByPhase(model, value, rule, phase, ruleBody);
-						return (ret != null && ret !== true) ? ret : null;
+						return ret != null && ret !== true ? ret : null;
 					});
 					var finalResult = [];
 					result.forEach(function (item) {
@@ -1494,19 +1486,19 @@
 			}
 		},
 		/**
-		 * validate
-		 * @param model
-		 * @param id
-		 * @returns {*}
-		 */
+   * validate
+   * @param model
+   * @param id
+   * @returns {*}
+   */
 		validate: function (model, id) {
 			// validate by phase, all phases
 			return this.validateByPhase(model, null, id);
 		},
 		/**
-		 * check property is required or not
-		 * @param id
-		 */
+   * check property is required or not
+   * @param id
+   */
 		isRequired: function (id) {
 			// TODO more complex scenarios need to be supported
 			var config = this.getConfig(id);
@@ -1519,24 +1511,24 @@
 	});
 
 	/**
-	 * create model validator
-	 * @param config {{}|{}[]} validator configuration
-	 * @param rules {{}} rules
-	 * @returns {ModelValidator}
-	 */
+  * create model validator
+  * @param config {{}|{}[]} validator configuration
+  * @param rules {{}} rules
+  * @returns {ModelValidator}
+  */
 	$pt.createModelValidator = function (config, rules) {
 		return new ModelValidator(config, rules);
 	};
 
 	/**
-	 * model interface
-	 */
+  * model interface
+  */
 	var ModelInterface = {
 		/**
-		 * constructor model class
-		 * @param model {*}
-		 * @param validator {ModelValidator}
-		 */
+   * constructor model class
+   * @param model {*}
+   * @param validator {ModelValidator}
+   */
 		constructor: function (model, validator) {
 			this.__base = model;
 			this.__model = $pt.cloneJSON(model);
@@ -1553,10 +1545,10 @@
 			}
 		},
 		/**
-		 * get/set parent model
-		 * @param parent {*} optional
-		 * @returns {*}
-		 */
+   * get/set parent model
+   * @param parent {*} optional
+   * @returns {*}
+   */
 		parent: function (parent) {
 			if (parent !== undefined) {
 				this.__parent = parent;
@@ -1566,69 +1558,69 @@
 			}
 		},
 		/**
-		 * check the model is changed or not
-		 * @returns {boolean}
-		 */
+   * check the model is changed or not
+   * @returns {boolean}
+   */
 		isChanged: function () {
 			return this.__changed;
 		},
 		/**
-		 * get original model
-		 * @returns {*}
-		 */
+   * get original model
+   * @returns {*}
+   */
 		getOriginalModel: function () {
 			return this.__base;
 		},
 		/**
-		 * get current model
-		 * @returns {*}
-		 */
+   * get current model
+   * @returns {*}
+   */
 		getCurrentModel: function () {
 			return this.__model;
 		},
 		/**
-		 * use base model as current model
-		 */
+   * use base model as current model
+   */
 		useBaseAsCurrent: function () {
 			this.__model = this.__base;
 			return this;
 		},
 		/**
-		 * merge data into current model.
-		 * Attention: this is deep copy. if don't want do deep copy, use getCurrentModel, and merge manually.
-		 * @param newModel {{}}
-		 */
+   * merge data into current model.
+   * Attention: this is deep copy. if don't want do deep copy, use getCurrentModel, and merge manually.
+   * @param newModel {{}}
+   */
 		mergeCurrentModel: function (newModel) {
 			this.__model = $.extend(true, this.__model, newModel);
 			return this;
 		},
 		/**
-		 * apply current data to base model.
-		 */
-		applyCurrentToBase: function() {
+   * apply current data to base model.
+   */
+		applyCurrentToBase: function () {
 			this.__base = $.extend(true, {}, this.__model);
 			return this;
 		},
 		/**
-		 * get validator
-		 * @returns {ModelValidator}
-		 */
+   * get validator
+   * @returns {ModelValidator}
+   */
 		getValidator: function () {
 			return this.__validator;
 		},
 		/**
-		 * get value by given id
-		 * @param id {string} property id
-		 * @returns {*}
-		 */
+   * get value by given id
+   * @param id {string} property id
+   * @returns {*}
+   */
 		get: function (id) {
 			return $pt.getValueFromJSON(this.__model, id);
 		},
 		/**
-		 * set value by given id and value
-		 * @param id {string} property id
-		 * @param value {*}
-		 */
+   * set value by given id and value
+   * @param id {string} property id
+   * @param value {*}
+   */
 		set: function (id, value) {
 			var oldValue = this.get(id);
 			if (oldValue == value) {
@@ -1648,12 +1640,12 @@
 			return this;
 		},
 		/**
-		 * add listener
-		 * @param id {string} id of property
-		 * @param time {string} post|pre
-		 * @param type {string} change|add|remove
-		 * @param listener {function} function with parameter event
-		 */
+   * add listener
+   * @param id {string} id of property
+   * @param time {string} post|pre
+   * @param type {string} change|add|remove
+   * @param listener {function} function with parameter event
+   */
 		addListener: function (id, time, type, listener) {
 			if (!id) {
 				// monitor all
@@ -1707,22 +1699,22 @@
 		addPostChangeListener: function (id, listener) {
 			return this.addListener(id, 'post', 'change', listener);
 		},
-		addPostAddListener: function(id, listener) {
+		addPostAddListener: function (id, listener) {
 			return this.addListener(id, 'post', 'add', listener);
 		},
-		addPostRemoveListener: function(id, listener) {
+		addPostRemoveListener: function (id, listener) {
 			return this.addListener(id, 'post', 'remove', listener);
 		},
-		addPostValidateListener: function(id, listener) {
+		addPostValidateListener: function (id, listener) {
 			return this.addListener(id, 'post', 'validate', listener);
 		},
 		/**
-		 * remove listener
-		 * @param id {string} id of property
-		 * @param time {string} post|pre
-		 * @param type {string} change|add|remove
-		 * @param listener {function} function which added
-		 */
+   * remove listener
+   * @param id {string} id of property
+   * @param time {string} post|pre
+   * @param type {string} change|add|remove
+   * @param listener {function} function which added
+   */
 		removeListener: function (id, time, type, listener) {
 			if (!id) {
 				id = '--all';
@@ -1766,19 +1758,19 @@
 		removePostChangeListener: function (id, listener) {
 			return this.removeListener(id, 'post', 'change', listener);
 		},
-		removePostAddListener: function(id, listener) {
+		removePostAddListener: function (id, listener) {
 			return this.removeListener(id, 'post', 'add', listener);
 		},
-		removePostRemoveListener: function(id, listener) {
+		removePostRemoveListener: function (id, listener) {
 			return this.removeListener(id, 'post', 'remove', listener);
 		},
-		removePostValidateListener: function(id, listener) {
+		removePostValidateListener: function (id, listener) {
 			return this.removeListener(id, 'post', 'validate', listener);
 		},
 		/**
-		 * fire event
-		 * @param evt {{type:string, time:string, id:string}} and more properties depend on event type
-		 */
+   * fire event
+   * @param evt {{type:string, time:string, id:string}} and more properties depend on event type
+   */
 		fireEvent: function (evt) {
 			// copy listeners array is very important.
 			// since change will invoke validate by FormCell,
@@ -1818,7 +1810,7 @@
 			});
 			return this;
 		},
-		firePostChangeEvent: function(id, _old, _new) {
+		firePostChangeEvent: function (id, _old, _new) {
 			return this.fireEvent({
 				model: this,
 				id: id,
@@ -1828,7 +1820,7 @@
 				type: "change"
 			});
 		},
-		firePostAddEvent: function(id, index) {
+		firePostAddEvent: function (id, index) {
 			var array = this.get(id);
 			return this.fireEvent({
 				model: this,
@@ -1841,7 +1833,7 @@
 				time: "post"
 			});
 		},
-		firePostRemoveEvent: function(id, _old, index) {
+		firePostRemoveEvent: function (id, _old, index) {
 			return this.fireEvent({
 				model: this,
 				id: id,
@@ -1853,7 +1845,7 @@
 				time: "post"
 			});
 		},
-		firePostValidateEvent: function(id) {
+		firePostValidateEvent: function (id) {
 			return this.fireEvent({
 				model: this,
 				id: id,
@@ -1862,8 +1854,8 @@
 			});
 		},
 		/**
-		 * reset model
-		 */
+   * reset model
+   */
 		reset: function () {
 			this.__model = $pt.cloneJSON(this.__base);
 			this.__validateResults = {};
@@ -1871,9 +1863,9 @@
 			return this;
 		},
 		/**
-		 * clear validate results
-		 * @param id {string} property id
-		 */
+   * clear validate results
+   * @param id {string} property id
+   */
 		clearValidateResults: function (id) {
 			if (id) {
 				delete this.__validateResults[id];
@@ -1883,10 +1875,10 @@
 			return this;
 		},
 		/**
-		 * validate by phase
-		 * @param phase
-		 * @param id
-		 */
+   * validate by phase
+   * @param phase
+   * @param id
+   */
 		validateByPhase: function (phase, id) {
 			var validator = this.getValidator();
 			if (validator === undefined || validator === null) {
@@ -1898,8 +1890,7 @@
 				if (ret !== true) {
 					this.__validateResults[id] = ret;
 				} else {
-					delete this.__validateResults[id]
-					;
+					delete this.__validateResults[id];
 				}
 				this.fireEvent({
 					model: this,
@@ -1922,27 +1913,27 @@
 			return this;
 		},
 		/**
-		 * validate value of give property id, or whole model if no parameter passed.
-		 * will fire post-validate event for each property after validation
-		 * @param id {string} property id
-		 */
+   * validate value of give property id, or whole model if no parameter passed.
+   * will fire post-validate event for each property after validation
+   * @param id {string} property id
+   */
 		validate: function (id) {
 			return this.validateByPhase(null, id);
 		},
 		/**
-		 * check the property is required or not
-		 * @param id {string} property id
-		 * @returns {boolean}
-		 */
+   * check the property is required or not
+   * @param id {string} property id
+   * @returns {boolean}
+   */
 		isRequired: function (id) {
 			var validator = this.getValidator();
 			return validator != null && validator.isRequired(id);
 		},
 		/**
-		 * get error of given id, or return all error when no parameter passed
-		 * @param id {string} property id
-		 * @returns {*}
-		 */
+   * get error of given id, or return all error when no parameter passed
+   * @param id {string} property id
+   * @returns {*}
+   */
 		getError: function (id) {
 			if (id) {
 				// property level
@@ -1952,10 +1943,10 @@
 			}
 		},
 		/**
-		 * check the model is has error or not, check property only when id appointed,
-		 * or check whole model when no parameter passed.
-		 * @returns {boolean}
-		 */
+   * check the model is has error or not, check property only when id appointed,
+   * or check whole model when no parameter passed.
+   * @returns {boolean}
+   */
 		hasError: function (id) {
 			if (id) {
 				// property level
@@ -1977,10 +1968,10 @@
 			return this;
 		},
 		/**
-		 * remove row from given id
-		 * @param id {string} property id
-		 * @param row {{}} row data
-		 */
+   * remove row from given id
+   * @param id {string} property id
+   * @param row {{}} row data
+   */
 		remove: function (id, row) {
 			var data = this.get(id);
 			if (data == null || data.length == 0) {
@@ -2006,10 +1997,10 @@
 			return this;
 		},
 		/**
-		 * add row into array by given id
-		 * @param id {string} property id
-		 * @param row {{}} row data
-		 */
+   * add row into array by given id
+   * @param id {string} property id
+   * @param row {{}} row data
+   */
 		add: function (id, row, index) {
 			var data = this.get(id);
 			if (data == null) {
@@ -2045,11 +2036,11 @@
 			return this;
 		},
 		/**
-		 * update new item instead of old item
-		 * @param id {string} property id
-		 * @param _old {{}} old row data
-		 * @param _new {{}} new row data
-		 */
+   * update new item instead of old item
+   * @param id {string} property id
+   * @param _old {{}} old row data
+   * @param _new {{}} new row data
+   */
 		update: function (id, _old, _new) {
 			var data = this.get(id);
 			if (data == null) {
@@ -2077,10 +2068,10 @@
 	};
 
 	/**
-	 * create model
-	 * @param jsonObjects {*|*[]}
-	 * @param validator {ModelValidator}
-	 */
+  * create model
+  * @param jsonObjects {*|*[]}
+  * @param validator {ModelValidator}
+  */
 	$pt.createModel = function (jsonObjects, validator) {
 		// create model
 
@@ -2120,9 +2111,9 @@
 	}
 
 	/**
-	 * cell layout
-	 * @type {class}
-	 */
+  * cell layout
+  * @type {class}
+  */
 	var CellLayout = jsface.Class({
 		$static: {
 			DEFAULT_POSITION: {},
@@ -2135,9 +2126,9 @@
 			}
 		},
 		/**
-		 * construct cell layout
-		 * @param id {string} property id or fake id
-		 * @param cell {{label: string,
+   * construct cell layout
+   * @param id {string} property id or fake id
+   * @param cell {{label: string,
          *              dataId: string,
          *              comp:{
          *                  type: string|{type: string, label: boolean, popover: boolean}
@@ -2149,7 +2140,7 @@
          *              },
          *              pos:{row: number, col: number, width: number, section: string, card: string}
          *              }}
-		 */
+   */
 		constructor: function (id, cell) {
 			this.__id = id;
 
@@ -2162,83 +2153,83 @@
 			this.__cell = cell;
 		},
 		/**
-		 * get id
-		 * @returns {string}
-		 */
+   * get id
+   * @returns {string}
+   */
 		getId: function () {
 			return this.__id;
 		},
 		/**
-		 * get data id.
-		 * data id can be given by 'dataId' key
-		 * @returns {string}
-		 */
+   * get data id.
+   * data id can be given by 'dataId' key
+   * @returns {string}
+   */
 		getDataId: function () {
 			return this.__dataId;
 		},
 		/**
-		 * get position
-		 * @returns {*}
-		 * @private
-		 */
+   * get position
+   * @returns {*}
+   * @private
+   */
 		getPosition: function () {
 			return this.__cell.pos ? this.__cell.pos : CellLayout.DEFAULT_POSITION;
 		},
 		/**
-		 * get row index
-		 * @returns {string}
-		 */
+   * get row index
+   * @returns {string}
+   */
 		getRowIndex: function () {
 			var row = this.getPosition().row;
 			return row == null ? CellLayout.DEFAULT_ROW : row;
 		},
 		/**
-		 * get column index
-		 * @returns {Array|string|boolean|*}
-		 */
+   * get column index
+   * @returns {Array|string|boolean|*}
+   */
 		getColumnIndex: function () {
 			var col = this.getPosition().col;
 			return col == null ? CellLayout.DEFAULT_COLUMN : col;
 		},
 		/**
-		 * get width of cell, default is 3
-		 * @returns {number}
-		 */
+   * get width of cell, default is 3
+   * @returns {number}
+   */
 		getWidth: function () {
 			var width = this.getPosition().width;
 			return width == null ? CellLayout.DEFAULT_WIDTH : width;
 		},
 		/**
-		 * get section
-		 * @returns {string}
-		 */
+   * get section
+   * @returns {string}
+   */
 		getSection: function () {
 			var section = this.getPosition().section;
 			return section != null ? section : SectionLayout.DEFAULT_KEY;
 		},
 		/**
-		 * get card
-		 * @returns {string}
-		 */
+   * get card
+   * @returns {string}
+   */
 		getCard: function () {
 			var card = this.getPosition().card;
 			return card != null ? card : CardLayout.DEFAULT_KEY;
 		},
 		/**
-		 * get component type
-		 * @returns {string}
-		 */
+   * get component type
+   * @returns {string}
+   */
 		getComponentType: function () {
 			var type = this.getComponentOption("type");
-			type = (type == null ? $pt.ComponentConstants.Text : type);
-			return (typeof type === "string") ? {type: type, label: true, popover: true} : type;
+			type = type == null ? $pt.ComponentConstants.Text : type;
+			return typeof type === "string" ? { type: type, label: true, popover: true } : type;
 		},
 		/**
-		 * get component option by given key, return null when not defined
-		 * @param key optional, return all options if parameter not passed
-		 * @param defaultValue optional, only effective when key passed
-		 * @returns {*}
-		 */
+   * get component option by given key, return null when not defined
+   * @param key optional, return all options if parameter not passed
+   * @param defaultValue optional, only effective when key passed
+   * @returns {*}
+   */
 		getComponentOption: function (key, defaultValue) {
 			if (key) {
 				// key passed
@@ -2261,41 +2252,41 @@
 			return !this.__cell.comp ? {} : this.__cell.comp;
 		},
 		/**
-		 * get label
-		 * @returns {string}
-		 */
+   * get label
+   * @returns {string}
+   */
 		getLabel: function () {
 			return this.__cell.label;
 		},
 		/**
-		 * get label CSS, if not defined, return original CSS
-		 * @param originalCSS optional
-		 * @returns {string}
-		 */
+   * get label CSS, if not defined, return original CSS
+   * @param originalCSS optional
+   * @returns {string}
+   */
 		getLabelCSS: function (originalCSS) {
 			return this.getAdditionalCSS("label", originalCSS);
 		},
 		/**
-		 * get cell CSS, if not defined, return original CSS
-		 * @param originalCSS optional
-		 * @returns {string}
-		 */
+   * get cell CSS, if not defined, return original CSS
+   * @param originalCSS optional
+   * @returns {string}
+   */
 		getCellCSS: function (originalCSS) {
 			return this.getAdditionalCSS("cell", originalCSS);
 		},
 		/**
-		 * get component css, if not defined, return original CSS
-		 * @param originalCSS
-		 * @returns {string}
-		 */
+   * get component css, if not defined, return original CSS
+   * @param originalCSS
+   * @returns {string}
+   */
 		getComponentCSS: function (originalCSS) {
 			return this.getAdditionalCSS('comp', originalCSS);
 		},
 		/**
-		 * is additional css defined
-		 * @param key optional
-		 * @returns {boolean}
-		 */
+   * is additional css defined
+   * @param key optional
+   * @returns {boolean}
+   */
 		isAdditionalCSSDefined: function (key) {
 			if (key) {
 				return this.__cell.css != null && this.__cell.css[key] != null;
@@ -2303,17 +2294,17 @@
 			return this.__cell.css != null;
 		},
 		/**
-		 * get additional css object, return {} when not defined
-		 * @param key optional, return string or empty string(not defined) when passed this parameter
-		 * @param originalCSS optional, combine with additional CSS if exists
-		 * @returns {*|string}
-		 */
+   * get additional css object, return {} when not defined
+   * @param key optional, return string or empty string(not defined) when passed this parameter
+   * @param originalCSS optional, combine with additional CSS if exists
+   * @returns {*|string}
+   */
 		getAdditionalCSS: function (key, originalCSS) {
 			if (key) {
 				var additionalCSS = this.isAdditionalCSSDefined(key) ? this.__cell.css[key] : '';
 				var cssList = additionalCSS ? additionalCSS.split(' ') : [];
 				var css = {};
-				cssList.forEach(function(cssClassName) {
+				cssList.forEach(function (cssClassName) {
 					if (cssClassName && !cssClassName.isBlank()) {
 						css[cssClassName.trim()] = true;
 					}
@@ -2327,10 +2318,10 @@
 			return this.isAdditionalCSSDefined() ? this.__cell.css : {};
 		},
 		/**
-		 * get event monitor
-		 * @param key optional, return event function or null (not defined) when passed this parameter.
-		 * @returns {function|*}
-		 */
+   * get event monitor
+   * @param key optional, return event function or null (not defined) when passed this parameter.
+   * @returns {function|*}
+   */
 		getEventMonitor: function (key) {
 			if (key) {
 				if (this.__cell && this.__cell.evt) {
@@ -2345,33 +2336,33 @@
 	});
 
 	/**
-	 * create cell layout
-	 * @param id {string} property id
-	 * @param cell {{}} cell definition
-	 * @returns {CellLayout}
-	 */
+  * create cell layout
+  * @param id {string} property id
+  * @param cell {{}} cell definition
+  * @returns {CellLayout}
+  */
 	$pt.createCellLayout = function (id, cell) {
 		return new CellLayout(id, cell);
 	};
 
 	/**
-	 * row layout
-	 * @type {class}
-	 */
+  * row layout
+  * @type {class}
+  */
 	var RowLayout = jsface.Class({
 		constructor: function (rowIndex) {
 			this.__rowIndex = rowIndex;
 		},
 		/**
-		 * get row index
-		 * @returns {number}
-		 */
+   * get row index
+   * @returns {number}
+   */
 		getRowIndex: function () {
 			return this.__rowIndex;
 		},
 		/**
-		 * add cell
-		 */
+   * add cell
+   */
 		addCell: function (cell) {
 			if (this.__cells === undefined) {
 				this.__cells = [];
@@ -2392,20 +2383,20 @@
 			return this;
 		},
 		/**
-		 * get cells
-		 * @returns {[CellLayout]}
-		 */
+   * get cells
+   * @returns {[CellLayout]}
+   */
 		getCells: function () {
 			return this.__cells;
 		}
 	});
 
 	/**
-	 * create row layout
-	 * @param rowIndex {number} row index
-	 * @param cells {CellLayout|CellLayout[]} optional, cells of this row
-	 * @returns {class}
-	 */
+  * create row layout
+  * @param rowIndex {number} row index
+  * @param cells {CellLayout|CellLayout[]} optional, cells of this row
+  * @returns {class}
+  */
 	$pt.createRowLayout = function (rowIndex, cells) {
 		var layout = new RowLayout(rowIndex);
 		if (cells) {
@@ -2421,9 +2412,9 @@
 	};
 
 	/**
-	 * section layout
-	 * @type {class}
-	 */
+  * section layout
+  * @type {class}
+  */
 	var SectionLayout = jsface.Class({
 		$static: {
 			DEFAULT_KEY: '_defaultSection',
@@ -2432,17 +2423,17 @@
 			DEFAULT_WIDTH: 12
 		},
 		/**
-		 * construct section layout.
-		 * @param section {{label:string,
+   * construct section layout.
+   * @param section {{label:string,
          *                  collapsible: boolean,
          *                  expanded: boolean,
          *                  row: number,
          *                  col: number,
          *                  width: number,
          *                  layout: {}}}
-		 * @param key {string} id of section layout
-		 * @param parentCard {CardLayout} card where section located
-		 */
+   * @param key {string} id of section layout
+   * @param parentCard {CardLayout} card where section located
+   */
 		constructor: function (section, key, parentCard) {
 			// layout definition
 			this.__layout = {};
@@ -2478,10 +2469,10 @@
 			return Object.keys(this.__all).length != 0;
 		},
 		/**
-		 * push cell into section.
-		 * auto create RowLayout
-		 * @param cell {CellLayout}
-		 */
+   * push cell into section.
+   * auto create RowLayout
+   * @param cell {CellLayout}
+   */
 		addCell: function (cell) {
 			this.__all[cell.getId()] = cell;
 
@@ -2498,9 +2489,9 @@
 			return this;
 		},
 		/**
-		 * sort rows in section
-		 * @private
-		 */
+   * sort rows in section
+   * @private
+   */
 		__sortRows: function () {
 			this.__rowsArray = [];
 			var rowsArray = this.__rowsArray;
@@ -2514,9 +2505,9 @@
 			});
 		},
 		/**
-		 * get row index of section, default 9999
-		 * @return {number}
-		 */
+   * get row index of section, default 9999
+   * @return {number}
+   */
 		getRowIndex: function () {
 			if (this.__layout == null || this.__layout.row == null) {
 				return SectionLayout.DEFAULT_ROW_INDEX;
@@ -2525,9 +2516,9 @@
 			}
 		},
 		/**
-		 * get column index of section, default 9999
-		 * @return {number}
-		 */
+   * get column index of section, default 9999
+   * @return {number}
+   */
 		getColumnIndex: function () {
 			if (this.__layout == null || this.__layout.col == null) {
 				return SectionLayout.DEFAULT_COLUMN_INDEX;
@@ -2536,9 +2527,9 @@
 			}
 		},
 		/**
-		 * get width of section, default 12
-		 * @return {number}
-		 */
+   * get width of section, default 12
+   * @return {number}
+   */
 		getWidth: function () {
 			if (this.__layout == null || this.__layout.width == null) {
 				return SectionLayout.DEFAULT_WIDTH;
@@ -2547,9 +2538,9 @@
 			}
 		},
 		/**
-		 * get style of section
-		 * @returns {*}
-		 */
+   * get style of section
+   * @returns {*}
+   */
 		getStyle: function () {
 			if (this.__layout == null || this.__layout.style == null) {
 				return 'default';
@@ -2565,9 +2556,9 @@
 			}
 		},
 		/**
-		 * get label of section
-		 * @returns {*}
-		 */
+   * get label of section
+   * @returns {*}
+   */
 		getLabel: function () {
 			if (this.__layout == null || this.__layout.label == null) {
 				return null;
@@ -2576,9 +2567,9 @@
 			}
 		},
 		/**
-		 * check the section is collapsible or not
-		 * @returns {boolean}
-		 */
+   * check the section is collapsible or not
+   * @returns {boolean}
+   */
 		isCollapsible: function () {
 			if (this.__layout == null || this.__layout.collapsible == null) {
 				return false;
@@ -2594,9 +2585,9 @@
 			}
 		},
 		/**
-		 * check section is default expanded or not
-		 * @returns {boolean}
-		 */
+   * check section is default expanded or not
+   * @returns {boolean}
+   */
 		isExpanded: function () {
 			if (this.__layout == null || this.__layout.expanded == null) {
 				return true;
@@ -2612,9 +2603,9 @@
 			}
 		},
 		/**
-		 * get check box in title definition
-		 * @returns {{}}
-		 */
+   * get check box in title definition
+   * @returns {{}}
+   */
 		hasCheckInTitle: function () {
 			return this.__layout && this.__layout.checkInTitle != null;
 		},
@@ -2657,66 +2648,66 @@
 			return this.__layout.visible;
 		},
 		/**
-		 * get id of section
-		 * @returns {string}
-		 */
+   * get id of section
+   * @returns {string}
+   */
 		getId: function () {
 			return this.__id;
 		},
 		/**
-		 * get all rows
-		 * @returns {RowLayout[]}
-		 */
+   * get all rows
+   * @returns {RowLayout[]}
+   */
 		getRows: function () {
 			return this.__rowsArray;
 		},
 		/**
-		 * get cell layout by given id
-		 * @param id {string} id of cell layout
-		 * @returns {CellLayout}
-		 */
+   * get cell layout by given id
+   * @param id {string} id of cell layout
+   * @returns {CellLayout}
+   */
 		getCell: function (id) {
 			return this.__all[id];
 		},
 		/**
-		 * get all cells
-		 * @returns {{}}
-		 */
+   * get all cells
+   * @returns {{}}
+   */
 		getCells: function () {
 			return this.__all;
 		},
 		/**
-		 * get parent card
-		 * @returns {CardLayout}
-		 */
+   * get parent card
+   * @returns {CardLayout}
+   */
 		getParentCard: function () {
 			return this.__parent;
 		}
 	});
 
 	/**
-	 * create section layout
-	 * @param settings
-	 * @param key
-	 * @param parentCard
-	 * @returns {SectionLayout}
-	 */
+  * create section layout
+  * @param settings
+  * @param key
+  * @param parentCard
+  * @returns {SectionLayout}
+  */
 	$pt.createSectionLayout = function (settings, key, parentCard) {
 		return new SectionLayout(settings, key, parentCard);
 	};
 
 	/**
-	 * card layout
-	 * @type {class}
-	 */
+  * card layout
+  * @type {class}
+  */
 	var CardLayout = jsface.Class({
 		$static: {
 			DEFAULT_KEY: '_defaultCard',
 			DEFAULT_CARD_INDEX: 9999
 		},
 		/**
-		 * construct card layout
-		 * @param card {{
+   * construct card layout
+   * @param card {{
          *              _sections: {},
          *              index: number,
          *              label: string,
@@ -2728,8 +2719,8 @@
          *              finishButton: {}
          *              rightButtons: {}|{}[],
          *              leftButtons: {}|{}[]}}
-		 * @param key {string} id of card
-		 */
+   * @param key {string} id of card
+   */
 		constructor: function (card, key) {
 			var _this = this;
 			// layout definition
@@ -2755,9 +2746,9 @@
 			return Object.keys(this.__all).length != 0;
 		},
 		/**
-		 * push cell to card
-		 * @param cell {CellLayout}
-		 */
+   * push cell to card
+   * @param cell {CellLayout}
+   */
 		addCell: function (cell) {
 			this.__all[cell.getId()] = cell;
 
@@ -2775,9 +2766,9 @@
 			return this;
 		},
 		/**
-		 * sort sections
-		 * @private
-		 */
+   * sort sections
+   * @private
+   */
 		__sortSections: function () {
 			this.__sectionsArray = [];
 			var sectionsArray = this.__sectionsArray;
@@ -2797,9 +2788,9 @@
 			});
 		},
 		/**
-		 * get card index
-		 * @returns {number}
-		 */
+   * get card index
+   * @returns {number}
+   */
 		getIndex: function () {
 			if (this.__layout.index == null) {
 				return CardLayout.DEFAULT_CARD_INDEX;
@@ -2808,30 +2799,30 @@
 			}
 		},
 		/**
-		 * get label of card
-		 * @returns {string}
-		 */
+   * get label of card
+   * @returns {string}
+   */
 		getLabel: function () {
 			return this.__layout.label;
 		},
 		/**
-		 * get icon of card
-		 * @returns {string}
-		 */
+   * get icon of card
+   * @returns {string}
+   */
 		getIcon: function () {
 			return this.__layout.icon;
 		},
 		/**
-		 * has badge icon or not
-		 * @returns {boolean}
-		 */
+   * has badge icon or not
+   * @returns {boolean}
+   */
 		hasBadge: function () {
 			return this.__layout.badge != null;
 		},
 		/**
-		 * get badge icon dependency id
-		 * @returns {string}
-		 */
+   * get badge icon dependency id
+   * @returns {string}
+   */
 		getBadgeId: function () {
 			return this.__layout.badge;
 		},
@@ -2839,99 +2830,99 @@
 			return this.__layout.badgeRender;
 		},
 		/**
-		 * get id of card
-		 * @returns {*}
-		 */
+   * get id of card
+   * @returns {*}
+   */
 		getId: function () {
 			return this.__id;
 		},
 		/**
-		 * check card is default active or not
-		 * @returns {boolean}
-		 */
+   * check card is default active or not
+   * @returns {boolean}
+   */
 		isActive: function () {
 			return this.__layout.active === true;
 		},
 		/**
-		 * set card to be active
-		 * @param active
-		 */
+   * set card to be active
+   * @param active
+   */
 		setActive: function (active) {
 			this.__layout.active = active;
 			return this;
 		},
 		/**
-		 * check the card can be backable or not
-		 * @returns {boolean}
-		 */
+   * check the card can be backable or not
+   * @returns {boolean}
+   */
 		isBackable: function () {
 			return this.__layout.backable !== false;
 		},
 		/**
-		 * get right buttons
-		 * @returns {{}|{}[]}
-		 */
+   * get right buttons
+   * @returns {{}|{}[]}
+   */
 		getRightButtons: function () {
 			return this.__layout.rightButtons ? this.__layout.rightButtons : [];
 		},
 		/**
-		 * get left buttons
-		 * @returns {{}|{}[]}
-		 */
+   * get left buttons
+   * @returns {{}|{}[]}
+   */
 		getLeftButtons: function () {
 			return this.__layout.leftButtons ? this.__layout.leftButtons : [];
 		},
 		/**
-		 * get finish button definition
-		 * @returns {{}}
-		 */
+   * get finish button definition
+   * @returns {{}}
+   */
 		getFinishButton: function () {
 			return this.__layout.finishButton;
 		},
 		/**
-		 * get sections
-		 * @return {SectionLayout[]}
-		 */
+   * get sections
+   * @return {SectionLayout[]}
+   */
 		getSections: function () {
 			return this.__sectionsArray;
 		},
 		/**
-		 * get all cells
-		 * @returns {{}}
-		 */
+   * get all cells
+   * @returns {{}}
+   */
 		getCells: function () {
 			return this.__all;
 		},
 		/**
-		 * get cell by given cell id
-		 * @param cellId
-		 * @returns {CellLayout}
-		 */
+   * get cell by given cell id
+   * @param cellId
+   * @returns {CellLayout}
+   */
 		getCell: function (cellId) {
 			return this.__all[cellId];
 		}
 	});
 
 	/**
-	 * create card layout
-	 * @param card {{}}
-	 * @param key {string} id of card
-	 * @returns {CardLayout}
-	 */
+  * create card layout
+  * @param card {{}}
+  * @param key {string} id of card
+  * @returns {CardLayout}
+  */
 	$pt.createCardLayout = function (card, key) {
 		return new CardLayout(card, key);
 	};
 
 	/**
-	 * form layout
-	 * @type {class}
-	 */
+  * form layout
+  * @type {class}
+  */
 	var FormLayout = jsface.Class({
 		/**
-		 * constructor of FormLayout, accepts one or more json object
-		 * @param layouts {{_freeCard: boolean,
+   * constructor of FormLayout, accepts one or more json object
+   * @param layouts {{_freeCard: boolean,
          *                 _cardButtonShown: boolean}|{}[]}
-		 */
+   */
 		constructor: function (layouts) {
 			// all cells map
 			this.__all = {};
@@ -2947,11 +2938,11 @@
 			this.__sortCards(cardLayouts);
 		},
 		/**
-		 * merge layouts to one
-		 * @param layouts {{}[]}
-		 * @return {{}}
-		 * @private
-		 */
+   * merge layouts to one
+   * @param layouts {{}[]}
+   * @return {{}}
+   * @private
+   */
 		__mergeLayouts: function (layouts) {
 			if (layouts.length == 1) {
 				return $.extend(true, {}, layouts[0]);
@@ -2960,11 +2951,11 @@
 			}
 		},
 		/**
-		 * create default card and default section
-		 * @param layout {{}}
-		 * @return {{}}
-		 * @private
-		 */
+   * create default card and default section
+   * @param layout {{}}
+   * @return {{}}
+   * @private
+   */
 		__createDefaultCard: function (layout) {
 			var cards = layout._cards;
 			this.__freeCard = layout._freeCard;
@@ -2972,7 +2963,7 @@
 			if (cards == null) {
 				cards = {};
 				// create default card
-				cards[CardLayout.DEFAULT_KEY] = {_sections: {}};
+				cards[CardLayout.DEFAULT_KEY] = { _sections: {} };
 				// all sections in default card
 				if (layout._sections == null) {
 					// no section defined, create default
@@ -2985,13 +2976,13 @@
 			return cards;
 		},
 		/**
-		 * read cells
-		 * @param layout {{}} layout definition
-		 * @param cards {{}} cards definition
-		 * @param all {{}} all cells
-		 * @returns {{}}
-		 * @private
-		 */
+   * read cells
+   * @param layout {{}} layout definition
+   * @param cards {{}} cards definition
+   * @param all {{}} all cells
+   * @returns {{}}
+   * @private
+   */
 		__readCells: function (layout, cards, all) {
 			// all cards
 			var cardLayouts = {};
@@ -3021,10 +3012,10 @@
 			return cardLayouts;
 		},
 		/**
-		 * sort cards
-		 * @param cards
-		 * @private
-		 */
+   * sort cards
+   * @param cards
+   * @private
+   */
 		__sortCards: function (cards) {
 			// sort cards
 			this.__cardsArray = [];
@@ -3037,152 +3028,152 @@
 			});
 		},
 		/**
-		 * get all cards
-		 * @returns {CardLayout[]}
-		 */
+   * get all cards
+   * @returns {CardLayout[]}
+   */
 		getCards: function () {
 			return this.__cardsArray;
 		},
 		/**
-		 * is free card or not
-		 * @returns {boolean}
-		 */
+   * is free card or not
+   * @returns {boolean}
+   */
 		isFreeCard: function () {
 			return this.__freeCard === true;
 		},
 		/**
-		 * is card button shown or not
-		 * @returns {boolean}
-		 */
+   * is card button shown or not
+   * @returns {boolean}
+   */
 		isCardButtonShown: function () {
 			return this.__cardButtonShown !== false;
 		},
 		/**
-		 * get cell layout by given id
-		 * @param id {string} id of cell
-		 * @returns {CellLayout}
-		 */
+   * get cell layout by given id
+   * @param id {string} id of cell
+   * @returns {CellLayout}
+   */
 		getCell: function (id) {
 			return this.__all[id];
 		},
 		/**
-		 * get all cells
-		 * @returns {{}}
-		 */
+   * get all cells
+   * @returns {{}}
+   */
 		getCells: function () {
 			return this.__all;
 		}
 	});
 
 	/**
-	 * create form layout
-	 * @param layouts {{}|{}[]}
-	 * @returns {FormLayout}
-	 */
+  * create form layout
+  * @param layouts {{}|{}[]}
+  * @returns {FormLayout}
+  */
 	$pt.createFormLayout = function (layouts) {
 		return new FormLayout(Array.prototype.slice.call(arguments));
 	};
 
 	/**
-	 * table column layout, an array like object
-	 * @type {class}
-	 */
+  * table column layout, an array like object
+  * @type {class}
+  */
 	var TableColumnLayout = jsface.Class({
 		/**
-		 *
-		 * @param columns {{
+   *
+   * @param columns {{
          *                  title: string,
          *                  width: number,
          *                  data: string,
          *                  codes: CodeTable,
          *                  render: function,
          *                  sort: boolean|string|function}[]}
-		 */
+   */
 		constructor: function (columns) {
 			this.__columns = columns.slice(0);
 		},
 		/**
-		 * get all columns
-		 * @returns {{}[]}
-		 */
+   * get all columns
+   * @returns {{}[]}
+   */
 		columns: function () {
 			return this.__columns;
 		},
 		/**
-		 * get column definition of given column index
-		 * @param index {number}
-		 * @returns {{}}
-		 */
+   * get column definition of given column index
+   * @param index {number}
+   * @returns {{}}
+   */
 		get: function (index) {
 			return this.__columns[index];
 		},
 		/**
-		 * push new column definition to columns
-		 * @param column {{}}
-		 */
+   * push new column definition to columns
+   * @param column {{}}
+   */
 		push: function (column) {
 			this.__columns.push(column);
 		},
 		/**
-		 * splice, same as array
-		 * @param index {number}
-		 * @param removeCount {number} remove column count
-		 * @param newItem {{}} new column definition
-		 */
+   * splice, same as array
+   * @param index {number}
+   * @param removeCount {number} remove column count
+   * @param newItem {{}} new column definition
+   */
 		splice: function (index, removeCount, newItem) {
 			this.__columns.splice(index, removeCount, newItem);
 		},
 		/**
-		 * same as array
-		 * @param func {function} same as Array.map
-		 * @returns {[]}
-		 */
+   * same as array
+   * @param func {function} same as Array.map
+   * @returns {[]}
+   */
 		map: function (func) {
 			return this.__columns.map(func);
 		},
 		/**
-		 * same as array
-		 * @param func {function} same as Array.forEach
-		 */
+   * same as array
+   * @param func {function} same as Array.forEach
+   */
 		forEach: function (func) {
 			this.__columns.forEach(func);
 		},
 		/**
-		 * get column count
-		 * @returns {number}
-		 */
+   * get column count
+   * @returns {number}
+   */
 		length: function () {
 			return this.__columns.length;
 		},
 		/**
-		 * same as array
-		 * @param func {function} same as Array.some
-		 * @returns {boolean}
-		 */
+   * same as array
+   * @param func {function} same as Array.some
+   * @returns {boolean}
+   */
 		some: function (func) {
 			return this.__columns.some(func);
 		}
 	});
 
 	/**
-	 * create table column layout
-	 * @param columns {{}[]}
-	 * @returns {TableColumnLayout}
-	 */
+  * create table column layout
+  * @param columns {{}[]}
+  * @returns {TableColumnLayout}
+  */
 	$pt.createTableColumnLayout = function (columns) {
 		return new TableColumnLayout(columns);
 	};
 
 	// component
 	/**
-	 * Component Base
-	 * @type {*}
-	 */
+  * Component Base
+  * @type {*}
+  */
 	var ComponentBase = {
 		/**
-		 * get model
-		 * @returns {ModelInterface}
-		 */
+   * get model
+   * @returns {ModelInterface}
+   */
 		getModel: function () {
 			if (this.useFormModel()) {
 				return this.getFormModel();
@@ -3191,60 +3182,60 @@
 			}
 		},
 		/**
-		 * use form model when the component inner data model is given
-		 * @returns {boolean}
-		 */
+   * use form model when the component inner data model is given
+   * @returns {boolean}
+   */
 		useFormModel: function () {
 			return this.getComponentOption('useFormModel') === true;
 		},
 		/**
-		 * get form model
-		 * @returns {ModelInterface}
-		 */
+   * get form model
+   * @returns {ModelInterface}
+   */
 		getFormModel: function () {
 			return this.props.model;
 		},
 		/**
-		 * get inner data model, return form model if not defined
-		 * @returns {ModelInterface}
-		 */
+   * get inner data model, return form model if not defined
+   * @returns {ModelInterface}
+   */
 		getInnerModel: function () {
 			var model = this.getComponentOption('model');
 			return model ? model : this.getFormModel();
 		},
 		/**
-		 * get value from model
-		 * @returns {*}
-		 */
+   * get value from model
+   * @returns {*}
+   */
 		getValueFromModel: function () {
 			return this.getModel().get(this.getDataId());
 		},
 		/**
-		 * set value to model
-		 * @param value
-		 */
+   * set value to model
+   * @param value
+   */
 		setValueToModel: function (value) {
 			this.getModel().set(this.getDataId(), value);
 		},
 		/**
-		 * get layout
-		 * @returns {CellLayout}
-		 */
+   * get layout
+   * @returns {CellLayout}
+   */
 		getLayout: function () {
 			return this.props.layout;
 		},
 		/**
-		 * component is view mode or not
-		 * @returns {boolean}
-		 */
-		isViewMode: function() {
+   * component is view mode or not
+   * @returns {boolean}
+   */
+		isViewMode: function () {
 			return this.props.view === true;
 		},
 		/**
-		 * render in view mode. default render as a label.
-		 * @returns {XML}
-		 */
-		renderInViewMode: function() {
+   * render in view mode. default render as a label.
+   * @returns {XML}
+   */
+		renderInViewMode: function () {
 			var externalViewModeRenderer = $pt.LayoutHelper.getComponentViewModeRenderer(this.getLayout().getComponentType());
 			if (externalViewModeRenderer) {
 				return externalViewModeRenderer.call(this, this.getModel(), this.getLayout(), this.props.direction, true);
@@ -3267,46 +3258,45 @@
 					textFromModel: false
 				}
 			}));
-			var parameters = $pt.LayoutHelper.transformParameters(
-				this.getModel(), labelLayout, this.props.direction, true);
+			var parameters = $pt.LayoutHelper.transformParameters(this.getModel(), labelLayout, this.props.direction, true);
 			parameters.ref = 'viewLabel';
-			return React.createElement($pt.Components.NLabel, React.__spread({},  parameters));
+			return React.createElement($pt.Components.NLabel, parameters);
 		},
 		/**
-		 * get id of component
-		 * @returns {string}
-		 */
+   * get id of component
+   * @returns {string}
+   */
 		getId: function () {
 			return this.getLayout().getId();
 		},
 		/**
-		 * get data id of component
-		 * @returns {*}
-		 */
+   * get data id of component
+   * @returns {*}
+   */
 		getDataId: function () {
 			return this.getLayout().getDataId();
 		},
 		/**
-		 * get component css
-		 * @param originalCSS original CSS
-		 * @returns {string}
-		 */
+   * get component css
+   * @param originalCSS original CSS
+   * @returns {string}
+   */
 		getComponentCSS: function (originalCSS) {
 			return this.getLayout().getComponentCSS(originalCSS);
 		},
 		/**
-		 * get combine css
-		 * @param originalCSS css class names
-		 * @param additionalKey key of additional css in layout
-		 * @returns {string}
-		 */
+   * get combine css
+   * @param originalCSS css class names
+   * @param additionalKey key of additional css in layout
+   * @returns {string}
+   */
 		getAdditionalCSS: function (additionalKey, originalCSS) {
 			return this.getLayout().getAdditionalCSS(additionalKey, originalCSS);
 		},
 		/**
-		 * get option
-		 * @param key
-		 */
+   * get option
+   * @param key
+   */
 		getComponentOption: function (key) {
 			var option = this.getLayout().getComponentOption(key);
 			if (option == null && this.props.defaultOptions != null) {
@@ -3315,66 +3305,66 @@
 			return option === undefined ? null : option;
 		},
 		/**
-		 * get id of component central.
-		 */
-		getComponentCentralId: function() {
+   * get id of component central.
+   */
+		getComponentCentralId: function () {
 			return this.getComponentOption('centralId');
 		},
 		/**
-		 * register to component central
-		 */
-		registerToComponentCentral: function() {
+   * register to component central
+   */
+		registerToComponentCentral: function () {
 			var id = this.getComponentCentralId();
 			if (id) {
 				$pt.LayoutHelper.registerComponent(id, this);
 			}
 		},
 		/**
-		 * unregsiter from component central
-		 */
-		unregisterFromComponentCentral: function() {
+   * unregsiter from component central
+   */
+		unregisterFromComponentCentral: function () {
 			var id = this.getComponentCentralId();
 			if (id) {
 				$pt.LayoutHelper.unregisterComponent(id, this);
 			}
 		},
 		/**
-		 * get event monitor
-		 * @param key {string} event name, if not passed, return whole event definition
-		 * @returns {*}
-		 */
+   * get event monitor
+   * @param key {string} event name, if not passed, return whole event definition
+   * @returns {*}
+   */
 		getEventMonitor: function (key) {
 			return this.getLayout().getEventMonitor(key);
 		},
-		notifyEvent: function(evt) {
-            var type = evt.type;
-            var monitor = this.getEventMonitor(type);
+		notifyEvent: function (evt) {
+			var type = evt.type;
+			var monitor = this.getEventMonitor(type);
 			if (monitor) {
 				monitor.call(this, evt);
 			}
-        },
+		},
 		/**
-		 * get component rule value.
-		 * get component option by given key. return default value if not defined.
-		 * otherwise call when function and return.
-		 * rule must be defined as {when: func, depends: props}
-		 * @param key
-		 * @param defaultValue
-		 * @returns {*}
-		 */
+   * get component rule value.
+   * get component option by given key. return default value if not defined.
+   * otherwise call when function and return.
+   * rule must be defined as {when: func, depends: props}
+   * @param key
+   * @param defaultValue
+   * @returns {*}
+   */
 		getComponentRuleValue: function (key, defaultValue) {
 			return this.getRuleValue(this.getComponentOption(key), defaultValue);
 		},
 		/**
-		 * get rule value. return default value if not defined.
-		 * otherwise call when function and return.
-		 * rule must be defined as {when: func, depends: props}
-		 * @param rule {{when: func, depends: props}}
-		 * @param defaultValue {*}
-		 * @param model {ModelInterface} given model, optional
-		 * @returns {*}
-		 */
-		getRuleValue: function(rule, defaultValue, model) {
+   * get rule value. return default value if not defined.
+   * otherwise call when function and return.
+   * rule must be defined as {when: func, depends: props}
+   * @param rule {{when: func, depends: props}}
+   * @param defaultValue {*}
+   * @param model {ModelInterface} given model, optional
+   * @returns {*}
+   */
+		getRuleValue: function (rule, defaultValue, model) {
 			if (rule === null) {
 				return defaultValue;
 			} else if (rule === true || rule === false) {
@@ -3384,20 +3374,20 @@
 			}
 		},
 		/**
-		 * get component rule dependencies.
-		 * rule must be defined as {when: func, depends: props}
-		 * @param key
-		 * @returns {[*]} always return an array, never return null or undefined.
-		 */
+   * get component rule dependencies.
+   * rule must be defined as {when: func, depends: props}
+   * @param key
+   * @returns {[*]} always return an array, never return null or undefined.
+   */
 		getComponentRuleDependencies: function (key) {
 			return this.getRuleDependencies(this.getComponentOption(key));
 		},
 		/**
-		 * get rule dependencies. rule must be defined as {when: func, depends: props}
-		 * @param dependencies {{when: func, depends: props}}
-		 * @returns {[*]} always return an array, never return null or undefined.
-		 */
-		getRuleDependencies: function(dependencies) {
+   * get rule dependencies. rule must be defined as {when: func, depends: props}
+   * @param dependencies {{when: func, depends: props}}
+   * @returns {[*]} always return an array, never return null or undefined.
+   */
+		getRuleDependencies: function (dependencies) {
 			if (dependencies === null || dependencies.depends === undefined || dependencies.depends === null) {
 				return [];
 			} else {
@@ -3409,9 +3399,9 @@
 			}
 		},
 		/**
-		 * is enabled
-		 * @returns {boolean}
-		 */
+   * is enabled
+   * @returns {boolean}
+   */
 		isEnabled: function () {
 			if (this.isViewMode()) {
 				// always enabled when in view mode
@@ -3420,16 +3410,16 @@
 			return this.getComponentRuleValue("enabled", true);
 		},
 		/**
-		 * is visible
-		 * @returns {boolean}
-		 */
+   * is visible
+   * @returns {boolean}
+   */
 		isVisible: function () {
 			return this.getComponentRuleValue("visible", true);
 		},
 		/**
-		 * get dependencies
-		 * @returns {Array|string}
-		 */
+   * get dependencies
+   * @returns {Array|string}
+   */
 		getDependencies: function (attrs) {
 			var dependencies = [];
 			if (!Array.isArray(attrs)) {
@@ -3455,41 +3445,41 @@
 			this.removeDependencyMonitor(this.getDependencies("enabled"));
 		},
 		/**
-		 * force update, call react API
-		 * @private
-		 */
+   * force update, call react API
+   * @private
+   */
 		__forceUpdate: function () {
 			this.forceUpdate();
 		},
 		/**
-		 * render normal bottom border
-		 * @returns {XML}
-		 */
+   * render normal bottom border
+   * @returns {XML}
+   */
 		renderNormalLine: function () {
 			var css = {
 				disabled: !this.isEnabled()
 			};
 			css[this.getAdditionalCSS('normal-line', 'normal-line')] = true;
-			return React.createElement("hr", {className: $pt.LayoutHelper.classSet(css), ref: "normalLine"});
+			return React.createElement("hr", { className: $pt.LayoutHelper.classSet(css), ref: "normalLine" });
 		},
 		/**
-		 * render focus bottom border
-		 * @returns {XML}
-		 */
+   * render focus bottom border
+   * @returns {XML}
+   */
 		renderFocusLine: function () {
-			return React.createElement("hr", {className: this.getAdditionalCSS('focus-line', 'focus-line'), ref: "focusLine"});
+			return React.createElement("hr", { className: this.getAdditionalCSS('focus-line', 'focus-line'), ref: "focusLine" });
 		},
 		/**
-		 * add dependencies monitor
-		 * @param dependencies {[]}
-		 * @param monitor {function} optional
-		 * @param model {ModelInterface} monitored model, optional
-		 */
+   * add dependencies monitor
+   * @param dependencies {[]}
+   * @param monitor {function} optional
+   * @param model {ModelInterface} monitored model, optional
+   */
 		addDependencyMonitor: function (dependencies, monitor, model) {
 			monitor = monitor == null ? this.__forceUpdate : monitor;
 			var _this = this;
 			if (model) {
-				dependencies.forEach(function(key) {
+				dependencies.forEach(function (key) {
 					model.addPostChangeListener(key, monitor);
 				});
 			} else {
@@ -3511,16 +3501,16 @@
 			return this;
 		},
 		/**
-		 * remove dependencies monitor
-		 * @param dependencies {[]}
-		 * @param monitor {function} optional
-		 * @param model {ModelInterface} monitored model, optional
-		 */
+   * remove dependencies monitor
+   * @param dependencies {[]}
+   * @param monitor {function} optional
+   * @param model {ModelInterface} monitored model, optional
+   */
 		removeDependencyMonitor: function (dependencies, monitor, model) {
-			monitor = monitor == null? this.__forceUpdate : monitor;
+			monitor = monitor == null ? this.__forceUpdate : monitor;
 			var _this = this;
 			if (model) {
-				dependencies.forEach(function(key) {
+				dependencies.forEach(function (key) {
 					model.removePostChangeListener(key, monitor);
 				});
 			} else {
@@ -3569,24 +3559,24 @@
 	};
 
 	/**
-	 * define cell component
-	 * @param config {{}} special component config, will replace the definition from component base if with same name
-	 */
+  * define cell component
+  * @param config {{}} special component config, will replace the definition from component base if with same name
+  */
 	$pt.defineCellComponent = function (config) {
 		return $.extend({}, ComponentBase, config);
 	};
 
 	var LayoutHelper = jsface.Class({
-		constructor: function() {
+		constructor: function () {
 			this.__comp = {};
 			this.__components = {};
 		},
 		/**
-		 * copy from React.addons.classSet
-		 * @param classNames
-		 * @returns {string}
-		 */
-		classSet : function (classNames) {
+   * copy from React.addons.classSet
+   * @param classNames
+   * @returns {string}
+   */
+		classSet: function (classNames) {
 			if (typeof classNames == 'object') {
 				return Object.keys(classNames).filter(function (className) {
 					return classNames[className];
@@ -3595,22 +3585,22 @@
 				return Array.prototype.join.call(arguments, ' ');
 			}
 		},
-		setDefaultCellWidth : function(width) {
+		setDefaultCellWidth: function (width) {
 			CellLayout.DEFAULT_WIDTH = width * 1;
 		},
-		setDefaultSectionWidth : function(width) {
+		setDefaultSectionWidth: function (width) {
 			SectionLayout.DEFAULT_WIDTH = width * 1;
 		},
 		/**
-		 * register react component to central
-		 */
-		registerComponent: function(id, component) {
+   * register react component to central
+   */
+		registerComponent: function (id, component) {
 			if (this.__comp[id]) {
 				// already some components use this id
 				var exists = this.__comp[id];
 				if (Array.isArray(exists)) {
 					// push to array if not exists
-					var found = exists.find(function(existed) {
+					var found = exists.find(function (existed) {
 						return existed === component;
 					});
 					if (!found) {
@@ -3629,9 +3619,9 @@
 			return this;
 		},
 		/**
-		 * unregister component from central
-		 */
-		unregisterComponent: function(id, component) {
+   * unregister component from central
+   */
+		unregisterComponent: function (id, component) {
 			if (component) {
 				// delete key, unregister all components with given id
 				delete this.__comp[id];
@@ -3640,7 +3630,7 @@
 				var exists = this.__comp[id];
 				if (exists) {
 					if (Array.isArray(exists)) {
-						var index = exists.findIndex(function(existed) {
+						var index = exists.findIndex(function (existed) {
 							return existed === component;
 						});
 						if (index != -1) {
@@ -3656,21 +3646,21 @@
 			return this;
 		},
 		/**
-		 * get component by given id
-		 */
-		getComponent: function(id) {
+   * get component by given id
+   */
+		getComponent: function (id) {
 			return this.__comp[id];
 		},
-		__forceUpdate: function(component) {
+		__forceUpdate: function (component) {
 			if (component.forceUpdate) {
 				component.forceUpdate();
 			}
 			return this;
 		},
 		/**
-		 * force update components which has give id
-		 */
-		forceUpdate: function(id) {
+   * force update components which has give id
+   */
+		forceUpdate: function (id) {
 			var components = this.getComponent(id);
 			if (components) {
 				if (Array.isArray(components)) {
@@ -3691,18 +3681,17 @@
 			}
 			this.__components[type] = func;
 		},
-		getComponentRenderer: function(type) {
+		getComponentRenderer: function (type) {
 			if (typeof type !== 'string') {
 				type = type.type;
 			}
 			if (this.__components[type]) {
 				return this.__components[type];
 			} else {
-				throw $pt.createComponentException($pt.ComponentConstants.Err_Unsupported_Component,
-					"Component type [" + type + "] is not supported yet.");
+				throw $pt.createComponentException($pt.ComponentConstants.Err_Unsupported_Component, "Component type [" + type + "] is not supported yet.");
 			}
 		},
-		registerComponentViewModeRenderer: function(type, func) {
+		registerComponentViewModeRenderer: function (type, func) {
 			if (typeof type !== 'string') {
 				type = type.type;
 			}
@@ -3712,7 +3701,7 @@
 			}
 			this.__components[type] = func;
 		},
-		getComponentViewModeRenderer: function(type) {
+		getComponentViewModeRenderer: function (type) {
 			if (typeof type !== 'string') {
 				type = type.type;
 			}
@@ -3724,7 +3713,7 @@
 				return null;
 			}
 		},
-		transformParameters: function(model, layout, direction, viewMode) {
+		transformParameters: function (model, layout, direction, viewMode) {
 			return {
 				model: model,
 				layout: layout,
@@ -3735,16 +3724,15 @@
 		}
 	});
 	$pt.LayoutHelper = new LayoutHelper();
-	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Nothing, function() {
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Nothing, function () {
 		return null;
 	});
 })(window, jQuery, jsface, React);
 
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NArrayCheck = React.createClass($pt.defineCellComponent({
 		displayName: 'NArrayCheck',
-		statics: {
-		},
+		statics: {},
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
@@ -3763,9 +3751,9 @@
 			return {};
 		},
 		/**
-		 * will update
-		 * @param nextProps
-		 */
+   * will update
+   * @param nextProps
+   */
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
@@ -3773,10 +3761,10 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
+   * did update
+   * @param prevProps
+   * @param prevState
+   */
 		componentDidUpdate: function (prevProps, prevState) {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
@@ -3784,8 +3772,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * did mount
-		 */
+   * did mount
+   */
 		componentDidMount: function () {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
@@ -3793,15 +3781,15 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * will unmount
-		 */
+   * will unmount
+   */
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
-		renderItem: function(enabled, item, itemIndex) {
+		renderItem: function (enabled, item, itemIndex) {
 			var model = $pt.createModel({
 				id: item.id,
 				checked: this.isCodeChecked(item)
@@ -3814,23 +3802,25 @@
 				}
 			});
 			model.addPostChangeListener('checked', this.onCodeItemCheckedChanged.bind(this, item));
-			return React.createElement($pt.Components.NCheck, {model: model, layout: layout, key: itemIndex});
+			return React.createElement($pt.Components.NCheck, { model: model, layout: layout, key: itemIndex });
 		},
-		render: function() {
+		render: function () {
 			var enabled = this.isEnabled();
 			var css = {
 				'n-disabled': !enabled,
 				vertical: this.getComponentOption('direction') === 'vertical'
 			};
 			css[this.getComponentCSS('n-array-check')] = true;
-			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
+			return React.createElement(
+				'div',
+				{ className: $pt.LayoutHelper.classSet(css) },
 				this.getCodeTable().list().map(this.renderItem.bind(this, enabled))
-			));
+			);
 		},
-		onModelChanged: function() {
+		onModelChanged: function () {
 			this.forceUpdate();
 		},
-		onCodeItemCheckedChanged: function(codeTableItem, evt) {
+		onCodeItemCheckedChanged: function (codeTableItem, evt) {
 			if (evt.new) {
 				// checked
 				this.onCodeItemChecked(codeTableItem);
@@ -3839,22 +3829,22 @@
 				this.onCodeTableUnchecked(codeTableItem);
 			}
 		},
-		onCodeTableUnchecked: function(codeTableItem) {
+		onCodeTableUnchecked: function (codeTableItem) {
 			var values = this.getValueFromModel();
 			if (values == null) {
 				return;
 			}
-			this.setValueToModel(values.filter(function(value) {
+			this.setValueToModel(values.filter(function (value) {
 				return value != codeTableItem.id;
 			}).slice(0));
 		},
-		onCodeItemChecked: function(codeTableItem) {
+		onCodeItemChecked: function (codeTableItem) {
 			// checked
 			var values = this.getValueFromModel();
 			if (values == null) {
 				values = [codeTableItem.id];
 			} else {
-				var index = values.findIndex(function(value) {
+				var index = values.findIndex(function (value) {
 					return value == codeTableItem.id;
 				});
 				if (index == -1) {
@@ -3863,21 +3853,21 @@
 			}
 			this.setValueToModel(values.slice(0));
 		},
-		getCodeTable: function() {
+		getCodeTable: function () {
 			return this.getComponentOption('data');
 		},
-		isCodeChecked: function(codeTableItem) {
+		isCodeChecked: function (codeTableItem) {
 			var values = this.getValueFromModel();
-			return values != null && values.some(function(value) {
+			return values != null && values.some(function (value) {
 				return value == codeTableItem.id;
 			});
 		}
 	}));
 	$pt.Components.NArrayCheck = NArrayCheck;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayCheck, function (model, layout, direction, viewMode) {
-		return React.createElement($pt.Components.NArrayCheck, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NArrayCheck, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
 	});
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * Array Panel, for array property
@@ -3915,7 +3905,7 @@
  *      }
  * }
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NArrayPanel = React.createClass($pt.defineCellComponent({
 		displayName: 'NArrayPanel',
 		statics: {
@@ -3940,9 +3930,9 @@
 			return {};
 		},
 		/**
-		 * will update
-		 * @param nextProps
-		 */
+   * will update
+   * @param nextProps
+   */
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
@@ -3952,10 +3942,10 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
+   * did update
+   * @param prevProps
+   * @param prevState
+   */
 		componentDidUpdate: function (prevProps, prevState) {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
@@ -3965,8 +3955,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * did mount
-		 */
+   * did mount
+   */
 		componentDidMount: function () {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
@@ -3976,8 +3966,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * will unmount
-		 */
+   * will unmount
+   */
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
@@ -3987,10 +3977,10 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * render item
-		 * @param item {{}}
-		 * @returns {XML}
-		 */
+   * render item
+   * @param item {{}}
+   * @returns {XML}
+   */
 		renderItem: function (item, itemIndex) {
 			var parentModel = this.getModel();
 			var parentValidator = parentModel.getValidator();
@@ -4036,52 +4026,58 @@
 					collapsedLabel: this.getComponentOption('collapsedLabel')
 				}
 			};
-			return (React.createElement("div", {className: "row", key: itemIndex}, 
-				React.createElement("div", {className: "col-sm-12 col-md-12 col-lg-12"}, 
-					React.createElement($pt.Components.NPanel, {model: model, 
-					        layout: $pt.createCellLayout('pseudo-panel', cellLayout), 
-					        direction: this.props.direction, 
-							view: this.isViewMode()})
+			return React.createElement(
+				'div',
+				{ className: 'row', key: itemIndex },
+				React.createElement(
+					'div',
+					{ className: 'col-sm-12 col-md-12 col-lg-12' },
+					React.createElement($pt.Components.NPanel, { model: model,
+						layout: $pt.createCellLayout('pseudo-panel', cellLayout),
+						direction: this.props.direction,
+						view: this.isViewMode() })
 				)
-			));
+			);
 		},
 		/**
-		 * render
-		 * @returns {XML}
-		 */
+   * render
+   * @returns {XML}
+   */
 		render: function () {
-			return (React.createElement("div", {className: this.getComponentCSS('n-array-panel')}, 
+			return React.createElement(
+				'div',
+				{ className: this.getComponentCSS('n-array-panel') },
 				this.getValueFromModel().map(this.renderItem)
-			));
+			);
 		},
 		/**
-		 * return [] when is null
-		 * @returns {[*]}
-		 */
+   * return [] when is null
+   * @returns {[*]}
+   */
 		getValueFromModel: function () {
 			var data = this.getModel().get(this.getDataId());
 			return data == null ? [] : data;
 		},
 		/**
-		 * on model changed
-		 * @param evt
-		 */
+   * on model changed
+   * @param evt
+   */
 		onModelChanged: function (evt) {
 			this.forceUpdate();
 		},
 		/**
-		 * monitor the parent model validation
-		 * @param evt
-		 */
+   * monitor the parent model validation
+   * @param evt
+   */
 		onModelValidateChanged: function (evt) {
 			// TODO maybe will introduce performance issue, cannot sure now.
 			this.forceUpdate();
 		},
 		/**
-		 * get edit layout
-		 * @param model {ModelInterface} item model
-		 * @returns {{}}
-		 */
+   * get edit layout
+   * @param model {ModelInterface} item model
+   * @returns {{}}
+   */
 		getEditLayout: function (model) {
 			var layout = this.getComponentOption('editLayout');
 			if (typeof layout === 'function') {
@@ -4091,10 +4087,10 @@
 			}
 		},
 		/**
-		 * get check in title
-		 * @param model {ModelInterface} item model
-		 * @returns {{}}
-		 */
+   * get check in title
+   * @param model {ModelInterface} item model
+   * @returns {{}}
+   */
 		getCheckInTitle: function (model) {
 			var checkInTitle = this.getComponentOption('checkInTitle');
 			if (typeof checkInTitle === 'function') {
@@ -4104,10 +4100,10 @@
 			}
 		},
 		/**
-		 * get panel titled
-		 * @param model {ModelInterface} item model
-		 * @returns {string}
-		 */
+   * get panel titled
+   * @param model {ModelInterface} item model
+   * @returns {string}
+   */
 		getPanelTitle: function (model) {
 			var title = this.getComponentOption('itemTitle');
 			if (title == null) {
@@ -4116,15 +4112,15 @@
 				return title;
 			} else {
 				var titleText = title.when.call(this, model);
-				return (titleText == null || titleText.isBlank()) ? NArrayPanel.UNTITLED : titleText;
+				return titleText == null || titleText.isBlank() ? NArrayPanel.UNTITLED : titleText;
 			}
 		}
 	}));
 	$pt.Components.NArrayPanel = NArrayPanel;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayPanel, function (model, layout, direction, viewMode) {
-		return React.createElement($pt.Components.NArrayPanel, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NArrayPanel, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
 	});
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * Created by brad.wu on 8/20/2015.
@@ -4166,7 +4162,7 @@
  *      }
  * }
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NArrayTab = React.createClass($pt.defineCellComponent({
 		displayName: 'NArrayTab',
 		statics: {
@@ -4196,9 +4192,9 @@
 			};
 		},
 		/**
-		 * will update
-		 * @param nextProps
-		 */
+   * will update
+   * @param nextProps
+   */
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
@@ -4208,10 +4204,10 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
+   * did update
+   * @param prevProps
+   * @param prevState
+   */
 		componentDidUpdate: function (prevProps, prevState) {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
@@ -4221,8 +4217,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * did mount
-		 */
+   * did mount
+   */
 		componentDidMount: function () {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
@@ -4232,8 +4228,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * will unmount
-		 */
+   * will unmount
+   */
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
@@ -4243,11 +4239,11 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * render tab content
-		 * @param tab
-		 * @param tabIndex
-		 * @returns {XML}
-		 */
+   * render tab content
+   * @param tab
+   * @param tabIndex
+   * @returns {XML}
+   */
 		renderTabContent: function (tab, tabIndex) {
 			var activeTabIndex = this.getActiveTabIndex();
 			var css = {
@@ -4279,22 +4275,21 @@
 					});
 				}
 			}
-			return (React.createElement($pt.Components.NForm, {model: tab.data, 
-			               layout: $pt.createFormLayout(tab.layout), 
-			               direction: this.props.direction, 
-						   view: this.isViewMode(), 
-			               className: $pt.LayoutHelper.classSet(css), 
-						   key: tabIndex})
-			);
+			return React.createElement($pt.Components.NForm, { model: tab.data,
+				layout: $pt.createFormLayout(tab.layout),
+				direction: this.props.direction,
+				view: this.isViewMode(),
+				className: $pt.LayoutHelper.classSet(css),
+				key: tabIndex });
 		},
 		/**
-		 * render
-		 * @returns {XML}
-		 */
+   * render
+   * @returns {XML}
+   */
 		render: function () {
 			var tabs = this.getTabs();
-			var canActiveProxy = function(newTabValue, newTabIndex, activeTabValue, activeTabIndex) {
-				if (this.isAddable() && (newTabIndex == tabs.length - 1)) {
+			var canActiveProxy = (function (newTabValue, newTabIndex, activeTabValue, activeTabIndex) {
+				if (this.isAddable() && newTabIndex == tabs.length - 1) {
 					var onAdd = this.getComponentOption('onAdd');
 					onAdd.call(this, this.getModel(), this.getValueFromModel());
 					return false;
@@ -4304,25 +4299,27 @@
 						canActive.call(this, newTabValue, newTabIndex, activeTabValue, activeTabIndex);
 					}
 				}
-			}.bind(this);
-			return (React.createElement("div", {className: this.getComponentCSS('n-array-tab')}, 
-				React.createElement($pt.Components.NTab, {type: this.getComponentOption('tabType'), 
-				      justified: this.getComponentOption('justified'), 
-				      direction: this.getComponentOption('titleDirection'), 
-				      size: this.getComponentOption('titleIconSize'), 
-				      tabClassName: this.getAdditionalCSS('tabs'), 
-				      tabs: tabs, 
-				      canActive: canActiveProxy, 
-				      onActive: this.onTabClicked, 
-				      ref: "tabs"}
-				), 
-
-				React.createElement("div", {className: "n-array-tab-content", ref: "content"}, 
+			}).bind(this);
+			return React.createElement(
+				'div',
+				{ className: this.getComponentCSS('n-array-tab') },
+				React.createElement($pt.Components.NTab, { type: this.getComponentOption('tabType'),
+					justified: this.getComponentOption('justified'),
+					direction: this.getComponentOption('titleDirection'),
+					size: this.getComponentOption('titleIconSize'),
+					tabClassName: this.getAdditionalCSS('tabs'),
+					tabs: tabs,
+					canActive: canActiveProxy,
+					onActive: this.onTabClicked,
+					ref: 'tabs' }),
+				React.createElement(
+					'div',
+					{ className: 'n-array-tab-content', ref: 'content' },
 					tabs.map(this.renderTabContent)
 				)
-			));
+			);
 		},
-		createItemModel: function(item) {
+		createItemModel: function (item) {
 			var parentModel = this.getModel();
 			var parentValidator = parentModel.getValidator();
 			var validator = null;
@@ -4350,14 +4347,14 @@
 			return model;
 		},
 		/**
-		 * get tabs
-		 * @returns {Array}
-		 */
+   * get tabs
+   * @returns {Array}
+   */
 		getTabs: function () {
 			var _this = this;
 			if (this.state.tabs) {
-				this.state.tabs.forEach(function(tab, tabIndex) {
-					if (_this.isAddable() && (tabIndex != _this.state.tabs.length - 1)) {
+				this.state.tabs.forEach(function (tab, tabIndex) {
+					if (_this.isAddable() && tabIndex != _this.state.tabs.length - 1 || !_this.isAddable()) {
 						var model = tab.data;
 						tab.label = _this.getTabTitle(model);
 						tab.icon = _this.getTabIcon(model);
@@ -4394,21 +4391,21 @@
 			}
 			return this.state.tabs;
 		},
-		clearTabs: function(callback) {
-			this.setState({tabs: null}, callback.call(this));
+		clearTabs: function (callback) {
+			this.setState({ tabs: null }, callback.call(this));
 		},
 		/**
-		 * return [] when is null
-		 * @returns {[*]}
-		 */
+   * return [] when is null
+   * @returns {[*]}
+   */
 		getValueFromModel: function () {
 			var data = this.getModel().get(this.getDataId());
 			return data == null ? [] : data;
 		},
 		/**
-		 * on model changed
-		 * @param evt
-		 */
+   * on model changed
+   * @param evt
+   */
 		onModelChanged: function (evt) {
 			if (evt.type === 'add') {
 				this.clearTabs(this.setActiveTabIndex.bind(this, evt.index));
@@ -4424,18 +4421,18 @@
 			}
 		},
 		/**
-		 * monitor the parent model validation
-		 * @param evt
-		 */
+   * monitor the parent model validation
+   * @param evt
+   */
 		onModelValidateChanged: function (evt) {
 			// TODO maybe will introduce performance issue, cannot sure now.
 			this.forceUpdate();
 		},
 		/**
-		 * get edit layout
-		 * @param model {ModelInterface} item model
-		 * @returns {FormLayout}
-		 */
+   * get edit layout
+   * @param model {ModelInterface} item model
+   * @returns {FormLayout}
+   */
 		getEditLayout: function (model) {
 			var layout = this.getComponentOption('editLayout');
 			if (typeof layout === 'function') {
@@ -4445,10 +4442,10 @@
 			}
 		},
 		/**
-		 * get item title
-		 * @param model {ModelInterface} item model
-		 * @returns {string}
-		 */
+   * get item title
+   * @param model {ModelInterface} item model
+   * @returns {string}
+   */
 		getTabTitle: function (model) {
 			var title = this.getComponentOption('itemTitle');
 			if (title == null) {
@@ -4457,7 +4454,7 @@
 				return title;
 			} else {
 				var titleText = title.when.call(this, model);
-				return (titleText == null || titleText.isBlank()) ? NArrayTab.UNTITLED : titleText;
+				return titleText == null || titleText.isBlank() ? NArrayTab.UNTITLED : titleText;
 			}
 		},
 		getTabBadge: function (model) {
@@ -4476,10 +4473,10 @@
 			}
 		},
 		/**
-		 * get item icon
-		 * @param model {ModelInterface} item model
-		 * @returns {string}
-		 */
+   * get item icon
+   * @param model {ModelInterface} item model
+   * @returns {string}
+   */
 		getTabIcon: function (model) {
 			var icon = this.getComponentOption('itemIcon');
 			if (icon == null) {
@@ -4490,14 +4487,14 @@
 				return icon.when.call(this, model);
 			}
 		},
-		isAddable: function() {
+		isAddable: function () {
 			return !this.isViewMode() && this.getComponentOption('onAdd') != null;
 		},
 		/**
-		 * on tab clicked
-		 * @param tabValue {string} tab value
-		 * @param index {number}
-		 */
+   * on tab clicked
+   * @param tabValue {string} tab value
+   * @param index {number}
+   */
 		onTabClicked: function (tabValue, index) {
 			this.setActiveTabIndex(index);
 			var onActive = this.getComponentOption('onActive');
@@ -4506,9 +4503,9 @@
 			}
 		},
 		/**
-		 * get active tab index
-		 * @returns {number}
-		 */
+   * get active tab index
+   * @returns {number}
+   */
 		getActiveTabIndex: function () {
 			var tabs = this.state.tabs;
 			// find the active tab
@@ -4518,7 +4515,7 @@
 			if (activeTabIndex == -1) {
 				// find the first visible tab if no active tab found
 				activeTabIndex = tabs.findIndex(function (tab, index) {
-					var visible =  tab.visible !== false;
+					var visible = tab.visible !== false;
 					if (visible) {
 						tab.active = true;
 						return true;
@@ -4528,19 +4525,19 @@
 			return activeTabIndex;
 		},
 		/**
-		 * set active tab index
-		 * @param {number}
-		 */
-		setActiveTabIndex: function(index) {
+   * set active tab index
+   * @param {number}
+   */
+		setActiveTabIndex: function (index) {
 			this.refs.tabs.setActiveTabIndex(index);
 			this.forceUpdate();
 		}
 	}));
 	$pt.Components.NArrayTab = NArrayTab;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ArrayTab, function (model, layout, direction, viewMode) {
-		return React.createElement($pt.Components.NArrayTab, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NArrayTab, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
 	});
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * Created by brad.wu on 8/18/2015.
@@ -4576,7 +4573,7 @@
  *      }
  * }
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NFormButton = React.createClass($pt.defineCellComponent({
 		displayName: 'NFormButton',
 		propTypes: {
@@ -4595,37 +4592,37 @@
 			};
 		},
 		/**
-		 * will update
-		 * @param nextProps
-		 */
+   * will update
+   * @param nextProps
+   */
 		componentWillUpdate: function (nextProps) {
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
+   * did update
+   * @param prevProps
+   * @param prevState
+   */
 		componentDidUpdate: function (prevProps, prevState) {
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
-		 * did mount
-		 */
+   * did mount
+   */
 		componentDidMount: function () {
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
-		 * will unmount
-		 */
+   * will unmount
+   */
 		componentWillUnmount: function () {
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
-		renderIcon: function(icon) {
+		renderIcon: function (icon) {
 			if (icon == null) {
 				return null;
 			} else {
@@ -4634,35 +4631,39 @@
 					'fa-fw': true
 				};
 				css['fa-' + icon] = true;
-				return React.createElement("span", {className: $pt.LayoutHelper.classSet(css)});
+				return React.createElement('span', { className: $pt.LayoutHelper.classSet(css) });
 			}
 		},
 		/**
-		 * render icon
-		 * @returns {*}
-		 */
+   * render icon
+   * @returns {*}
+   */
 		renderButtonIcon: function () {
 			return this.renderIcon(this.getIcon());
 		},
-		renderMoreButtons: function(css) {
+		renderMoreButtons: function (css) {
 			var more = this.getComponentOption('more');
 			if (more) {
-				var dropdown = (React.createElement("a", {href: "javascript:void(0);", 
-					className: $pt.LayoutHelper.classSet(css) + ' dropdown-toggle', 
-					onClick: this.onClicked, 
-					disabled: !this.isEnabled(), 
-					"data-toggle": "dropdown", 
-					"aria-haspopup": "true", 
-					"aria-expanded": "false", 
-					key: "a"}, 
-				   	React.createElement("span", {className: "caret"})
-				));
-				var emptyFunction = function(){};
+				var dropdown = React.createElement(
+					'a',
+					{ href: 'javascript:void(0);',
+						className: $pt.LayoutHelper.classSet(css) + ' dropdown-toggle',
+						onClick: this.onClicked,
+						disabled: !this.isEnabled(),
+						'data-toggle': 'dropdown',
+						'aria-haspopup': 'true',
+						'aria-expanded': 'false',
+						key: 'a' },
+					React.createElement('span', { className: 'caret' })
+				);
+				var emptyFunction = function () {};
 				var _this = this;
-				var menus = (React.createElement("ul", {className: "dropdown-menu", key: "ul"}, 
-					more.map(function(menu, menuIndex) {
+				var menus = React.createElement(
+					'ul',
+					{ className: 'dropdown-menu', key: 'ul' },
+					more.map(function (menu, menuIndex) {
 						if (menu.divider) {
-							return (React.createElement("li", {role: "separator", className: "divider", key: menuIndex}));
+							return React.createElement('li', { role: 'separator', className: 'divider', key: menuIndex });
 						} else {
 							var click = menu.click ? menu.click : emptyFunction;
 							var label = menu.text;
@@ -4670,14 +4671,19 @@
 							if (label && icon) {
 								label = ' ' + label;
 							}
-							return (React.createElement("li", {key: menuIndex}, 
-								React.createElement("a", {href: "javascript:void(0);", onClick: click.bind(_this, _this.getModel())}, 
-									icon, label
+							return React.createElement(
+								'li',
+								{ key: menuIndex },
+								React.createElement(
+									'a',
+									{ href: 'javascript:void(0);', onClick: click.bind(_this, _this.getModel()) },
+									icon,
+									label
 								)
-							));
+							);
 						}
 					})
-				));
+				);
 				return [dropdown, menus];
 			} else {
 				return null;
@@ -4702,42 +4708,56 @@
 					label = label + ' ';
 				}
 				// label in left
-				return (React.createElement("div", {className: $pt.LayoutHelper.classSet(compCSS)}, 
-					React.createElement("div", {className: "btn-group"}, 
-						React.createElement("a", {href: "javascript:void(0);", 
-						   className: $pt.LayoutHelper.classSet(css), 
-						   onClick: this.onClicked, 
-						   disabled: !this.isEnabled(), 
-						   title: this.getComponentOption('tooltip'), 
-						   ref: "a"}, 
-							label, icon
-						), 
+				return React.createElement(
+					'div',
+					{ className: $pt.LayoutHelper.classSet(compCSS) },
+					React.createElement(
+						'div',
+						{ className: 'btn-group' },
+						React.createElement(
+							'a',
+							{ href: 'javascript:void(0);',
+								className: $pt.LayoutHelper.classSet(css),
+								onClick: this.onClicked,
+								disabled: !this.isEnabled(),
+								title: this.getComponentOption('tooltip'),
+								ref: 'a' },
+							label,
+							icon
+						),
 						this.renderMoreButtons(css)
 					)
-				));
+				);
 			} else {
 				if (label && icon) {
 					label = ' ' + label;
 				}
 				// default label in right
-				return (React.createElement("div", {className: $pt.LayoutHelper.classSet(compCSS)}, 
-					React.createElement("div", {className: "btn-group"}, 
-						React.createElement("a", {href: "javascript:void(0);", 
-						   className: $pt.LayoutHelper.classSet(css), 
-						   onClick: this.onClicked, 
-						   disabled: !this.isEnabled(), 
-						   title: this.getComponentOption('tooltip'), 
-						   ref: "a"}, 
-							icon, label
-						), 
+				return React.createElement(
+					'div',
+					{ className: $pt.LayoutHelper.classSet(compCSS) },
+					React.createElement(
+						'div',
+						{ className: 'btn-group' },
+						React.createElement(
+							'a',
+							{ href: 'javascript:void(0);',
+								className: $pt.LayoutHelper.classSet(css),
+								onClick: this.onClicked,
+								disabled: !this.isEnabled(),
+								title: this.getComponentOption('tooltip'),
+								ref: 'a' },
+							icon,
+							label
+						),
 						this.renderMoreButtons(css)
 					)
-				));
+				);
 			}
 		},
 		onClicked: function (evt) {
 			if (this.isEnabled()) {
-				$(React.findDOMNode(this.refs.a)).toggleClass('effect');
+				$(ReactDOM.findDOMNode(this.refs.a)).toggleClass('effect');
 				var onclick = this.getComponentOption("click");
 				if (onclick) {
 					onclick.call(this, this.getModel(), evt.target);
@@ -4745,27 +4765,27 @@
 			}
 		},
 		/**
-		 * get icon
-		 * @returns {string}
-		 */
+   * get icon
+   * @returns {string}
+   */
 		getIcon: function () {
 			return this.getComponentOption("icon");
 		},
 		/**
-		 * get button style
-		 * @returns {string}
-		 */
+   * get button style
+   * @returns {string}
+   */
 		getStyle: function () {
 			return this.getComponentOption("style");
 		},
 		/**
-		 * get label position
-		 * @returns {string}
-		 */
+   * get label position
+   * @returns {string}
+   */
 		getLabelPosition: function () {
 			return this.getComponentOption("labelPosition");
 		},
-		getLabel: function() {
+		getLabel: function () {
 			var labelFromModel = this.getComponentOption('labelFromModel');
 			if (labelFromModel) {
 				return this.getValueFromModel();
@@ -4774,18 +4794,18 @@
 			}
 		},
 		/**
-		 * @overrides do nothing
-		 * @param value
-		 */
+   * @overrides do nothing
+   * @param value
+   */
 		setValueToModel: function (value) {
 			// nothing
 		}
 	}));
 	$pt.Components.NFormButton = NFormButton;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Button, function (model, layout, direction, viewMode) {
-		return React.createElement($pt.Components.NFormButton, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NFormButton, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
 	});
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * checkbox
@@ -4818,7 +4838,7 @@
  *      }
  * }
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NCheck = React.createClass($pt.defineCellComponent({
 		displayName: 'NCheck',
 		propTypes: {
@@ -4828,9 +4848,9 @@
 			layout: React.PropTypes.object
 		},
 		/**
-		 * will update
-		 * @param nextProps
-		 */
+   * will update
+   * @param nextProps
+   */
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
@@ -4838,10 +4858,10 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
+   * did update
+   * @param prevProps
+   * @param prevState
+   */
 		componentDidUpdate: function (prevProps, prevState) {
 			// set model value to component
 			// this.getComponent().prop("checked", this.getValueFromModel());
@@ -4851,8 +4871,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * did mount
-		 */
+   * did mount
+   */
 		componentDidMount: function () {
 			// set model value to component
 			// this.getComponent().prop("checked", this.getValueFromModel());
@@ -4862,8 +4882,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * will unmount
-		 */
+   * will unmount
+   */
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
@@ -4871,10 +4891,10 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * render label
-		 * @param labelInLeft {boolean}
-		 * @returns {XML}
-		 */
+   * render label
+   * @param labelInLeft {boolean}
+   * @returns {XML}
+   */
 		renderLabel: function (labelInLeft) {
 			if (this.isLabelAttached()) {
 				var label = this.getLayout().getLabel();
@@ -4887,17 +4907,19 @@
 					disabled: !this.isEnabled(),
 					'check-label-left': labelInLeft
 				};
-				return (React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
-				             onClick: (enabled && !this.isViewMode()) ? this.onButtonClicked : null}, 
-                	this.getLayout().getLabel()
-            	));
+				return React.createElement(
+					'span',
+					{ className: $pt.LayoutHelper.classSet(css),
+						onClick: enabled && !this.isViewMode() ? this.onButtonClicked : null },
+					this.getLayout().getLabel()
+				);
 			}
 			return null;
 		},
 		/**
-		 * render check box, using font awesome instead
-		 * @returns {XML}
-		 */
+   * render check box, using font awesome instead
+   * @returns {XML}
+   */
 		renderCheckbox: function () {
 			var checked = this.isChecked();
 			var enabled = this.isEnabled();
@@ -4906,20 +4928,24 @@
 				checked: checked,
 				'check-container': true
 			};
-			return (React.createElement("div", {className: "check-container"}, 
-	            React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
-	                  onClick: (enabled && !this.isViewMode()) ? this.onButtonClicked : null, 
-	                  onKeyUp: (enabled && !this.isViewMode()) ? this.onKeyUp: null, 
-	                  tabIndex: "0", 
-	                  ref: "out"}, 
-	            	React.createElement("span", {className: "check", onClick: this.onInnerClicked})
-	        	)
-			));
+			return React.createElement(
+				'div',
+				{ className: 'check-container' },
+				React.createElement(
+					'span',
+					{ className: $pt.LayoutHelper.classSet(css),
+						onClick: enabled && !this.isViewMode() ? this.onButtonClicked : null,
+						onKeyUp: enabled && !this.isViewMode() ? this.onKeyUp : null,
+						tabIndex: '0',
+						ref: 'out' },
+					React.createElement('span', { className: 'check', onClick: this.onInnerClicked })
+				)
+			);
 		},
 		/**
-		 * render
-		 * @returns {XML}
-		 */
+   * render
+   * @returns {XML}
+   */
 		render: function () {
 			var css = {
 				'n-disabled': !this.isEnabled(),
@@ -4929,22 +4955,24 @@
 			var isLabelAtLeft = this.isLabelAtLeft();
 			// <input type="checkbox" style={{display: "none"}}
 			// 	   onChange={this.onComponentChanged} ref='txt'/>
-			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
-				isLabelAtLeft ? this.renderLabel(true) : null, 
-				this.renderCheckbox(), 
+			return React.createElement(
+				'div',
+				{ className: $pt.LayoutHelper.classSet(css) },
+				isLabelAtLeft ? this.renderLabel(true) : null,
+				this.renderCheckbox(),
 				!isLabelAtLeft ? this.renderLabel(false) : null
-			));
+			);
 		},
 		/**
-		 * inner span clicked, force focus to outer span
-		 * for fix the outer span cannot gain focus in IE11
-		 */
+   * inner span clicked, force focus to outer span
+   * for fix the outer span cannot gain focus in IE11
+   */
 		onInnerClicked: function () {
-			$(React.findDOMNode(this.refs.out)).focus();
+			$(ReactDOM.findDOMNode(this.refs.out)).focus();
 		},
 		/**
-		 * handle button clicked event
-		 */
+   * handle button clicked event
+   */
 		onButtonClicked: function () {
 			this.setValueToModel(!this.isChecked());
 		},
@@ -4954,41 +4982,41 @@
 			}
 		},
 		/**
-		 * on component change
-		 * @param evt
-		 */
+   * on component change
+   * @param evt
+   */
 		// onComponentChanged: function (evt) {
 		// 	// synchronize value to model
 		// 	this.setValueToModel(evt.target.checked);
 		// },
 		/**
-		 * on model change
-		 * @param evt
-		 */
+   * on model change
+   * @param evt
+   */
 		onModelChanged: function (evt) {
 			// this.getComponent().prop("checked", evt.new === true);
 			this.forceUpdate();
 		},
 		/**
-		 * is checked or not
-		 * @returns {boolean}
-		 */
+   * is checked or not
+   * @returns {boolean}
+   */
 		isChecked: function () {
 			return this.getValueFromModel() === true;
 		},
 		/**
-		 * is label attached
-		 * @returns {boolean}
-		 */
+   * is label attached
+   * @returns {boolean}
+   */
 		isLabelAttached: function () {
 			return this.getComponentOption('labelAttached') !== null;
 		},
 		/**
-		 * get component
-		 * @returns {jQuery}
-		 */
+   * get component
+   * @returns {jQuery}
+   */
 		// getComponent: function () {
-		// 	return $(React.findDOMNode(this.refs.txt));
+		// 	return $(ReactDOM.findDOMNode(this.refs.txt));
 		// },
 		isLabelAtLeft: function () {
 			return this.getComponentOption('labelAttached') === 'left';
@@ -4996,9 +5024,9 @@
 	}));
 	$pt.Components.NCheck = NCheck;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Check, function (model, layout, direction, viewMode) {
-		return React.createElement($pt.Components.NCheck, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NCheck, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
 	});
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * 1. the coordinate system of clock is center or circle.
@@ -5008,7 +5036,7 @@
  * 		2.3 mouse wheel
  *		2.4 window resize
  */
-(function(window, $, moment, React, $pt) {
+(function (window, $, moment, React, ReactDOM, $pt) {
 	var NDateTime = React.createClass($pt.defineCellComponent({
 		displayName: 'NDateTime',
 		statics: {
@@ -5038,10 +5066,10 @@
 			CLOCK_BIG_ENGRAVE_LENGTH: 8,
 			CLOCK_SMALL_ENGRAVE_LENGTH: 4,
 			CLOCK_CHAR_POS: {
-				TOP: {X: 100, Y: -2},
-				LEFT: {X: -1, Y: 99},
-				RIGHT: {X: 201, Y: 99},
-				BOTTOM: {X: 100, Y: 203}
+				TOP: { X: 100, Y: -2 },
+				LEFT: { X: -1, Y: 99 },
+				RIGHT: { X: 201, Y: 99 },
+				BOTTOM: { X: 100, Y: 203 }
 			},
 			CLOCK_HAND_OFFSET: 10,
 			TOTAL_HEIGHT: 272
@@ -5051,7 +5079,7 @@
 			layout: React.PropTypes.object,
 			view: React.PropTypes.bool
 		},
-		getDefaultProps: function() {
+		getDefaultProps: function () {
 			return {
 				defaultOptions: {
 					locale: 'en',
@@ -5066,35 +5094,35 @@
 				}
 			};
 		},
-		getInitialState: function() {
+		getInitialState: function () {
 			return {
 				popover: null
 			};
 		},
-		componentWillUpdate: function(nextProps) {
+		componentWillUpdate: function (nextProps) {
 			this.removePostChangeListener(this.onModelChange);
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
-		componentDidUpdate: function(prevProps, prevState) {
+		componentDidUpdate: function (prevProps, prevState) {
 			this.setValueToTextInput(this.getValueFromModel());
 			this.addPostChangeListener(this.onModelChange);
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
-		componentDidMount: function() {
+		componentDidMount: function () {
 			this.setValueToTextInput(this.getValueFromModel());
 			this.addPostChangeListener(this.onModelChange);
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
-		componentWillUnmount: function() {
+		componentWillUnmount: function () {
 			this.destroyPopover();
 			this.removePostChangeListener(this.onModelChange);
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
-		renderIcon: function(options) {
+		renderIcon: function (options) {
 			var css = {
 				fa: true,
 				'fa-fw': true
@@ -5103,9 +5131,9 @@
 			if (options.className) {
 				css[options.className] = true;
 			}
-			return React.createElement("span", {className: $pt.LayoutHelper.classSet(css), onClick: options.click});
+			return React.createElement('span', { className: $pt.LayoutHelper.classSet(css), onClick: options.click });
 		},
-		render: function() {
+		render: function () {
 			if (this.isViewMode()) {
 				return this.renderInViewMode();
 			}
@@ -5118,65 +5146,77 @@
 				'n-datetime': true,
 				'n-disabled': !this.isEnabled()
 			};
-			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(divCSS)}, 
-				React.createElement("div", {className: "input-group", ref: "comp"}, 
-					React.createElement("input", {type: "text", 
-					       className: "form-control", 
-					       disabled: !this.isEnabled(), 
-						   onChange: this.onTextInputChange, 
-					       onFocus: this.onTextInputFocused, 
-					       onBlur: this.onTextInputBlurred, 
-						   ref: "text"}), 
-	                React.createElement("span", {className: $pt.LayoutHelper.classSet(css)}, 
-	                    this.renderIcon({icon: this.getIcon('calendar'), click: this.onCalendarButtonClicked})
-	                )
-				), 
-				this.renderNormalLine(), 
+			return React.createElement(
+				'div',
+				{ className: $pt.LayoutHelper.classSet(divCSS) },
+				React.createElement(
+					'div',
+					{ className: 'input-group', ref: 'comp' },
+					React.createElement('input', { type: 'text',
+						className: 'form-control',
+						disabled: !this.isEnabled(),
+						onChange: this.onTextInputChange,
+						onFocus: this.onTextInputFocused,
+						onBlur: this.onTextInputBlurred,
+						ref: 'text' }),
+					React.createElement(
+						'span',
+						{ className: $pt.LayoutHelper.classSet(css) },
+						this.renderIcon({ icon: this.getIcon('calendar'), click: this.onCalendarButtonClicked })
+					)
+				),
+				this.renderNormalLine(),
 				this.renderFocusLine()
-			));
+			);
 		},
-		renderHeaderMonth: function(date) {
-			return (React.createElement("span", {onClick: this.renderPopover.bind(this, {date: date, type: NDateTime.FORMAT_TYPES.MONTH}), 
-						  className: "header-date-btn", 
-						  key: "header-month"}, 
+		renderHeaderMonth: function (date) {
+			return React.createElement(
+				'span',
+				{ onClick: this.renderPopover.bind(this, { date: date, type: NDateTime.FORMAT_TYPES.MONTH }),
+					className: 'header-date-btn',
+					key: 'header-month' },
 				this.convertValueToString(date, this.getHeaderMonthFormat())
-			));
+			);
 		},
-		renderHeaderYear: function(date) {
-			return (React.createElement("span", {onClick: this.renderPopover.bind(this, {date: date, type: NDateTime.FORMAT_TYPES.YEAR}), 
-						  className: "header-date-btn", 
-						  key: "header-year"}, 
+		renderHeaderYear: function (date) {
+			return React.createElement(
+				'span',
+				{ onClick: this.renderPopover.bind(this, { date: date, type: NDateTime.FORMAT_TYPES.YEAR }),
+					className: 'header-date-btn',
+					key: 'header-year' },
 				this.convertValueToString(date, this.getHeaderYearFormat())
-			));
+			);
 		},
-		renderDayHeader: function(date) {
+		renderDayHeader: function (date) {
 			var mainHeader = [this.renderHeaderMonth(date), ' ', this.renderHeaderYear(date)];
 			var monthFirst = this.getComponentOption('headerMonthFirst');
-			return (React.createElement("div", {className: "calendar-header day-view"}, 
+			return React.createElement(
+				'div',
+				{ className: 'calendar-header day-view' },
 				this.renderIcon({
 					icon: 'angle-double-left',
 					className: 'header-btn left',
-					click: this.renderPopover.bind(this, {date: date.clone().subtract(1, 'y'), type: NDateTime.FORMAT_TYPES.DAY})
-				}), 
+					click: this.renderPopover.bind(this, { date: date.clone().subtract(1, 'y'), type: NDateTime.FORMAT_TYPES.DAY })
+				}),
 				this.renderIcon({
 					icon: 'angle-left',
 					className: 'header-btn left',
-					click: this.renderPopover.bind(this, {date: date.clone().subtract(1, 'M'), type: NDateTime.FORMAT_TYPES.DAY})
-				}), 
-				monthFirst ? mainHeader : mainHeader.reverse(), 
+					click: this.renderPopover.bind(this, { date: date.clone().subtract(1, 'M'), type: NDateTime.FORMAT_TYPES.DAY })
+				}),
+				monthFirst ? mainHeader : mainHeader.reverse(),
 				this.renderIcon({
 					icon: 'angle-double-right',
 					className: 'header-btn right',
-					click: this.renderPopover.bind(this, {date: date.clone().add(1, 'y'), type: NDateTime.FORMAT_TYPES.DAY})
-				}), 
+					click: this.renderPopover.bind(this, { date: date.clone().add(1, 'y'), type: NDateTime.FORMAT_TYPES.DAY })
+				}),
 				this.renderIcon({
 					icon: 'angle-right',
 					className: 'header-btn right',
-					click: this.renderPopover.bind(this, {date: date.clone().add(1, 'M'), type: NDateTime.FORMAT_TYPES.DAY})
+					click: this.renderPopover.bind(this, { date: date.clone().add(1, 'M'), type: NDateTime.FORMAT_TYPES.DAY })
 				})
-			));
+			);
 		},
-		getWeekdayHeader: function(date) {
+		getWeekdayHeader: function (date) {
 			var orgLocale = moment.locale();
 			moment.locale(this.getLocale());
 			var header = moment.weekdaysMin();
@@ -5187,7 +5227,7 @@
 			header = header.concat.apply(header, removed);
 			return header;
 		},
-		getDaysOfDayBody: function(date) {
+		getDaysOfDayBody: function (date) {
 			var days = this.getDaysOfMonth(date);
 			var firstDay = date.clone();
 			firstDay.date(1); // set to the first day of month
@@ -5217,7 +5257,7 @@
 			}
 			// gap days by next month
 			var gapDaysOfNextMonth = 7 - viewDays.length % 7;
-			gapDaysOfNextMonth = (gapDaysOfNextMonth == 7) ? 0 : gapDaysOfNextMonth;
+			gapDaysOfNextMonth = gapDaysOfNextMonth == 7 ? 0 : gapDaysOfNextMonth;
 			var lastDay = viewDays[viewDays.length - 1];
 			for (index = 1; index <= gapDaysOfNextMonth; index++) {
 				viewDay = lastDay.clone();
@@ -5226,62 +5266,80 @@
 			}
 			return viewDays;
 		},
-		renderDayBody: function(date) {
+		renderDayBody: function (date) {
 			var _this = this;
 			var header = this.getWeekdayHeader();
 			var days = this.getDaysOfDayBody(date);
 			var currentMonth = date.month();
 			var value = this.getValueFromModel();
 			var today = this.getToday();
-			return (React.createElement("div", {className: "calendar-body day-view"}, 
-				React.createElement("div", {className: "day-view-body-header row"}, 
-					header.map(function(weekday, weekdayIndex) {
-						return React.createElement("div", {className: "cell-7-1", key: 'weekday-' + weekdayIndex}, weekday);
+			return React.createElement(
+				'div',
+				{ className: 'calendar-body day-view' },
+				React.createElement(
+					'div',
+					{ className: 'day-view-body-header row' },
+					header.map(function (weekday, weekdayIndex) {
+						return React.createElement(
+							'div',
+							{ className: 'cell-7-1', key: 'weekday-' + weekdayIndex },
+							weekday
+						);
 					})
-				), 
-				React.createElement("div", {className: "day-view-body-body row"}, 
-					days.map(function(day, dayIndex) {
+				),
+				React.createElement(
+					'div',
+					{ className: 'day-view-body-body row' },
+					days.map(function (day, dayIndex) {
 						var css = {
 							'cell-7-1': true,
-							'gap-day': (day.month() != currentMonth),
+							'gap-day': day.month() != currentMonth,
 							today: day.isSame(today, 'day'),
 							'current-value': value != null && day.isSame(value, 'day')
 						};
-						return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
-									 onClick: _this.onDaySelected.bind(_this, day), 
-									 key: 'day-' + dayIndex}, 
-							React.createElement("span", null, day.date())
-						));
+						return React.createElement(
+							'div',
+							{ className: $pt.LayoutHelper.classSet(css),
+								onClick: _this.onDaySelected.bind(_this, day),
+								key: 'day-' + dayIndex },
+							React.createElement(
+								'span',
+								null,
+								day.date()
+							)
+						);
 					})
 				)
-			));
+			);
 		},
-		renderMonthHeader: function(date) {
-			return (React.createElement("div", {className: "calendar-header month-view"}, 
+		renderMonthHeader: function (date) {
+			return React.createElement(
+				'div',
+				{ className: 'calendar-header month-view' },
 				this.renderIcon({
 					icon: 'angle-double-left',
 					className: 'header-btn left',
-					click: this.renderPopover.bind(this, {date: date.clone().subtract(10, 'y'), type: NDateTime.FORMAT_TYPES.MONTH})
-				}), 
+					click: this.renderPopover.bind(this, { date: date.clone().subtract(10, 'y'), type: NDateTime.FORMAT_TYPES.MONTH })
+				}),
 				this.renderIcon({
 					icon: 'angle-left',
 					className: 'header-btn left',
-					click: this.renderPopover.bind(this, {date: date.clone().subtract(1, 'y'), type: NDateTime.FORMAT_TYPES.MONTH})
-				}), 
-				this.renderHeaderYear(date), 
+					click: this.renderPopover.bind(this, { date: date.clone().subtract(1, 'y'), type: NDateTime.FORMAT_TYPES.MONTH })
+				}),
+				this.renderHeaderYear(date),
 				this.renderIcon({
 					icon: 'angle-double-right',
 					className: 'header-btn right',
-					click: this.renderPopover.bind(this, {date: date.clone().add(10, 'y'), type: NDateTime.FORMAT_TYPES.MONTH})
-				}), 
+					click: this.renderPopover.bind(this, { date: date.clone().add(10, 'y'), type: NDateTime.FORMAT_TYPES.MONTH })
+				}),
 				this.renderIcon({
 					icon: 'angle-right',
 					className: 'header-btn right',
-					click: this.renderPopover.bind(this, {date: date.clone().add(1, 'y'), type: NDateTime.FORMAT_TYPES.MONTH})
+					click: this.renderPopover.bind(this, { date: date.clone().add(1, 'y'), type: NDateTime.FORMAT_TYPES.MONTH })
 				})
-			));
+			);
 		},
-		renderMonthBody: function(date) {
+		renderMonthBody: function (date) {
 			var _this = this;
 			var orgLocale = moment.locale();
 			moment.locale(this.getLocale());
@@ -5293,9 +5351,13 @@
 			}
 			var value = this.getValueFromModel();
 			var today = this.getToday();
-			return (React.createElement("div", {className: "calendar-body month-view"}, 
-				React.createElement("div", {className: "month-view-body-body row"}, 
-					months.map(function(month, index) {
+			return React.createElement(
+				'div',
+				{ className: 'calendar-body month-view' },
+				React.createElement(
+					'div',
+					{ className: 'month-view-body-body row' },
+					months.map(function (month, index) {
 						var selectedDay = day.clone();
 						selectedDay.year(date.year());
 						selectedDay.month(index);
@@ -5304,46 +5366,46 @@
 							today: index == today.month(),
 							'current-value': value != null && index == value.month()
 						};
-						return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
-									 onClick: _this.onMonthSelected.bind(_this, selectedDay), 
-									 key: index}, 
+						return React.createElement(
+							'div',
+							{ className: $pt.LayoutHelper.classSet(css),
+								onClick: _this.onMonthSelected.bind(_this, selectedDay),
+								key: index },
 							month
-						));
+						);
 					})
 				)
-			));
+			);
 		},
-		renderYearHeader: function(date) {
-			var yearHeader = [
-				this.convertValueToString(date.clone().subtract(10, 'y'), this.getHeaderYearFormat()),
-				' - ',
-				this.convertValueToString(date.clone().add(9, 'y'), this.getHeaderYearFormat())
-			];
-			return (React.createElement("div", {className: "calendar-header year-view"}, 
+		renderYearHeader: function (date) {
+			var yearHeader = [this.convertValueToString(date.clone().subtract(10, 'y'), this.getHeaderYearFormat()), ' - ', this.convertValueToString(date.clone().add(9, 'y'), this.getHeaderYearFormat())];
+			return React.createElement(
+				'div',
+				{ className: 'calendar-header year-view' },
 				this.renderIcon({
 					icon: 'angle-double-left',
 					className: 'header-btn left',
-					click: this.renderPopover.bind(this, {date: date.clone().subtract(40, 'y'), type: NDateTime.FORMAT_TYPES.YEAR})
-				}), 
+					click: this.renderPopover.bind(this, { date: date.clone().subtract(40, 'y'), type: NDateTime.FORMAT_TYPES.YEAR })
+				}),
 				this.renderIcon({
 					icon: 'angle-left',
 					className: 'header-btn left',
-					click: this.renderPopover.bind(this, {date: date.clone().subtract(20, 'y'), type: NDateTime.FORMAT_TYPES.YEAR})
-				}), 
-				yearHeader, 
+					click: this.renderPopover.bind(this, { date: date.clone().subtract(20, 'y'), type: NDateTime.FORMAT_TYPES.YEAR })
+				}),
+				yearHeader,
 				this.renderIcon({
 					icon: 'angle-double-right',
 					className: 'header-btn right',
-					click: this.renderPopover.bind(this, {date: date.clone().add(40, 'y'), type: NDateTime.FORMAT_TYPES.YEAR})
-				}), 
+					click: this.renderPopover.bind(this, { date: date.clone().add(40, 'y'), type: NDateTime.FORMAT_TYPES.YEAR })
+				}),
 				this.renderIcon({
 					icon: 'angle-right',
 					className: 'header-btn right',
-					click: this.renderPopover.bind(this, {date: date.clone().add(20, 'y'), type: NDateTime.FORMAT_TYPES.YEAR})
+					click: this.renderPopover.bind(this, { date: date.clone().add(20, 'y'), type: NDateTime.FORMAT_TYPES.YEAR })
 				})
-			));
+			);
 		},
-		renderYearBody: function(date) {
+		renderYearBody: function (date) {
 			var _this = this;
 			var day = this.getValueFromModel();
 			if (day == null) {
@@ -5353,34 +5415,44 @@
 			var today = this.getToday();
 			var years = [];
 			for (var index = -10; index <= 9; index++) {
-				var year = date.clone().set({month: day.month(), date: day.date(), hour: day.hour(), minute: day.minute(), second: day.second(), millisecond: day.millisecond()});
+				var year = date.clone().set({ month: day.month(), date: day.date(), hour: day.hour(), minute: day.minute(), second: day.second(), millisecond: day.millisecond() });
 				year.add(index, 'y');
 				years.push(year);
 			}
-			return (React.createElement("div", {className: "calendar-body month-view"}, 
-				React.createElement("div", {className: "year-view-body-body row"}, 
-					years.map(function(year, yearIndex) {
+			return React.createElement(
+				'div',
+				{ className: 'calendar-body month-view' },
+				React.createElement(
+					'div',
+					{ className: 'year-view-body-body row' },
+					years.map(function (year, yearIndex) {
 						var css = {
 							'cell-4-1': true,
 							today: year.year() == today.year(),
 							'current-value': value != null && year.year() == value.year()
 						};
-						return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
-									 onClick: _this.onYearSelected.bind(_this, year), 
-									 key: yearIndex}, 
+						return React.createElement(
+							'div',
+							{ className: $pt.LayoutHelper.classSet(css),
+								onClick: _this.onYearSelected.bind(_this, year),
+								key: yearIndex },
 							year.format(_this.getBodyYearFormat())
-						));
+						);
 					})
 				)
-			));
+			);
 		},
-		renderPopoverContentFooterButton: function(options) {
-			return (React.createElement("div", {className: "cell-3-1", onClick: options.click}, 
-				this.renderIcon({icon: this.getIcon(options.icon)})
-			));
+		renderPopoverContentFooterButton: function (options) {
+			return React.createElement(
+				'div',
+				{ className: 'cell-3-1', onClick: options.click },
+				this.renderIcon({ icon: this.getIcon(options.icon) })
+			);
 		},
-		renderPopoverContentFooter: function(today, type) {
-			return (React.createElement("div", {className: "calendar-footer row"}, 
+		renderPopoverContentFooter: function (today, type) {
+			return React.createElement(
+				'div',
+				{ className: 'calendar-footer row' },
 				this.renderPopoverContentFooterButton({
 					icon: 'today',
 					click: this.renderPopover.bind(this, {
@@ -5388,7 +5460,7 @@
 						type: type,
 						set: true
 					})
-				}), 
+				}),
 				this.renderPopoverContentFooterButton({
 					icon: 'clear',
 					click: this.renderPopover.bind(this, {
@@ -5396,127 +5468,166 @@
 						type: type,
 						set: true
 					})
-				}), 
+				}),
 				this.renderPopoverContentFooterButton({
 					icon: 'close',
 					click: this.hidePopover
 				})
-			));
+			);
 		},
-		renderEngrave: function(degree, radius, length, className, offset) {
+		renderEngrave: function (degree, radius, length, className, offset) {
 			var startLength = radius - length;
-			return (React.createElement("line", {className: className, 
-						  x1: startLength * Math.cos(Math.PI * 2 * degree / 360) + offset, 
-						  y1: offset - startLength * Math.sin(Math.PI * 2 * degree / 360), 
-						  x2: radius * Math.cos(Math.PI * 2 * degree / 360) + offset, 
-						  y2: offset - radius * Math.sin(Math.PI * 2 * degree / 360), 
-						  key: degree}));
+			return React.createElement('line', { className: className,
+				x1: startLength * Math.cos(Math.PI * 2 * degree / 360) + offset,
+				y1: offset - startLength * Math.sin(Math.PI * 2 * degree / 360),
+				x2: radius * Math.cos(Math.PI * 2 * degree / 360) + offset,
+				y2: offset - radius * Math.sin(Math.PI * 2 * degree / 360),
+				key: degree });
 		},
-		render12HourDial: function(date, popoverType) {
+		render12HourDial: function (date, popoverType) {
 			var _this = this;
 			var am = date.hour() <= 11; // 0-23
 			var hourRadius = this.getHourRadius();
-			return (React.createElement("g", {key: "hour-12-dial"}, 
-				React.createElement("text", {className: 'text hour-12 am' + (am ? ' yes' : ''), 
-					  onClick: this.onAMPMSelected.bind(this, true, popoverType), 
-					  x: 0, 
-					  y: 0}, "AM"), 
-				React.createElement("text", {className: 'text hour-12 pm' + (am ? '' : ' yes'), 
-					  onClick: this.onAMPMSelected.bind(this, false, popoverType), 
-					  x: NDateTime.CLOCK_RADIUS * 2, 
-					  y: 0}, "PM"), 
-				React.createElement("text", {className: "text hour-12 top-num", 
-					  x: NDateTime.CLOCK_CHAR_POS.TOP.X, 
-					  y: NDateTime.CLOCK_CHAR_POS.TOP.Y + NDateTime.CLOCK_RADIUS - hourRadius}, "0"), 
-				React.createElement("text", {className: "text hour-12 left-num", 
-					  x: NDateTime.CLOCK_CHAR_POS.LEFT.X + NDateTime.CLOCK_RADIUS - hourRadius, 
-					  y: NDateTime.CLOCK_CHAR_POS.LEFT.Y}, "9"), 
-				React.createElement("text", {className: "text hour-12 right-num", 
-					  x: NDateTime.CLOCK_CHAR_POS.RIGHT.X - NDateTime.CLOCK_RADIUS + hourRadius, 
-					  y: NDateTime.CLOCK_CHAR_POS.RIGHT.Y}, "3"), 
-				React.createElement("text", {className: "text hour-12 bottom-num", 
-					  x: NDateTime.CLOCK_CHAR_POS.BOTTOM.X, 
-					  y: NDateTime.CLOCK_CHAR_POS.BOTTOM.Y - NDateTime.CLOCK_RADIUS + hourRadius}, "6"), 
-				[30, 60, 120, 150, 210, 240, 300, 330].map(function(degree) {
-					return _this.renderEngrave(degree,
-						hourRadius,
-						NDateTime.CLOCK_SMALL_ENGRAVE_LENGTH,
-						'big',
-						NDateTime.CLOCK_RADIUS);
+			return React.createElement(
+				'g',
+				{ key: 'hour-12-dial' },
+				React.createElement(
+					'text',
+					{ className: 'text hour-12 am' + (am ? ' yes' : ''),
+						onClick: this.onAMPMSelected.bind(this, true, popoverType),
+						x: 0,
+						y: 0 },
+					'AM'
+				),
+				React.createElement(
+					'text',
+					{ className: 'text hour-12 pm' + (am ? '' : ' yes'),
+						onClick: this.onAMPMSelected.bind(this, false, popoverType),
+						x: NDateTime.CLOCK_RADIUS * 2,
+						y: 0 },
+					'PM'
+				),
+				React.createElement(
+					'text',
+					{ className: 'text hour-12 top-num',
+						x: NDateTime.CLOCK_CHAR_POS.TOP.X,
+						y: NDateTime.CLOCK_CHAR_POS.TOP.Y + NDateTime.CLOCK_RADIUS - hourRadius },
+					'0'
+				),
+				React.createElement(
+					'text',
+					{ className: 'text hour-12 left-num',
+						x: NDateTime.CLOCK_CHAR_POS.LEFT.X + NDateTime.CLOCK_RADIUS - hourRadius,
+						y: NDateTime.CLOCK_CHAR_POS.LEFT.Y },
+					'9'
+				),
+				React.createElement(
+					'text',
+					{ className: 'text hour-12 right-num',
+						x: NDateTime.CLOCK_CHAR_POS.RIGHT.X - NDateTime.CLOCK_RADIUS + hourRadius,
+						y: NDateTime.CLOCK_CHAR_POS.RIGHT.Y },
+					'3'
+				),
+				React.createElement(
+					'text',
+					{ className: 'text hour-12 bottom-num',
+						x: NDateTime.CLOCK_CHAR_POS.BOTTOM.X,
+						y: NDateTime.CLOCK_CHAR_POS.BOTTOM.Y - NDateTime.CLOCK_RADIUS + hourRadius },
+					'6'
+				),
+				[30, 60, 120, 150, 210, 240, 300, 330].map(function (degree) {
+					return _this.renderEngrave(degree, hourRadius, NDateTime.CLOCK_SMALL_ENGRAVE_LENGTH, 'big', NDateTime.CLOCK_RADIUS);
 				})
-			));
+			);
 		},
-		render24HourDial: function() {
+		render24HourDial: function () {
 			var _this = this;
 			var hourRadius = this.getHourRadius();
-			return (React.createElement("g", {key: "hour-24-dial"}, 
-				React.createElement("text", {className: "text hour-24 top-num", 
-					  x: NDateTime.CLOCK_CHAR_POS.TOP.X, 
-					  y: NDateTime.CLOCK_CHAR_POS.TOP.Y + NDateTime.CLOCK_RADIUS - hourRadius}, "0"), 
-				React.createElement("text", {className: "text hour-24 left-num", 
-					  x: NDateTime.CLOCK_CHAR_POS.LEFT.X + NDateTime.CLOCK_RADIUS - hourRadius, 
-					  y: NDateTime.CLOCK_CHAR_POS.LEFT.Y}, "18"), 
-				React.createElement("text", {className: "text hour-24 right-num", 
-					  x: NDateTime.CLOCK_CHAR_POS.RIGHT.X - NDateTime.CLOCK_RADIUS + hourRadius, 
-					  y: NDateTime.CLOCK_CHAR_POS.RIGHT.Y}, "6"), 
-				React.createElement("text", {className: "text hour-24 bottom-num", 
-					  x: NDateTime.CLOCK_CHAR_POS.BOTTOM.X, 
-					  y: NDateTime.CLOCK_CHAR_POS.BOTTOM.Y - NDateTime.CLOCK_RADIUS + hourRadius}, "12"), 
-				[45, 135, 225, 315].map(function(degree) {
-					return _this.renderEngrave(degree,
-						hourRadius,
-						NDateTime.CLOCK_BIG_ENGRAVE_LENGTH,
-						'big',
-						NDateTime.CLOCK_RADIUS);
-				}), 
-				[15, 30, 60, 75, 105, 120, 150, 165, 195, 210, 240, 255, 285, 300, 330, 345].map(function(degree) {
-					return _this.renderEngrave(degree,
-						hourRadius,
-						NDateTime.CLOCK_SMALL_ENGRAVE_LENGTH,
-						'small',
-						NDateTime.CLOCK_RADIUS);
+			return React.createElement(
+				'g',
+				{ key: 'hour-24-dial' },
+				React.createElement(
+					'text',
+					{ className: 'text hour-24 top-num',
+						x: NDateTime.CLOCK_CHAR_POS.TOP.X,
+						y: NDateTime.CLOCK_CHAR_POS.TOP.Y + NDateTime.CLOCK_RADIUS - hourRadius },
+					'0'
+				),
+				React.createElement(
+					'text',
+					{ className: 'text hour-24 left-num',
+						x: NDateTime.CLOCK_CHAR_POS.LEFT.X + NDateTime.CLOCK_RADIUS - hourRadius,
+						y: NDateTime.CLOCK_CHAR_POS.LEFT.Y },
+					'18'
+				),
+				React.createElement(
+					'text',
+					{ className: 'text hour-24 right-num',
+						x: NDateTime.CLOCK_CHAR_POS.RIGHT.X - NDateTime.CLOCK_RADIUS + hourRadius,
+						y: NDateTime.CLOCK_CHAR_POS.RIGHT.Y },
+					'6'
+				),
+				React.createElement(
+					'text',
+					{ className: 'text hour-24 bottom-num',
+						x: NDateTime.CLOCK_CHAR_POS.BOTTOM.X,
+						y: NDateTime.CLOCK_CHAR_POS.BOTTOM.Y - NDateTime.CLOCK_RADIUS + hourRadius },
+					'12'
+				),
+				[45, 135, 225, 315].map(function (degree) {
+					return _this.renderEngrave(degree, hourRadius, NDateTime.CLOCK_BIG_ENGRAVE_LENGTH, 'big', NDateTime.CLOCK_RADIUS);
+				}),
+				[15, 30, 60, 75, 105, 120, 150, 165, 195, 210, 240, 255, 285, 300, 330, 345].map(function (degree) {
+					return _this.renderEngrave(degree, hourRadius, NDateTime.CLOCK_SMALL_ENGRAVE_LENGTH, 'small', NDateTime.CLOCK_RADIUS);
 				})
-			));
+			);
 		},
-		renderMinuteDial: function() {
+		renderMinuteDial: function () {
 			if (!this.hasMinute()) {
 				// no minute need to display
 				return null;
 			}
 			var _this = this;
-			return (React.createElement("g", {key: "minute-dial"}, 
-				React.createElement("text", {className: "text minute top-num", 
-					  x: NDateTime.CLOCK_CHAR_POS.TOP.X, 
-					  y: NDateTime.CLOCK_CHAR_POS.TOP.Y}, "0"), 
-				React.createElement("text", {className: "text minute left-num", 
-					  x: NDateTime.CLOCK_CHAR_POS.LEFT.X, 
-					  y: NDateTime.CLOCK_CHAR_POS.LEFT.Y}, "45"), 
-				React.createElement("text", {className: "text minute right-num", 
-					  x: NDateTime.CLOCK_CHAR_POS.RIGHT.X, 
-					  y: NDateTime.CLOCK_CHAR_POS.RIGHT.Y}, "15"), 
-				React.createElement("text", {className: "text minute bottom-num", 
-					  x: NDateTime.CLOCK_CHAR_POS.BOTTOM.X, 
-					  y: NDateTime.CLOCK_CHAR_POS.BOTTOM.Y}, "30"), 
-				[30, 60, 120, 150, 210, 240, 300, 330].map(function(degree) {
-					return _this.renderEngrave(degree,
-						NDateTime.CLOCK_RADIUS,
-						NDateTime.CLOCK_BIG_ENGRAVE_LENGTH,
-						'big',
-						NDateTime.CLOCK_RADIUS);
-				}), 
-				[6, 12, 18, 24, 36, 42, 48, 54, 66, 72, 78, 84,
-					96, 102, 108, 114, 126, 132, 138, 144, 156, 162, 168, 174,
-					186, 192, 198, 204, 216, 222, 228, 234, 246, 252, 258, 264,
-					276, 282, 288, 294, 306, 312, 318, 324, 336, 342, 348, 354].map(function(degree) {
-					return _this.renderEngrave(degree,
-						NDateTime.CLOCK_RADIUS,
-						NDateTime.CLOCK_SMALL_ENGRAVE_LENGTH,
-						'small',
-						NDateTime.CLOCK_RADIUS);
+			return React.createElement(
+				'g',
+				{ key: 'minute-dial' },
+				React.createElement(
+					'text',
+					{ className: 'text minute top-num',
+						x: NDateTime.CLOCK_CHAR_POS.TOP.X,
+						y: NDateTime.CLOCK_CHAR_POS.TOP.Y },
+					'0'
+				),
+				React.createElement(
+					'text',
+					{ className: 'text minute left-num',
+						x: NDateTime.CLOCK_CHAR_POS.LEFT.X,
+						y: NDateTime.CLOCK_CHAR_POS.LEFT.Y },
+					'45'
+				),
+				React.createElement(
+					'text',
+					{ className: 'text minute right-num',
+						x: NDateTime.CLOCK_CHAR_POS.RIGHT.X,
+						y: NDateTime.CLOCK_CHAR_POS.RIGHT.Y },
+					'15'
+				),
+				React.createElement(
+					'text',
+					{ className: 'text minute bottom-num',
+						x: NDateTime.CLOCK_CHAR_POS.BOTTOM.X,
+						y: NDateTime.CLOCK_CHAR_POS.BOTTOM.Y },
+					'30'
+				),
+				[30, 60, 120, 150, 210, 240, 300, 330].map(function (degree) {
+					return _this.renderEngrave(degree, NDateTime.CLOCK_RADIUS, NDateTime.CLOCK_BIG_ENGRAVE_LENGTH, 'big', NDateTime.CLOCK_RADIUS);
+				}),
+				[6, 12, 18, 24, 36, 42, 48, 54, 66, 72, 78, 84, 96, 102, 108, 114, 126, 132, 138, 144, 156, 162, 168, 174, 186, 192, 198, 204, 216, 222, 228, 234, 246, 252, 258, 264, 276, 282, 288, 294, 306, 312, 318, 324, 336, 342, 348, 354].map(function (degree) {
+					return _this.renderEngrave(degree, NDateTime.CLOCK_RADIUS, NDateTime.CLOCK_SMALL_ENGRAVE_LENGTH, 'small', NDateTime.CLOCK_RADIUS);
 				})
-			));
+			);
 		},
-		renderHourHand: function(date, offset) {
+		renderHourHand: function (date, offset) {
 			var hour = date.hour();
 			var degree = null;
 			if (this.is12Hour()) {
@@ -5525,26 +5636,26 @@
 				degree = 450 - hour * 15;
 			}
 			var hourRadius = this.getHourRadius();
-			return (React.createElement("line", {x1: offset + NDateTime.CLOCK_HAND_OFFSET * Math.cos(Math.PI * 2 * (degree - 180) / 360), 
-						  y1: offset - NDateTime.CLOCK_HAND_OFFSET * Math.sin(Math.PI * 2 * (degree - 180) / 360), 
-						  x2: offset + (hourRadius - NDateTime.CLOCK_HAND_OFFSET) * Math.cos(Math.PI * 2 * (degree) / 360), 
-						  y2: offset - (hourRadius - NDateTime.CLOCK_HAND_OFFSET) * Math.sin(Math.PI * 2 * (degree) / 360), 
-						  className: "hour-hand"}));
+			return React.createElement('line', { x1: offset + NDateTime.CLOCK_HAND_OFFSET * Math.cos(Math.PI * 2 * (degree - 180) / 360),
+				y1: offset - NDateTime.CLOCK_HAND_OFFSET * Math.sin(Math.PI * 2 * (degree - 180) / 360),
+				x2: offset + (hourRadius - NDateTime.CLOCK_HAND_OFFSET) * Math.cos(Math.PI * 2 * degree / 360),
+				y2: offset - (hourRadius - NDateTime.CLOCK_HAND_OFFSET) * Math.sin(Math.PI * 2 * degree / 360),
+				className: 'hour-hand' });
 		},
-		renderMinuteHand: function(date, radius, offset) {
+		renderMinuteHand: function (date, radius, offset) {
 			if (!this.hasMinute()) {
 				// no minute need to display
 				return null;
 			}
 			var minute = date.minute();
 			var degree = 450 - minute * 6;
-			return (React.createElement("line", {x1: offset + NDateTime.CLOCK_HAND_OFFSET * Math.cos(Math.PI * 2 * (degree - 180) / 360), 
-						  y1: offset - NDateTime.CLOCK_HAND_OFFSET * Math.sin(Math.PI * 2 * (degree - 180) / 360), 
-						  x2: offset + (radius - NDateTime.CLOCK_HAND_OFFSET) * Math.cos(Math.PI * 2 * (degree) / 360), 
-						  y2: offset - (radius - NDateTime.CLOCK_HAND_OFFSET) * Math.sin(Math.PI * 2 * (degree) / 360), 
-						  className: "minute-hand"}));
+			return React.createElement('line', { x1: offset + NDateTime.CLOCK_HAND_OFFSET * Math.cos(Math.PI * 2 * (degree - 180) / 360),
+				y1: offset - NDateTime.CLOCK_HAND_OFFSET * Math.sin(Math.PI * 2 * (degree - 180) / 360),
+				x2: offset + (radius - NDateTime.CLOCK_HAND_OFFSET) * Math.cos(Math.PI * 2 * degree / 360),
+				y2: offset - (radius - NDateTime.CLOCK_HAND_OFFSET) * Math.sin(Math.PI * 2 * degree / 360),
+				className: 'minute-hand' });
 		},
-		renderSecondHand: function(date, radius, offset) {
+		renderSecondHand: function (date, radius, offset) {
 			var popoverType = this.guessDisplayFormatType();
 			if (!this.hasSecond()) {
 				// no minute need to display
@@ -5553,13 +5664,13 @@
 			var _this = this;
 			var second = date.second();
 			var degree = 450 - second * 6;
-			return (React.createElement("line", {x1: offset + NDateTime.CLOCK_HAND_OFFSET * Math.cos(Math.PI * 2 * (degree - 180) / 360), 
-						  y1: offset - NDateTime.CLOCK_HAND_OFFSET * Math.sin(Math.PI * 2 * (degree - 180) / 360), 
-						  x2: offset + (radius) * Math.cos(Math.PI * 2 * (degree) / 360), 
-						  y2: offset - (radius) * Math.sin(Math.PI * 2 * (degree) / 360), 
-						  className: "second-hand"}));
+			return React.createElement('line', { x1: offset + NDateTime.CLOCK_HAND_OFFSET * Math.cos(Math.PI * 2 * (degree - 180) / 360),
+				y1: offset - NDateTime.CLOCK_HAND_OFFSET * Math.sin(Math.PI * 2 * (degree - 180) / 360),
+				x2: offset + radius * Math.cos(Math.PI * 2 * degree / 360),
+				y2: offset - radius * Math.sin(Math.PI * 2 * degree / 360),
+				className: 'second-hand' });
 		},
-		renderTime: function(date, popoverType) {
+		renderTime: function (date, popoverType) {
 			var _this = this;
 			var allPopoverType = this.guessDisplayFormatType();
 			if (!this.hasTimeToDisplay(allPopoverType)) {
@@ -5575,40 +5686,52 @@
 			} else if (this.hasMinute()) {
 				titleFormat = 'HH:mm';
 			}
-			return (React.createElement("div", {className: "time-view", style: styles}, 
-				React.createElement("div", {className: "calendar-header"}, 
+			return React.createElement(
+				'div',
+				{ className: 'time-view', style: styles },
+				React.createElement(
+					'div',
+					{ className: 'calendar-header' },
 					date.format(titleFormat)
-				), 
-				React.createElement("div", {className: "calendar-body"}, 
-					React.createElement("div", {className: "time-view-body-body"}, 
-						React.createElement("div", {style: {height: NDateTime.CLOCK_RADIUS * 2, width: NDateTime.CLOCK_RADIUS * 2, position: 'relative'}}, 
-							React.createElement("svg", {className: "clock", 
-								 height: NDateTime.CLOCK_RADIUS * 2, 
-								 width: NDateTime.CLOCK_RADIUS * 2}, 
-								this.renderMinuteDial(), 
-								this.is12Hour() ? this.render12HourDial(date, popoverType) : this.render24HourDial(), 
-								this.renderHourHand(date, NDateTime.CLOCK_RADIUS), 
-								this.renderMinuteHand(date, NDateTime.CLOCK_RADIUS, NDateTime.CLOCK_RADIUS), 
+				),
+				React.createElement(
+					'div',
+					{ className: 'calendar-body' },
+					React.createElement(
+						'div',
+						{ className: 'time-view-body-body' },
+						React.createElement(
+							'div',
+							{ style: { height: NDateTime.CLOCK_RADIUS * 2, width: NDateTime.CLOCK_RADIUS * 2, position: 'relative' } },
+							React.createElement(
+								'svg',
+								{ className: 'clock',
+									height: NDateTime.CLOCK_RADIUS * 2,
+									width: NDateTime.CLOCK_RADIUS * 2 },
+								this.renderMinuteDial(),
+								this.is12Hour() ? this.render12HourDial(date, popoverType) : this.render24HourDial(),
+								this.renderHourHand(date, NDateTime.CLOCK_RADIUS),
+								this.renderMinuteHand(date, NDateTime.CLOCK_RADIUS, NDateTime.CLOCK_RADIUS),
 								this.renderSecondHand(date, NDateTime.CLOCK_RADIUS, NDateTime.CLOCK_RADIUS)
-							), 
-							React.createElement("div", {style: {position: 'absolute',
-										 backgroundColor: 'transparent',
-										 top: 0,
-										 left: 0,
-										 height: NDateTime.CLOCK_RADIUS * 2,
-										 width: NDateTime.CLOCK_RADIUS * 2}, 
-								 onClick: this.onClockClicked.bind(this, popoverType)})
+							),
+							React.createElement('div', { style: { position: 'absolute',
+									backgroundColor: 'transparent',
+									top: 0,
+									left: 0,
+									height: NDateTime.CLOCK_RADIUS * 2,
+									width: NDateTime.CLOCK_RADIUS * 2 },
+								onClick: this.onClockClicked.bind(this, popoverType) })
 						)
 					)
 				)
-			));
+			);
 		},
 		/**
-		 * render popover content
-		 * @param date {moment} flag date for popover
-		 * @param popoverType {number} popover display type
-		 */
-		renderPopoverContent: function(date, popoverType) {
+   * render popover content
+   * @param date {moment} flag date for popover
+   * @param popoverType {number} popover display type
+   */
+		renderPopoverContent: function (date, popoverType) {
 			date = date ? date : this.getValueFromModel();
 			date = date ? date : this.getToday();
 			if (popoverType == null) {
@@ -5621,49 +5744,63 @@
 			if ((popoverType & NDateTime.FORMAT_TYPES.DAY) != 0) {
 				// has day, YMD
 				this.startClockInterval(NDateTime.FORMAT_TYPES.DAY);
-				return (React.createElement("div", {className: "popover-content row"}, 
-					React.createElement("div", {className: "date-view", style: styles}, 
-						this.renderDayHeader(date), 
-						this.renderDayBody(date), 
+				return React.createElement(
+					'div',
+					{ className: 'popover-content row' },
+					React.createElement(
+						'div',
+						{ className: 'date-view', style: styles },
+						this.renderDayHeader(date),
+						this.renderDayBody(date),
 						this.renderPopoverContentFooter(this.getToday(), NDateTime.FORMAT_TYPES.DAY)
-					), 
+					),
 					this.renderTime(date, NDateTime.FORMAT_TYPES.DAY)
-				));
+				);
 			} else if ((popoverType & NDateTime.FORMAT_TYPES.MONTH) != 0) {
 				// has month, YM
 				this.startClockInterval(NDateTime.FORMAT_TYPES.MONTH);
-				return (React.createElement("div", {className: "popover-content row"}, 
-					React.createElement("div", {className: "date-view", style: styles}, 
-						this.renderMonthHeader(date), 
-						this.renderMonthBody(date), 
+				return React.createElement(
+					'div',
+					{ className: 'popover-content row' },
+					React.createElement(
+						'div',
+						{ className: 'date-view', style: styles },
+						this.renderMonthHeader(date),
+						this.renderMonthBody(date),
 						this.renderPopoverContentFooter(this.getToday(), NDateTime.FORMAT_TYPES.MONTH)
-					), 
+					),
 					this.renderTime(date, NDateTime.FORMAT_TYPES.MONTH)
-				));
+				);
 			} else if ((popoverType & NDateTime.FORMAT_TYPES.YEAR) != 0) {
 				// has year, YEAR
 				this.startClockInterval(NDateTime.FORMAT_TYPES.YEAR);
-				return (React.createElement("div", {className: "popover-content row"}, 
-					React.createElement("div", {className: "date-view", style: styles}, 
-						this.renderYearHeader(date), 
-						this.renderYearBody(date), 
+				return React.createElement(
+					'div',
+					{ className: 'popover-content row' },
+					React.createElement(
+						'div',
+						{ className: 'date-view', style: styles },
+						this.renderYearHeader(date),
+						this.renderYearBody(date),
 						this.renderPopoverContentFooter(this.getToday(), NDateTime.FORMAT_TYPES.YEAR)
-					), 
+					),
 					this.renderTime(date, NDateTime.FORMAT_TYPES.YEAR)
-				));
+				);
 			} else {
 				this.startClockInterval(popoverType);
 				// only time
-				return (React.createElement("div", {className: "popover-content row"}, 
+				return React.createElement(
+					'div',
+					{ className: 'popover-content row' },
 					this.renderTime(date, this.guessDisplayFormatType())
-				));
+				);
 			}
 		},
 		/**
-		 * render popover
-		 * @param options {{date: moment, type: number, set: boolean}} optional
-		 */
-		renderPopover: function(options) {
+   * render popover
+   * @param options {{date: moment, type: number, set: boolean}} optional
+   */
+		renderPopover: function (options) {
 			if (!options) {
 				options = {};
 			}
@@ -5671,7 +5808,7 @@
 				this.setValueToModel(options.date);
 			}
 
-			var styles = {display: 'block'};
+			var styles = { display: 'block' };
 			var component = this.getComponent();
 			styles.width = component.outerWidth();
 			var displayFormatType = this.guessDisplayFormatType();
@@ -5691,14 +5828,14 @@
 				'in': true
 			};
 			// check popover in top or bottom
-			if ((styles.top + NDateTime.TOTAL_HEIGHT) > ($(window).height() + $(window).scrollTop())) {
+			if (styles.top + NDateTime.TOTAL_HEIGHT > $(window).height() + $(window).scrollTop()) {
 				// cannot show in bottom and in current viewport
 				// check it is enough top or not
-				if ((offset.top - $(window).scrollTop()) >= NDateTime.TOTAL_HEIGHT) {
+				if (offset.top - $(window).scrollTop() >= NDateTime.TOTAL_HEIGHT) {
 					// enough
 					styles.top = offset.top - NDateTime.TOTAL_HEIGHT;
 					popoverCSS.top = true;
-				} else if ((styles.top + NDateTime.TOTAL_HEIGHT) <= $(document).height()) {
+				} else if (styles.top + NDateTime.TOTAL_HEIGHT <= $(document).height()) {
 					// cannot show in bottom and in current document
 					popoverCSS.bottom = true;
 				} else if (offset.top < NDateTime.TOTAL_HEIGHT) {
@@ -5716,49 +5853,49 @@
 			// check popover to left or right
 			if (widerThanComponent) {
 				width = $(document).width();
-				if ((styles.left + styles.width) <= width) {
+				if (styles.left + styles.width <= width) {
 					// normal from left to right, do nothing
-				} else if ((styles.left + component.outerWidth()) >= styles.width) {
-					// from right to left
-					styles.left = styles.left + component.outerWidth() - styles.width;
-					popoverCSS['right-to-left'] = true;
-				} else {
-					// still left to right, do nothing
-				}
+				} else if (styles.left + component.outerWidth() >= styles.width) {
+						// from right to left
+						styles.left = styles.left + component.outerWidth() - styles.width;
+						popoverCSS['right-to-left'] = true;
+					} else {
+						// still left to right, do nothing
+					}
 			}
 
-			var popover = (React.createElement("div", {role: "tooltip", className: $pt.LayoutHelper.classSet(popoverCSS), style: styles}, 
-				React.createElement("div", {className: "arrow"}), 
+			var popover = React.createElement(
+				'div',
+				{ role: 'tooltip', className: $pt.LayoutHelper.classSet(popoverCSS), style: styles },
+				React.createElement('div', { className: 'arrow' }),
 				this.renderPopoverContent(options.date, options.type)
-			));
-			React.render(popover, this.state.popover.get(0));
+			);
+			ReactDOM.render(popover, this.state.popover.get(0));
 		},
-		renderPopoverContainer: function() {
+		renderPopoverContainer: function () {
 			if (this.state.popover == null) {
 				this.state.popover = $('<div>');
 				this.state.popover.appendTo($('body'));
-				$(document).on('mousedown', this.onDocumentMouseDown)
-					.on('keyup', this.onDocumentKeyUp)
-					.on('mousewheel', this.onDocumentMouseWheel);
+				$(document).on('mousedown', this.onDocumentMouseDown).on('keyup', this.onDocumentKeyUp).on('mousewheel', this.onDocumentMouseWheel);
 				$(window).on('resize', this.onWindowResize);
 			}
 			this.state.popover.hide();
 		},
-		stopClockInterval: function() {
+		stopClockInterval: function () {
 			if (this.state.clockInterval) {
 				clearInterval(this.state.clockInterval.handler);
 				this.state.clockInterval = null;
 			}
 		},
-		startClockInterval: function(popoverType) {
+		startClockInterval: function (popoverType) {
 			var _this = this;
 			var value = this.getValueFromModel();
 			if (value == null) {
 				if (!this.state.clockInterval || this.state.clockInterval.type != popoverType) {
 					this.stopClockInterval();
 					this.state.clockInterval = {
-						handler: setInterval(function() {
-							_this.renderPopover({date: moment(), type: popoverType});
+						handler: setInterval(function () {
+							_this.renderPopover({ date: moment(), type: popoverType });
 						}, 1000),
 						type: popoverType
 					};
@@ -5768,49 +5905,45 @@
 			}
 		},
 		/**
-		 * show popover
-		 */
-		showPopover: function() {
+   * show popover
+   */
+		showPopover: function () {
 			this.renderPopoverContainer();
 			this.renderPopover();
 			this.state.popover.show();
 		},
-		hidePopover: function() {
+		hidePopover: function () {
 			this.destroyPopover();
 		},
-		destroyPopover: function() {
+		destroyPopover: function () {
 			if (this.state.popover) {
 				this.stopClockInterval();
-				$(document).off('mousedown', this.onDocumentMouseDown)
-					.off('keyup', this.onDocumentKeyUp)
-					.off('mousewheel', this.onDocumentMouseWheel);
+				$(document).off('mousedown', this.onDocumentMouseDown).off('keyup', this.onDocumentKeyUp).off('mousewheel', this.onDocumentMouseWheel);
 				$(window).on('resize', this.onWindowResize);
 				this.state.popover.remove();
 				delete this.state.popover;
 			}
 		},
 		/**
-		 * check display type has time or not
-		 * @returns {boolean}
-		 */
-		hasTimeToDisplay: function(type) {
-			return (type &
-				(NDateTime.FORMAT_TYPES.HOUR | NDateTime.FORMAT_TYPES.MINUTE |
-					NDateTime.FORMAT_TYPES.SECOND | NDateTime.FORMAT_TYPES.MILLSECOND)) != 0;
+   * check display type has time or not
+   * @returns {boolean}
+   */
+		hasTimeToDisplay: function (type) {
+			return (type & (NDateTime.FORMAT_TYPES.HOUR | NDateTime.FORMAT_TYPES.MINUTE | NDateTime.FORMAT_TYPES.SECOND | NDateTime.FORMAT_TYPES.MILLSECOND)) != 0;
 		},
 		/**
-		 * check display type has date or not
-		 * @returns {boolean}
-		 */
-		hasDateToDisplay: function(type) {
+   * check display type has date or not
+   * @returns {boolean}
+   */
+		hasDateToDisplay: function (type) {
 			return (type & NDateTime.FORMAT_TYPES.YMD) != 0;
 		},
 		/**
-		 * guess display format type
-		 * @returns {number} format type
-		 * @see NDateTime.FORMAT_TYPES
-		 */
-		guessDisplayFormatType: function() {
+   * guess display format type
+   * @returns {number} format type
+   * @see NDateTime.FORMAT_TYPES
+   */
+		guessDisplayFormatType: function () {
 			var format = this.getPrimaryDisplayFormat();
 			var hasYear = format.indexOf('Y') != -1;
 			var hasMonth = format.indexOf('M') != -1;
@@ -5821,32 +5954,27 @@
 			var hasSecond = format.indexOf('s') != -1;
 			var hasMillsecond = format.indexOf('S') != -1;
 
-			return (hasYear ? NDateTime.FORMAT_TYPES.YEAR : 0) +
-				(hasMonth ? NDateTime.FORMAT_TYPES.MONTH : 0) +
-				(hasDay ? NDateTime.FORMAT_TYPES.DAY : 0) +
-				(hasHour ? NDateTime.FORMAT_TYPES.HOUR : 0) +
-				(hasMinute ? NDateTime.FORMAT_TYPES.MINUTE : 0) +
-				(hasSecond ? NDateTime.FORMAT_TYPES.SECOND : 0) +
-				(hasMillsecond ? NDateTime.FORMAT_TYPES.MILLSECOND : 0);
+			return (hasYear ? NDateTime.FORMAT_TYPES.YEAR : 0) + (hasMonth ? NDateTime.FORMAT_TYPES.MONTH : 0) + (hasDay ? NDateTime.FORMAT_TYPES.DAY : 0) + (hasHour ? NDateTime.FORMAT_TYPES.HOUR : 0) + (hasMinute ? NDateTime.FORMAT_TYPES.MINUTE : 0) + (hasSecond ? NDateTime.FORMAT_TYPES.SECOND : 0) + (hasMillsecond ? NDateTime.FORMAT_TYPES.MILLSECOND : 0);
 		},
-		onDocumentMouseDown: function(evt) {
+		onDocumentMouseDown: function (evt) {
 			var target = $(evt.target);
 			if (target.closest(this.getComponent()).length == 0 && target.closest(this.state.popover).length == 0) {
 				this.hidePopover();
 			}
 		},
-		onDocumentMouseWheel: function(evt) {
+		onDocumentMouseWheel: function (evt) {
 			this.hidePopover();
 		},
-		onDocumentKeyUp: function(evt) {
-			if (evt.keyCode === 27 || evt.keyCode === 9) { // escape and tab
+		onDocumentKeyUp: function (evt) {
+			if (evt.keyCode === 27 || evt.keyCode === 9) {
+				// escape and tab
 				this.hidePopover();
 			}
 		},
-		onWindowResize: function() {
+		onWindowResize: function () {
 			this.hidePopover();
 		},
-		onCalendarButtonClicked: function() {
+		onCalendarButtonClicked: function () {
 			if (!this.isEnabled() || this.isViewMode()) {
 				// do nothing
 				return;
@@ -5855,15 +5983,15 @@
 			this.getTextInput().focus();
 		},
 		onTextInputFocused: function () {
-			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 		},
 		onTextInputBlurred: function () {
-			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 
 			var text = this.getTextInput().val();
-			if (text.length == 0 || text.isBlank())  {
+			if (text.length == 0 || text.isBlank()) {
 				this.setValueToModel(null);
 			} else {
 				var date = this.convertValueFromString(text, this.getDisplayFormat());
@@ -5875,41 +6003,41 @@
 				}
 			}
 		},
-		onYearSelected: function(date) {
+		onYearSelected: function (date) {
 			this.setValueToModel(date);
 			var type = this.guessDisplayFormatType();
 			// no time display and only year display, hide
-			if (!this.hasTimeToDisplay(type) && ((type & NDateTime.FORMAT_TYPES.MONTH) == 0)) {
+			if (!this.hasTimeToDisplay(type) && (type & NDateTime.FORMAT_TYPES.MONTH) == 0) {
 				this.hidePopover();
 			} else {
-				this.renderPopover({date: date, type: NDateTime.FORMAT_TYPES.MONTH});
+				this.renderPopover({ date: date, type: NDateTime.FORMAT_TYPES.MONTH });
 			}
 		},
-		onMonthSelected: function(date) {
+		onMonthSelected: function (date) {
 			this.setValueToModel(date);
 			var type = this.guessDisplayFormatType();
 			// no time display and no day display, hide
-			if (!this.hasTimeToDisplay(type) && ((type & NDateTime.FORMAT_TYPES.DAY) == 0)) {
+			if (!this.hasTimeToDisplay(type) && (type & NDateTime.FORMAT_TYPES.DAY) == 0) {
 				this.hidePopover();
 			} else {
-				this.renderPopover({date: date, type: NDateTime.FORMAT_TYPES.DAY});
+				this.renderPopover({ date: date, type: NDateTime.FORMAT_TYPES.DAY });
 			}
 		},
-		onDaySelected: function(date) {
+		onDaySelected: function (date) {
 			this.setValueToModel(date);
 			var type = this.guessDisplayFormatType();
 			// no time display, hide
 			if (!this.hasTimeToDisplay(type)) {
 				this.hidePopover();
 			} else {
-				this.renderPopover({date: date, type: NDateTime.FORMAT_TYPES.DAY});
+				this.renderPopover({ date: date, type: NDateTime.FORMAT_TYPES.DAY });
 			}
 		},
-		onClockClicked: function(popoverType, evt) {
+		onClockClicked: function (popoverType, evt) {
 			var offset = $(evt.target).offset();
 			// be careful of the quadrant
 			var point = {
-				x: (evt.pageX - offset.left) - NDateTime.CLOCK_RADIUS,
+				x: evt.pageX - offset.left - NDateTime.CLOCK_RADIUS,
 				y: NDateTime.CLOCK_RADIUS - (evt.pageY - offset.top)
 			};
 			// window.console.log('Mouse Point: ' + point.x + ',' + point.y);
@@ -5923,7 +6051,7 @@
 				return;
 			}
 			var eventType = NDateTime.FORMAT_TYPES.SECOND;
-			if (length > (NDateTime.CLOCK_RADIUS - NDateTime.CLOCK_HAND_OFFSET)) {
+			if (length > NDateTime.CLOCK_RADIUS - NDateTime.CLOCK_HAND_OFFSET) {
 				// change second or minute or hour
 				if (this.hasSecond()) {
 					eventType = NDateTime.FORMAT_TYPES.SECOND;
@@ -5932,7 +6060,7 @@
 				} else {
 					eventType = NDateTime.FORMAT_TYPES.HOUR;
 				}
-			} else if (length > (NDateTime.CLOCK_RADIUS * NDateTime.CLOCK_HOUR_PERCENTAGE)) {
+			} else if (length > NDateTime.CLOCK_RADIUS * NDateTime.CLOCK_HOUR_PERCENTAGE) {
 				// change minute or hour
 				if (this.hasMinute()) {
 					eventType = NDateTime.FORMAT_TYPES.MINUTE;
@@ -5956,10 +6084,10 @@
 				if (point.x > 0 && point.y >= 0) {
 					// do nothing
 				} else if (point.x < 0) {
-					degree += 180;
-				} else {
-					degree += 360;
-				}
+						degree += 180;
+					} else {
+						degree += 360;
+					}
 			}
 			// transform to real clock coordinate system
 			if (degree <= 90) {
@@ -5981,29 +6109,29 @@
 				date.minute(minute);
 			} else if (this.is12Hour()) {
 				hour = Math.floor(degree / 30) + (degree % 30 < 15 ? 0 : 1);
-				date.hour(currentHour <= 11 ? hour : (hour + 12));
+				date.hour(currentHour <= 11 ? hour : hour + 12);
 			} else {
 				hour = Math.floor(degree / 15) + (degree % 15 < 7.5 ? 0 : 1);
 				date.hour(hour);
 			}
 			// window.console.log('Hour: [' + hour + '], Minute: [' + minute + '], Second: [' + second + ']');
-			this.renderPopover({date: date, type: popoverType, set: true});
+			this.renderPopover({ date: date, type: popoverType, set: true });
 		},
-		onAMPMSelected: function(isAM, type) {
+		onAMPMSelected: function (isAM, type) {
 			var value = this.getValueFromModel();
 			value = value == null ? this.getToday() : value;
 			var hour = value.hour();
 			if (isAM) {
-				hour = hour > 11 ? (hour - 12) : hour;
+				hour = hour > 11 ? hour - 12 : hour;
 			} else {
-				hour = hour <= 11 ? (hour + 12) : hour;
+				hour = hour <= 11 ? hour + 12 : hour;
 			}
 			value.hour(hour);
 			this.setValueToModel(value);
 
-			this.renderPopover({date: value, type: type});
+			this.renderPopover({ date: value, type: type });
 		},
-		onTextInputChange: function() {
+		onTextInputChange: function () {
 			// since the text input might be incorrect date format,
 			// or use un-strict mode to format
 			// cannot know the result of moment format
@@ -6018,52 +6146,52 @@
 		setValueToModel: function (value) {
 			this.getModel().set(this.getDataId(), this.convertValueToString(value));
 		},
-		setValueToTextInput: function(value) {
+		setValueToTextInput: function (value) {
 			this.getTextInput().val(this.convertValueToString(value, this.getPrimaryDisplayFormat()));
 		},
 		/**
-		 * convert value from string
-		 * @param value {string}
-		 * @param format {string} optional, use value format if not passed
-		 * @returns {moment}
-		 */
+   * convert value from string
+   * @param value {string}
+   * @param format {string} optional, use value format if not passed
+   * @returns {moment}
+   */
 		convertValueFromString: function (value, format) {
-			var date = (value == null || value.isBlank()) ? null : moment(value, format ? format : this.getValueFormat(), this.getLocale());
-			return (date == null || !date.isValid()) ? null : date;
+			var date = value == null || value.isBlank() ? null : moment(value, format ? format : this.getValueFormat(), this.getLocale());
+			return date == null || !date.isValid() ? null : date;
 		},
 		/**
-		 * convert value to string
-		 * @param value {moment}
-		 * @param format {string} optional, use value format if not passed
-		 * @returns {string}
-		 */
-		convertValueToString: function(value, format) {
+   * convert value to string
+   * @param value {moment}
+   * @param format {string} optional, use value format if not passed
+   * @returns {string}
+   */
+		convertValueToString: function (value, format) {
 			return value == null ? null : value.format(format ? format : this.getValueFormat());
 		},
 		/**
-		 * get first day of week
-		 * returns {number} 0-6, sunday to saturday
-		 */
-		getFirstDayOfWeek: function() {
+   * get first day of week
+   * returns {number} 0-6, sunday to saturday
+   */
+		getFirstDayOfWeek: function () {
 			return this.getMomentLocaleData().firstDayOfWeek();
 		},
 		/**
-		 * get day of week.
-		 * returns {number} 0-6, sunday to saturday
-		 */
-		getDayOfWeek: function(date) {
+   * get day of week.
+   * returns {number} 0-6, sunday to saturday
+   */
+		getDayOfWeek: function (date) {
 			return date.day();
 		},
 		/**
-		 * get days count of month
-		 * @returns {number}
-		 */
-		getDaysOfMonth: function(date) {
+   * get days count of month
+   * @returns {number}
+   */
+		getDaysOfMonth: function (date) {
 			var month = date.month() + 1;
-			switch(month) {
-				case 1: case 3: case 5: case 7: case 8: case 10: case 12:
+			switch (month) {
+				case 1:case 3:case 5:case 7:case 8:case 10:case 12:
 					return 31;
-				case 4: case 6: case 9: case 11:
+				case 4:case 6:case 9:case 11:
 					return 30;
 				case 2:
 					return date.isLeapYear() ? 29 : 28;
@@ -6074,21 +6202,21 @@
 					return 31;
 			}
 		},
-		getComponent: function() {
-			return $(React.findDOMNode(this.refs.comp));
+		getComponent: function () {
+			return $(ReactDOM.findDOMNode(this.refs.comp));
 		},
-		getTextInput: function() {
-			return $(React.findDOMNode(this.refs.text));
+		getTextInput: function () {
+			return $(ReactDOM.findDOMNode(this.refs.text));
 		},
 		/**
-		 * get display format
-		 * @returns {string}
-		 */
-		getDisplayFormat: function() {
+   * get display format
+   * @returns {string}
+   */
+		getDisplayFormat: function () {
 			var format = this.getComponentOption('format');
 			return format ? format : NDateTime.FORMAT;
 		},
-		getPrimaryDisplayFormat: function() {
+		getPrimaryDisplayFormat: function () {
 			var format = this.getDisplayFormat();
 			if (Array.isArray(format)) {
 				return format[0];
@@ -6096,29 +6224,29 @@
 				return format;
 			}
 		},
-		getHeaderMonthFormat: function() {
+		getHeaderMonthFormat: function () {
 			var format = this.getComponentOption('headerMonthFormat');
 			return format ? format : NDateTime.HEADER_MONTH_FORMAT;
 		},
-		getHeaderYearFormat: function() {
+		getHeaderYearFormat: function () {
 			var format = this.getComponentOption('headerYearFormat');
 			return format ? format : NDateTime.HEADER_YEAR_FORMAT;
 		},
-		getBodyYearFormat: function() {
+		getBodyYearFormat: function () {
 			return this.getComponentOption('bodyYearFormat');
 		},
 		/**
-		 * get value format
-		 * @returns {string}
-		 */
-		getValueFormat: function() {
+   * get value format
+   * @returns {string}
+   */
+		getValueFormat: function () {
 			var valueFormat = this.getComponentOption('valueFormat');
 			return valueFormat ? valueFormat : NDateTime.VALUE_FORMAT;
 		},
-		is12Hour: function() {
+		is12Hour: function () {
 			return this.getComponentOption('hour') == 12;
 		},
-		getHourRadius: function() {
+		getHourRadius: function () {
 			var hourRadius = NDateTime.CLOCK_RADIUS;
 			if (this.hasMinute()) {
 				// with minute and second
@@ -6126,38 +6254,38 @@
 			}
 			return hourRadius;
 		},
-		hasMinute: function() {
+		hasMinute: function () {
 			return (this.guessDisplayFormatType() & NDateTime.FORMAT_TYPES.MINUTE) != 0;
 		},
-		hasSecond: function() {
+		hasSecond: function () {
 			return (this.guessDisplayFormatType() & NDateTime.FORMAT_TYPES.SECOND) != 0;
 		},
 		/**
-		 * get icon definition by given icon key
-		 * @returns {string}
-		 */
-		getIcon: function(key) {
+   * get icon definition by given icon key
+   * @returns {string}
+   */
+		getIcon: function (key) {
 			return this.getComponentOption('icons')[key];
 		},
-		getTextInViewMode: function() {
+		getTextInViewMode: function () {
 			return this.convertValueToString(this.getValueFromModel(), this.getPrimaryDisplayFormat());
 		},
-		getLocale: function() {
+		getLocale: function () {
 			return this.getComponentOption('locale');
 		},
-		getMomentLocaleData: function() {
+		getMomentLocaleData: function () {
 			return moment.localeData(this.getLocale());
 		},
-		getToday: function() {
+		getToday: function () {
 			return moment().locale(this.getLocale());
 		}
 	}));
 
 	$pt.Components.NDateTime = NDateTime;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Date, function (model, layout, direction, viewMode) {
-		return React.createElement($pt.Components.NDateTime, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NDateTime, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
 	});
-}(window, jQuery, moment, React, $pt));
+})(window, jQuery, moment, React, ReactDOM, $pt);
 
 /**
  * datetime picker, see datetimepicker from bootstrap
@@ -6193,7 +6321,7 @@
  *      }
  * }
  */
-(function (window, $, moment, React, $pt) {
+(function (window, $, moment, React, ReactDOM, $pt) {
 	var NDateTime2 = React.createClass($pt.defineCellComponent({
 		displayName: 'NDateTime2',
 		statics: {
@@ -6266,9 +6394,9 @@
 			};
 		},
 		/**
-		 * will update
-		 * @param nextProps
-		 */
+   * will update
+   * @param nextProps
+   */
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChange);
@@ -6276,11 +6404,11 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * overrride react method
-		 * @param prevProps
-		 * @param prevState
-		 * @override
-		 */
+   * overrride react method
+   * @param prevProps
+   * @param prevState
+   * @override
+   */
 		componentDidUpdate: function (prevProps, prevState) {
 			if (!this.isViewMode()) {
 				this.getComponent().data("DateTimePicker").date(this.getValueFromModel());
@@ -6291,9 +6419,9 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * override react method
-		 * @override
-		 */
+   * override react method
+   * @override
+   */
 		componentDidMount: function () {
 			this.createComponent();
 			if (!this.isViewMode()) {
@@ -6305,9 +6433,9 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * override react method
-		 * @override
-		 */
+   * override react method
+   * @override
+   */
 		componentWillUnmount: function () {
 			// remove post change listener
 			this.removePostChangeListener(this.onModelChange);
@@ -6315,8 +6443,8 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * create component
-		 */
+   * create component
+   */
 		createComponent: function () {
 			var _this = this;
 			var component = this.getComponent().datetimepicker(this.createDisplayOptions({
@@ -6369,7 +6497,7 @@
 				}
 				// window.console.log("Input Offset: " + JSON.stringify(inputOffset));
 				// window.console.log("Widget Offset: " + JSON.stringify(widgetOffset));
-				var css = {top: widgetOffset.top, left: widgetOffset.left, bottom: "auto", right: "auto", height: 'auto'};
+				var css = { top: widgetOffset.top, left: widgetOffset.left, bottom: "auto", right: "auto", height: 'auto' };
 				var modalForm = $(target).closest('.n-modal-form');
 				if (modalForm.length != 0) {
 					css["z-index"] = modalForm.css("z-index") + 1;
@@ -6420,9 +6548,9 @@
 			//});
 		},
 		/**
-		 * create display options
-		 * @param options
-		 */
+   * create display options
+   * @param options
+   */
 		createDisplayOptions: function (options) {
 			var _this = this;
 			Object.keys(options).forEach(function (key) {
@@ -6434,9 +6562,9 @@
 			return options;
 		},
 		/**
-		 * render
-		 * @returns {XML}
-		 */
+   * render
+   * @returns {XML}
+   */
 		render: function () {
 			if (this.isViewMode()) {
 				return this.renderInViewMode();
@@ -6450,34 +6578,40 @@
 				'n-datetime': true,
 				'n-disabled': !this.isEnabled()
 			};
-			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(divCSS)}, 
-				React.createElement("div", {className: "input-group", ref: "div"}, 
-					React.createElement("input", {type: "text", 
-					       className: "form-control", 
-					       disabled: !this.isEnabled(), 
+			return React.createElement(
+				'div',
+				{ className: $pt.LayoutHelper.classSet(divCSS) },
+				React.createElement(
+					'div',
+					{ className: 'input-group', ref: 'div' },
+					React.createElement('input', { type: 'text',
+						className: 'form-control',
+						disabled: !this.isEnabled(),
 
-					       onFocus: this.onComponentFocused, 
-					       onBlur: this.onComponentBlurred}), 
-                React.createElement("span", {className: $pt.LayoutHelper.classSet(css)}, 
-                    React.createElement("span", {className: "fa fa-fw fa-calendar"})
-                )
-				), 
-				this.renderNormalLine(), 
+						onFocus: this.onComponentFocused,
+						onBlur: this.onComponentBlurred }),
+					React.createElement(
+						'span',
+						{ className: $pt.LayoutHelper.classSet(css) },
+						React.createElement('span', { className: 'fa fa-fw fa-calendar' })
+					)
+				),
+				this.renderNormalLine(),
 				this.renderFocusLine()
-			));
+			);
 		},
 		onComponentFocused: function () {
-			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 		},
 		onComponentBlurred: function () {
-			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 		},
 		/**
-		 * on component change
-		 * @param evt
-		 */
+   * on component change
+   * @param evt
+   */
 		onComponentChange: function (evt) {
 			// synchronize value to model
 			if (evt.date !== false) {
@@ -6487,49 +6621,49 @@
 			}
 		},
 		/**
-		 * on model change
-		 * @param evt
-		 */
+   * on model change
+   * @param evt
+   */
 		onModelChange: function (evt) {
 			// this.getComponent().data('DateTimePicker').date(this.convertValueFromModel(evt.new));
 			this.forceUpdate();
 		},
 		/**
-		 * get component
-		 * @returns {*|jQuery|HTMLElement}
-		 * @override
-		 */
+   * get component
+   * @returns {*|jQuery|HTMLElement}
+   * @override
+   */
 		getComponent: function () {
-			return $(React.findDOMNode(this.refs.div));
+			return $(ReactDOM.findDOMNode(this.refs.div));
 		},
 		/**
-		 * get value from model
-		 * @returns {*}
-		 * @override
-		 */
+   * get value from model
+   * @returns {*}
+   * @override
+   */
 		getValueFromModel: function () {
 			return this.convertValueFromModel(this.getModel().get(this.getDataId()));
 		},
 		/**
-		 * set value to model
-		 * @param value momentjs object
-		 * @override
-		 */
+   * set value to model
+   * @param value momentjs object
+   * @override
+   */
 		setValueToModel: function (value) {
 			this.getModel().set(this.getDataId(), value == null ? null : value.format(this.getValueFormat()));
 		},
 		/**
-		 * convert value from model
-		 * @param value string date with value format
-		 * @returns {*} moment date
-		 */
+   * convert value from model
+   * @param value string date with value format
+   * @returns {*} moment date
+   */
 		convertValueFromModel: function (value) {
 			return value == null ? null : moment(value, this.getValueFormat());
 		},
 		/**
-		 * get value format
-		 * @returns {string}
-		 */
+   * get value format
+   * @returns {string}
+   */
 		getValueFormat: function () {
 			var valueFormat = this.getComponentOption('valueFormat');
 			return valueFormat ? valueFormat : NDateTime2.VALUE_FORMAT;
@@ -6538,26 +6672,26 @@
 			var format = this.getComponentOption('headerYearFormat');
 			return format ? format : NDateTime2.HEADER_YEAR_FORMAT;
 		},
-		getTextInViewMode: function() {
+		getTextInViewMode: function () {
 			var value = this.getValueFromModel();
 			return value == null ? null : value.format(this.getDisplayFormat());
 		},
-		getDisplayFormat: function() {
+		getDisplayFormat: function () {
 			var format = this.getComponentOption('format');
 			return format ? format : NDateTime2.FORMAT;
 		}
 	}));
 	$pt.Components.NDateTime2 = NDateTime2;
 	$pt.LayoutHelper.registerComponentRenderer('date2', function (model, layout, direction, viewMode) {
-		return React.createElement($pt.Components.NDateTime2, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NDateTime2, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
 	});
-}(window, jQuery, moment, React, $pt));
+})(window, jQuery, moment, React, ReactDOM, $pt);
 
 /**
  * exception modal dialog
  * z-index is 9999 and 9998, the max z-index.
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NExceptionModal = React.createClass({
 		displayName: 'NExceptionModal',
 		statics: {
@@ -6569,8 +6703,7 @@
 					if (exceptionContainer.length == 0) {
 						$("<div id='exception_modal_container' />").appendTo($(document.body));
 					}
-					$pt.exceptionDialog = React.render(React.createElement($pt.Components.NExceptionModal, {className: className}),
-						document.getElementById("exception_modal_container"));
+					$pt.exceptionDialog = ReactDOM.render(React.createElement($pt.Components.NExceptionModal, { className: className }), document.getElementById("exception_modal_container"));
 				}
 				return $pt.exceptionDialog;
 			},
@@ -6591,49 +6724,61 @@
 			};
 		},
 		/**
-		 * set z-index
-		 */
+   * set z-index
+   */
 		fixDocumentPadding: function () {
 			document.body.style.paddingRight = 0;
 		},
 		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
+   * did update
+   * @param prevProps
+   * @param prevState
+   */
 		componentDidUpdate: function (prevProps, prevState) {
 			this.fixDocumentPadding();
 			$(document).on('keyup', this.onDocumentKeyUp);
 		},
 		/**
-		 * did mount
-		 */
+   * did mount
+   */
 		componentDidMount: function () {
 			this.fixDocumentPadding();
 			$(document).on('keyup', this.onDocumentKeyUp);
 		},
-		componentWillUpdate: function() {
+		componentWillUpdate: function () {
 			$(document).off('keyup', this.onDocumentKeyUp);
 		},
-		componentWillUnmount: function() {
+		componentWillUnmount: function () {
 			$(document).off('keyup', this.onDocumentKeyUp);
 		},
 		/**
-		 * render content
-		 */
+   * render content
+   */
 		renderContent: function () {
 			var status = this.state.status;
 			var statusMessage = $pt.ComponentConstants.Http_Status[status];
 			var message = this.state.message;
-			return (React.createElement("div", null, 
-				React.createElement("h6", null, status, ": ", statusMessage), 
-				message != null ? (React.createElement("pre", null, message)) : null
-			));
+			return React.createElement(
+				"div",
+				null,
+				React.createElement(
+					"h6",
+					null,
+					status,
+					": ",
+					statusMessage
+				),
+				message != null ? React.createElement(
+					"pre",
+					null,
+					message
+				) : null
+			);
 		},
 		/**
-		 * render
-		 * @returns {*}
-		 */
+   * render
+   * @returns {*}
+   */
 		render: function () {
 			if (!this.state.visible) {
 				return null;
@@ -6648,56 +6793,79 @@
 			if (this.props.className) {
 				css[this.props.className] = true;
 			}
-			return (React.createElement("div", null, 
-				React.createElement("div", {className: "modal-backdrop fade in", style: {zIndex: NExceptionModal.Z_INDEX}}), 
-				React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
-					 tabIndex: "-1", 
-					 role: "dialog", 
-					 style: {display: 'block', zIndex: NExceptionModal.Z_INDEX + 1}}, 
-					React.createElement("div", {className: "modal-danger modal-dialog"}, 
-						React.createElement("div", {className: "modal-content", role: "document"}, 
-							React.createElement("div", {className: "modal-header"}, 
-								React.createElement("button", {className: "close", 
-										onClick: this.hide, 
-										"aria-label": "Close", 
-										style: {marginTop: '-2px'}}, 
-									React.createElement("span", {"aria-hidden": "true"}, "×")
-								), 
-								React.createElement("h4", {className: "modal-title"}, NExceptionModal.TITLE)
-							), 
-							React.createElement("div", {className: "modal-body"}, 
+			return React.createElement(
+				"div",
+				null,
+				React.createElement("div", { className: "modal-backdrop fade in", style: { zIndex: NExceptionModal.Z_INDEX } }),
+				React.createElement(
+					"div",
+					{ className: $pt.LayoutHelper.classSet(css),
+						tabIndex: "-1",
+						role: "dialog",
+						style: { display: 'block', zIndex: NExceptionModal.Z_INDEX + 1 } },
+					React.createElement(
+						"div",
+						{ className: "modal-danger modal-dialog" },
+						React.createElement(
+							"div",
+							{ className: "modal-content", role: "document" },
+							React.createElement(
+								"div",
+								{ className: "modal-header" },
+								React.createElement(
+									"button",
+									{ className: "close",
+										onClick: this.hide,
+										"aria-label": "Close",
+										style: { marginTop: '-2px' } },
+									React.createElement(
+										"span",
+										{ "aria-hidden": "true" },
+										"×"
+									)
+								),
+								React.createElement(
+									"h4",
+									{ className: "modal-title" },
+									NExceptionModal.TITLE
+								)
+							),
+							React.createElement(
+								"div",
+								{ className: "modal-body" },
 								this.renderContent()
 							)
 						)
 					)
 				)
-			));
+			);
 		},
-		onDocumentKeyUp: function(evt) {
-			if (evt.keyCode === 27) { // escape
+		onDocumentKeyUp: function (evt) {
+			if (evt.keyCode === 27) {
+				// escape
 				this.hide();
 			}
 		},
 		/**
-		 * hide dialog
-		 */
+   * hide dialog
+   */
 		hide: function () {
-			this.setState({visible: false, status: null, message: null});
+			this.setState({ visible: false, status: null, message: null });
 		},
 		/**
-		 * show dialog
-		 * @param status http status
-		 * @param message error message
-		 */
+   * show dialog
+   * @param status http status
+   * @param message error message
+   */
 		show: function (status, message) {
 			$(':focus').blur();
-			this.setState({visible: true, status: status, message: message});
+			this.setState({ visible: true, status: status, message: message });
 		}
 	});
 	$pt.Components.NExceptionModal = NExceptionModal;
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NFile = React.createClass($pt.defineCellComponent({
 		displayName: 'NFile',
 		statics: {},
@@ -6728,14 +6896,14 @@
 		getInitialState: function () {
 			return {};
 		},
-		componentWillUpdate: function() {
+		componentWillUpdate: function () {
 			this.unregisterFromComponentCentral();
 		},
-		componentDidUpdate: function() {
+		componentDidUpdate: function () {
 			this.registerToComponentCentral();
 		},
 		componentDidMount: function () {
-			var input = $(React.findDOMNode(this.refs.file));
+			var input = $(ReactDOM.findDOMNode(this.refs.file));
 			input.fileinput(this.createDisplayOptions({
 				ajaxDeleteSettings: null,
 				ajaxSettings: null,
@@ -6836,17 +7004,13 @@
 				input.on(eventKey, monitors[eventKey]);
 			});
 
-			var comp = $(React.findDOMNode(this.refs.comp));
-			comp.find('.kv-fileinput-caption')
-				.focus(this.onComponentFocused)
-				.blur(this.onComponentBlurred);
-			comp.find('.input-group-btn>.btn')
-				.focus(this.onComponentFocused)
-				.blur(this.onComponentBlurred);
+			var comp = $(ReactDOM.findDOMNode(this.refs.comp));
+			comp.find('.kv-fileinput-caption').focus(this.onComponentFocused).blur(this.onComponentBlurred);
+			comp.find('.input-group-btn>.btn').focus(this.onComponentFocused).blur(this.onComponentBlurred);
 			this.registerToComponentCentral();
 		},
 		componentWillUnmount: function () {
-			var input = $(React.findDOMNode(this.refs.file));
+			var input = $(ReactDOM.findDOMNode(this.refs.file));
 			// event monitor
 			var monitors = this.getEventMonitor();
 			Object.keys(monitors).forEach(function (eventKey) {
@@ -6862,15 +7026,17 @@
 			var inputCSS = {
 				file: true
 			};
-			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), ref: "comp"}, 
-				React.createElement("input", {type: "file", 
-				       className: $pt.LayoutHelper.classSet(inputCSS), 
-				       multiple: this.allowMultipleFiles(), 
-				       disabled: !this.isEnabled(), 
-				       ref: "file"}), 
-				this.renderNormalLine(), 
+			return React.createElement(
+				'div',
+				{ className: $pt.LayoutHelper.classSet(css), ref: 'comp' },
+				React.createElement('input', { type: 'file',
+					className: $pt.LayoutHelper.classSet(inputCSS),
+					multiple: this.allowMultipleFiles(),
+					disabled: !this.isEnabled(),
+					ref: 'file' }),
+				this.renderNormalLine(),
 				this.renderFocusLine()
-			));
+			);
 		},
 		createDisplayOptions: function (options) {
 			var _this = this;
@@ -6886,19 +7052,19 @@
 			return this.getComponentOption('multiple');
 		},
 		onComponentFocused: function () {
-			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 		},
 		onComponentBlurred: function () {
-			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 		}
 	}));
 	$pt.Components.NFile = NFile;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.File, function (model, layout, direction, viewMode) {
-		return React.createElement($pt.Components.NFile, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NFile, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
 	});
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * form component, a div
@@ -6936,7 +7102,7 @@
  *      }
  * }
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NForm = React.createClass({
 		displayName: 'NForm',
 		statics: {
@@ -6979,9 +7145,9 @@
 			};
 		},
 		/**
-		 * will update
-		 * @param nextProps
-		 */
+   * will update
+   * @param nextProps
+   */
 		componentWillUpdate: function (nextProps) {
 			var _this = this;
 			this.getLayout().getCards().forEach(function (card) {
@@ -6991,10 +7157,10 @@
 			});
 		},
 		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
+   * did update
+   * @param prevProps
+   * @param prevState
+   */
 		componentDidUpdate: function (prevProps, prevState) {
 			var _this = this;
 			this.getLayout().getCards().forEach(function (card) {
@@ -7004,8 +7170,8 @@
 			});
 		},
 		/**
-		 * did mount
-		 */
+   * did mount
+   */
 		componentDidMount: function () {
 			var _this = this;
 			this.getLayout().getCards().forEach(function (card) {
@@ -7015,8 +7181,8 @@
 			});
 		},
 		/**
-		 * will unmount
-		 */
+   * will unmount
+   */
 		componentWillUnmount: function () {
 			var _this = this;
 			this.getLayout().getCards().forEach(function (card) {
@@ -7026,10 +7192,10 @@
 			});
 		},
 		/**
-		 * render sections
-		 * @param sections {[SectionLayout]}
-		 * @returns {XML}
-		 */
+   * render sections
+   * @param sections {[SectionLayout]}
+   * @returns {XML}
+   */
 		renderSections: function (sections) {
 			var layout = {};
 			var _this = this;
@@ -7074,16 +7240,16 @@
 					width: 12
 				}
 			};
-			return React.createElement($pt.Components.NPanel, {model: this.getModel(), 
-			               layout: $pt.createCellLayout(sections[0].getParentCard().getId() + '-body', sectionLayout), 
-			               direction: this.getLabelDirection(), 
-						   view: this.isViewMode()});
+			return React.createElement($pt.Components.NPanel, { model: this.getModel(),
+				layout: $pt.createCellLayout(sections[0].getParentCard().getId() + '-body', sectionLayout),
+				direction: this.getLabelDirection(),
+				view: this.isViewMode() });
 		},
 		/**
-		 * attach previous button
-		 * @param left
-		 * @param card
-		 */
+   * attach previous button
+   * @param left
+   * @param card
+   */
 		attachPreviousButton: function (left, card) {
 			if (this.getLayout().isCardButtonShown()) {
 				// add default previous
@@ -7097,19 +7263,19 @@
 			}
 		},
 		/**
-		 * attach next button
-		 * @param right {{}[]} right buttons definition
-		 */
+   * attach next button
+   * @param right {{}[]} right buttons definition
+   */
 		attachNextButton: function (right) {
 			if (this.getLayout().isCardButtonShown()) {
 				right.push(this.state.next);
 			}
 		},
 		/**
-		 * wrap custom button
-		 * @param button {{successCallback: string, click: function}}
-		 * @returns {{}}
-		 */
+   * wrap custom button
+   * @param button {{successCallback: string, click: function}}
+   * @returns {{}}
+   */
 		wrapCustomButton: function (button) {
 			var _this = this;
 			var newButton = $.extend({}, button);
@@ -7136,10 +7302,10 @@
 			return newButton;
 		},
 		/**
-		 * wrap custom buttons
-		 * @param buttons
-		 * @returns {{}[]}
-		 */
+   * wrap custom buttons
+   * @param buttons
+   * @returns {{}[]}
+   */
 		wrapCustomButtons: function (buttons) {
 			if (buttons == null) {
 				return null;
@@ -7153,12 +7319,12 @@
 			}
 		},
 		/**
-		 * render card
-		 * @param card {CardLayout}
-		 * @param isCards {boolean}
-		 * @param index {number}
-		 * @returns {XML}
-		 */
+   * render card
+   * @param card {CardLayout}
+   * @param isCards {boolean}
+   * @param index {number}
+   * @returns {XML}
+   */
 		renderCard: function (card, isCards, index) {
 			var css = {
 				'n-card': true
@@ -7191,31 +7357,38 @@
 			}
 			if (right.length != 0 || left.length != 0) {
 				right = right.reverse();
-				footer = (React.createElement($pt.Components.NPanelFooter, {right: right, left: left, model: this.getModel(), view: this.isViewMode()}));
+				footer = React.createElement($pt.Components.NPanelFooter, { right: right, left: left, model: this.getModel(), view: this.isViewMode() });
 			}
-			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), key: index}, 
-				this.renderSections(card.getSections()), 
+			return React.createElement(
+				'div',
+				{ className: $pt.LayoutHelper.classSet(css), key: index },
+				this.renderSections(card.getSections()),
 				footer
-			));
+			);
 		},
 		/**
-		 * render badge
-		 * @param card
-		 * @returns {XML}
-		 */
+   * render badge
+   * @param card
+   * @returns {XML}
+   */
 		renderBadge: function (card) {
 			if (card.hasBadge()) {
 				var badgeRender = card.getBadgeRender();
 				var badge = badgeRender ? badgeRender.call(this, this.getModel().get(card.getBadgeId()), this.getModel()) : this.getModel().get(card.getBadgeId());
-				return (React.createElement("span", {className: "badge"}, " ", badge));
+				return React.createElement(
+					'span',
+					{ className: 'badge' },
+					' ',
+					badge
+				);
 			} else {
 				return null;
 			}
 		},
 		/**
-		 * render card title
-		 * @returns {XML}
-		 */
+   * render card title
+   * @returns {XML}
+   */
 		renderWizards: function () {
 			var css = $pt.LayoutHelper.classSet({
 				'nav': true,
@@ -7226,7 +7399,9 @@
 				'n-cards-free': this.isFreeCard()
 			});
 			var _this = this;
-			return (React.createElement("ul", {className: css, key: "wizards"}, 
+			return React.createElement(
+				'ul',
+				{ className: css, key: 'wizards' },
 				this.getLayout().getCards().map(function (card, cardIndex) {
 					var css = {
 						active: card.getId() == _this.state.activeCard,
@@ -7246,21 +7421,27 @@
 							'fa-fw': true
 						};
 						iconCSS['fa-' + card.getIcon()] = true;
-						icon = React.createElement("span", {className: $pt.LayoutHelper.classSet(iconCSS)});
+						icon = React.createElement('span', { className: $pt.LayoutHelper.classSet(iconCSS) });
 					}
-					return (React.createElement("li", {className: $pt.LayoutHelper.classSet(css), key: cardIndex}, 
-						React.createElement("a", {href: "javascript:void(0);", onClick: click}, 
-							icon, " ", card.getLabel(), 
+					return React.createElement(
+						'li',
+						{ className: $pt.LayoutHelper.classSet(css), key: cardIndex },
+						React.createElement(
+							'a',
+							{ href: 'javascript:void(0);', onClick: click },
+							icon,
+							' ',
+							card.getLabel(),
 							_this.renderBadge(card)
 						)
-					));
+					);
 				})
-			));
+			);
 		},
 		/**
-		 * render cards
-		 * @returns {[XML]}
-		 */
+   * render cards
+   * @returns {[XML]}
+   */
 		renderCards: function () {
 			var cards = this.getLayout().getCards();
 			if (cards.length == 1) {
@@ -7281,8 +7462,8 @@
 			}
 		},
 		/**
-		 * initialize active card
-		 */
+   * initialize active card
+   */
 		initActiveCard: function () {
 			if (this.state.activeCard != null) {
 				return;
@@ -7300,9 +7481,9 @@
 			}
 		},
 		/**
-		 * render
-		 * @returns {XML}
-		 */
+   * render
+   * @returns {XML}
+   */
 		render: function () {
 			var css = {
 				'n-form': true
@@ -7310,18 +7491,22 @@
 			if (this.props.className) {
 				css[this.props.className] = true;
 			}
-			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, this.renderCards()));
+			return React.createElement(
+				'div',
+				{ className: $pt.LayoutHelper.classSet(css) },
+				this.renderCards()
+			);
 		},
 		/**
-		 * on model changed
-		 * @param evt
-		 */
+   * on model changed
+   * @param evt
+   */
 		onModelChanged: function (evt) {
 			this.forceUpdate();
 		},
 		/**
-		 * on previous clicked
-		 */
+   * on previous clicked
+   */
 		onPreviousClicked: function () {
 			var activeIndex = this.getActiveCardIndex();
 			var prevCard = this.getLayout().getCards()[activeIndex - 1];
@@ -7332,8 +7517,8 @@
 			}
 		},
 		/**
-		 * on next clicked
-		 */
+   * on next clicked
+   */
 		onNextClicked: function () {
 			var activeIndex = this.getActiveCardIndex();
 			var nextCard = this.getLayout().getCards()[activeIndex + 1];
@@ -7342,19 +7527,19 @@
 			});
 		},
 		/**
-		 * jump to card
-		 * @param cardId
-		 */
+   * jump to card
+   * @param cardId
+   */
 		jumpToCard: function (cardId) {
 			this.setState({
 				activeCard: cardId
 			});
 		},
 		/**
-		 * get active card index
-		 * @param cardId optional, use activeCard if no parameter
-		 * @return {number}
-		 */
+   * get active card index
+   * @param cardId optional, use activeCard if no parameter
+   * @return {number}
+   */
 		getActiveCardIndex: function (cardId) {
 			var activeCardId = cardId ? cardId : this.state.activeCard;
 			var cards = this.getLayout().getCards();
@@ -7368,24 +7553,24 @@
 			return activeIndex;
 		},
 		/**
-		 * get section key
-		 * @param section
-		 * @returns {string}
-		 */
+   * get section key
+   * @param section
+   * @returns {string}
+   */
 		getSectionKey: function (section) {
 			return section.getParentCard().getId() + '-' + section.getId();
 		},
-		isViewMode: function() {
+		isViewMode: function () {
 			return this.props.view;
 		},
-		isFreeCard: function() {
+		isFreeCard: function () {
 			return this.isViewMode() || this.getLayout().isFreeCard();
 		},
 		/**
-		 * is previous card backable
-		 * @param cardId
-		 * @return {*}
-		 */
+   * is previous card backable
+   * @param cardId
+   * @return {*}
+   */
 		isPreviousCardBackable: function (cardId) {
 			if (this.isFreeCard()) {
 				return true;
@@ -7396,43 +7581,43 @@
 			return cards[index - 1].isBackable();
 		},
 		/**
-		 * check the given card is before active card or not
-		 * @param cardId
-		 * @returns {boolean}
-		 */
+   * check the given card is before active card or not
+   * @param cardId
+   * @returns {boolean}
+   */
 		isAfterActiveCard: function (cardId) {
 			return this.getActiveCardIndex(cardId) - this.getActiveCardIndex() > 0;
 		},
 		/**
-		 * check the given card is after active card or not
-		 * @param cardId
-		 * @returns {boolean}
-		 */
+   * check the given card is after active card or not
+   * @param cardId
+   * @returns {boolean}
+   */
 		isBeforeActiveCard: function (cardId) {
 			return this.getActiveCardIndex(cardId) - this.getActiveCardIndex() < 0;
 		},
 		/**
-		 * get model
-		 * @returns {*}
-		 */
+   * get model
+   * @returns {*}
+   */
 		getModel: function () {
 			return this.props.model;
 		},
-		getLabelDirection: function() {
+		getLabelDirection: function () {
 			return this.props.direction ? this.props.direction : NForm.LABEL_DIRECTION;
 		},
 		/**
-		 * get layout
-		 * @returns {*}
-		 */
+   * get layout
+   * @returns {*}
+   */
 		getLayout: function () {
 			return this.props.layout;
 		},
 		/**
-		 * get cell component, react class instance
-		 * @param key
-		 * @return {object}
-		 */
+   * get cell component, react class instance
+   * @param key
+   * @return {object}
+   */
 		getCellComponent: function (key) {
 			var cell = this.refs[key];
 			if (cell) {
@@ -7444,14 +7629,14 @@
 	$pt.Components.NForm = NForm;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Form, function (model, layout, direction, viewMode) {
 		var formLayout = $pt.createFormLayout(layout.getComponentOption('editLayout'));
-		return React.createElement($pt.Components.NForm, React.__spread({},  $pt.LayoutHelper.transformParameters(model, formLayout, direction, viewMode)));
+		return React.createElement($pt.Components.NForm, $pt.LayoutHelper.transformParameters(model, formLayout, direction, viewMode));
 	});
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * Created by brad.wu on 9/10/2015.
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NFormButtonFooter = React.createClass($pt.defineCellComponent({
 		displayName: 'NFormButtonFooter',
 		propTypes: {
@@ -7460,28 +7645,28 @@
 			// layout, FormLayout
 			layout: React.PropTypes.object
 		},
-		componentWillUpdate: function() {
+		componentWillUpdate: function () {
 			this.unregisterFromComponentCentral();
 		},
-		componentDidUpdate: function() {
+		componentDidUpdate: function () {
 			this.registerToComponentCentral();
 		},
-		componentDidMount: function() {
+		componentDidMount: function () {
 			this.registerToComponentCentral();
 		},
-		componentWillUnmount: function() {
+		componentWillUnmount: function () {
 			this.unregisterFromComponentCentral();
 		},
 		render: function () {
 			var buttonLayout = this.getButtonLayout();
-			return React.createElement($pt.Components.NPanelFooter, {model: this.props.model, 
-								 view: this.isViewMode(), 
-			                     save: buttonLayout.save, 
-			                     validate: buttonLayout.validate, 
-			                     cancel: buttonLayout.cancel, 
-			                     reset: buttonLayout.reset, 
-			                     left: buttonLayout.left, 
-			                     right: buttonLayout.right});
+			return React.createElement($pt.Components.NPanelFooter, { model: this.props.model,
+				view: this.isViewMode(),
+				save: buttonLayout.save,
+				validate: buttonLayout.validate,
+				cancel: buttonLayout.cancel,
+				reset: buttonLayout.reset,
+				left: buttonLayout.left,
+				right: buttonLayout.right });
 		},
 		getButtonLayout: function () {
 			return this.getComponentOption('buttonLayout');
@@ -7489,9 +7674,9 @@
 	}));
 	$pt.Components.NFormButtonFooter = NFormButtonFooter;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.ButtonFooter, function (model, layout, direction, viewMode) {
-		return React.createElement($pt.Components.NFormButtonFooter, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NFormButtonFooter, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
 	});
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * Created by brad.wu on 8/18/2015.
@@ -7511,7 +7696,7 @@
  *      }
  * }
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NFormCell = React.createClass($pt.defineCellComponent({
 		displayName: 'NFormCell',
 		statics: {
@@ -7546,9 +7731,9 @@
 			};
 		},
 		/**
-		 * will update
-		 * @param nextProps
-		 */
+   * will update
+   * @param nextProps
+   */
 		componentWillUpdate: function (nextProps) {
 			this.destroyPopover();
 			this.removePostChangeListener(this.onModelChanged);
@@ -7558,10 +7743,10 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
+   * did update
+   * @param prevProps
+   * @param prevState
+   */
 		componentDidUpdate: function (prevProps, prevState) {
 			this.renderPopover();
 			this.addPostChangeListener(this.onModelChanged);
@@ -7571,8 +7756,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * did mount
-		 */
+   * did mount
+   */
 		componentDidMount: function () {
 			this.renderPopover();
 			this.addPostChangeListener(this.onModelChanged);
@@ -7582,8 +7767,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * will unmount
-		 */
+   * will unmount
+   */
 		componentWillUnmount: function () {
 			this.destroyPopover();
 			this.removePostChangeListener(this.onModelChanged);
@@ -7595,12 +7780,12 @@
 		destroyPopover: function () {
 			var comp = this.refs.comp;
 			if (comp != null) {
-				$(React.findDOMNode(comp)).popover("destroy");
+				$(ReactDOM.findDOMNode(comp)).popover("destroy");
 			}
 		},
 		/**
-		 * render error popover
-		 */
+   * render error popover
+   */
 		renderPopover: function () {
 			if (this.getLayout().getComponentType().popover !== false && this.getModel().hasError(this.getDataId())) {
 				var messages = this.getModel().getError(this.getDataId());
@@ -7622,14 +7807,14 @@
 
 				var comp = this.refs.comp;
 				if (comp != null) {
-					$(React.findDOMNode(comp)).popover(popover);
+					$(ReactDOM.findDOMNode(comp)).popover(popover);
 				}
 			}
 		},
 		/**
-		 * render input component
-		 * @param componentDefinition
-		 */
+   * render input component
+   * @param componentDefinition
+   */
 		renderInputComponent: function (componentDefinition) {
 			// always pass form model to component,
 			// since maybe getModel() returns inner model which defined with comp: {model: another}
@@ -7644,14 +7829,16 @@
 			if (!type) {
 				type = "text";
 			}
-			return (React.createElement("div", {ref: "comp"}, 
+			return React.createElement(
+				'div',
+				{ ref: 'comp' },
 				$pt.LayoutHelper.getComponentRenderer(type).call(this, this.getFormModel(), this.getLayout(), direction, this.isViewMode())
-			));
+			);
 		},
 		/**
-		 * render label
-		 * @returns {XML}
-		 */
+   * render label
+   * @returns {XML}
+   */
 		renderLabel: function () {
 			var requiredPaint = this.getComponentOption("paintRequired");
 			var requireIconCSS = {
@@ -7660,8 +7847,7 @@
 				required: true
 			};
 			requireIconCSS['fa-' + NFormCell.REQUIRED_ICON] = true;
-			var requiredLabel = requiredPaint && this.getModel().isRequired(this.getDataId()) ?
-				(React.createElement("span", {className: $pt.LayoutHelper.classSet(requireIconCSS)})) : null;
+			var requiredLabel = requiredPaint && this.getModel().isRequired(this.getDataId()) ? React.createElement('span', { className: $pt.LayoutHelper.classSet(requireIconCSS) }) : null;
 			//var showColon = !this.getLayout().getLabel().endsWith('?')
 			//{showColon ? ':' : null}
 			var tooltip = this.getComponentOption('tooltip');
@@ -7673,18 +7859,20 @@
 					'n-form-cell-tooltip': true
 				};
 				tooltipCSS['fa-' + NFormCell.TOOLTIP_ICON] = true;
-				tooltipIcon = React.createElement("span", {className: $pt.LayoutHelper.classSet(tooltipCSS), title: tooltip});
+				tooltipIcon = React.createElement('span', { className: $pt.LayoutHelper.classSet(tooltipCSS), title: tooltip });
 			}
-			return (React.createElement("span", {className: this.getLayout().getLabelCSS(), onClick: this.onLabelClicked, ref: "label"}, 
-			this.getLayout().getLabel(), 
-				tooltipIcon, 
+			return React.createElement(
+				'span',
+				{ className: this.getLayout().getLabelCSS(), onClick: this.onLabelClicked, ref: 'label' },
+				this.getLayout().getLabel(),
+				tooltipIcon,
 				requiredLabel
-		));
+			);
 		},
 		/**
-		 * render
-		 * @returns {XML}
-		 */
+   * render
+   * @returns {XML}
+   */
 		render: function () {
 			// when the component is not visible
 			// or declared only view in edit mode
@@ -7693,14 +7881,14 @@
 			if (visible) {
 				var view = this.getComponentOption('view');
 				if (this.isViewMode()) {
-					visible = (view == 'edit') != true;
+					visible = view == 'edit' != true;
 				} else if (!this.isViewMode()) {
-					visible = (view == 'view') != true;
+					visible = view == 'view' != true;
 				}
 			}
 
 			if (!visible) {
-				return (React.createElement("div", {className: this.getCSSClassName() + ' n-form-cell-invisible'}));
+				return React.createElement('div', { className: this.getCSSClassName() + ' n-form-cell-invisible' });
 			} else {
 				var css = this.getCSSClassName();
 				if (this.getModel().hasError(this.getDataId())) {
@@ -7712,45 +7900,57 @@
 				// read component definition
 				var type = this.getLayout().getComponentType();
 				if (type.label === false) {
-					return (React.createElement("div", {className: css, ref: "div"}, 
+					return React.createElement(
+						'div',
+						{ className: css, ref: 'div' },
 						this.renderInputComponent(type)
-					));
+					);
 				} else {
 					var labelDirection = this.getComponentOption("labelDirection");
 					if (labelDirection == null) {
 						labelDirection = this.props.direction ? this.props.direction : 'vertical';
 					}
 					if (labelDirection != 'vertical') {
-						return (React.createElement("div", {className: css + ' horizontal-label', ref: "div"}, 
-							React.createElement("div", {className: "row"}, 
-								React.createElement("div", {className: this.getHorizontalLabelCSS()}, 
+						return React.createElement(
+							'div',
+							{ className: css + ' horizontal-label', ref: 'div' },
+							React.createElement(
+								'div',
+								{ className: 'row' },
+								React.createElement(
+									'div',
+									{ className: this.getHorizontalLabelCSS() },
 									this.renderLabel()
-								), 
-								React.createElement("div", {className: this.getHorizontalComponentCSS()}, 
+								),
+								React.createElement(
+									'div',
+									{ className: this.getHorizontalComponentCSS() },
 									this.renderInputComponent(type)
 								)
 							)
-						));
+						);
 					} else {
-						return (React.createElement("div", {className: css + ' vertical-label', ref: "div"}, 
-							this.renderLabel(), 
+						return React.createElement(
+							'div',
+							{ className: css + ' vertical-label', ref: 'div' },
+							this.renderLabel(),
 							this.renderInputComponent(type)
-						));
+						);
 					}
 				}
 			}
 		},
 		/**
-		 * on model change
-		 * @param evt
-		 */
+   * on model change
+   * @param evt
+   */
 		onModelChanged: function (evt) {
 			this.getModel().validate(evt.id);
 		},
 		/**
-		 * on model validate change
-		 * @param evt not used
-		 */
+   * on model validate change
+   * @param evt not used
+   */
 		onModelValidateChanged: function (evt) {
 			// TODO maybe will introduce performance issue, cannot sure now.
 			// this.forceUpdate();
@@ -7759,26 +7959,26 @@
 				this.renderPopover();
 				div = this.refs.div;
 				if (div != null) {
-					$(React.findDOMNode(div)).addClass('has-error');
+					$(ReactDOM.findDOMNode(div)).addClass('has-error');
 				}
 			} else {
 				this.destroyPopover();
 				div = this.refs.div;
 				if (div != null) {
-					$(React.findDOMNode(div)).removeClass('has-error');
+					$(ReactDOM.findDOMNode(div)).removeClass('has-error');
 				}
 			}
 		},
 		/**
-		 * on label clicked
-		 */
+   * on label clicked
+   */
 		onLabelClicked: function () {
-			$(React.findDOMNode(this.refs.comp)).focus();
+			$(ReactDOM.findDOMNode(this.refs.comp)).focus();
 		},
 		/**
-		 * get css class
-		 * @returns {string}
-		 */
+   * get css class
+   * @returns {string}
+   */
 		getCSSClassName: function () {
 			var width = this.getLayout().getWidth();
 			var css = {
@@ -7796,17 +7996,17 @@
 			return this.getLayout().getCellCSS($pt.LayoutHelper.classSet(css));
 		},
 		/**
-		 * get label css when horizontal direction
-		 * @returns {string}
-		 */
+   * get label css when horizontal direction
+   * @returns {string}
+   */
 		getHorizontalLabelCSS: function () {
 			var width = this.getHorizontalLabelWidth();
 			return "col-sm-" + width + " col-md-" + width + " col-lg-" + width;
 		},
 		/**
-		 * get component css when horizontal direction
-		 * @returns {string}
-		 */
+   * get component css when horizontal direction
+   * @returns {string}
+   */
 		getHorizontalComponentCSS: function () {
 			var width = 12 - this.getHorizontalLabelWidth();
 			return "col-sm-" + width + " col-md-" + width + " col-lg-" + width;
@@ -7816,18 +8016,18 @@
 			return width ? width : NFormCell.LABEL_WIDTH;
 		},
 		/**
-		 * register to component central
-		 */
-		registerToComponentCentral: function() {
+   * register to component central
+   */
+		registerToComponentCentral: function () {
 			var id = this.getComponentCentralId();
 			if (id) {
 				$pt.LayoutHelper.registerComponent(id + '@cell', this);
 			}
 		},
 		/**
-		 * unregsiter from component central
-		 */
-		unregisterFromComponentCentral: function() {
+   * unregsiter from component central
+   */
+		unregisterFromComponentCentral: function () {
 			var id = this.getComponentCentralId();
 			if (id) {
 				$pt.LayoutHelper.unregisterComponent(id + '@cell', this);
@@ -7835,7 +8035,7 @@
 		}
 	}));
 	$pt.Components.NFormCell = NFormCell;
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * Created by brad.wu on 8/20/2015.
@@ -7874,7 +8074,7 @@
  *      }
  * }
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NFormTab = React.createClass($pt.defineCellComponent({
 		displayName: 'NFormTab',
 		propTypes: {
@@ -7897,9 +8097,9 @@
 			return {};
 		},
 		/**
-		 * will update
-		 * @param nextProps
-		 */
+   * will update
+   * @param nextProps
+   */
 		componentWillUpdate: function (nextProps) {
 			var _this = this;
 			this.getTabs().forEach(function (tab) {
@@ -7910,10 +8110,10 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
+   * did update
+   * @param prevProps
+   * @param prevState
+   */
 		componentDidUpdate: function (prevProps, prevState) {
 			var _this = this;
 			this.getTabs().forEach(function (tab) {
@@ -7924,8 +8124,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * did mount
-		 */
+   * did mount
+   */
 		componentDidMount: function () {
 			var _this = this;
 			this.getTabs().forEach(function (tab) {
@@ -7936,8 +8136,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * will unmount
-		 */
+   * will unmount
+   */
 		componentWillUnmount: function () {
 			var _this = this;
 			this.getTabs().forEach(function (tab) {
@@ -7954,12 +8154,12 @@
 				show: index == activeIndex,
 				hide: index != activeIndex
 			};
-			return (React.createElement($pt.Components.NForm, {model: this.getModel(), 
-			               layout: layout, 
-			               direction: this.props.direction, 
-						   view: this.isViewMode(), 
-			               className: $pt.LayoutHelper.classSet(css), 
-			               key: 'form-' + index}));
+			return React.createElement($pt.Components.NForm, { model: this.getModel(),
+				layout: layout,
+				direction: this.props.direction,
+				view: this.isViewMode(),
+				className: $pt.LayoutHelper.classSet(css),
+				key: 'form-' + index });
 		},
 		render: function () {
 			var tabs = this.initializeTabs();
@@ -7967,23 +8167,26 @@
 			if (canActive) {
 				canActive.bind(this);
 			}
-			return (React.createElement("div", {className: this.getComponentCSS('n-form-tab')}, 
-				React.createElement($pt.Components.NTab, {type: this.getComponentOption('tabType'), 
-				      justified: this.getComponentOption('justified'), 
-				      direction: this.getComponentOption('titleDirection'), 
-				      size: this.getComponentOption('titleIconSize'), 
-				      tabClassName: this.getAdditionalCSS('tabs'), 
-				      tabs: tabs, 
-				      canActive: canActive, 
-				      onActive: this.onTabClicked, 
-					  ref: "tabs"}), 
-
-				React.createElement("div", {className: "n-form-tab-content", ref: "content"}, 
+			return React.createElement(
+				'div',
+				{ className: this.getComponentCSS('n-form-tab') },
+				React.createElement($pt.Components.NTab, { type: this.getComponentOption('tabType'),
+					justified: this.getComponentOption('justified'),
+					direction: this.getComponentOption('titleDirection'),
+					size: this.getComponentOption('titleIconSize'),
+					tabClassName: this.getAdditionalCSS('tabs'),
+					tabs: tabs,
+					canActive: canActive,
+					onActive: this.onTabClicked,
+					ref: 'tabs' }),
+				React.createElement(
+					'div',
+					{ className: 'n-form-tab-content', ref: 'content' },
 					this.getTabLayouts().map(this.renderTabContent)
 				)
-			));
+			);
 		},
-		getTabs: function() {
+		getTabs: function () {
 			return this.getComponentOption('tabs');
 		},
 		initializeTabs: function () {
@@ -8000,19 +8203,19 @@
 			return tabs;
 		},
 		/**
-		 * get tab layouts
-		 * @returns {FormLayout[]}
-		 */
+   * get tab layouts
+   * @returns {FormLayout[]}
+   */
 		getTabLayouts: function () {
 			return this.getTabs().map(function (tab) {
 				return $pt.createFormLayout(tab.layout || tab.editLayout);
 			});
 		},
 		/**
-		 * on tab clicked
-		 * @param tabValue {string} tab value
-		 * @param index {number}
-		 */
+   * on tab clicked
+   * @param tabValue {string} tab value
+   * @param index {number}
+   */
 		onTabClicked: function (tabValue, index) {
 			this.setActiveTabIndex(index);
 			var onActive = this.getComponentOption('onActive');
@@ -8021,9 +8224,9 @@
 			}
 		},
 		/**
-		 * get active tab index
-		 * @returns {number}
-		 */
+   * get active tab index
+   * @returns {number}
+   */
 		getActiveTabIndex: function () {
 			var tabs = this.getComponentOption('tabs');
 			// find the active tab
@@ -8033,7 +8236,7 @@
 			if (activeTabIndex == -1) {
 				// find the first visible tab if no active tab found
 				activeTabIndex = tabs.findIndex(function (tab, index) {
-					var visible =  tab.visible !== false;
+					var visible = tab.visible !== false;
 					if (visible) {
 						tab.active = true;
 						return true;
@@ -8043,24 +8246,24 @@
 			return activeTabIndex;
 		},
 		/**
-		 * set active tab index
-		 * @param {number}
-		 */
-		setActiveTabIndex: function(index) {
+   * set active tab index
+   * @param {number}
+   */
+		setActiveTabIndex: function (index) {
 			this.refs.tabs.setActiveTabIndex(index);
 			this.forceUpdate();
 		}
 	}));
 	$pt.Components.NFormTab = NFormTab;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Tab, function (model, layout, direction, viewMode) {
-		return React.createElement($pt.Components.NFormTab, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NFormTab, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
 	});
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * icon based on font-awesome
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NIcon = React.createClass({
 		displayName: 'NIcon',
 		propTypes: {
@@ -8090,9 +8293,9 @@
 			};
 		},
 		/**
-		 * get size
-		 * @returns {*}
-		 */
+   * get size
+   * @returns {*}
+   */
 		getSize: function () {
 			var size = {
 				"fa-lg": this.props.size === "lg",
@@ -8108,9 +8311,9 @@
 			return size;
 		},
 		/**
-		 * get icon
-		 * @returns {*}
-		 */
+   * get icon
+   * @returns {*}
+   */
 		getIcon: function () {
 			var c = {
 				"fa": true,
@@ -8129,9 +8332,9 @@
 			return c;
 		},
 		/**
-		 * get background icon
-		 * @returns {*}
-		 */
+   * get background icon
+   * @returns {*}
+   */
 		getBackIcon: function () {
 			var c = {
 				"fa": true,
@@ -8150,9 +8353,9 @@
 			return c;
 		},
 		/**
-		 * render
-		 * @returns {XML}
-		 */
+   * render
+   * @returns {XML}
+   */
 		render: function () {
 			var size = this.getSize();
 			var iconClasses = this.getIcon();
@@ -8161,53 +8364,61 @@
 				iconClasses['fa-stack-1x'] = true;
 				var backIconClasses = this.getBackIcon();
 				backIconClasses['fa-stack-2x'] = true;
-				return (React.createElement("span", {className: $pt.LayoutHelper.classSet(size), title: this.props.tooltip}, 
-                React.createElement("i", {className: $pt.LayoutHelper.classSet(iconClasses)}), 
-                React.createElement("i", {className: $pt.LayoutHelper.classSet(backIconClasses)})
-            ));
+				return React.createElement(
+					"span",
+					{ className: $pt.LayoutHelper.classSet(size), title: this.props.tooltip },
+					React.createElement("i", { className: $pt.LayoutHelper.classSet(iconClasses) }),
+					React.createElement("i", { className: $pt.LayoutHelper.classSet(backIconClasses) })
+				);
 			}
-			return React.createElement("span", {className: $pt.LayoutHelper.classSet($.extend(iconClasses, size)), 
-			             title: this.props.tooltip});
+			return React.createElement("span", { className: $pt.LayoutHelper.classSet($.extend(iconClasses, size)),
+				title: this.props.tooltip });
 		}
 	});
 	$pt.Components.NIcon = NIcon;
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * Jumbortron
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NJumbortron = React.createClass({
 		displayName: 'NJumbortron',
 		propTypes: {
-			highlightText: React.PropTypes.oneOfType([
-				React.PropTypes.string,
-				React.PropTypes.arrayOf(React.PropTypes.string)]).isRequired
+			highlightText: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.arrayOf(React.PropTypes.string)]).isRequired
 		},
 		renderText: function () {
 			if (Array.isArray(this.props.highlightText)) {
 				return this.props.highlightText.map(function (text, textIndex) {
-					return React.createElement("h4", {key: textIndex}, text);
+					return React.createElement(
+						"h4",
+						{ key: textIndex },
+						text
+					);
 				});
 			} else {
-				return React.createElement("h4", null, this.props.highlightText);
+				return React.createElement(
+					"h4",
+					null,
+					this.props.highlightText
+				);
 			}
 		},
 		render: function () {
-			return (
-				React.createElement("div", {className: "n-jumbotron jumbotron"}, 
-					this.renderText()
-				)
+			return React.createElement(
+				"div",
+				{ className: "n-jumbotron jumbotron" },
+				this.renderText()
 			);
 		}
 	});
 	$pt.Components.NJumbortron = NJumbortron;
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * Created by brad.wu on 8/21/2015.
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NLabel = React.createClass($pt.defineCellComponent({
 		displayName: 'NLabel',
 		propTypes: {
@@ -8224,9 +8435,9 @@
 			};
 		},
 		/**
-		 * will update
-		 * @param nextProps
-		 */
+   * will update
+   * @param nextProps
+   */
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.__forceUpdate);
@@ -8234,10 +8445,10 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
+   * did update
+   * @param prevProps
+   * @param prevState
+   */
 		componentDidUpdate: function (prevProps, prevState) {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.__forceUpdate);
@@ -8245,8 +8456,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * did mount
-		 */
+   * did mount
+   */
 		componentDidMount: function () {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.__forceUpdate);
@@ -8254,8 +8465,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * will unmount
-		 */
+   * will unmount
+   */
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
@@ -8277,8 +8488,8 @@
 
 				var left = this.getComponentOption('left');
 				var right = this.getComponentOption('right');
-				texts = left ? (left + texts) : texts;
-				texts = right ? (texts + right) : texts;
+				texts = left ? left + texts : texts;
+				texts = right ? texts + right : texts;
 				texts = [texts];
 			}
 			var css = {
@@ -8289,11 +8500,17 @@
 			if (style) {
 				css['n-label-' + style] = true;
 			}
-			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
+			return React.createElement(
+				'div',
+				{ className: $pt.LayoutHelper.classSet(css) },
 				texts.map(function (text, textIndex) {
-					return React.createElement("span", {key: textIndex}, text);
+					return React.createElement(
+						'span',
+						{ key: textIndex },
+						text
+					);
 				})
-			));
+			);
 		},
 		getText: function () {
 			if (this.isTextFromModel()) {
@@ -8308,9 +8525,9 @@
 	}));
 	$pt.Components.NLabel = NLabel;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Label, function (model, layout, direction, viewMode) {
-		return React.createElement($pt.Components.NLabel, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NLabel, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
 	});
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * modal confirm dialog
@@ -8318,7 +8535,7 @@
  *
  * depends NFormButton
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NConfirm = React.createClass({
 		displayName: 'NConfirm',
 		statics: {
@@ -8328,8 +8545,7 @@
 					if (confirmContainer.length == 0) {
 						$("<div id='confirm_modal_container' />").appendTo($(document.body));
 					}
-					$pt.confirmDialog = React.render(React.createElement($pt.Components.NConfirm, {className: className}),
-						document.getElementById("confirm_modal_container"));
+					$pt.confirmDialog = ReactDOM.render(React.createElement($pt.Components.NConfirm, { className: className }), document.getElementById("confirm_modal_container"));
 				}
 				return $pt.confirmDialog;
 			},
@@ -8356,37 +8572,37 @@
 			};
 		},
 		/**
-		 * set z-index
-		 */
+   * set z-index
+   */
 		fixDocumentPadding: function () {
 			document.body.style.paddingRight = 0;
 		},
 		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
+   * did update
+   * @param prevProps
+   * @param prevState
+   */
 		componentDidUpdate: function (prevProps, prevState) {
 			this.fixDocumentPadding();
 			$(document).on('keyup', this.onDocumentKeyUp);
 		},
 		/**
-		 * did mount
-		 */
+   * did mount
+   */
 		componentDidMount: function () {
 			this.fixDocumentPadding();
 			$(document).on('keyup', this.onDocumentKeyUp);
 		},
-		componentWillUpdate: function() {
+		componentWillUpdate: function () {
 			$(document).off('keyup', this.onDocumentKeyUp);
 		},
-		componentWillUnmount: function() {
+		componentWillUnmount: function () {
 			$(document).off('keyup', this.onDocumentKeyUp);
 		},
 		/**
-		 * render confirm button
-		 * @returns {XML}
-		 */
+   * render confirm button
+   * @returns {XML}
+   */
 		renderConfirmButton: function () {
 			if (this.state.options && this.state.options.disableConfirm) {
 				return null;
@@ -8400,43 +8616,45 @@
 					click: this.onConfirmClicked
 				}
 			});
-			return React.createElement($pt.Components.NFormButton, {layout: layout});
+			return React.createElement($pt.Components.NFormButton, { layout: layout });
 		},
 		/**
-		 * render close button
-		 * @returns {XML}
-		 */
+   * render close button
+   * @returns {XML}
+   */
 		renderCloseButton: function () {
 			if (this.state.options && this.state.options.disableClose) {
 				return null;
 			}
 			var layout = $pt.createCellLayout('pseudo-button', {
-				label: (this.state.options && this.state.options.close) ? NConfirm.CLOSE_TEXT : NConfirm.CANCEL_TEXT,
+				label: this.state.options && this.state.options.close ? NConfirm.CLOSE_TEXT : NConfirm.CANCEL_TEXT,
 				comp: {
 					type: $pt.ComponentConstants.Button,
-					icon: (this.state.options && this.state.options.close) ? NConfirm.CLOSE_ICON : NConfirm.CANCEL_ICON,
+					icon: this.state.options && this.state.options.close ? NConfirm.CLOSE_ICON : NConfirm.CANCEL_ICON,
 					style: 'danger',
 					click: this.onCancelClicked
 				}
 			});
-			return React.createElement($pt.Components.NFormButton, {layout: layout});
+			return React.createElement($pt.Components.NFormButton, { layout: layout });
 		},
 		/**
-		 * render footer
-		 * @returns {XML}
-		 */
+   * render footer
+   * @returns {XML}
+   */
 		renderFooter: function () {
 			if (this.state.options && this.state.options.disableButtons) {
-				return React.createElement("div", {className: "modal-footer-empty"});
+				return React.createElement("div", { className: "modal-footer-empty" });
 			}
-			return (React.createElement("div", {className: "modal-footer"}, 
-				this.renderCloseButton(), 
+			return React.createElement(
+				"div",
+				{ className: "modal-footer" },
+				this.renderCloseButton(),
 				this.renderConfirmButton()
-			));
+			);
 		},
 		/**
-		 * render content
-		 */
+   * render content
+   */
 		renderContent: function () {
 			var messages = this.state.options;
 			if (typeof messages === "string") {
@@ -8450,13 +8668,17 @@
 			}
 			// string array
 			return messages.map(function (element, index) {
-				return React.createElement("h6", {key: index}, element);
+				return React.createElement(
+					"h6",
+					{ key: index },
+					element
+				);
 			});
 		},
 		/**
-		 * render
-		 * @returns {XML}
-		 */
+   * render
+   * @returns {XML}
+   */
 		render: function () {
 			if (!this.state.visible) {
 				return null;
@@ -8470,40 +8692,63 @@
 			if (this.props.className) {
 				css[this.props.className] = true;
 			}
-			return (React.createElement("div", null, 
-				React.createElement("div", {className: "modal-backdrop fade in", style: {zIndex: NConfirm.Z_INDEX}}), 
-				React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
-					 tabIndex: "-1", 
-					 role: "dialog", 
-					 style: {display: 'block', zIndex: NConfirm.Z_INDEX + 1}}, 
-					React.createElement("div", {className: "modal-dialog"}, 
-						React.createElement("div", {className: "modal-content", role: "document"}, 
-							React.createElement("div", {className: "modal-header"}, 
-								React.createElement("button", {className: "close", 
-										onClick: this.onCancelClicked, 
-										"aria-label": "Close", 
-										style: {marginTop: '-2px'}}, 
-									React.createElement("span", {"aria-hidden": "true"}, "×")
-								), 
-								React.createElement("h4", {className: "modal-title"}, this.state.title)
-							), 
-							React.createElement("div", {className: "modal-body"}, 
+			return React.createElement(
+				"div",
+				null,
+				React.createElement("div", { className: "modal-backdrop fade in", style: { zIndex: NConfirm.Z_INDEX } }),
+				React.createElement(
+					"div",
+					{ className: $pt.LayoutHelper.classSet(css),
+						tabIndex: "-1",
+						role: "dialog",
+						style: { display: 'block', zIndex: NConfirm.Z_INDEX + 1 } },
+					React.createElement(
+						"div",
+						{ className: "modal-dialog" },
+						React.createElement(
+							"div",
+							{ className: "modal-content", role: "document" },
+							React.createElement(
+								"div",
+								{ className: "modal-header" },
+								React.createElement(
+									"button",
+									{ className: "close",
+										onClick: this.onCancelClicked,
+										"aria-label": "Close",
+										style: { marginTop: '-2px' } },
+									React.createElement(
+										"span",
+										{ "aria-hidden": "true" },
+										"×"
+									)
+								),
+								React.createElement(
+									"h4",
+									{ className: "modal-title" },
+									this.state.title
+								)
+							),
+							React.createElement(
+								"div",
+								{ className: "modal-body" },
 								this.renderContent()
-							), 
+							),
 							this.renderFooter()
 						)
 					)
 				)
-			));
+			);
 		},
-		onDocumentKeyUp: function(evt) {
-			if (evt.keyCode === 27) { // escape
+		onDocumentKeyUp: function (evt) {
+			if (evt.keyCode === 27) {
+				// escape
 				this.onCancelClicked();
 			}
 		},
 		/**
-		 * hide dialog
-		 */
+   * hide dialog
+   */
 		hide: function () {
 			this.setState({
 				visible: false,
@@ -8514,8 +8759,8 @@
 			});
 		},
 		/**
-		 * on confirm clicked
-		 */
+   * on confirm clicked
+   */
 		onConfirmClicked: function () {
 			if (this.state.onConfirm) {
 				this.state.onConfirm.call(this);
@@ -8526,8 +8771,8 @@
 			}
 		},
 		/**
-		 * on cancel clicked
-		 */
+   * on cancel clicked
+   */
 		onCancelClicked: function () {
 			if (this.state.onCancel) {
 				this.state.onCancel.call(this);
@@ -8538,27 +8783,27 @@
 			}
 		},
 		/**
-		 * show dialog
-		 *
-		 * from 0.0.3
-		 * all parameters should be pass to #show in first as a JSON object
-		 *
-		 * @param title deprecated title of dialog
-		 * @param options string or string array, or object as below.
-		 *          {
-	 *              disableButtons: true, // hide button bar
-	 *              disableConfirm: true, // hide confirm button
-	 *              disableClose: true, // hide close button
-	 *              messsages: "", // string or string array,
-	 *              close: true, // show close button text as "close"
-	 *              onConfirm: function,
-	 *              onCancel: function,
-	 *              afterClose: function,
-	 *              title: string
-	 *          }
-		 * @param onConfirm deprecated callback function when confirm button clicked
-		 * @param onCancel deprecated callback function when cancel button clicked
-		 */
+   * show dialog
+   *
+   * from 0.0.3
+   * all parameters should be pass to #show in first as a JSON object
+   *
+   * @param title deprecated title of dialog
+   * @param options string or string array, or object as below.
+   *          {
+  *              disableButtons: true, // hide button bar
+  *              disableConfirm: true, // hide confirm button
+  *              disableClose: true, // hide close button
+  *              messsages: "", // string or string array,
+  *              close: true, // show close button text as "close"
+  *              onConfirm: function,
+  *              onCancel: function,
+  *              afterClose: function,
+  *              title: string
+  *          }
+   * @param onConfirm deprecated callback function when confirm button clicked
+   * @param onCancel deprecated callback function when cancel button clicked
+   */
 		show: function (title, options, onConfirm, onCancel) {
 			$(':focus').blur();
 			var state;
@@ -8593,23 +8838,23 @@
 		}
 	});
 	$pt.Components.NConfirm = NConfirm;
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * modal form dialog
  *
  * depends NPanelFooter, NForm, NConfirm
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NModalForm = React.createClass({
 		displayName: 'NModalForm',
 		statics: {
 			/**
-			 * create form modal dialog
-			 * @param title
-			 * @param className
-			 * @returns {object}
-			 */
+    * create form modal dialog
+    * @param title
+    * @param className
+    * @returns {object}
+    */
 			createFormModal: function (title, className) {
 				if ($pt.formModalIndex === undefined || $pt.formModalIndex === null) {
 					$pt.formModalIndex = 1500;
@@ -8627,9 +8872,8 @@
 				if (className) {
 					css[className] = true;
 				}
-				return React.render(React.createElement($pt.Components.NModalForm, {title: title, className: $pt.LayoutHelper.classSet(css), 
-				                                zIndex: $pt.formModalIndex}),
-					document.getElementById(containerId));
+				return ReactDOM.render(React.createElement($pt.Components.NModalForm, { title: title, className: $pt.LayoutHelper.classSet(css),
+					zIndex: $pt.formModalIndex }), document.getElementById(containerId));
 			},
 			RESET_CONFIRM_TITLE: "Reset Data",
 			RESET_CONFIRM_MESSAGE: ["Are you sure to reset data?", "All data will be lost and cannot be recovered."],
@@ -8650,18 +8894,18 @@
 			};
 		},
 		/**
-		 * set z-index
-		 */
+   * set z-index
+   */
 		fixDocumentPadding: function () {
 			document.body.style.paddingRight = 0;
 		},
-		setDraggable: function() {
+		setDraggable: function () {
 			if (!this.isDraggable() || !this.refs.top) {
 				return;
 			}
-			var top = $(React.findDOMNode(this.refs.top));
+			var top = $(ReactDOM.findDOMNode(this.refs.top));
 			var modal = top.children('.modal');
-			modal.drags({handle: '.modal-header'});
+			modal.drags({ handle: '.modal-header' });
 			modal.css({
 				overflow: 'visible',
 				height: 0
@@ -8712,18 +8956,18 @@
 				}
 			}
 		},
-		stopDraggable: function() {
+		stopDraggable: function () {
 			if (this.refs.top) {
-				var top = $(React.findDOMNode(this.refs.top));
+				var top = $(ReactDOM.findDOMNode(this.refs.top));
 				var modal = top.children('.modal');
-				modal.stopDrags({handle: '.modal-header'});
+				modal.stopDrags({ handle: '.modal-header' });
 			}
 		},
 		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
+   * did update
+   * @param prevProps
+   * @param prevState
+   */
 		componentDidUpdate: function (prevProps, prevState) {
 			this.fixDocumentPadding();
 			this.setDraggable();
@@ -8731,15 +8975,15 @@
 				$(document).on('keyup', this.onDocumentKeyUp);
 			}
 		},
-		componentWillUpdate: function() {
+		componentWillUpdate: function () {
 			this.stopDraggable();
 			if (this.isDialogCloseShown()) {
 				$(document).off('keyup', this.onDocumentKeyUp);
 			}
 		},
 		/**
-		 * did mount
-		 */
+   * did mount
+   */
 		componentDidMount: function () {
 			this.fixDocumentPadding();
 			this.setDraggable();
@@ -8747,67 +8991,81 @@
 				$(document).on('keyup', this.onDocumentKeyUp);
 			}
 		},
-		componentDidUnmount: function() {
+		componentDidUnmount: function () {
 			this.stopDraggable();
 			if (this.isDialogCloseShown()) {
 				$(document).off('keyup', this.onDocumentKeyUp);
 			}
 		},
 		/**
-		 * render footer
-		 * @returns {XML}
-		 */
+   * render footer
+   * @returns {XML}
+   */
 		renderFooter: function () {
 			if (this.state.footer === false || !this.state.expanded) {
-				return React.createElement("div", {ref: "footer"});
+				return React.createElement("div", { ref: "footer" });
 			} else {
-				return (React.createElement("div", {className: "n-modal-form-footer modal-footer", ref: "footer"}, 
-					React.createElement($pt.Components.NPanelFooter, {reset: this.getResetButton(), 
-					              validate: this.getValidationButton(), 
-					              save: this.getSaveButton(), 
-					              cancel: this.getCancelButton(), 
-					              left: this.getLeftButton(), 
-					              right: this.getRightButton(), 
-					              model: this.getModel(), 
-								  view: this.isViewMode()})
-				));
+				return React.createElement(
+					"div",
+					{ className: "n-modal-form-footer modal-footer", ref: "footer" },
+					React.createElement($pt.Components.NPanelFooter, { reset: this.getResetButton(),
+						validate: this.getValidationButton(),
+						save: this.getSaveButton(),
+						cancel: this.getCancelButton(),
+						left: this.getLeftButton(),
+						right: this.getRightButton(),
+						model: this.getModel(),
+						view: this.isViewMode() })
+				);
 			}
 		},
-		renderBody: function() {
+		renderBody: function () {
 			var css = {
 				'modal-body': true,
 				hide: !this.state.expanded
 			};
-			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
-				React.createElement($pt.Components.NForm, {model: this.getModel(), 
-					   layout: this.getLayout(), 
-					   direction: this.getDirection(), 
-					   view: this.isViewMode(), 
-				       ref: "form"})
-			));
+			return React.createElement(
+				"div",
+				{ className: $pt.LayoutHelper.classSet(css) },
+				React.createElement($pt.Components.NForm, { model: this.getModel(),
+					layout: this.getLayout(),
+					direction: this.getDirection(),
+					view: this.isViewMode(),
+					ref: "form" })
+			);
 		},
-		renderCloseButton: function() {
+		renderCloseButton: function () {
 			if (this.isDialogCloseShown()) {
-				return (React.createElement("button", {className: "close", 
-						onClick: this.hide, 
-						"aria-label": "Close", 
-						style: {marginTop: '-2px'}}, 
-					React.createElement("span", {"aria-hidden": "true"}, "×")
-				));
+				return React.createElement(
+					"button",
+					{ className: "close",
+						onClick: this.hide,
+						"aria-label": "Close",
+						style: { marginTop: '-2px' } },
+					React.createElement(
+						"span",
+						{ "aria-hidden": "true" },
+						"×"
+					)
+				);
 			}
 			return null;
 		},
 		/**
-		 * render
-		 * @returns {*}
-		 */
+   * render
+   * @returns {*}
+   */
 		render: function () {
 			if (!this.state.visible) {
 				return null;
 			}
 			var title = this.state.title ? this.state.title : this.props.title;
 			if (this.isCollapsible()) {
-				title = (React.createElement("a", {href: "javascript:void(0);", onClick: this.onTitleClicked}, title));
+				title = React.createElement(
+					"a",
+					{ href: "javascript:void(0);", onClick: this.onTitleClicked },
+					title
+				);
 			}
 			var css = {
 				'n-confirm': true,
@@ -8819,106 +9077,117 @@
 				css[this.props.className] = true;
 			}
 			// tabindex="0"
-			return (React.createElement("div", {ref: "top"}, 
-				React.createElement("div", {className: "modal-backdrop fade in", style: {zIndex: this.props.zIndex * 1}}), 
-				React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
-					 role: "dialog", 
-					 style: {display: 'block', zIndex: this.props.zIndex * 1 + 1}}, 
-					React.createElement("div", {className: "modal-dialog"}, 
-						React.createElement("div", {className: "modal-content", role: "document"}, 
-							React.createElement("div", {className: "modal-header"}, 
-								this.renderCloseButton(), 
-								React.createElement("h4", {className: "modal-title"}, title)
-							), 
-							this.renderBody(), 
+			return React.createElement(
+				"div",
+				{ ref: "top" },
+				React.createElement("div", { className: "modal-backdrop fade in", style: { zIndex: this.props.zIndex * 1 } }),
+				React.createElement(
+					"div",
+					{ className: $pt.LayoutHelper.classSet(css),
+						role: "dialog",
+						style: { display: 'block', zIndex: this.props.zIndex * 1 + 1 } },
+					React.createElement(
+						"div",
+						{ className: "modal-dialog" },
+						React.createElement(
+							"div",
+							{ className: "modal-content", role: "document" },
+							React.createElement(
+								"div",
+								{ className: "modal-header" },
+								this.renderCloseButton(),
+								React.createElement(
+									"h4",
+									{ className: "modal-title" },
+									title
+								)
+							),
+							this.renderBody(),
 							this.renderFooter()
 						)
 					)
 				)
-			));
+			);
 		},
-		onDocumentKeyUp: function(evt) {
-			if (evt.keyCode === 27) { // escape
+		onDocumentKeyUp: function (evt) {
+			if (evt.keyCode === 27) {
+				// escape
 				this.hide();
 			}
 		},
 		/**
-		 * on title clicked
-		 */
-		onTitleClicked: function() {
+   * on title clicked
+   */
+		onTitleClicked: function () {
 			// TODO no animotion, tried, weird.
-			this.setState({expanded: !this.state.expanded});
+			this.setState({ expanded: !this.state.expanded });
 		},
 		/**
-		 * on reset clicked
-		 */
+   * on reset clicked
+   */
 		onResetClicked: function () {
 			var reset = function () {
 				this.getModel().reset();
 				this.refs.form.forceUpdate();
 			};
-			$pt.Components.NConfirm.getConfirmModal().show(NModalForm.RESET_CONFIRM_TITLE,
-				NModalForm.RESET_CONFIRM_MESSAGE,
-				reset.bind(this));
+			$pt.Components.NConfirm.getConfirmModal().show(NModalForm.RESET_CONFIRM_TITLE, NModalForm.RESET_CONFIRM_MESSAGE, reset.bind(this));
 		},
 		/**
-		 * on validate clicked
-		 */
+   * on validate clicked
+   */
 		onValidateClicked: function () {
 			this.getModel().validate();
 			this.forceUpdate();
 		},
 		/**
-		 * on cancel clicked
-		 */
+   * on cancel clicked
+   */
 		onCancelClicked: function () {
-			if (this.state.buttons && (typeof this.state.buttons.cancel === 'function')) {
+			if (this.state.buttons && typeof this.state.buttons.cancel === 'function') {
 				this.hide();
 			} else {
-				$pt.Components.NConfirm.getConfirmModal().show(NModalForm.CANCEL_CONFIRM_TITLE,
-					NModalForm.CANCEL_CONFIRM_MESSAGE,
-					this.hide);
+				$pt.Components.NConfirm.getConfirmModal().show(NModalForm.CANCEL_CONFIRM_TITLE, NModalForm.CANCEL_CONFIRM_MESSAGE, this.hide);
 			}
 		},
 		/**
-		 * get model
-		 * @returns {ModelInterface}
-		 */
+   * get model
+   * @returns {ModelInterface}
+   */
 		getModel: function () {
 			return this.state.model;
 		},
 		/**
-		 * get layout
-		 * @returns {FormLayout}
-		 */
+   * get layout
+   * @returns {FormLayout}
+   */
 		getLayout: function () {
 			return this.state.layout;
 		},
 		/**
-		 * get direction
-		 * @returns {string}
-		 */
+   * get direction
+   * @returns {string}
+   */
 		getDirection: function () {
 			return this.state.direction;
 		},
 		/**
-		 * get left button configuration
-		 * @returns {{}|{}[]}
-		 */
+   * get left button configuration
+   * @returns {{}|{}[]}
+   */
 		getLeftButton: function () {
 			return this.state.buttons ? this.state.buttons.left : null;
 		},
 		/**
-		 * get right button configuration
-		 * @returns {{}|{}[]}
-		 */
+   * get right button configuration
+   * @returns {{}|{}[]}
+   */
 		getRightButton: function () {
 			return this.state.buttons ? this.state.buttons.right : null;
 		},
 		/**
-		 * get validation button
-		 * @returns {function}
-		 */
+   * get validation button
+   * @returns {function}
+   */
 		getValidationButton: function () {
 			if (this.state.buttons && this.state.buttons.validate === false) {
 				return null;
@@ -8929,9 +9198,9 @@
 			}
 		},
 		/**
-		 * get cancel button
-		 * @returns {function}
-		 */
+   * get cancel button
+   * @returns {function}
+   */
 		getCancelButton: function () {
 			if (this.state.buttons && this.state.buttons.cancel === false) {
 				return null;
@@ -8940,9 +9209,9 @@
 			}
 		},
 		/**
-		 * get reset button
-		 * @returns {function}
-		 */
+   * get reset button
+   * @returns {function}
+   */
 		getResetButton: function () {
 			if (this.state.buttons && this.state.buttons.reset === false) {
 				return null;
@@ -8953,71 +9222,71 @@
 			}
 		},
 		/**
-		 * get save button configuration
-		 * @returns {{}}
-		 */
+   * get save button configuration
+   * @returns {{}}
+   */
 		getSaveButton: function () {
 			return this.state.buttons ? this.state.buttons.save : null;
 		},
 		/**
-		 * is dialog close button shown
-		 * @returns boolean
-		 */
-		isDialogCloseShown: function() {
+   * is dialog close button shown
+   * @returns boolean
+   */
+		isDialogCloseShown: function () {
 			return this.state.buttons ? this.state.buttons.dialogCloseShown !== false : true;
 		},
 		/**
-		 * is draggable
-		 * @returns boolean
-		 */
-		isDraggable: function() {
+   * is draggable
+   * @returns boolean
+   */
+		isDraggable: function () {
 			return this.state.draggable || !this.state.modal;
 		},
 		/**
-		 * is collapsible
-		 * @returns boolean
-		 */
-		isCollapsible: function() {
+   * is collapsible
+   * @returns boolean
+   */
+		isCollapsible: function () {
 			return this.state.collapsible;
 		},
 		/**
-		 * is expanded
-		 * @returns boolean
-		 */
-		isExpanded: function() {
+   * is expanded
+   * @returns boolean
+   */
+		isExpanded: function () {
 			return this.state.expanded;
 		},
 		/**
-		 * is view mode
-		 * @returns boolean
-		 */
-		isViewMode: function() {
+   * is view mode
+   * @returns boolean
+   */
+		isViewMode: function () {
 			return this.state.view;
 		},
 		/**
-		 * validate
-		 * @returns {boolean}
-		 */
+   * validate
+   * @returns {boolean}
+   */
 		validate: function () {
 			this.getModel().validate();
 			this.forceUpdate();
 			return this.getModel().hasError();
 		},
 		/**
-		 * hide dialog
-		 * @return model
-		 */
+   * hide dialog
+   * @return model
+   */
 		hide: function () {
 			var model = this.state.model;
-			if (this.state.buttons && (typeof this.state.buttons.cancel === 'function')) {
-				this.state.buttons.cancel.call(this, model, function() {
+			if (this.state.buttons && typeof this.state.buttons.cancel === 'function') {
+				this.state.buttons.cancel.call(this, model, (function () {
 					this.setState({
 						visible: false,
 						model: null,
 						layout: null,
 						buttons: null
 					});
-				}.bind(this));
+				}).bind(this));
 			} else {
 				this.setState({
 					visible: false,
@@ -9029,16 +9298,16 @@
 			return model;
 		},
 		/**
-		 * show dialog
-		 *
-		 * from 0.0.3, all parameters can be defined in first as a JSON.
-		 * @param model
-		 * @param layout
-		 * @param buttons
-		 * @param direction vertical or horizontal
-		 * @param footer {boolean}
-		 * @param title {string}
-		 */
+   * show dialog
+   *
+   * from 0.0.3, all parameters can be defined in first as a JSON.
+   * @param model
+   * @param layout
+   * @param buttons
+   * @param direction vertical or horizontal
+   * @param footer {boolean}
+   * @param title {string}
+   */
 		show: function (model, layout, buttons, direction, footer, title) {
 			if (!model.getCurrentModel) {
 				// test the model is ModelInterface or not
@@ -9051,7 +9320,7 @@
 					footer: model.footer,
 					title: model.title,
 					draggable: model.draggable,
-					modal: model.modal == null ? (model.draggable ? false : true) : true,
+					modal: model.modal == null ? model.draggable ? false : true : true,
 					collapsible: model.collapsible,
 					expanded: model.expanded == null ? true : model.expanded,
 					pos: model.pos,
@@ -9078,57 +9347,57 @@
 	});
 	$pt.Components.NModalForm = NModalForm;
 
-	$.fn.drags = function(opt) {
-		opt = $.extend({handle:"",cursor:"move"}, opt);
+	$.fn.drags = function (opt) {
+		opt = $.extend({ handle: "", cursor: "move" }, opt);
 		var $el = null;
-		if(opt.handle === "") {
+		if (opt.handle === "") {
 			$el = this;
 		} else {
 			$el = this.find(opt.handle);
 		}
 
-		return $el.css('cursor', opt.cursor).on("mousedown", function(e) {
+		return $el.css('cursor', opt.cursor).on("mousedown", function (e) {
 			var $drag = null;
-			if(opt.handle === "") {
+			if (opt.handle === "") {
 				$drag = $(this).addClass('draggable');
 			} else {
 				$drag = $(this).addClass('active-handle').parent().addClass('draggable');
 			}
 			var z_idx = $drag.css('z-index'),
-			drg_h = $drag.outerHeight(),
-			drg_w = $drag.outerWidth(),
-			pos_y = $drag.offset().top + drg_h - e.pageY,
-			pos_x = $drag.offset().left + drg_w - e.pageX;
+			    drg_h = $drag.outerHeight(),
+			    drg_w = $drag.outerWidth(),
+			    pos_y = $drag.offset().top + drg_h - e.pageY,
+			    pos_x = $drag.offset().left + drg_w - e.pageX;
 
 			//          $drag.css('z-index', 1000).parents().on("mousemove", function(e) {
-			$drag.parents().on("mousemove", function(e) {
+			$drag.parents().on("mousemove", function (e) {
 				$('.draggable').offset({
-					top:e.pageY + pos_y - drg_h,
-					left:e.pageX + pos_x - drg_w
-				}).on("mouseup", function() {
+					top: e.pageY + pos_y - drg_h,
+					left: e.pageX + pos_x - drg_w
+				}).on("mouseup", function () {
 					$(this).removeClass('draggable').css('z-index', z_idx);
 				});
 			});
 			e.preventDefault(); // disable selection
-		}).on("mouseup", function() {
-			if(opt.handle === "") {
+		}).on("mouseup", function () {
+			if (opt.handle === "") {
 				$(this).removeClass('draggable');
 			} else {
 				$(this).removeClass('active-handle').parent().removeClass('draggable');
 			}
 		});
 	};
-	$.fn.stopDrags = function(opt) {
-		opt = $.extend({handle:"",cursor:"move"}, opt);
+	$.fn.stopDrags = function (opt) {
+		opt = $.extend({ handle: "", cursor: "move" }, opt);
 		var $el = null;
-		if(opt.handle === "") {
+		if (opt.handle === "") {
 			$el = this;
 		} else {
 			$el = this.find(opt.handle);
 		}
 
 		var $drag = null;
-		if(opt.handle === "") {
+		if (opt.handle === "") {
 			$drag = $($el);
 		} else {
 			$drag = $($el).parent();
@@ -9137,12 +9406,12 @@
 
 		return $el.off('mousedown mouseup');
 	};
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * Created by brad.wu on 9/2/2015.
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NNormalLabel = React.createClass({
 		displayName: 'NNormalLabel',
 		propTypes: {
@@ -9170,24 +9439,30 @@
 			if (this.props.size) {
 				css['n-label-' + this.props.size] = true;
 			}
-			return (React.createElement("span", {className: $pt.LayoutHelper.classSet(css)}, 
-            texts.map(function (text, textIndex) {
-	            return React.createElement("span", {key: textIndex}, text);
-            })
-        ));
+			return React.createElement(
+				'span',
+				{ className: $pt.LayoutHelper.classSet(css) },
+				texts.map(function (text, textIndex) {
+					return React.createElement(
+						'span',
+						{ key: textIndex },
+						text
+					);
+				})
+			);
 		},
 		getText: function () {
 			return this.props.text;
 		}
 	});
 	$pt.Components.NNormalLabel = NNormalLabel;
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * on request modal dialog.
  * z-index is 9899 and 9898, less than exception dialog, more than any other.
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NOnRequestModal = React.createClass({
 		displayName: 'NOnRequestModal',
 		statics: {
@@ -9197,8 +9472,7 @@
 					if (onRequestContainer.length == 0) {
 						$("<div id='onrequest_modal_container' />").appendTo($(document.body));
 					}
-					$pt.onRequestDialog = React.render(
-						React.createElement($pt.Components.NOnRequestModal, {className: className}), document.getElementById("onrequest_modal_container"));
+					$pt.onRequestDialog = ReactDOM.render(React.createElement($pt.Components.NOnRequestModal, { className: className }), document.getElementById("onrequest_modal_container"));
 				}
 				return $pt.onRequestDialog;
 			},
@@ -9214,22 +9488,22 @@
 			};
 		},
 		/**
-		 * set z-index
-		 */
+   * set z-index
+   */
 		fixDocumentPadding: function () {
 			document.body.style.paddingRight = 0;
 		},
 		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
+   * did update
+   * @param prevProps
+   * @param prevState
+   */
 		componentDidUpdate: function (prevProps, prevState) {
 			this.fixDocumentPadding();
 		},
 		/**
-		 * did mount
-		 */
+   * did mount
+   */
 		componentDidMount: function () {
 			this.fixDocumentPadding();
 		},
@@ -9246,42 +9520,54 @@
 			if (this.props.className) {
 				css[this.props.className] = true;
 			}
-			return (React.createElement("div", null, 
-				React.createElement("div", {className: "modal-backdrop fade in", style: {zIndex: NOnRequestModal.Z_INDEX}}), 
-				React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
-					 tabIndex: "-1", 
-					 role: "dialog", 
-					 style: {display: 'block', zIndex: NOnRequestModal.Z_INDEX + 1}}, 
-					React.createElement("div", {className: "modal-danger modal-dialog"}, 
-						React.createElement("div", {className: "modal-content", role: "document"}, 
-							React.createElement("div", {className: "modal-body", ref: "body"}, 
-								React.createElement("span", {className: "fa fa-fw fa-lg fa-spin fa-spinner"}), " ", NOnRequestModal.WAITING_MESSAGE
+			return React.createElement(
+				"div",
+				null,
+				React.createElement("div", { className: "modal-backdrop fade in", style: { zIndex: NOnRequestModal.Z_INDEX } }),
+				React.createElement(
+					"div",
+					{ className: $pt.LayoutHelper.classSet(css),
+						tabIndex: "-1",
+						role: "dialog",
+						style: { display: 'block', zIndex: NOnRequestModal.Z_INDEX + 1 } },
+					React.createElement(
+						"div",
+						{ className: "modal-danger modal-dialog" },
+						React.createElement(
+							"div",
+							{ className: "modal-content", role: "document" },
+							React.createElement(
+								"div",
+								{ className: "modal-body", ref: "body" },
+								React.createElement("span", { className: "fa fa-fw fa-lg fa-spin fa-spinner" }),
+								" ",
+								NOnRequestModal.WAITING_MESSAGE
 							)
 						)
 					)
 				)
-			));
+			);
 		},
 		/**
-		 * hide dialog
-		 */
+   * hide dialog
+   */
 		hide: function () {
-			this.setState({visible: false});
+			this.setState({ visible: false });
 		},
 		/**
-		 * show dialog
-		 */
+   * show dialog
+   */
 		show: function () {
-			this.setState({visible: true});
+			this.setState({ visible: true });
 		}
 	});
 	$pt.Components.NOnRequestModal = NOnRequestModal;
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * page footer.<br>
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NPageFooter = React.createClass({
 		displayName: 'NPageFooter',
 		statics: {
@@ -9299,42 +9585,69 @@
 		},
 		renderTech: function () {
 			if (NPageFooter.TECH_BASE != null && !NPageFooter.TECH_BASE.isBlank()) {
-				return (
-					React.createElement("span", null, ", on ", React.createElement("a", {href: NPageFooter.TECH_URL, target: "_blank", tabIndex: "-1"}, NPageFooter.TECH_BASE)));
+				return React.createElement(
+					'span',
+					null,
+					', on ',
+					React.createElement(
+						'a',
+						{ href: NPageFooter.TECH_URL, target: '_blank', tabIndex: '-1' },
+						NPageFooter.TECH_BASE
+					)
+				);
 			}
 			return null;
 		},
 		renderCompany: function () {
 			if (NPageFooter.COMPANY != null && !NPageFooter.COMPANY.isBlank()) {
-				return (
-					React.createElement("span", null, ", by ", React.createElement("a", {href: NPageFooter.COMPANY_URL, target: "_blank", tabIndex: "-1"}, NPageFooter.COMPANY)));
+				return React.createElement(
+					'span',
+					null,
+					', by ',
+					React.createElement(
+						'a',
+						{ href: NPageFooter.COMPANY_URL, target: '_blank', tabIndex: '-1' },
+						NPageFooter.COMPANY
+					)
+				);
 			}
 			return null;
 		},
 		render: function () {
-			return (
-				React.createElement("footer", {className: "footer"}, 
-					React.createElement("div", {className: "container"}, 
-						React.createElement("p", {className: "text-muted", style: {display: 'inline-block'}}, 
-							React.createElement("span", null, NPageFooter.LEFT_TEXT)
-						), 
-
-						React.createElement("p", {className: "text-muted pull-right", style: {display: 'inline-block'}}, 
-							this.props.name, 
-							this.renderTech(), 
-							this.renderCompany(), "."
+			return React.createElement(
+				'footer',
+				{ className: 'footer' },
+				React.createElement(
+					'div',
+					{ className: 'container' },
+					React.createElement(
+						'p',
+						{ className: 'text-muted', style: { display: 'inline-block' } },
+						React.createElement(
+							'span',
+							null,
+							NPageFooter.LEFT_TEXT
 						)
+					),
+					React.createElement(
+						'p',
+						{ className: 'text-muted pull-right', style: { display: 'inline-block' } },
+						this.props.name,
+						this.renderTech(),
+						this.renderCompany(),
+						'.'
 					)
-				));
+				)
+			);
 		}
 	});
 	$pt.Components.NPageFooter = NPageFooter;
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * Page Header<br>
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NPageHeader = React.createClass({
 		displayName: 'NPageHeader',
 		statics: {
@@ -9357,9 +9670,9 @@
 			};
 		},
 		/**
-		 * get initial state
-		 * @returns {*}
-		 */
+   * get initial state
+   * @returns {*}
+   */
 		getInitialState: function () {
 			return {
 				model: $pt.createModel({
@@ -9368,9 +9681,9 @@
 			};
 		},
 		/**
-		 * render search box
-		 * @returns {XML}
-		 */
+   * render search box
+   * @returns {XML}
+   */
 		renderSearchBox: function () {
 			var layout = $pt.createCellLayout('text', {
 				comp: {
@@ -9382,44 +9695,66 @@
 				}
 			});
 
-			return (React.createElement("div", {className: "navbar-form navbar-right", role: "search"}, 
-				React.createElement($pt.Components.NText, {model: this.state.model, layout: layout})
-			));
+			return React.createElement(
+				'div',
+				{ className: 'navbar-form navbar-right', role: 'search' },
+				React.createElement($pt.Components.NText, { model: this.state.model, layout: layout })
+			);
 		},
 		renderMenuItem: function (item, index, menus, onTopLevel) {
 			if (item.children !== undefined) {
 				// render dropdown menu
 				var _this = this;
-				return (
-					React.createElement("li", {className: onTopLevel ? "dropdown" : "dropdown-submenu", key: index}, 
-						React.createElement("a", {href: "#", className: "dropdown-toggle", "data-toggle": "dropdown", role: "button", 
-						   "aria-expanded": "false"}, 
-							item.text, " ", onTopLevel ? React.createElement("span", {className: "caret"}) : null
-						), 
-						React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
-							item.children.map(function (childItem, childIndex, dropdownItems) {
-								return _this.renderMenuItem(childItem, childIndex, dropdownItems, false);
-							})
-						)
+				return React.createElement(
+					'li',
+					{ className: onTopLevel ? "dropdown" : "dropdown-submenu", key: index },
+					React.createElement(
+						'a',
+						{ href: '#', className: 'dropdown-toggle', 'data-toggle': 'dropdown', role: 'button',
+							'aria-expanded': 'false' },
+						item.text,
+						' ',
+						onTopLevel ? React.createElement('span', { className: 'caret' }) : null
+					),
+					React.createElement(
+						'ul',
+						{ className: 'dropdown-menu', role: 'menu' },
+						item.children.map(function (childItem, childIndex, dropdownItems) {
+							return _this.renderMenuItem(childItem, childIndex, dropdownItems, false);
+						})
 					)
 				);
 			} else if (item.divider === true) {
 				// render divider
-				return (React.createElement("li", {className: "divider", key: index}));
+				return React.createElement('li', { className: 'divider', key: index });
 			} else if (item.func !== undefined) {
 				// call javascript function
-				return (React.createElement("li", null, 
-					React.createElement("a", {href: "javascript:void(0);", onClick: this.onMenuClicked.bind(this, item.func), key: index}, item.text)
-				));
+				return React.createElement(
+					'li',
+					null,
+					React.createElement(
+						'a',
+						{ href: 'javascript:void(0);', onClick: this.onMenuClicked.bind(this, item.func), key: index },
+						item.text
+					)
+				);
 			} else {
 				// jump to url
-				return (React.createElement("li", {key: index}, React.createElement("a", {href: item.url}, item.text)));
+				return React.createElement(
+					'li',
+					{ key: index },
+					React.createElement(
+						'a',
+						{ href: item.url },
+						item.text
+					)
+				);
 			}
 		},
 		/**
-		 * render menus
-		 * @returns {XML}
-		 */
+   * render menus
+   * @returns {XML}
+   */
 		renderMenus: function () {
 			var _this = this;
 			if (this.props.side) {
@@ -9431,26 +9766,44 @@
 			if (this.props.side) {
 				css['nav-side'] = true;
 			}
-			return (
-				React.createElement("ul", {className: $pt.LayoutHelper.classSet(css)}, 
-					this.props.menus.map(function (item, index, menu) {
-						return _this.renderMenuItem(item, index, menu, true);
-					})
-				)
+			return React.createElement(
+				'ul',
+				{ className: $pt.LayoutHelper.classSet(css) },
+				this.props.menus.map(function (item, index, menu) {
+					return _this.renderMenuItem(item, index, menu, true);
+				})
 			);
 		},
 		renderBrand: function () {
 			if (this.props.brandUrl) {
-				return React.createElement("a", {href: this.props.brandUrl}, React.createElement("span", {className: "navbar-brand"}, this.props.brand));
+				return React.createElement(
+					'a',
+					{ href: this.props.brandUrl },
+					React.createElement(
+						'span',
+						{ className: 'navbar-brand' },
+						this.props.brand
+					)
+				);
 			} else if (this.props.brandFunc || this.props.side) {
-				return (React.createElement("a", {href: "javascript:void(0);", 
-				           onMouseEnter: this.onBrandMouseEnter, 
-				           onMouseLeave: this.onBrandMouseLeave, 
-				           onClick: this.onBrandClicked}, 
-					React.createElement("span", {className: "navbar-brand"}, this.props.brand)
-				));
+				return React.createElement(
+					'a',
+					{ href: 'javascript:void(0);',
+						onMouseEnter: this.onBrandMouseEnter,
+						onMouseLeave: this.onBrandMouseLeave,
+						onClick: this.onBrandClicked },
+					React.createElement(
+						'span',
+						{ className: 'navbar-brand' },
+						this.props.brand
+					)
+				);
 			} else {
-				return React.createElement("span", {className: "navbar-brand"}, this.props.brand);
+				return React.createElement(
+					'span',
+					{ className: 'navbar-brand' },
+					this.props.brand
+				);
 			}
 		},
 		onBrandMouseEnter: function () {
@@ -9468,67 +9821,79 @@
 			}
 		},
 		/**
-		 * on brand clicked
-		 */
+   * on brand clicked
+   */
 		onBrandClicked: function () {
 			if (this.props.brandFunc) {
 				this.props.brandFunc.call(this);
 			}
 		},
 		/**
-		 * on menu clicked
-		 * @param func
-		 */
+   * on menu clicked
+   * @param func
+   */
 		onMenuClicked: function (func) {
 			func.call(this);
 		},
 		/**
-		 * on search clicked
-		 */
+   * on search clicked
+   */
 		onSearchClicked: function () {
 			this.props.search.call(this, this.state.model.get('text'));
 		},
 		/**
-		 * render component
-		 * @returns {XML}
-		 */
+   * render component
+   * @returns {XML}
+   */
 		render: function () {
-			return (
-				React.createElement("nav", {className: "navbar navbar-default navbar-fixed-top"}, 
-					React.createElement("div", {className: "container-fluid"}, 
-						React.createElement("div", {className: "navbar-header"}, 
-							React.createElement("button", {type: "button", className: "navbar-toggle collapsed", "data-toggle": "collapse", 
-							        "data-target": "#navbar-1"}, 
-								React.createElement("span", {className: "sr-only"}, "Toggle navigation"), 
-								React.createElement("span", {className: "icon-bar"}), 
-								React.createElement("span", {className: "icon-bar"}), 
-								React.createElement("span", {className: "icon-bar"})
-							), 
-							this.renderBrand()
-						), 
-						React.createElement("div", {className: "collapse navbar-collapse", id: "navbar-1"}, 
-							this.props.menus ? this.renderMenus() : null, 
-							this.props.search ? this.renderSearchBox() : null
-						)
+			return React.createElement(
+				'nav',
+				{ className: 'navbar navbar-default navbar-fixed-top' },
+				React.createElement(
+					'div',
+					{ className: 'container-fluid' },
+					React.createElement(
+						'div',
+						{ className: 'navbar-header' },
+						React.createElement(
+							'button',
+							{ type: 'button', className: 'navbar-toggle collapsed', 'data-toggle': 'collapse',
+								'data-target': '#navbar-1' },
+							React.createElement(
+								'span',
+								{ className: 'sr-only' },
+								'Toggle navigation'
+							),
+							React.createElement('span', { className: 'icon-bar' }),
+							React.createElement('span', { className: 'icon-bar' }),
+							React.createElement('span', { className: 'icon-bar' })
+						),
+						this.renderBrand()
+					),
+					React.createElement(
+						'div',
+						{ className: 'collapse navbar-collapse', id: 'navbar-1' },
+						this.props.menus ? this.renderMenus() : null,
+						this.props.search ? this.renderSearchBox() : null
 					)
 				)
 			);
 		}
 	});
 	$pt.Components.NPageHeader = NPageHeader;
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * pagination
  *
  * NOTE: never jump by itself, must register the toPage and refresh this component manually
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NPagination = React.createClass({
 		displayName: 'NPagination',
 		/**
-		 * @override
-		 */
+   * @override
+   */
 		propTypes: {
 			// max page buttons
 			maxPageButtons: React.PropTypes.number,
@@ -9546,10 +9911,10 @@
 			showStatus: React.PropTypes.bool
 		},
 		/**
-		 * override react method
-		 * @returns {*}
-		 * @override
-		 */
+   * override react method
+   * @returns {*}
+   * @override
+   */
 		getDefaultProps: function () {
 			return {
 				maxPageButtons: 5,
@@ -9559,8 +9924,8 @@
 			};
 		},
 		/**
-		 * make max page buttons is an odd number and at least 3
-		 */
+   * make max page buttons is an odd number and at least 3
+   */
 		getMaxPageButtons: function () {
 			var maxPageButtons = this.props.maxPageButtons * 1;
 			if (maxPageButtons % 2 == 0) {
@@ -9572,9 +9937,9 @@
 			return maxPageButtons;
 		},
 		/**
-		 * get buttons range
-		 * @returns {{min: number, max: number}}
-		 */
+   * get buttons range
+   * @returns {{min: number, max: number}}
+   */
 		getPageButtonsRange: function () {
 			var currentPageIndex = this.getCurrentPageIndex();
 
@@ -9589,7 +9954,7 @@
 			} else {
 				max = currentPageIndex + availablePageCountFromCurrent;
 				// move to min buttons, since no enough available pages to display
-				maxButtonCountFromCurrent += (maxButtonCountFromCurrent - availablePageCountFromCurrent);
+				maxButtonCountFromCurrent += maxButtonCountFromCurrent - availablePageCountFromCurrent;
 			}
 			// calc the steps from currentPageIndex to first page
 			var min = 0;
@@ -9601,55 +9966,67 @@
 			}
 
 			// calc the steps
-			if ((max - min) < maxPageButtons) {
+			if (max - min < maxPageButtons) {
 				// no enough buttons
 				max = min + maxPageButtons - 1;
 				max = max > this.getPageCount() ? this.getPageCount() : max;
 			}
 
-			return {min: min, max: max};
+			return { min: min, max: max };
 		},
 		/**
-		 * render button which jump to first page
-		 * @param buttonsRange
-		 * @returns {XML}
-		 */
+   * render button which jump to first page
+   * @param buttonsRange
+   * @returns {XML}
+   */
 		renderFirst: function (buttonsRange) {
-			return (React.createElement("li", null, 
-				React.createElement("a", {href: "javascript:void(0);", "aria-label": "First", onClick: this.toFirst}, 
-					React.createElement("span", {className: "fa fa-fw fa-fast-backward"})
+			return React.createElement(
+				"li",
+				null,
+				React.createElement(
+					"a",
+					{ href: "javascript:void(0);", "aria-label": "First", onClick: this.toFirst },
+					React.createElement("span", { className: "fa fa-fw fa-fast-backward" })
 				)
-			));
+			);
 		},
 		/**
-		 * render button which jump to previous page section
-		 * @param buttonsRange
-		 * @returns {XML}
-		 */
+   * render button which jump to previous page section
+   * @param buttonsRange
+   * @returns {XML}
+   */
 		renderPreviousSection: function (buttonsRange) {
-			return (React.createElement("li", null, 
-				React.createElement("a", {href: "javascript:void(0);", "aria-label": "PreviousSection", onClick: this.toPreviousSection}, 
-					React.createElement("span", {className: "fa fa-fw fa-backward"})
+			return React.createElement(
+				"li",
+				null,
+				React.createElement(
+					"a",
+					{ href: "javascript:void(0);", "aria-label": "PreviousSection", onClick: this.toPreviousSection },
+					React.createElement("span", { className: "fa fa-fw fa-backward" })
 				)
-			));
+			);
 		},
 		/**
-		 * render button which jump to previous page
-		 * @param buttonsRange
-		 * @returns {XML}
-		 */
+   * render button which jump to previous page
+   * @param buttonsRange
+   * @returns {XML}
+   */
 		renderPrevious: function (buttonsRange) {
-			return (React.createElement("li", null, 
-				React.createElement("a", {href: "javascript:void(0);", "aria-label": "Previous", onClick: this.toPrevious}, 
-					React.createElement("span", {className: "fa fa-fw fa-chevron-left"})
+			return React.createElement(
+				"li",
+				null,
+				React.createElement(
+					"a",
+					{ href: "javascript:void(0);", "aria-label": "Previous", onClick: this.toPrevious },
+					React.createElement("span", { className: "fa fa-fw fa-chevron-left" })
 				)
-			));
+			);
 		},
 		/**
-		 * render buttons
-		 * @param buttonsRange
-		 * @returns {[XML]}
-		 */
+   * render buttons
+   * @param buttonsRange
+   * @returns {[XML]}
+   */
 		renderButtons: function (buttonsRange) {
 			var buttons = [];
 			for (var index = buttonsRange.min; index <= buttonsRange.max; index++) {
@@ -9661,70 +10038,95 @@
 				if (index == _this.getCurrentPageIndex()) {
 					css.active = true;
 				}
-				return (React.createElement("li", {key: index}, 
-					React.createElement("a", {href: "javascript:void(0);", 
-					   onClick: _this.toPage, 
-					   "data-index": index, 
-					   className: $pt.LayoutHelper.classSet(css)}, index)
-				));
+				return React.createElement(
+					"li",
+					{ key: index },
+					React.createElement(
+						"a",
+						{ href: "javascript:void(0);",
+							onClick: _this.toPage,
+							"data-index": index,
+							className: $pt.LayoutHelper.classSet(css) },
+						index
+					)
+				);
 			});
 		},
 		/**
-		 * render button which jump to next page
-		 * @param buttonsRange
-		 * @returns {XML}
-		 */
+   * render button which jump to next page
+   * @param buttonsRange
+   * @returns {XML}
+   */
 		renderNext: function (buttonsRange) {
-			return (React.createElement("li", null, 
-				React.createElement("a", {href: "javascript:void(0);", "aria-label": "Next", onClick: this.toNext}, 
-					React.createElement("span", {className: "fa fa-fw fa-chevron-right"})
+			return React.createElement(
+				"li",
+				null,
+				React.createElement(
+					"a",
+					{ href: "javascript:void(0);", "aria-label": "Next", onClick: this.toNext },
+					React.createElement("span", { className: "fa fa-fw fa-chevron-right" })
 				)
-			));
+			);
 		},
 		/**
-		 * render button which jump to next page section
-		 * @param buttonsRange
-		 * @returns {XML}
-		 */
+   * render button which jump to next page section
+   * @param buttonsRange
+   * @returns {XML}
+   */
 		renderNextSection: function (buttonsRange) {
-			return (React.createElement("li", null, 
-				React.createElement("a", {href: "javascript:void(0);", "aria-label": "NextSection", onClick: this.toNextSection}, 
-					React.createElement("span", {className: "fa fa-fw fa-forward"})
+			return React.createElement(
+				"li",
+				null,
+				React.createElement(
+					"a",
+					{ href: "javascript:void(0);", "aria-label": "NextSection", onClick: this.toNextSection },
+					React.createElement("span", { className: "fa fa-fw fa-forward" })
 				)
-			));
+			);
 		},
 		/**
-		 * render button which jump to last page
-		 * @param buttonsRange
-		 * @returns {XML}
-		 */
+   * render button which jump to last page
+   * @param buttonsRange
+   * @returns {XML}
+   */
 		renderLast: function (buttonsRange) {
-			return (React.createElement("li", null, 
-				React.createElement("a", {href: "javascript:void(0);", "aria-label": "Last", onClick: this.toLast}, 
-					React.createElement("span", {className: "fa fa-fw fa-fast-forward"})
+			return React.createElement(
+				"li",
+				null,
+				React.createElement(
+					"a",
+					{ href: "javascript:void(0);", "aria-label": "Last", onClick: this.toLast },
+					React.createElement("span", { className: "fa fa-fw fa-fast-forward" })
 				)
-			));
+			);
 		},
 		/**
-		 * render status
-		 * @returns {XML}
-		 */
+   * render status
+   * @returns {XML}
+   */
 		renderStatus: function () {
 			if (this.props.showStatus) {
-				return (React.createElement("div", {className: "n-pagination-status col-sm-2 col-md-2 col-lg-2"}, 
-					React.createElement("div", null, 
-						"Page: ", this.getCurrentPageIndex(), " / ", this.getPageCount()
+				return React.createElement(
+					"div",
+					{ className: "n-pagination-status col-sm-2 col-md-2 col-lg-2" },
+					React.createElement(
+						"div",
+						null,
+						"Page: ",
+						this.getCurrentPageIndex(),
+						" / ",
+						this.getPageCount()
 					)
-				));
+				);
 			} else {
 				return null;
 			}
 		},
 		/**
-		 * override react method
-		 * @returns {XML}
-		 * @override
-		 */
+   * override react method
+   * @returns {XML}
+   * @override
+   */
 		render: function () {
 			var buttonsRange = this.getPageButtonsRange();
 			var css = {
@@ -9739,26 +10141,32 @@
 				'col-sm-10 col-md-10 col-lg-10': this.props.showStatus,
 				'col-sm-12 col-md-12 col-lg-12': !this.props.showStatus
 			};
-			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
-				this.renderStatus(), 
-				React.createElement("div", {className: $pt.LayoutHelper.classSet(buttonCSS)}, 
-					React.createElement("ul", {className: "pagination"}, 
-						this.renderFirst(buttonsRange), 
-						this.renderPreviousSection(buttonsRange), 
-						this.renderPrevious(buttonsRange), 
-						this.renderButtons(buttonsRange), 
-						this.renderNext(buttonsRange), 
-						this.renderNextSection(buttonsRange), 
+			return React.createElement(
+				"div",
+				{ className: $pt.LayoutHelper.classSet(css) },
+				this.renderStatus(),
+				React.createElement(
+					"div",
+					{ className: $pt.LayoutHelper.classSet(buttonCSS) },
+					React.createElement(
+						"ul",
+						{ className: "pagination" },
+						this.renderFirst(buttonsRange),
+						this.renderPreviousSection(buttonsRange),
+						this.renderPrevious(buttonsRange),
+						this.renderButtons(buttonsRange),
+						this.renderNext(buttonsRange),
+						this.renderNextSection(buttonsRange),
 						this.renderLast(buttonsRange)
 					)
 				)
-			));
+			);
 		},
 		/**
-		 * get current page index
-		 * @param button
-		 * @returns {*|jQuery}
-		 */
+   * get current page index
+   * @param button
+   * @returns {*|jQuery}
+   */
 		getCurrentPageIndex: function (button) {
 			if (button) {
 				return $(button).attr("data-index");
@@ -9770,58 +10178,58 @@
 			return this.props.pageCount * 1;
 		},
 		/**
-		 * jump to first page
-		 */
+   * jump to first page
+   */
 		toFirst: function () {
 			this.jumpTo(1);
 		},
 		/**
-		 * jump to previous page section
-		 */
+   * jump to previous page section
+   */
 		toPreviousSection: function () {
 			var previousIndex = this.getCurrentPageIndex() - this.getMaxPageButtons();
 			previousIndex = previousIndex < 1 ? 1 : previousIndex;
 			this.jumpTo(previousIndex);
 		},
 		/**
-		 * jump to previous page
-		 */
+   * jump to previous page
+   */
 		toPrevious: function () {
 			var previousIndex = this.getCurrentPageIndex() - 1;
 			this.jumpTo(previousIndex < 1 ? 1 : previousIndex);
 		},
 		/**
-		 * jump to given page according to event
-		 * @param evt
-		 */
+   * jump to given page according to event
+   * @param evt
+   */
 		toPage: function (evt) {
 			this.jumpTo(this.getCurrentPageIndex(evt.target));
 		},
 		/**
-		 * jump to next page
-		 */
+   * jump to next page
+   */
 		toNext: function () {
 			var nextIndex = this.getCurrentPageIndex() + 1;
 			this.jumpTo(nextIndex > this.getPageCount() ? this.getPageCount() : nextIndex);
 		},
 		/**
-		 * jump to next page section
-		 */
+   * jump to next page section
+   */
 		toNextSection: function () {
 			var nextIndex = this.getCurrentPageIndex() + this.getMaxPageButtons();
 			nextIndex = nextIndex > this.getPageCount() ? this.getPageCount() : nextIndex;
 			this.jumpTo(nextIndex);
 		},
 		/**
-		 * jump to last page
-		 */
+   * jump to last page
+   */
 		toLast: function () {
 			this.jumpTo(this.getPageCount());
 		},
 		/**
-		 * jump to given page index
-		 * @param pageIndex
-		 */
+   * jump to given page index
+   * @param pageIndex
+   */
 		jumpTo: function (pageIndex) {
 			pageIndex = pageIndex * 1;
 			$(':focus').blur();
@@ -9836,7 +10244,7 @@
 		}
 	});
 	$pt.Components.NPagination = NPagination;
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * panel
@@ -9875,7 +10283,7 @@
  *      }
  * }
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NPanel = React.createClass($pt.defineCellComponent({
 		displayName: 'NPanel',
 		propTypes: {
@@ -9886,9 +10294,9 @@
 			direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
 		},
 		/**
-		 * will update
-		 * @param nextProps
-		 */
+   * will update
+   * @param nextProps
+   */
 		componentWillUpdate: function (nextProps) {
 			if (this.hasCheckInTitle()) {
 				this.getModel().removeListener(this.getCheckInTitleDataId(), 'post', 'change', this.onTitleCheckChanged);
@@ -9898,10 +10306,10 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
+   * did update
+   * @param prevProps
+   * @param prevState
+   */
 		componentDidUpdate: function (prevProps, prevState) {
 			if (this.hasCheckInTitle()) {
 				this.getModel().addListener(this.getCheckInTitleDataId(), 'post', 'change', this.onTitleCheckChanged);
@@ -9911,8 +10319,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * did mount
-		 */
+   * did mount
+   */
 		componentDidMount: function () {
 			if (this.hasCheckInTitle()) {
 				this.getModel().addListener(this.getCheckInTitleDataId(), 'post', 'change', this.onTitleCheckChanged);
@@ -9922,8 +10330,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * will unmount
-		 */
+   * will unmount
+   */
 		componentWillUnmount: function () {
 			if (this.hasCheckInTitle()) {
 				this.getModel().removeListener(this.getCheckInTitleDataId(), 'post', 'change', this.onTitleCheckChanged);
@@ -9947,9 +10355,9 @@
 			};
 		},
 		/**
-		 * render check in title
-		 * @returns {XML}
-		 */
+   * render check in title
+   * @returns {XML}
+   */
 		renderCheckInTitle: function () {
 			if (!this.hasCheckInTitle()) {
 				return null;
@@ -9958,21 +10366,23 @@
 			var layout = {
 				label: this.getCheckInTitleLabel(),
 				dataId: this.getCheckInTitleDataId(),
-				comp: $.extend({labelAttached: 'left'}, this.getCheckInTitleOption(), {
+				comp: $.extend({ labelAttached: 'left' }, this.getCheckInTitleOption(), {
 					type: $pt.ComponentConstants.Check,
 					labelDirection: 'horizontal'
 				})
 			};
-			return (React.createElement("div", null, 
-				"(", 
-				React.createElement($pt.Components.NCheck, {model: this.getModel(), layout: $pt.createCellLayout('check', layout), view: this.isViewMode()}), 
-				")"
-			));
+			return React.createElement(
+				'div',
+				null,
+				'(',
+				React.createElement($pt.Components.NCheck, { model: this.getModel(), layout: $pt.createCellLayout('check', layout), view: this.isViewMode() }),
+				')'
+			);
 		},
 		/**
-		 * render heading
-		 * @returns {XML}
-		 */
+   * render heading
+   * @returns {XML}
+   */
 		renderHeading: function () {
 			var label = this.getTitle();
 			var css = {
@@ -9980,50 +10390,76 @@
 			};
 			if (this.isCollapsible()) {
 				css['n-collapsible-title-check'] = this.hasCheckInTitle();
-				return (React.createElement("div", {className: "panel-heading"}, 
-					React.createElement("h4", {className: $pt.LayoutHelper.classSet(css)}, 
-						React.createElement("a", {href: "javascript:void(0);", onClick: this.onTitleClicked, ref: "head"}, label), 
+				return React.createElement(
+					'div',
+					{ className: 'panel-heading' },
+					React.createElement(
+						'h4',
+						{ className: $pt.LayoutHelper.classSet(css) },
+						React.createElement(
+							'a',
+							{ href: 'javascript:void(0);', onClick: this.onTitleClicked, ref: 'head' },
+							label
+						),
 						this.renderCheckInTitle()
 					)
-				));
+				);
 			} else if (this.hasCheckInTitle()) {
 				css['n-normal-title-check'] = this.hasCheckInTitle();
-				return (React.createElement("div", {className: "panel-heading"}, 
-					React.createElement("h4", {className: $pt.LayoutHelper.classSet(css)}, 
-						React.createElement("span", {ref: "head"}, label), 
+				return React.createElement(
+					'div',
+					{ className: 'panel-heading' },
+					React.createElement(
+						'h4',
+						{ className: $pt.LayoutHelper.classSet(css) },
+						React.createElement(
+							'span',
+							{ ref: 'head' },
+							label
+						),
 						this.renderCheckInTitle()
 					)
-				));
+				);
 			} else {
-				return React.createElement("div", {className: "panel-heading", ref: "head"}, label);
+				return React.createElement(
+					'div',
+					{ className: 'panel-heading', ref: 'head' },
+					label
+				);
 			}
 		},
 		/**
-		 * render row
-		 * @param row {RowLayout}
-		 */
+   * render row
+   * @param row {RowLayout}
+   */
 		renderRow: function (row, rowIndex) {
 			var _this = this;
 			var cells = row.getCells().map(function (cell, cellIndex) {
-				return React.createElement($pt.Components.NFormCell, {layout: cell, 
-				                  model: _this.getModel(), 
-				                  ref: cell.getId(), 
-				                  direction: _this.props.direction, 
-								  view: _this.isViewMode(), 
-								  key: '' + rowIndex + '-' + cellIndex});
+				return React.createElement($pt.Components.NFormCell, { layout: cell,
+					model: _this.getModel(),
+					ref: cell.getId(),
+					direction: _this.props.direction,
+					view: _this.isViewMode(),
+					key: '' + rowIndex + '-' + cellIndex });
 			});
-			return (React.createElement("div", {className: "row", key: rowIndex}, cells));
+			return React.createElement(
+				'div',
+				{ className: 'row', key: rowIndex },
+				cells
+			);
 		},
 		/**
-		 * render
-		 * @returns {XML}
-		 */
+   * render
+   * @returns {XML}
+   */
 		render: function () {
 			var label = this.getLayout().getLabel();
 			if (label == null) {
-				return (React.createElement("div", {ref: "panel"}, 
+				return React.createElement(
+					'div',
+					{ ref: 'panel' },
 					this.getInnerLayout().getRows().map(this.renderRow)
-				));
+				);
 			}
 			var css = {
 				panel: true
@@ -10033,31 +10469,35 @@
 			var bodyStyle = {
 				display: this.isInitExpanded() ? 'block' : 'none'
 			};
-			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), ref: "panel"}, 
-				this.renderHeading(), 
-				React.createElement("div", {className: "panel-body", style: bodyStyle, ref: "body"}, 
+			return React.createElement(
+				'div',
+				{ className: $pt.LayoutHelper.classSet(css), ref: 'panel' },
+				this.renderHeading(),
+				React.createElement(
+					'div',
+					{ className: 'panel-body', style: bodyStyle, ref: 'body' },
 					this.getInnerLayout().getRows().map(this.renderRow)
 				)
-			));
+			);
 		},
 		/**
-		 * get inner layout
-		 * @returns {SectionLayout}
-		 */
+   * get inner layout
+   * @returns {SectionLayout}
+   */
 		getInnerLayout: function () {
-			return $pt.createSectionLayout({layout: this.getComponentOption('editLayout')});
+			return $pt.createSectionLayout({ layout: this.getComponentOption('editLayout') });
 		},
 		/**
-		 * is collapsible or not
-		 * @returns {boolean}
-		 */
+   * is collapsible or not
+   * @returns {boolean}
+   */
 		isCollapsible: function () {
 			return this.getComponentOption('collapsible');
 		},
 		/**
-		 * is expanded
-		 * @returns {boolean}
-		 */
+   * is expanded
+   * @returns {boolean}
+   */
 		isInitExpanded: function () {
 			if (this.state.expanded == null) {
 				// first equals 'expanded' definition
@@ -10069,20 +10509,20 @@
 					if (action === 'same') {
 						// check behavior same as collapsible
 						// all expanded, finally expanded
-						this.state.expanded = this.state.expanded && (value === true);
+						this.state.expanded = this.state.expanded && value === true;
 					} else if (action === 'reverse') {
 						// check behavior reversed as collapsible
 						// all expanded, finally expanded
-						this.state.expanded = this.state.expanded && (value !== true);
+						this.state.expanded = this.state.expanded && value !== true;
 					}
 				}
 			}
 			return this.state.expanded;
 		},
 		/**
-		 * get style
-		 * @returns {string}
-		 */
+   * get style
+   * @returns {string}
+   */
 		getStyle: function () {
 			return this.getComponentOption('style');
 		},
@@ -10116,48 +10556,48 @@
 			return this.getComponentOption('collapsedLabel');
 		},
 		/**
-		 * has check box in title or not
-		 * @returns {boolean}
-		 */
+   * has check box in title or not
+   * @returns {boolean}
+   */
 		hasCheckInTitle: function () {
 			return this.getComponentOption('checkInTitle') != null;
 		},
 		/**
-		 * get check box value of panel title
-		 * @returns {boolean}
-		 */
+   * get check box value of panel title
+   * @returns {boolean}
+   */
 		getCheckInTitleValue: function () {
 			var id = this.getCheckInTitleDataId();
 			return id ? this.getModel().get(id) : null;
 		},
 		/**
-		 * get check box data id of panel title
-		 * @returns {string}
-		 */
+   * get check box data id of panel title
+   * @returns {string}
+   */
 		getCheckInTitleDataId: function () {
 			var checkInTitle = this.getComponentOption('checkInTitle');
 			return checkInTitle ? checkInTitle.data : null;
 		},
 		/**
-		 * get check box label of panel title
-		 * @returns {string}
-		 */
+   * get check box label of panel title
+   * @returns {string}
+   */
 		getCheckInTitleLabel: function () {
 			var checkInTitle = this.getComponentOption('checkInTitle');
 			return checkInTitle ? checkInTitle.label : null;
 		},
 		/**
-		 * get check box value and collapsible is related or not
-		 * @returns {same|reverse}
-		 */
+   * get check box value and collapsible is related or not
+   * @returns {same|reverse}
+   */
 		getCheckInTitleCollapsible: function () {
 			var checkInTitle = this.getComponentOption('checkInTitle');
 			return checkInTitle ? checkInTitle.collapsible : null;
 		},
 		/**
-		 * get other check in title options
-		 * @returns {null}
-		 */
+   * get other check in title options
+   * @returns {null}
+   */
 		getCheckInTitleOption: function () {
 			var checkInTitle = this.getComponentOption('checkInTitle');
 			if (checkInTitle) {
@@ -10171,18 +10611,18 @@
 			}
 		},
 		/**
-		 * on title clicked
-		 * @param e
-		 */
+   * on title clicked
+   * @param e
+   */
 		onTitleClicked: function (e) {
 			e.selected = false;
 			e.preventDefault();
 			this.toggleExpanded(!this.state.expanded);
 		},
 		/**
-		 * on title check-box value changed
-		 * @param evt
-		 */
+   * on title check-box value changed
+   * @param evt
+   */
 		onTitleCheckChanged: function (evt) {
 			var value = evt.new;
 			var collapsible = this.getCheckInTitleCollapsible();
@@ -10193,27 +10633,27 @@
 			}
 		},
 		/**
-		 * toggle panel expanded
-		 * @param expanded {boolean}
-		 */
+   * toggle panel expanded
+   * @param expanded {boolean}
+   */
 		toggleExpanded: function (expanded) {
 			if (expanded) {
 				if (this.canExpanded()) {
 					// panel can be expanded
-					$(React.findDOMNode(this.refs.body)).slideDown(300, function () {
-						this.setState({expanded: true});
-					}.bind(this));
+					$(ReactDOM.findDOMNode(this.refs.body)).slideDown(300, (function () {
+						this.setState({ expanded: true });
+					}).bind(this));
 				}
 			} else {
-				$(React.findDOMNode(this.refs.body)).slideUp(300, function () {
-					this.setState({expanded: false});
-				}.bind(this));
+				$(ReactDOM.findDOMNode(this.refs.body)).slideUp(300, (function () {
+					this.setState({ expanded: false });
+				}).bind(this));
 			}
 		},
 		/**
-		 * check the panel can expanded or not
-		 * @returns {boolean}
-		 */
+   * check the panel can expanded or not
+   * @returns {boolean}
+   */
 		canExpanded: function () {
 			if (this.hasCheckInTitle()) {
 				var value = this.getCheckInTitleValue();
@@ -10231,15 +10671,15 @@
 	}));
 	$pt.Components.NPanel = NPanel;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Panel, function (model, layout, direction, viewMode) {
-		return React.createElement($pt.Components.NPanel, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NPanel, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
 	});
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * panel footer which only contains buttons
  * depends NFormButton
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NPanelFooter = React.createClass({
 		displayName: 'NPanelFooter',
 		statics: {
@@ -10291,31 +10731,27 @@
 			view: React.PropTypes.bool
 		},
 		/**
-		 * will update
-		 * @param nextProps
-		 */
-		componentWillUpdate: function (nextProps) {
-		},
+   * will update
+   * @param nextProps
+   */
+		componentWillUpdate: function (nextProps) {},
 		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
-		componentDidUpdate: function (prevProps, prevState) {
-		},
+   * did update
+   * @param prevProps
+   * @param prevState
+   */
+		componentDidUpdate: function (prevProps, prevState) {},
 		/**
-		 * did mount
-		 */
-		componentDidMount: function () {
-		},
+   * did mount
+   */
+		componentDidMount: function () {},
 		/**
-		 * will unmount
-		 */
-		componentWillUnmount: function () {
-		},
+   * will unmount
+   */
+		componentWillUnmount: function () {},
 		/**
-		 * render left buttons
-		 */
+   * render left buttons
+   */
 		renderLeftButtons: function () {
 			if (this.props.left) {
 				if (Array.isArray(this.props.left)) {
@@ -10328,8 +10764,8 @@
 			}
 		},
 		/**
-		 * render right buttons
-		 */
+   * render right buttons
+   */
 		renderRightButtons: function () {
 			if (this.props.right) {
 				if (Array.isArray(this.props.right)) {
@@ -10342,8 +10778,8 @@
 			}
 		},
 		/**
-		 * render button
-		 */
+   * render button
+   */
 		renderButton: function (option, buttonIndex) {
 			if (this.isViewMode() && option.view == 'edit') {
 				return null;
@@ -10361,18 +10797,24 @@
 					visible: option.visible
 				}
 			};
-			return React.createElement($pt.Components.NFormButton, {model: this.getModel(), 
-											   layout: $pt.createCellLayout('pseudo-button', layout), 
-											   key: buttonIndex});
+			return React.createElement($pt.Components.NFormButton, { model: this.getModel(),
+				layout: $pt.createCellLayout('pseudo-button', layout),
+				key: buttonIndex });
 		},
 		/**
-		 * render
-		 * @returns {XML}
-		 */
+   * render
+   * @returns {XML}
+   */
 		render: function () {
-			return (React.createElement("div", {className: "row n-panel-footer"}, 
-				React.createElement("div", {className: "col-sm-12 col-md-12 col-lg-12"}, 
-					React.createElement("div", {className: "btn-toolbar n-panel-footer-left", role: "toolbar"}, 
+			return React.createElement(
+				"div",
+				{ className: "row n-panel-footer" },
+				React.createElement(
+					"div",
+					{ className: "col-sm-12 col-md-12 col-lg-12" },
+					React.createElement(
+						"div",
+						{ className: "btn-toolbar n-panel-footer-left", role: "toolbar" },
 						this.props.reset ? this.renderButton({
 							icon: NPanelFooter.RESET_ICON,
 							text: NPanelFooter.RESET_TEXT,
@@ -10380,7 +10822,7 @@
 							click: this.props.reset.click ? this.props.reset.click : this.props.reset,
 							enabled: this.props.reset.enabled ? this.props.reset.enabled : true,
 							visible: this.props.reset.visible ? this.props.reset.visible : true
-						}) : null, 
+						}) : null,
 						this.props.validate ? this.renderButton({
 							icon: NPanelFooter.VALIDATE_ICON,
 							text: NPanelFooter.VALIDATE_TEXT,
@@ -10388,10 +10830,12 @@
 							click: this.props.validate.click ? this.props.validate.click : this.props.validate,
 							enabled: this.props.validate.enabled ? this.props.validate.enabled : true,
 							visible: this.props.validate.visible ? this.props.validate.visible : true
-						}) : null, 
+						}) : null,
 						this.renderLeftButtons()
-					), 
-					React.createElement("div", {className: "btn-toolbar n-panel-footer-right", role: "toolbar"}, 
+					),
+					React.createElement(
+						"div",
+						{ className: "btn-toolbar n-panel-footer-right", role: "toolbar" },
 						this.props.cancel ? this.renderButton({
 							icon: NPanelFooter.CANCEL_ICON,
 							text: NPanelFooter.CANCEL_TEXT,
@@ -10399,7 +10843,7 @@
 							click: this.props.cancel.click ? this.props.cancel.click : this.props.cancel,
 							enabled: this.props.cancel.enabled ? this.props.cancel.enabled : true,
 							visible: this.props.cancel.visible ? this.props.cancel.visible : true
-						}) : null, 
+						}) : null,
 						this.props.save ? this.renderButton({
 							icon: NPanelFooter.SAVE_ICON,
 							text: NPanelFooter.SAVE_TEXT,
@@ -10407,25 +10851,25 @@
 							click: this.props.save.click ? this.props.save.click : this.props.save,
 							enabled: this.props.save.enabled ? this.props.save.enabled : true,
 							visible: this.props.save.visible ? this.props.save.visible : true
-						}) : null, 
+						}) : null,
 						this.renderRightButtons()
 					)
 				)
-			));
+			);
 		},
 		/**
-		 * get model
-		 * @returns {ModelInterface}
-		 */
+   * get model
+   * @returns {ModelInterface}
+   */
 		getModel: function () {
 			return this.props.model;
 		},
-		isViewMode: function() {
+		isViewMode: function () {
 			return this.props.view;
 		}
 	});
 	$pt.Components.NPanelFooter = NPanelFooter;
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * radio button
@@ -10458,7 +10902,7 @@
  *      }
  * }
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NRadio = React.createClass($pt.defineCellComponent({
 		displayName: 'NRadio',
 		propTypes: {
@@ -10476,9 +10920,9 @@
 			};
 		},
 		/**
-		 * will update
-		 * @param nextProps
-		 */
+   * will update
+   * @param nextProps
+   */
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
@@ -10486,10 +10930,10 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
+   * did update
+   * @param prevProps
+   * @param prevState
+   */
 		componentDidUpdate: function (prevProps, prevState) {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
@@ -10497,8 +10941,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * did mount
-		 */
+   * did mount
+   */
 		componentDidMount: function () {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
@@ -10506,8 +10950,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * will unmount
-		 */
+   * will unmount
+   */
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
@@ -10515,27 +10959,29 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * render label
-		 * @param option {{text:string}}
-		 * @param labelInLeft {boolean}
-		 * @returns {XML}
-		 */
+   * render label
+   * @param option {{text:string}}
+   * @param labelInLeft {boolean}
+   * @returns {XML}
+   */
 		renderLabel: function (option, labelInLeft) {
 			var css = {
 				'radio-label': true,
 				disabled: !this.isEnabled(),
 				'radio-label-left': labelInLeft
 			};
-			return (React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
-			             onClick: (this.isEnabled() && !this.isViewMode()) ? this.onButtonClicked.bind(this, option) : null}, 
-            	option.text
-        	));
+			return React.createElement(
+				'span',
+				{ className: $pt.LayoutHelper.classSet(css),
+					onClick: this.isEnabled() && !this.isViewMode() ? this.onButtonClicked.bind(this, option) : null },
+				option.text
+			);
 		},
 		/**
-		 * render radio button, using font awesome instead
-		 * @params option radio option
-		 * @returns {XML}
-		 */
+   * render radio button, using font awesome instead
+   * @params option radio option
+   * @returns {XML}
+   */
 		renderRadio: function (option, optionIndex) {
 			var checked = this.getValueFromModel() == option.id;
 			var enabled = this.isEnabled();
@@ -10545,19 +10991,25 @@
 				'radio-container': true
 			};
 			var labelAtLeft = this.isLabelAtLeft();
-			return (React.createElement("div", {className: "n-radio-option", key: optionIndex}, 
-				labelAtLeft ? this.renderLabel(option, true) : null, 
-				React.createElement("div", {className: "radio-container"}, 
-                React.createElement("span", {className: $pt.LayoutHelper.classSet(css), 
-                      onClick: (enabled && !this.isViewMode()) ? this.onButtonClicked.bind(this, option) : null, 
-                      onKeyUp: (enabled && !this.isViewMode()) ? this.onKeyUp.bind(this, option): null, 
-                      tabIndex: "0", 
-                      ref: 'out-' + option.id}, 
-                    React.createElement("span", {className: "check", onClick: this.onInnerClicked.bind(this, option)})
-                )
-				), 
+			return React.createElement(
+				'div',
+				{ className: 'n-radio-option', key: optionIndex },
+				labelAtLeft ? this.renderLabel(option, true) : null,
+				React.createElement(
+					'div',
+					{ className: 'radio-container' },
+					React.createElement(
+						'span',
+						{ className: $pt.LayoutHelper.classSet(css),
+							onClick: enabled && !this.isViewMode() ? this.onButtonClicked.bind(this, option) : null,
+							onKeyUp: enabled && !this.isViewMode() ? this.onKeyUp.bind(this, option) : null,
+							tabIndex: '0',
+							ref: 'out-' + option.id },
+						React.createElement('span', { className: 'check', onClick: this.onInnerClicked.bind(this, option) })
+					)
+				),
 				labelAtLeft ? null : this.renderLabel(option, false)
-			));
+			);
 		},
 		render: function () {
 			var css = {
@@ -10569,22 +11021,24 @@
 			// <input type="hidden" style={{display: "none"}}
 			// 	   onChange={this.onComponentChanged} value={this.getValueFromModel()}
 			// 	   ref='txt'/>
-			return (React.createElement("div", {className: this.getComponentCSS($pt.LayoutHelper.classSet(css))}, 
+			return React.createElement(
+				'div',
+				{ className: this.getComponentCSS($pt.LayoutHelper.classSet(css)) },
 				this.getComponentOption("data").map(this.renderRadio)
-			));
+			);
 		},
 		/**
-		 * inner span clicked, force focus to outer span
-		 * for fix the outer span cannot gain focus in IE11
-		 * @param option
-		 */
+   * inner span clicked, force focus to outer span
+   * for fix the outer span cannot gain focus in IE11
+   * @param option
+   */
 		onInnerClicked: function (option) {
-			$(React.findDOMNode(this.refs['out-' + option.id])).focus();
+			$(ReactDOM.findDOMNode(this.refs['out-' + option.id])).focus();
 		},
 		/**
-		 * on button clicked
-		 * @param option
-		 */
+   * on button clicked
+   * @param option
+   */
 		onButtonClicked: function (option) {
 			this.setValueToModel(option.id);
 		},
@@ -10594,27 +11048,27 @@
 			}
 		},
 		/**
-		 * on component change
-		 * @param evt
-		 */
+   * on component change
+   * @param evt
+   */
 		// onComponentChanged: function (evt) {
 		// 	// synchronize value to model
 		// 	this.setValueToModel(evt.target.checked);
 		// },
 		/**
-		 * on model changed
-		 * @param evt
-		 */
+   * on model changed
+   * @param evt
+   */
 		onModelChanged: function (evt) {
 			// this.getComponent().val(evt.new);
 			this.forceUpdate();
 		},
 		/**
-		 * get component
-		 * @returns {jQuery}
-		 */
+   * get component
+   * @returns {jQuery}
+   */
 		// getComponent: function () {
-		// 	return $(React.findDOMNode(this.refs.txt));
+		// 	return $(ReactDOM.findDOMNode(this.refs.txt));
 		// },
 		isLabelAtLeft: function () {
 			return this.getComponentOption('labelAtLeft');
@@ -10622,14 +11076,14 @@
 	}));
 	$pt.Components.NRadio = NRadio;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Radio, function (model, layout, direction, viewMode) {
-		return React.createElement($pt.Components.NRadio, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NRadio, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
 	});
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * search text
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NSearchText = React.createClass($pt.defineCellComponent({
 		displayName: 'NSearchText',
 		statics: {
@@ -10658,9 +11112,9 @@
 			};
 		},
 		/**
-		 * will update
-		 * @param nextProps
-		 */
+   * will update
+   * @param nextProps
+   */
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChange);
@@ -10668,10 +11122,10 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
+   * did update
+   * @param prevProps
+   * @param prevState
+   */
 		componentDidUpdate: function (prevProps, prevState) {
 			this.initSetValues();
 			// add post change listener to handle model change
@@ -10680,8 +11134,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * did mount
-		 */
+   * did mount
+   */
 		componentDidMount: function () {
 			// set model value to component
 			this.initSetValues();
@@ -10691,8 +11145,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * will unmount
-		 */
+   * will unmount
+   */
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChange);
@@ -10700,9 +11154,9 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * render
-		 * @returns {XML}
-		 */
+   * render
+   * @returns {XML}
+   */
 		render: function () {
 			if (this.isViewMode()) {
 				return this.renderInViewMode();
@@ -10717,47 +11171,53 @@
 			var middleSpanStyle = {
 				width: '0'
 			};
-			return (React.createElement("div", {className: this.getComponentCSS($pt.LayoutHelper.classSet(css))}, 
-				React.createElement("div", {className: "input-group"}, 
-					React.createElement("input", {type: "text", className: "form-control search-code", onKeyUp: this.onComponentChange, ref: "code", 
-					       disabled: !enabled, onFocus: this.onComponentFocused, onBlur: this.onComponentBlurred}), 
-					React.createElement("span", {className: "input-group-btn", style: middleSpanStyle}), 
-					React.createElement("input", {type: "text", className: "form-control search-label", onFocus: this.onLabelFocused, ref: "label", 
-					       disabled: !enabled}), 
-				React.createElement("span", {className: "input-group-addon advanced-search-btn", 
-				      onClick: enabled ? this.showAdvancedSearchDialog : null}, 
-					React.createElement("span", {className: 'fa fa-fw fa-' + NSearchText.ADVANCED_SEARCH_BUTTON_ICON})
-				), 
-					this.renderNormalLine(), 
+			return React.createElement(
+				'div',
+				{ className: this.getComponentCSS($pt.LayoutHelper.classSet(css)) },
+				React.createElement(
+					'div',
+					{ className: 'input-group' },
+					React.createElement('input', { type: 'text', className: 'form-control search-code', onKeyUp: this.onComponentChange, ref: 'code',
+						disabled: !enabled, onFocus: this.onComponentFocused, onBlur: this.onComponentBlurred }),
+					React.createElement('span', { className: 'input-group-btn', style: middleSpanStyle }),
+					React.createElement('input', { type: 'text', className: 'form-control search-label', onFocus: this.onLabelFocused, ref: 'label',
+						disabled: !enabled }),
+					React.createElement(
+						'span',
+						{ className: 'input-group-addon advanced-search-btn',
+							onClick: enabled ? this.showAdvancedSearchDialog : null },
+						React.createElement('span', { className: 'fa fa-fw fa-' + NSearchText.ADVANCED_SEARCH_BUTTON_ICON })
+					),
+					this.renderNormalLine(),
 					this.renderFocusLine()
 				)
-			));
+			);
 		},
 		/**
-		 * transfer focus to first text input
-		 */
+   * transfer focus to first text input
+   */
 		onLabelFocused: function () {
 			this.getComponent().focus();
 		},
 		onComponentFocused: function () {
-			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 		},
 		onComponentBlurred: function () {
-			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 		},
 		/**
-		 * on component changed
-		 */
+   * on component changed
+   */
 		onComponentChange: function (evt) {
 			var value = evt.target.value;
 			this.setValueToModel(evt.target.value);
 		},
 		/**
-		 * on model change
-		 * @param evt
-		 */
+   * on model change
+   * @param evt
+   */
 		onModelChange: function (evt) {
 			var value = evt.new;
 			this.getComponent().val(value);
@@ -10765,8 +11225,8 @@
 			// this.forceUpdate();
 		},
 		/**
-		 * show advanced search dialog
-		 */
+   * show advanced search dialog
+   */
 		showAdvancedSearchDialog: function () {
 			if (!this.state.searchDialog) {
 				this.state.searchDialog = $pt.Components.NModalForm.createFormModal(this.getLayout().getLabel(), 'advanced-search-dialog');
@@ -10782,16 +11242,16 @@
 			});
 		},
 		/**
-		 * pickup advanced result item
-		 * @param item
-		 */
+   * pickup advanced result item
+   * @param item
+   */
 		pickupAdvancedResultItem: function (item) {
 			this.state.stopRetrieveLabelFromRemote = true;
 			this.getModel().set(this.getDataId(), item.code);
 			this.setLabelText(item.name);
 			this.state.stopRetrieveLabelFromRemote = false;
 		},
-		initSetValues: function() {
+		initSetValues: function () {
 			var value = this.getValueFromModel();
 			this.getComponent().val(value);
 			var labelPropertyId = this.getComponentOption('labelPropId');
@@ -10806,7 +11266,7 @@
 			if (this.isViewMode()) {
 				var value = this.getValueFromModel();
 				if (value == null) {
-					$(React.findDOMNode(this.refs.viewLabel)).text('');
+					$(ReactDOM.findDOMNode(this.refs.viewLabel)).text('');
 				} else {
 					var label = value;
 					if (text == null) {
@@ -10814,16 +11274,16 @@
 					} else {
 						label += ' - ' + text;
 					}
-					$(React.findDOMNode(this.refs.viewLabel)).text(label);
+					$(ReactDOM.findDOMNode(this.refs.viewLabel)).text(label);
 				}
 			} else {
-				$(React.findDOMNode(this.refs.label)).val(text);
+				$(ReactDOM.findDOMNode(this.refs.label)).val(text);
 			}
 		},
 		/**
-		 * get label text from remote
-		 */
-		retrieveAndSetLabelTextFromRemote: function(value) {
+   * get label text from remote
+   */
+		retrieveAndSetLabelTextFromRemote: function (value) {
 			if (this.state.search != null) {
 				clearTimeout(this.state.search);
 			}
@@ -10834,18 +11294,16 @@
 
 			var triggerDigits = this.getSearchTriggerDigits();
 			if (triggerDigits == null) {
-				throw new $pt.createComponentException(
-					$pt.ComponentConstants.Err_Search_Text_Trigger_Digits_Not_Defined,
-					"Trigger digits cannot be null in search text.");
+				throw new $pt.createComponentException($pt.ComponentConstants.Err_Search_Text_Trigger_Digits_Not_Defined, "Trigger digits cannot be null in search text.");
 			}
 
-			if (value == null || value.isBlank() || (value.length != triggerDigits && triggerDigits != -1)) {
+			if (value == null || value.isBlank() || value.length != triggerDigits && triggerDigits != -1) {
 				this.setLabelText(null);
 				return;
 			}
 
 			var _this = this;
-			this.state.search = setTimeout(function() {
+			this.state.search = setTimeout(function () {
 				$pt.doPost(_this.getSearchUrl(), {
 					code: value
 				}, {
@@ -10855,37 +11313,37 @@
 						data = JSON.parse(data);
 					}
 					_this.setLabelText(data.name);
-				}).fail(function() {
+				}).fail(function () {
 					window.console.error('Error occured when retrieve label from remote in NSearch.');
-					arguments.slice(0).forEach(function(argu) {
+					arguments.slice(0).forEach(function (argu) {
 						window.console.error(argu);
 					});
 				});
 			}, 300);
 		},
 		/**
-		 * get search url
-		 * @returns {string}
-		 */
+   * get search url
+   * @returns {string}
+   */
 		getSearchUrl: function () {
 			return this.getComponentOption("searchUrl");
 		},
 		/**
-		 * get advanced search url
-		 * @returns {string}
-		 */
+   * get advanced search url
+   * @returns {string}
+   */
 		getAdvancedSearchUrl: function () {
 			return this.getComponentOption("advancedUrl");
 		},
 		/**
-		 * get minimum digits to trigger search
-		 * @returns {number}
-		 */
+   * get minimum digits to trigger search
+   * @returns {number}
+   */
 		getSearchTriggerDigits: function () {
 			return this.getComponentOption("searchTriggerDigits");
 		},
 		getComponent: function () {
-			return $(React.findDOMNode(this.refs.code));
+			return $(ReactDOM.findDOMNode(this.refs.code));
 		},
 		// search dialog
 		getAdvancedSearchDialogModel: function () {
@@ -10943,7 +11401,7 @@
 								delete currentModel.criteria;
 
 								$pt.doPost(_this.getAdvancedSearchUrl(), currentModel, {
-									done: function (data) {
+									done: (function (data) {
 										if (typeof data === 'string') {
 											data = JSON.parse(data);
 										}
@@ -10951,7 +11409,7 @@
 										model.set('criteria_url', this.getAdvancedSearchUrl());
 										window.console.debug(model.getCurrentModel());
 										this.state.searchDialog.forceUpdate();
-									}.bind(_this)
+									}).bind(_this)
 								});
 							}
 						},
@@ -11001,19 +11459,17 @@
 			}
 			return $pt.createFormLayout(layout);
 		},
-		getTextInViewMode: function() {
+		getTextInViewMode: function () {
 			var value = this.getValueFromModel();
-			if (value != null) {
-
-			}
+			if (value != null) {}
 			return value;
 		}
 	}));
 	$pt.Components.NSearchText = NSearchText;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Search, function (model, layout, direction, viewMode) {
-		return React.createElement($pt.Components.NSearchText, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NSearchText, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
 	});
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * select component, see select2 from jQuery
@@ -11057,7 +11513,7 @@
  *      }
  * }
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NSelect2 = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelect2',
 		statics: {
@@ -11081,20 +11537,20 @@
 					availableWhenNoParentValue: false
 					// other
 					/*
-					 parentPropId: parent property id
-					 parentModel: parent model, default is this.props.model is not defined
-					 parentFilter: filter of options according to parent property value,
-					 can be property of self options
-					 or a function with parameters
-					 1: parent value
-					 2: self options array
-					 */
+      parentPropId: parent property id
+      parentModel: parent model, default is this.props.model is not defined
+      parentFilter: filter of options according to parent property value,
+      can be property of self options
+      or a function with parameters
+      1: parent value
+      2: self options array
+      */
 				}
 			};
 		},
 		/**
-		 * will update
-		 */
+   * will update
+   */
 		componentWillUpdate: function (nextProps) {
 			this.removePostChangeListener(this.onModelChanged);
 			this.removeEnableDependencyMonitor();
@@ -11105,10 +11561,10 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
+   * did update
+   * @param prevProps
+   * @param prevState
+   */
 		componentDidUpdate: function (prevProps, prevState) {
 			// react will not clear the options when component updating,
 			// so have to reset select options manually
@@ -11135,8 +11591,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * did mount
-		 */
+   * did mount
+   */
 		componentDidMount: function () {
 			// Set up Select2
 			this.createComponent();
@@ -11150,8 +11606,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * will unmount
-		 */
+   * will unmount
+   */
 		componentWillUnmount: function () {
 			// remove post change listener
 			this.removePostChangeListener(this.onModelChanged);
@@ -11165,8 +11621,8 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * create component
-		 */
+   * create component
+   */
 		createComponent: function () {
 			var options = this.createDisplayOptions({
 				allowClear: null,
@@ -11174,26 +11630,21 @@
 				minimumResultsForSearch: null,
 				data: null
 			}, this.getLayout());
-			this.getComponent().fireOnDisable()
-				.select2(options)
-				.val(this.getValueFromModel())
-				.trigger("change")
-				.change(this.onComponentChanged);
+			this.getComponent().fireOnDisable().select2(options).val(this.getValueFromModel()).trigger("change").change(this.onComponentChanged);
 
 			this.renderBorderBottom();
 		},
 		renderBorderBottom: function () {
-			var top = $(React.findDOMNode(this.refs.div));
+			var top = $(ReactDOM.findDOMNode(this.refs.div));
 			var selection = top.find('.select2-selection');
 			if (selection.find('hr.normal-line').length == 0) {
-				selection.append('<hr class="' + this.getAdditionalCSS('normal-line', 'normal-line') + '"/>')
-					.append('<hr class="' + this.getAdditionalCSS('focus-line', 'focus-line') + '"/>');
+				selection.append('<hr class="' + this.getAdditionalCSS('normal-line', 'normal-line') + '"/>').append('<hr class="' + this.getAdditionalCSS('focus-line', 'focus-line') + '"/>');
 			}
 		},
 		/**
-		 * create display options
-		 * @param options
-		 */
+   * create display options
+   * @param options
+   */
 		createDisplayOptions: function (options) {
 			var _this = this;
 			Object.keys(options).forEach(function (key) {
@@ -11215,27 +11666,27 @@
 			return options;
 		},
 		/**
-		 * convert data options, options can be CodeTable object or an array
-		 * @param options
-		 * @returns {*}
-		 */
+   * convert data options, options can be CodeTable object or an array
+   * @param options
+   * @returns {*}
+   */
 		convertDataOptions: function (options) {
 			return Array.isArray(options) ? options : options.list();
 		},
 		/**
-		 * remove tooltip, which is default set by select2 component.
-		 * it's unnecessary.
-		 */
+   * remove tooltip, which is default set by select2 component.
+   * it's unnecessary.
+   */
 		removeTooltip: function () {
 			//$("#select2-" + this.getId() + "-container").removeAttr("title");
-			var top = $(React.findDOMNode(this.refs.div));
+			var top = $(ReactDOM.findDOMNode(this.refs.div));
 			var renderer = top.find('.select2-selection__rendered');
 			renderer.removeAttr('title');
 		},
 		/**
-		 * render
-		 * @returns {XML}
-		 */
+   * render
+   * @returns {XML}
+   */
 		render: function () {
 			if (this.isViewMode()) {
 				return this.renderInViewMode();
@@ -11244,17 +11695,19 @@
 				'n-disabled': !this.isEnabled()
 			};
 			css[this.getComponentCSS('n-select')] = true;
-			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), 
-			            ref: "div"}, 
-				React.createElement("select", {style: {width: this.getComponentOption("width")}, 
-				        disabled: !this.isEnabled(), 
-				        ref: "select"})
-			));
+			return React.createElement(
+				"div",
+				{ className: $pt.LayoutHelper.classSet(css),
+					ref: "div" },
+				React.createElement("select", { style: { width: this.getComponentOption("width") },
+					disabled: !this.isEnabled(),
+					ref: "select" })
+			);
 		},
 		/**
-		 * on component change
-		 * @param evt
-		 */
+   * on component change
+   * @param evt
+   */
 		onComponentChanged: function (evt) {
 			var value = this.getComponent().val();
 			if (value != this.getValueFromModel()) {
@@ -11264,9 +11717,9 @@
 			this.removeTooltip();
 		},
 		/**
-		 * on model change
-		 * @param evt
-		 */
+   * on model change
+   * @param evt
+   */
 		onModelChanged: function (evt) {
 			var oldValue = this.getComponent().val();
 			if (oldValue == evt.new) {
@@ -11278,48 +11731,48 @@
 			}
 		},
 		/**
-		 * on parent model change
-		 * @param evt
-		 */
+   * on parent model change
+   * @param evt
+   */
 		onParentModelChanged: function (evt) {
 			var data = this.getAvailableOptions(evt.new);
-			this.resetOptions({data: data});
+			this.resetOptions({ data: data });
 		},
 		/**
-		 * get parent model
-		 * @returns {*}
-		 */
+   * get parent model
+   * @returns {*}
+   */
 		getParentModel: function () {
 			var parentModel = this.getComponentOption("parentModel");
 			return parentModel == null ? this.getModel() : parentModel;
 		},
 		/**
-		 * get parent property value
-		 * @returns {*}
-		 */
+   * get parent property value
+   * @returns {*}
+   */
 		getParentPropertyValue: function () {
 			return this.getParentModel().get(this.getParentPropertyId());
 		},
 		/**
-		 * get parent property id
-		 * @returns {string}
-		 */
+   * get parent property id
+   * @returns {string}
+   */
 		getParentPropertyId: function () {
 			return this.getComponentOption("parentPropId");
 		},
 		/**
-		 * has parent or not
-		 * @returns {boolean}
-		 */
+   * has parent or not
+   * @returns {boolean}
+   */
 		hasParent: function () {
 			return this.getParentPropertyId() != null;
 		},
 		/**
-		 * get available options.
-		 * if no parent assigned, return all data options
-		 * @param parentValue
-		 * @returns {[*]}
-		 */
+   * get available options.
+   * if no parent assigned, return all data options
+   * @param parentValue
+   * @returns {[*]}
+   */
 		getAvailableOptions: function (parentValue) {
 			if (parentValue == null) {
 				return this.isAvailableWhenNoParentValue() ? this.convertDataOptions(this.getComponentOption("data")) : [];
@@ -11327,7 +11780,7 @@
 				var filter = this.getComponentOption("parentFilter");
 				if (typeof filter === 'object') {
 					// call code table filter
-					return this.convertDataOptions(this.getComponentOption('data').filter($.extend({}, filter, {value: parentValue})));
+					return this.convertDataOptions(this.getComponentOption('data').filter($.extend({}, filter, { value: parentValue })));
 				} else {
 					// call local filter
 					var data = this.convertDataOptions(this.getComponentOption("data"));
@@ -11342,19 +11795,19 @@
 			}
 		},
 		/**
-		 * is available when no parent value.
-		 * if no parent assigned, always return true.
-		 * @returns {boolean}
-		 */
+   * is available when no parent value.
+   * if no parent assigned, always return true.
+   * @returns {boolean}
+   */
 		isAvailableWhenNoParentValue: function () {
 			// when has parent, return availableWhenNoParentValue
 			// or return true
 			return this.hasParent() ? this.getComponentOption("availableWhenNoParentValue") : true;
 		},
 		/**
-		 * reset select options
-		 * @param newOptions
-		 */
+   * reset select options
+   * @param newOptions
+   */
 		resetOptions: function (newOptions) {
 			if (this.isViewMode()) {
 				return;
@@ -11387,9 +11840,9 @@
 			}
 		},
 		getComponent: function () {
-			return $(React.findDOMNode(this.refs.select));
+			return $(ReactDOM.findDOMNode(this.refs.select));
 		},
-		getTextInViewMode: function() {
+		getTextInViewMode: function () {
 			var value = this.getValueFromModel();
 			if (value != null) {
 				var data = null;
@@ -11398,7 +11851,7 @@
 				} else {
 					data = this.convertDataOptions(this.getComponentOption('data'));
 				}
-				data.some(function(item) {
+				data.some(function (item) {
 					if (item.id == value) {
 						value = item.text;
 						return true;
@@ -11410,8 +11863,8 @@
 		}
 	}));
 
-// to fix the select2 disabled property not work in IE8-10
-// provided by https://gist.github.com/cmcnulty/7036509
+	// to fix the select2 disabled property not work in IE8-10
+	// provided by https://gist.github.com/cmcnulty/7036509
 	(function ($) {
 		"use strict";
 
@@ -11421,25 +11874,24 @@
 			// Also only perform if getOwnPropertyDescriptor exists - IE>=8
 			// I suppose I could test for "propertychange fires, but not when form
 			// element is disabled" - but it would be overkill
-			if (!( 'onpropertychange' in document.createElement('input') ) || Object.getOwnPropertyDescriptor === undefined) {
+			if (!('onpropertychange' in document.createElement('input')) || Object.getOwnPropertyDescriptor === undefined) {
 				return this;
 			}
 
 			// IE9-10 use HTMLElement proto, IE8 uses Element proto
 			var someProto = window.HTMLElement === undefined ? window.Element.prototype : window.HTMLElement.prototype,
-				someTrigger = function () {
-				},
-				origDisabled = Object.getOwnPropertyDescriptor(someProto, 'disabled');
+			    someTrigger = function () {},
+			    origDisabled = Object.getOwnPropertyDescriptor(someProto, 'disabled');
 
 			if (document.createEvent) {
 				someTrigger = function (newVal) {
 					var event = document.createEvent('MutationEvent');
 					/*
-					 * Instantiate the event as close to native as possible:
-					 * event.initMutationEvent(eventType, canBubble, cancelable,
-					 * relatedNodeArg, prevValueArg, newValueArg, attrNameArg,
-					 * attrChangeArg);
-					 */
+      * Instantiate the event as close to native as possible:
+      * event.initMutationEvent(eventType, canBubble, cancelable,
+      * relatedNodeArg, prevValueArg, newValueArg, attrNameArg,
+      * attrChangeArg);
+      */
 					event.initMutationEvent('DOMAttrModified', true, false, this.getAttributeNode('disabled'), '', '', 'disabled', 1);
 					this.dispatchEvent(event);
 				};
@@ -11481,11 +11933,11 @@
 	})(jQuery);
 	$pt.Components.NSelect2 = NSelect2;
 	$pt.LayoutHelper.registerComponentRenderer('select2', function (model, layout, direction, viewMode) {
-		return React.createElement($pt.Components.NSelect2, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NSelect2, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
 	});
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NSelect = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelect',
 		statics: {
@@ -11510,23 +11962,23 @@
 					availableWhenNoParentValue: false
 					// other
 					/*
-					 parentPropId: parent property id
-					 parentModel: parent model, default is this.props.model is not defined
-					 parentFilter: filter of options according to parent property value,
-					 can be property of self options
-					 or a function with parameters
-					 1: parent value
-					 2: self options array
-					 */
+      parentPropId: parent property id
+      parentModel: parent model, default is this.props.model is not defined
+      parentFilter: filter of options according to parent property value,
+      can be property of self options
+      or a function with parameters
+      1: parent value
+      2: self options array
+      */
 				}
 			};
 		},
-		getInitialState: function() {
+		getInitialState: function () {
 			return {};
 		},
 		/**
-		 * will update
-		 */
+   * will update
+   */
 		componentWillUpdate: function (nextProps) {
 			this.removePostChangeListener(this.onModelChanged);
 			this.removeEnableDependencyMonitor();
@@ -11537,10 +11989,10 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
+   * did update
+   * @param prevProps
+   * @param prevState
+   */
 		componentDidUpdate: function (prevProps, prevState) {
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
@@ -11552,8 +12004,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * did mount
-		 */
+   * did mount
+   */
 		componentDidMount: function () {
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
@@ -11564,8 +12016,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * will unmount
-		 */
+   * will unmount
+   */
 		componentWillUnmount: function () {
 			// remove post change listener
 			this.removePostChangeListener(this.onModelChanged);
@@ -11576,18 +12028,18 @@
 			}
 			this.unregisterFromComponentCentral();
 		},
-		renderClear: function() {
+		renderClear: function () {
 			if (!this.getComponentOption('allowClear')) {
 				return null;
 			}
-			return (React.createElement("span", {className: "fa fa-fw fa-close clear", 
-						  onClick: this.onClearClick}));
+			return React.createElement('span', { className: 'fa fa-fw fa-close clear',
+				onClick: this.onClearClick });
 		},
-		renderText: function() {
+		renderText: function () {
 			var value = this.getValueFromModel();
 			var itemText = null;
 			if (value != null) {
-				var item = this.getAvailableOptions().find(function(item) {
+				var item = this.getAvailableOptions().find(function (item) {
 					return item.id == value;
 				});
 				if (item) {
@@ -11597,16 +12049,22 @@
 			if (itemText == null) {
 				itemText = NSelect.PLACEHOLDER;
 			}
-			return (React.createElement("div", {className: "input-group form-control", onClick: this.onComponentClicked, ref: "comp"}, 
-				React.createElement("span", {className: "text"}, itemText), 
-				this.renderClear(), 
-				React.createElement("span", {className: "fa fa-fw fa-sort-down drop"})
-			));
+			return React.createElement(
+				'div',
+				{ className: 'input-group form-control', onClick: this.onComponentClicked, ref: 'comp' },
+				React.createElement(
+					'span',
+					{ className: 'text' },
+					itemText
+				),
+				this.renderClear(),
+				React.createElement('span', { className: 'fa fa-fw fa-sort-down drop' })
+			);
 		},
 		/**
-		 * render
-		 * @returns {XML}
-		 */
+   * render
+   * @returns {XML}
+   */
 		render: function () {
 			if (this.isViewMode()) {
 				return this.renderInViewMode();
@@ -11616,93 +12074,115 @@
 				'n-view-mode': this.isViewMode()
 			};
 			css[this.getComponentCSS('n-select')] = true;
-			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), tabIndex: "0"}, 
-				this.renderText(), 
-				this.renderNormalLine(), 
+			return React.createElement(
+				'div',
+				{ className: $pt.LayoutHelper.classSet(css), tabIndex: '0' },
+				this.renderText(),
+				this.renderNormalLine(),
 				this.renderFocusLine()
-			));
+			);
 		},
-		renderPopoverContainer: function() {
+		renderPopoverContainer: function () {
 			if (this.state.popoverDiv == null) {
 				this.state.popoverDiv = $('<div>');
 				this.state.popoverDiv.appendTo($('body'));
-				$(document).on('mousedown', this.onDocumentMouseDown)
-					.on('keyup', this.onDocumentKeyUp)
-					.on('mousewheel', this.onDocumentMouseWheel);
+				$(document).on('mousedown', this.onDocumentMouseDown).on('keyup', this.onDocumentKeyUp).on('mousewheel', this.onDocumentMouseWheel);
 				$(window).on('resize', this.onWindowResize);
 			}
 			this.state.popoverDiv.hide();
 		},
-		renderOptions: function(options, filterText) {
+		renderOptions: function (options, filterText) {
 			if (options == null || options.length == 0) {
 				return null;
 			}
 			if (filterText != null && !filterText.isBlank()) {
-				options = options == null ? null : options.filter(function(item) {
+				options = options == null ? null : options.filter(function (item) {
 					return item.text.toLowerCase().indexOf(filterText) != -1;
 				});
 			}
 			var _this = this;
-			return (React.createElement("ul", null, 
-				options.map(function(item, itemIndex) {
-					return (React.createElement("li", {onClick: _this.onOptionClick.bind(_this, item), key: itemIndex}, 
-						React.createElement("span", null, item.text)
-					));
+			return React.createElement(
+				'ul',
+				null,
+				options.map(function (item, itemIndex) {
+					return React.createElement(
+						'li',
+						{ onClick: _this.onOptionClick.bind(_this, item), key: itemIndex },
+						React.createElement(
+							'span',
+							null,
+							item.text
+						)
+					);
 				})
-			));
+			);
 		},
-		renderNoOption: function(options) {
+		renderNoOption: function (options) {
 			if (options == null || options.length == 0) {
-				return React.createElement("div", {className: "no-option"}, React.createElement("span", null, NSelect.NO_OPTION_FOUND));
+				return React.createElement(
+					'div',
+					{ className: 'no-option' },
+					React.createElement(
+						'span',
+						null,
+						NSelect.NO_OPTION_FOUND
+					)
+				);
 			}
 			return null;
 		},
-		renderFilterText: function(options, filterText) {
+		renderFilterText: function (options, filterText) {
 			if (options == null || options.length == 0) {
 				return;
 			}
 			var minimumResultsForSearch = this.getComponentOption('minimumResultsForSearch');
-			if (minimumResultsForSearch >=0 && minimumResultsForSearch != Infinity) {
-				var model = $pt.createModel({text: filterText});
+			if (minimumResultsForSearch >= 0 && minimumResultsForSearch != Infinity) {
+				var model = $pt.createModel({ text: filterText });
 				var layout = $pt.createCellLayout('text', {
 					comp: {
 						placeholder: NSelect.FILTER_PLACEHOLDER
 					}
 				});
 				model.addPostChangeListener('text', this.onFilterTextChange);
-				return React.createElement($pt.Components.NText, {model: model, layout: layout});
+				return React.createElement($pt.Components.NText, { model: model, layout: layout });
 			} else {
 				return null;
 			}
 		},
-		renderPopoverContent: function(filterText) {
+		renderPopoverContent: function (filterText) {
 			var options = this.getAvailableOptions();
-			return (React.createElement("div", null, 
-				this.renderFilterText(options, filterText), 
-				this.renderNoOption(options), 
+			return React.createElement(
+				'div',
+				null,
+				this.renderFilterText(options, filterText),
+				this.renderNoOption(options),
 				this.renderOptions(options, filterText)
-			));
+			);
 		},
-		renderPopover: function(filterText) {
-			var styles = {display: 'block'};
+		renderPopover: function (filterText) {
+			var styles = { display: 'block' };
 			var component = this.getComponent();
 			styles.width = component.outerWidth();
 			var offset = component.offset();
 			styles.top = -10000; // let it out of screen
 			styles.left = 0;
-			var popover = (React.createElement("div", {role: "tooltip", className: "n-select-popover popover bottom in", style: styles}, 
-				React.createElement("div", {className: "arrow"}), 
-				React.createElement("div", {className: "popover-content"}, 
+			var popover = React.createElement(
+				'div',
+				{ role: 'tooltip', className: 'n-select-popover popover bottom in', style: styles },
+				React.createElement('div', { className: 'arrow' }),
+				React.createElement(
+					'div',
+					{ className: 'popover-content' },
 					this.renderPopoverContent(filterText)
 				)
-			));
-			React.render(popover, this.state.popoverDiv.get(0), this.onPopoverRenderComplete);
+			);
+			ReactDOM.render(popover, this.state.popoverDiv.get(0), this.onPopoverRenderComplete);
 		},
-		showPopover: function(filterText) {
+		showPopover: function (filterText) {
 			this.renderPopoverContainer();
 			this.renderPopover(filterText);
 		},
-		onPopoverRenderComplete: function() {
+		onPopoverRenderComplete: function () {
 			this.state.popoverDiv.show();
 			var popover = this.state.popoverDiv.children('.popover');
 			var styles = {};
@@ -11719,14 +12199,14 @@
 			// set the real top, assumpt it is on bottom
 			styles.top = offset.top + component.outerHeight();
 			// check popover in top or bottom
-			if ((styles.top + realHeight) > ($(window).height() + $(window).scrollTop())) {
+			if (styles.top + realHeight > $(window).height() + $(window).scrollTop()) {
 				// cannot show in bottom and in current viewport
 				// check it is enough top or not
-				if ((offset.top - $(window).scrollTop()) >= realHeight) {
+				if (offset.top - $(window).scrollTop() >= realHeight) {
 					// enough
 					styles.top = offset.top - realHeight;
 					onTop = true;
-				} else if ((styles.top + realHeight) <= $(document).height()) {
+				} else if (styles.top + realHeight <= $(document).height()) {
 					// cannot show in bottom and in current document
 					onTop = false;
 				} else if (offset.top < realHeight) {
@@ -11744,15 +12224,15 @@
 			// check popover to left or right
 			if (realWidth > styles.width) {
 				width = $(document).width();
-				if ((styles.left + realWidth) <= width) {
+				if (styles.left + realWidth <= width) {
 					// normal from left to right, do nothing
-				} else if ((styles.left + styles.width) >= realWidth) {
-					// from right to left
-					styles.left = styles.left + styles.width - realWidth;
-					rightToLeft = true;
-				} else {
-					// still left to right, do nothing
-				}
+				} else if (styles.left + styles.width >= realWidth) {
+						// from right to left
+						styles.left = styles.left + styles.width - realWidth;
+						rightToLeft = true;
+					} else {
+						// still left to right, do nothing
+					}
 			}
 
 			if (onTop) {
@@ -11765,22 +12245,20 @@
 			if (rightToLeft) {
 				popover.addClass('right-to-left');
 			}
-			popover.css({top: styles.top, left: styles.left});
+			popover.css({ top: styles.top, left: styles.left });
 		},
-		hidePopover: function() {
+		hidePopover: function () {
 			this.destroyPopover();
 		},
-		destroyPopover: function() {
+		destroyPopover: function () {
 			if (this.state.popoverDiv) {
-				$(document).off('mousedown', this.onDocumentMouseDown)
-					.off('keyup', this.onDocumentKeyUp)
-					.off('mousewheel', this.onDocumentMouseWheel);
+				$(document).off('mousedown', this.onDocumentMouseDown).off('keyup', this.onDocumentKeyUp).off('mousewheel', this.onDocumentMouseWheel);
 				$(window).off('resize', this.onWindowResize);
 				this.state.popoverDiv.remove();
 				delete this.state.popoverDiv;
 			}
 		},
-		onComponentClicked: function() {
+		onComponentClicked: function () {
 			if (!this.isEnabled() || this.isViewMode()) {
 				// do nothing
 				return;
@@ -11789,54 +12267,55 @@
 				this.showPopover();
 			}
 		},
-		onDocumentMouseDown: function(evt) {
+		onDocumentMouseDown: function (evt) {
 			var target = $(evt.target);
 			if (target.closest(this.getComponent()).length == 0 && target.closest(this.state.popoverDiv).length == 0) {
 				this.hidePopover();
 			}
 		},
-		onDocumentMouseWheel: function(evt) {
+		onDocumentMouseWheel: function (evt) {
 			var target = $(evt.target);
 			if (target.closest(this.state.popoverDiv).length == 0) {
 				this.hidePopover();
 			}
 		},
-		onDocumentKeyUp: function(evt) {
-			if (evt.keyCode === 27 || evt.keyCode === 9) { // escape and tab
+		onDocumentKeyUp: function (evt) {
+			if (evt.keyCode === 27 || evt.keyCode === 9) {
+				// escape and tab
 				this.hidePopover();
 			}
 		},
-		onWindowResize: function() {
+		onWindowResize: function () {
 			this.hidePopover();
 		},
-		onOptionClick: function(item) {
+		onOptionClick: function (item) {
 			this.setValueToModel(item.id);
 			this.hidePopover();
 		},
-		onClearClick: function() {
+		onClearClick: function () {
 			if (!this.isEnabled() || this.isViewMode()) {
 				return;
 			}
 			this.setValueToModel(null);
 		},
-		onFilterTextChange: function(evt) {
+		onFilterTextChange: function (evt) {
 			this.showPopover(evt.new);
 		},
 		/**
-		 * on model change
-		 * @param evt
-		 */
+   * on model change
+   * @param evt
+   */
 		onModelChanged: function (evt) {
 			this.forceUpdate();
 		},
 		/**
-		 * on parent model change
-		 * @param evt
-		 */
+   * on parent model change
+   * @param evt
+   */
 		onParentModelChanged: function (evt) {
 			var options = this.getAvailableOptions();
 			var currentValue = this.getValueFromModel();
-			var index = options.findIndex(function(item) {
+			var index = options.findIndex(function (item) {
 				return item.id == currentValue;
 			});
 			if (index == -1) {
@@ -11844,47 +12323,47 @@
 			}
 		},
 		/**
-		 * get parent model
-		 * @returns {*}
-		 */
+   * get parent model
+   * @returns {*}
+   */
 		getParentModel: function () {
 			var parentModel = this.getComponentOption("parentModel");
 			return parentModel == null ? this.getModel() : parentModel;
 		},
 		/**
-		 * get parent property value
-		 * @returns {*}
-		 */
+   * get parent property value
+   * @returns {*}
+   */
 		getParentPropertyValue: function () {
 			return this.getParentModel().get(this.getParentPropertyId());
 		},
 		/**
-		 * get parent property id
-		 * @returns {string}
-		 */
+   * get parent property id
+   * @returns {string}
+   */
 		getParentPropertyId: function () {
 			return this.getComponentOption("parentPropId");
 		},
 		/**
-		 * has parent or not
-		 * @returns {boolean}
-		 */
+   * has parent or not
+   * @returns {boolean}
+   */
 		hasParent: function () {
 			return this.getParentPropertyId() != null;
 		},
 		/**
-		 * convert data options, options can be CodeTable object or an array
-		 * @param options
-		 * @returns {*}
-		 */
+   * convert data options, options can be CodeTable object or an array
+   * @param options
+   * @returns {*}
+   */
 		convertDataOptions: function (options) {
 			return Array.isArray(options) ? options : options.list();
 		},
 		/**
-		 * get available options.
-		 * if no parent assigned, return all data options
-		 * @returns {[*]}
-		 */
+   * get available options.
+   * if no parent assigned, return all data options
+   * @returns {[*]}
+   */
 		getAvailableOptions: function () {
 			if (!this.hasParent()) {
 				return this.convertDataOptions(this.getComponentOption('data'));
@@ -11896,7 +12375,7 @@
 					var filter = this.getComponentOption("parentFilter");
 					if (typeof filter === 'object') {
 						// call code table filter
-						return this.convertDataOptions(this.getComponentOption('data').filter($.extend({}, filter, {value: parentValue})));
+						return this.convertDataOptions(this.getComponentOption('data').filter($.extend({}, filter, { value: parentValue })));
 					} else {
 						// call local filter
 						var data = this.convertDataOptions(this.getComponentOption("data"));
@@ -11912,19 +12391,19 @@
 			}
 		},
 		/**
-		 * is available when no parent value.
-		 * if no parent assigned, always return true.
-		 * @returns {boolean}
-		 */
+   * is available when no parent value.
+   * if no parent assigned, always return true.
+   * @returns {boolean}
+   */
 		isAvailableWhenNoParentValue: function () {
 			// when has parent, return availableWhenNoParentValue
 			// or return true
 			return this.hasParent() ? this.getComponentOption("availableWhenNoParentValue") : true;
 		},
-		getComponent: function() {
-			return $(React.findDOMNode(this.refs.comp));
+		getComponent: function () {
+			return $(ReactDOM.findDOMNode(this.refs.comp));
 		},
-		getTextInViewMode: function() {
+		getTextInViewMode: function () {
 			var value = this.getValueFromModel();
 			if (value != null) {
 				var data = null;
@@ -11933,7 +12412,7 @@
 				} else {
 					data = this.convertDataOptions(this.getComponentOption('data'));
 				}
-				data.some(function(item) {
+				data.some(function (item) {
 					if (item.id == value) {
 						value = item.text;
 						return true;
@@ -11946,9 +12425,9 @@
 	}));
 	$pt.Components.NSelect = NSelect;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Select, function (model, layout, direction, viewMode) {
-		return React.createElement($pt.Components.NSelect, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NSelect, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
 	});
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * popover will be closed on
@@ -11957,18 +12436,17 @@
  * 		2.3 mouse wheel
  *		2.4 window resize
  */
-(function(window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NSelectTree = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelectTree',
-		statics: {
-		},
+		statics: {},
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
 			// CellLayout
 			layout: React.PropTypes.object
 		},
-		getDefaultProps: function() {
+		getDefaultProps: function () {
 			return {
 				defaultOptions: {
 					hideChildWhenParentChecked: false
@@ -11983,13 +12461,13 @@
 				}
 			};
 		},
-		getInitialState: function() {
+		getInitialState: function () {
 			return {};
 		},
 		/**
-		 * will update
-		 * @param nextProps
-		 */
+   * will update
+   * @param nextProps
+   */
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.__forceUpdate);
@@ -12001,10 +12479,10 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
+   * did update
+   * @param prevProps
+   * @param prevState
+   */
 		componentDidUpdate: function (prevProps, prevState) {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.__forceUpdate);
@@ -12020,8 +12498,8 @@
 			}
 		},
 		/**
-		 * did mount
-		 */
+   * did mount
+   */
 		componentDidMount: function () {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.__forceUpdate);
@@ -12033,8 +12511,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * will unmount
-		 */
+   * will unmount
+   */
 		componentWillUnmount: function () {
 			this.destroyPopover();
 			// remove post change listener to handle model change
@@ -12046,34 +12524,36 @@
 			}
 			this.unregisterFromComponentCentral();
 		},
-		renderTree: function() {
+		renderTree: function () {
 			var layout = $pt.createCellLayout('values', this.getTreeLayout());
-			var model = $pt.createModel({values: this.getValueFromModel()});
+			var model = $pt.createModel({ values: this.getValueFromModel() });
 			model.addPostChangeListener('values', this.onTreeValueChanged);
-			return React.createElement($pt.Components.NTree, {model: model, layout: layout});
+			return React.createElement($pt.Components.NTree, { model: model, layout: layout });
 		},
-		renderSelectionItem: function(codeItem, nodeId) {
-			return (React.createElement("li", null, 
-				React.createElement("span", {className: "fa fa-fw fa-remove", onClick: this.onSelectionItemRemove.bind(this, nodeId)}), 
+		renderSelectionItem: function (codeItem, nodeId) {
+			return React.createElement(
+				"li",
+				null,
+				React.createElement("span", { className: "fa fa-fw fa-remove", onClick: this.onSelectionItemRemove.bind(this, nodeId) }),
 				codeItem.text
-			));
+			);
 		},
-		renderSelectionWhenValueAsArray: function(values) {
+		renderSelectionWhenValueAsArray: function (values) {
 			var _this = this;
 			var codes = null;
 			if (this.isHideChildWhenParentChecked()) {
 				// only render parent selections
 				codes = this.getAvailableTreeModel().list();
-				var isChecked = function(code) {
-					return -1 != values.findIndex(function(value) {
+				var isChecked = function (code) {
+					return -1 != values.findIndex(function (value) {
 						return value == code.id;
 					});
 				};
-				var traverse = function(codes) {
-					return codes.map(function(code) {
+				var traverse = function (codes) {
+					return codes.map(function (code) {
 						if (isChecked(code)) {
 							return _this.renderSelectionItem(code, code.id);
-						} else if (code.children){
+						} else if (code.children) {
 							return traverse(code.children);
 						}
 					});
@@ -12082,8 +12562,8 @@
 			} else {
 				// render all selections
 				codes = this.getAvailableTreeModel().listAllChildren();
-				return Object.keys(codes).map(function(id) {
-					var value = values.find(function(value) {
+				return Object.keys(codes).map(function (id) {
+					var value = values.find(function (value) {
 						return value == id;
 					});
 					if (value != null) {
@@ -12092,18 +12572,18 @@
 				});
 			}
 		},
-		renderSelectionWhenValueAsJSON: function(values) {
+		renderSelectionWhenValueAsJSON: function (values) {
 			var _this = this;
-			var codes = this.getAvailableTreeModel().listWithHierarchyKeys({separator: NTree.NODE_SEPARATOR, rootId: NTree.ROOT_ID});
+			var codes = this.getAvailableTreeModel().listWithHierarchyKeys({ separator: NTree.NODE_SEPARATOR, rootId: NTree.ROOT_ID });
 			if (this.isHideChildWhenParentChecked()) {
 				var paintedNodes = [];
-				var isPainted = function(nodeId) {
+				var isPainted = function (nodeId) {
 					// if nodeId starts with paintedNodeId, do not paint again
-					return -1 != paintedNodes.findIndex(function(paintedNodeId) {
+					return -1 != paintedNodes.findIndex(function (paintedNodeId) {
 						return nodeId.startsWith(paintedNodeId);
 					});
 				};
-				return Object.keys(codes).map(function(nodeId) {
+				return Object.keys(codes).map(function (nodeId) {
 					if (!isPainted(nodeId)) {
 						var valueId = nodeId.split(NTree.NODE_SEPARATOR).slice(1).join($pt.PROPERTY_SEPARATOR) + $pt.PROPERTY_SEPARATOR + 'selected';
 						var checked = $pt.getValueFromJSON(values, valueId);
@@ -12114,27 +12594,27 @@
 					}
 				});
 			} else {
-				var render = function(node, currentId, parentId) {
+				var render = function (node, currentId, parentId) {
 					var nodeId = parentId + NTree.NODE_SEPARATOR + currentId;
 					var spans = [];
 					if (node.selected) {
 						spans.push(_this.renderSelectionItem(codes[nodeId], nodeId));
 					}
-					spans.push.apply(spans, Object.keys(node).filter(function(key) {
+					spans.push.apply(spans, Object.keys(node).filter(function (key) {
 						return key != 'selected';
-					}).map(function(key) {
+					}).map(function (key) {
 						return render(node[key], key, nodeId);
 					}));
 					return spans;
 				};
-				return Object.keys(values).filter(function(key) {
+				return Object.keys(values).filter(function (key) {
 					return key != 'selected';
-				}).map(function(key) {
+				}).map(function (key) {
 					return render(values[key], key, NTree.ROOT_ID);
 				});
 			}
 		},
-		renderSelection: function() {
+		renderSelection: function () {
 			var values = this.getValueFromModel();
 			if (values == null) {
 				// no selection
@@ -12147,57 +12627,65 @@
 				return this.renderSelectionWhenValueAsJSON(values);
 			}
 		},
-		renderText: function() {
-			return (React.createElement("div", {className: "input-group form-control", onClick: this.onComponentClicked, ref: "comp"}, 
-				React.createElement("ul", {className: "selection"}, 
+		renderText: function () {
+			return React.createElement(
+				"div",
+				{ className: "input-group form-control", onClick: this.onComponentClicked, ref: "comp" },
+				React.createElement(
+					"ul",
+					{ className: "selection" },
 					this.renderSelection()
-				), 
-				React.createElement("span", {className: "fa fa-fw fa-sort-down pull-right"})
-			));
+				),
+				React.createElement("span", { className: "fa fa-fw fa-sort-down pull-right" })
+			);
 		},
-		render: function() {
+		render: function () {
 			var css = {
 				'n-disabled': !this.isEnabled(),
 				'n-view-mode': this.isViewMode()
 			};
 			css[this.getComponentCSS('n-select-tree')] = true;
-			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css), tabIndex: "0"}, 
-				this.renderText(), 
-				this.renderNormalLine(), 
+			return React.createElement(
+				"div",
+				{ className: $pt.LayoutHelper.classSet(css), tabIndex: "0" },
+				this.renderText(),
+				this.renderNormalLine(),
 				this.renderFocusLine()
-			));
+			);
 		},
-		renderPopoverContainer: function() {
+		renderPopoverContainer: function () {
 			if (this.state.popoverDiv == null) {
 				this.state.popoverDiv = $('<div>');
 				this.state.popoverDiv.appendTo($('body'));
-				$(document).on('mousedown', this.onDocumentMouseDown)
-					.on('keyup', this.onDocumentKeyUp)
-					.on('mousewheel', this.onDocumentMouseWheel);
+				$(document).on('mousedown', this.onDocumentMouseDown).on('keyup', this.onDocumentKeyUp).on('mousewheel', this.onDocumentMouseWheel);
 				$(window).on('resize', this.onWindowResize);
 			}
 			this.state.popoverDiv.hide();
 		},
-		renderPopover: function() {
-			var styles = {display: 'block'};
+		renderPopover: function () {
+			var styles = { display: 'block' };
 			var component = this.getComponent();
 			styles.width = component.outerWidth();
 			var offset = component.offset();
 			styles.top = -10000; // let it out of screen
 			styles.left = 0;
-			var popover = (React.createElement("div", {role: "tooltip", className: "n-select-tree-popover popover bottom in", style: styles}, 
-				React.createElement("div", {className: "arrow"}), 
-				React.createElement("div", {className: "popover-content"}, 
+			var popover = React.createElement(
+				"div",
+				{ role: "tooltip", className: "n-select-tree-popover popover bottom in", style: styles },
+				React.createElement("div", { className: "arrow" }),
+				React.createElement(
+					"div",
+					{ className: "popover-content" },
 					this.renderTree()
 				)
-			));
-			React.render(popover, this.state.popoverDiv.get(0), this.onPopoverRenderComplete);
+			);
+			ReactDOM.render(popover, this.state.popoverDiv.get(0), this.onPopoverRenderComplete);
 		},
-		showPopover: function() {
+		showPopover: function () {
 			this.renderPopoverContainer();
 			this.renderPopover();
 		},
-		onPopoverRenderComplete: function() {
+		onPopoverRenderComplete: function () {
 			this.state.popoverDiv.show();
 
 			var popover = this.state.popoverDiv.children('.popover');
@@ -12215,14 +12703,14 @@
 			// set the real top, assumpt it is on bottom
 			styles.top = offset.top + component.outerHeight();
 			// check popover in top or bottom
-			if ((styles.top + realHeight) > ($(window).height() + $(window).scrollTop())) {
+			if (styles.top + realHeight > $(window).height() + $(window).scrollTop()) {
 				// cannot show in bottom and in current viewport
 				// check it is enough top or not
-				if ((offset.top - $(window).scrollTop()) >= realHeight) {
+				if (offset.top - $(window).scrollTop() >= realHeight) {
 					// enough
 					styles.top = offset.top - realHeight;
 					onTop = true;
-				} else if ((styles.top + realHeight) <= $(document).height()) {
+				} else if (styles.top + realHeight <= $(document).height()) {
 					// cannot show in bottom and in current document
 					onTop = false;
 				} else if (offset.top < realHeight) {
@@ -12240,15 +12728,15 @@
 			// check popover to left or right
 			if (realWidth > styles.width) {
 				width = $(document).width();
-				if ((styles.left + realWidth) <= width) {
+				if (styles.left + realWidth <= width) {
 					// normal from left to right, do nothing
-				} else if ((styles.left + styles.width) >= realWidth) {
-					// from right to left
-					styles.left = styles.left + styles.width - realWidth;
-					rightToLeft = true;
-				} else {
-					// still left to right, do nothing
-				}
+				} else if (styles.left + styles.width >= realWidth) {
+						// from right to left
+						styles.left = styles.left + styles.width - realWidth;
+						rightToLeft = true;
+					} else {
+						// still left to right, do nothing
+					}
 			}
 
 			if (onTop) {
@@ -12261,56 +12749,55 @@
 			if (rightToLeft) {
 				popover.addClass('right-to-left');
 			}
-			popover.css({top: styles.top, left: styles.left});
+			popover.css({ top: styles.top, left: styles.left });
 		},
-		hidePopover: function() {
+		hidePopover: function () {
 			// if (this.state.popoverDiv && this.state.popoverDiv.is(':visible')) {
 			// 	this.state.popoverDiv.hide();
-			// 	React.render(<noscript/>, this.state.popoverDiv.get(0));
+			// 	ReactDOM.render(<noscript/>, this.state.popoverDiv.get(0));
 			// }
 			this.destroyPopover();
 		},
-		destroyPopover: function() {
+		destroyPopover: function () {
 			if (this.state.popoverDiv) {
-				$(document).off('mousedown', this.onDocumentMouseDown)
-					.off('keyup', this.onDocumentKeyUp)
-					.off('mousewheel', this.onDocumentMouseWheel);
+				$(document).off('mousedown', this.onDocumentMouseDown).off('keyup', this.onDocumentKeyUp).off('mousewheel', this.onDocumentMouseWheel);
 				$(window).off('resize', this.onWindowResize);
 				this.state.popoverDiv.remove();
 				delete this.state.popoverDiv;
 			}
 		},
-		onComponentClicked: function() {
+		onComponentClicked: function () {
 			if (!this.isEnabled() || this.isViewMode()) {
 				// do nothing
 				return;
 			}
 			this.showPopover();
 		},
-		onDocumentMouseDown: function(evt) {
+		onDocumentMouseDown: function (evt) {
 			var target = $(evt.target);
 			if (target.closest(this.getComponent()).length == 0 && target.closest(this.state.popoverDiv).length == 0) {
 				this.hidePopover();
 			}
 		},
-		onDocumentMouseWheel: function(evt) {
+		onDocumentMouseWheel: function (evt) {
 			var target = $(evt.target);
 			if (target.closest(this.state.popoverDiv).length == 0) {
 				this.hidePopover();
 			}
 		},
-		onDocumentKeyUp: function(evt) {
-			if (evt.keyCode === 27 || evt.keyCode === 9) { // escape and tab
+		onDocumentKeyUp: function (evt) {
+			if (evt.keyCode === 27 || evt.keyCode === 9) {
+				// escape and tab
 				this.hidePopover();
 			}
 		},
-		onWindowResize: function() {
+		onWindowResize: function () {
 			this.hidePopover();
 		},
 		/**
-		 * on parent model changed
-		 */
-		onParentModelChanged: function() {
+   * on parent model changed
+   */
+		onParentModelChanged: function () {
 			var parentChanged = this.getComponentOption('parentChanged');
 			if (parentChanged) {
 				this.setValueToModel(parentChanged.call(this, this.getModel(), this.getParentPropertyValue()));
@@ -12321,9 +12808,9 @@
 			this.forceUpdate();
 		},
 		/**
-		 * on tree value changed
-		 */
-		onTreeValueChanged: function(evt) {
+   * on tree value changed
+   */
+		onTreeValueChanged: function (evt) {
 			var values = evt.new;
 			if (values == null) {
 				this.setValueToModel(values);
@@ -12333,7 +12820,7 @@
 				this.setValueToModel($.extend(true, {}, values));
 			}
 		},
-		onSelectionItemRemove: function(nodeId) {
+		onSelectionItemRemove: function (nodeId) {
 			if (!this.isEnabled()) {
 				// do nothing
 				return;
@@ -12343,73 +12830,73 @@
 			if (values == null) {
 				// do nothing
 			} else if (this.getTreeLayout().comp.valueAsArray) {
-				if (hierarchyCheck) {
-					var codes = this.getAvailableTreeModel().listWithHierarchyKeys({separator: NTree.NODE_SEPARATOR, rootId: NTree.ROOT_ID});
-					var codeHierarchyIds = Object.keys(codes);
-					// find all children
-					var childrenIds = codeHierarchyIds.filter(function(key) {
-						return key.indexOf(nodeId + NTree.NODE_SEPARATOR) != -1;
-					}).map(function(id) {
-						return id.split(NTree.NODE_SEPARATOR).pop();
-					});
-					var hierarchyId = codeHierarchyIds.find(function(id) {
-						return id.endsWith(NTree.NODE_SEPARATOR + nodeId);
-					});
-					// find itself and its ancestor ids
-					var ancestorIds = codeHierarchyIds.filter(function(id) {
-						return hierarchyId.startsWith(id);
-					}).map(function(id) {
-						return id.split(NTree.NODE_SEPARATOR).pop();
-					});
-					// combine
-					var ids = childrenIds.concat(ancestorIds);
-					// filter found ids
-					this.setValueToModel(values.filter(function(id) {
-						return -1 == ids.findIndex(function(idNeedRemove) {
-							return id == idNeedRemove;
+					if (hierarchyCheck) {
+						var codes = this.getAvailableTreeModel().listWithHierarchyKeys({ separator: NTree.NODE_SEPARATOR, rootId: NTree.ROOT_ID });
+						var codeHierarchyIds = Object.keys(codes);
+						// find all children
+						var childrenIds = codeHierarchyIds.filter(function (key) {
+							return key.indexOf(nodeId + NTree.NODE_SEPARATOR) != -1;
+						}).map(function (id) {
+							return id.split(NTree.NODE_SEPARATOR).pop();
 						});
-					}));
+						var hierarchyId = codeHierarchyIds.find(function (id) {
+							return id.endsWith(NTree.NODE_SEPARATOR + nodeId);
+						});
+						// find itself and its ancestor ids
+						var ancestorIds = codeHierarchyIds.filter(function (id) {
+							return hierarchyId.startsWith(id);
+						}).map(function (id) {
+							return id.split(NTree.NODE_SEPARATOR).pop();
+						});
+						// combine
+						var ids = childrenIds.concat(ancestorIds);
+						// filter found ids
+						this.setValueToModel(values.filter(function (id) {
+							return -1 == ids.findIndex(function (idNeedRemove) {
+								return id == idNeedRemove;
+							});
+						}));
+					} else {
+						// remove itself
+						this.setValueToModel(values.filter(function (id) {
+							return id != nodeId;
+						}));
+					}
 				} else {
-					// remove itself
-					this.setValueToModel(values.filter(function(id) {
-						return id != nodeId;
-					}));
+					var effectiveNodes = nodeId.split(NTree.NODE_SEPARATOR).slice(1);
+					var node = $pt.getValueFromJSON(values, effectiveNodes.join($pt.PROPERTY_SEPARATOR));
+					if (hierarchyCheck) {
+						// set itself and its children to unselected
+						Object.keys(node).forEach(function (key) {
+							delete node[key];
+						});
+						// set its ancestors to unselected
+						effectiveNodes.splice(effectiveNodes.length - 1, 1);
+						effectiveNodes.forEach(function (id, index, array) {
+							$pt.setValueIntoJSON(values, array.slice(0, index + 1).join($pt.PROPERTY_SEPARATOR) + $pt.PROPERTY_SEPARATOR + 'selected', false);
+						});
+					} else {
+						// set itself to unselected
+						delete node.selected;
+					}
+					this.getModel().firePostChangeEvent(this.getDataId(), values, values);
 				}
-			} else {
-				var effectiveNodes = nodeId.split(NTree.NODE_SEPARATOR).slice(1);
-				var node = $pt.getValueFromJSON(values, effectiveNodes.join($pt.PROPERTY_SEPARATOR));
-				if (hierarchyCheck) {
-					// set itself and its children to unselected
-					Object.keys(node).forEach(function(key) {
-						delete node[key];
-					});
-					// set its ancestors to unselected
-					effectiveNodes.splice(effectiveNodes.length - 1, 1);
-					effectiveNodes.forEach(function(id, index, array) {
-						$pt.setValueIntoJSON(values, array.slice(0, index + 1).join($pt.PROPERTY_SEPARATOR) + $pt.PROPERTY_SEPARATOR + 'selected', false);
-					});
-				} else {
-					// set itself to unselected
-					delete node.selected;
-				}
-				this.getModel().firePostChangeEvent(this.getDataId(), values, values);
-			}
 		},
-		getComponent: function() {
-			return $(React.findDOMNode(this.refs.comp));
+		getComponent: function () {
+			return $(ReactDOM.findDOMNode(this.refs.comp));
 		},
 		/**
-		 * get tree model
-		 * @returns {CodeTable}
-		 */
-		getTreeModel: function() {
+   * get tree model
+   * @returns {CodeTable}
+   */
+		getTreeModel: function () {
 			return this.getComponentOption('data');
 		},
 		/**
-		 * get available tree model
-		 * @returns {CodeTable}
-		 */
-		getAvailableTreeModel: function() {
+   * get available tree model
+   * @returns {CodeTable}
+   */
+		getAvailableTreeModel: function () {
 			var filter = this.getComponentOption('parentFilter');
 			var tree = this.getTreeModel();
 			if (filter) {
@@ -12418,7 +12905,7 @@
 				return tree;
 			}
 		},
-		getTreeLayout: function() {
+		getTreeLayout: function () {
 			var treeLayout = this.getComponentOption('treeLayout');
 			if (treeLayout) {
 				treeLayout = $.extend(true, {}, this.props.treeLayout, treeLayout);
@@ -12428,17 +12915,17 @@
 			treeLayout.comp.data = this.getAvailableTreeModel();
 			treeLayout.comp.valueAsArray = treeLayout.comp.valueAsArray ? treeLayout.comp.valueAsArray : false;
 			treeLayout.evt = treeLayout.evt ? treeLayout.evt : {};
-			treeLayout.evt.expand = treeLayout.evt.expand ? function(evt) {
+			treeLayout.evt.expand = treeLayout.evt.expand ? function (evt) {
 				treeLayout.evt.expand.call(this, evt);
 				this.onPopoverRenderComplete.call(this);
 			} : this.onPopoverRenderComplete;
-			treeLayout.evt.collapse = treeLayout.evt.collapse ? function(evt) {
+			treeLayout.evt.collapse = treeLayout.evt.collapse ? function (evt) {
 				treeLayout.evt.collapse.call(this, evt);
 				this.onPopoverRenderComplete.call(this);
 			} : this.onPopoverRenderComplete;
 			return treeLayout;
 		},
-		isHideChildWhenParentChecked: function() {
+		isHideChildWhenParentChecked: function () {
 			var hierarchyCheck = this.getTreeLayout().comp.hierarchyCheck;
 			if (hierarchyCheck) {
 				return this.getComponentOption('hideChildWhenParentChecked');
@@ -12447,53 +12934,53 @@
 			}
 		},
 		/**
-		 * has parent or not
-		 * @returns {boolean}
-		 */
-		hasParent: function() {
+   * has parent or not
+   * @returns {boolean}
+   */
+		hasParent: function () {
 			return this.getParentPropertyId() != null;
 		},
 		/**
-		 * get parent property id
-		 * @returns {string}
-		 */
-		getParentPropertyId: function() {
+   * get parent property id
+   * @returns {string}
+   */
+		getParentPropertyId: function () {
 			return this.getComponentOption("parentPropId");
 		},
 		/**
-		 * get parent model
-		 * @returns {ModelInterface}
-		 */
+   * get parent model
+   * @returns {ModelInterface}
+   */
 		getParentModel: function () {
 			var parentModel = this.getComponentOption("parentModel");
 			return parentModel == null ? this.getModel() : parentModel;
 		},
 		/**
-		 * get parent property value
-		 * @returns {*}
-		 */
+   * get parent property value
+   * @returns {*}
+   */
 		getParentPropertyValue: function () {
 			return this.getParentModel().get(this.getParentPropertyId());
 		}
 	}));
 	$pt.Components.NSelectTree = NSelectTree;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.SelectTree, function (model, layout, direction, viewMode) {
-		return React.createElement($pt.Components.NSelectTree, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NSelectTree, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
 	});
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NSideMenu = React.createClass({
 		displayName: 'NSideMenu',
 		statics: {
 			/**
-			 * get side menu
-			 * @param menus
-			 * @param containerId optional, default is 'side_menu_container'
-			 * @param className
-			 * @param hover
-			 * @returns {react element}
-			 */
+    * get side menu
+    * @param menus
+    * @param containerId optional, default is 'side_menu_container'
+    * @param className
+    * @param hover
+    * @returns {react element}
+    */
 			getSideMenu: function (menus, containerId, className, hover) {
 				if (!containerId) {
 					containerId = "side_menu_container";
@@ -12508,11 +12995,9 @@
 					if (sideMenuContainer.length == 0) {
 						$("<div id='" + containerId + "' />").appendTo($(document.body));
 					}
-					$pt.sideMenu[containerId] = React.render(
-						React.createElement($pt.Components.NSideMenu, {menus: menus, 
-						           className: className, 
-						           hover: hover ? true : false}),
-						document.getElementById(containerId));
+					$pt.sideMenu[containerId] = ReactDOM.render(React.createElement($pt.Components.NSideMenu, { menus: menus,
+						className: className,
+						hover: hover ? true : false }), document.getElementById(containerId));
 				}
 				return $pt.sideMenu[containerId];
 			}
@@ -12533,53 +13018,81 @@
 			return {};
 		},
 		componentDidMount: function () {
-			$(React.findDOMNode(this.refs.menus)).hide();
+			$(ReactDOM.findDOMNode(this.refs.menus)).hide();
 		},
 		renderMenuItem: function (item, index, menus, onTopLevel) {
 			if (item.children !== undefined) {
 				// render dropdown menu
 				var _this = this;
 				var id = 'item_' + index;
-				return (React.createElement("li", {ref: id, key: index}, 
-					React.createElement("a", {href: "javascript:void(0);", 
-					   onClick: this.onParentMenuClicked.bind(this, id), ref: id + '_link'}, 
-						item.text, 
-						React.createElement("span", {className: "fa fa-fw fa-angle-double-down n-side-menu-ul", ref: id + '_icon'})
-					), 
-					React.createElement("ul", {ref: id + '_child', style: {display: 'none'}}, 
+				return React.createElement(
+					"li",
+					{ ref: id, key: index },
+					React.createElement(
+						"a",
+						{ href: "javascript:void(0);",
+							onClick: this.onParentMenuClicked.bind(this, id), ref: id + '_link' },
+						item.text,
+						React.createElement("span", { className: "fa fa-fw fa-angle-double-down n-side-menu-ul", ref: id + '_icon' })
+					),
+					React.createElement(
+						"ul",
+						{ ref: id + '_child', style: { display: 'none' } },
 						item.children.map(function (childItem, childIndex, dropdownItems) {
 							return _this.renderMenuItem(childItem, index + '_' + childIndex, dropdownItems, false);
 						})
 					)
-				));
+				);
 			} else if (item.func !== undefined) {
 				// call javascript function
-				return (React.createElement("li", {key: index}, 
-					React.createElement("a", {href: "javascript:void(0);", 
-					   onClick: this.onMenuClicked.bind(this, item.func, item.value)}, item.text)
-				));
+				return React.createElement(
+					"li",
+					{ key: index },
+					React.createElement(
+						"a",
+						{ href: "javascript:void(0);",
+							onClick: this.onMenuClicked.bind(this, item.func, item.value) },
+						item.text
+					)
+				);
 			} else if (item.divider === true) {
 				return null;
 			} else {
 				// jump to url
-				return (React.createElement("li", {key: index}, React.createElement("a", {href: item.url}, item.text)));
+				return React.createElement(
+					"li",
+					{ key: index },
+					React.createElement(
+						"a",
+						{ href: item.url },
+						item.text
+					)
+				);
 			}
 		},
 		render: function () {
 			var _this = this;
-			return (React.createElement("div", {className: "n-side-menu", ref: "menus", 
-			             onMouseEnter: this.onMouseEnter, onMouseLeave: this.onMouseLeave}, 
-				React.createElement("ul", {className: "nav navbar-nav"}, 
+			return React.createElement(
+				"div",
+				{ className: "n-side-menu", ref: "menus",
+					onMouseEnter: this.onMouseEnter, onMouseLeave: this.onMouseLeave },
+				React.createElement(
+					"ul",
+					{ className: "nav navbar-nav" },
 					this.props.menus.map(function (item, index, menu) {
 						return _this.renderMenuItem(item, index, menu, true);
-					}), 
-					React.createElement("li", {className: "n-side-menu-close"}, 
-						React.createElement("a", {href: "javascript:void(0);", onClick: this.onCloseClicked}, 
-							React.createElement("span", {className: "fa fa-fw fa-arrow-circle-left"})
+					}),
+					React.createElement(
+						"li",
+						{ className: "n-side-menu-close" },
+						React.createElement(
+							"a",
+							{ href: "javascript:void(0);", onClick: this.onCloseClicked },
+							React.createElement("span", { className: "fa fa-fw fa-arrow-circle-left" })
 						)
 					)
 				)
-			));
+			);
 		},
 		onMouseEnter: function () {
 			if (this.props.hover) {
@@ -12592,67 +13105,67 @@
 			}
 		},
 		/**
-		 * on menu clicked
-		 * @param func
-		 * @param value
-		 */
+   * on menu clicked
+   * @param func
+   * @param value
+   */
 		onMenuClicked: function (func, value) {
 			func.call(this, value);
 		},
 		onParentMenuClicked: function (id) {
-			$(React.findDOMNode(this.refs[id + '_link'])).blur();
-			var ul = $(React.findDOMNode(this.refs[id + '_child']));
+			$(ReactDOM.findDOMNode(this.refs[id + '_link'])).blur();
+			var ul = $(ReactDOM.findDOMNode(this.refs[id + '_child']));
 			ul.toggle('fade', function () {
 				// if close, then close all sub menus
 				if (ul.not(':visible')) {
 					ul.find('ul').hide();
 				}
 			});
-			$(React.findDOMNode(this.refs[id + '_icon'])).toggleClass('fa-angle-double-down fa-angle-double-up');
+			$(ReactDOM.findDOMNode(this.refs[id + '_icon'])).toggleClass('fa-angle-double-down fa-angle-double-up');
 
 			this.collapseMenus(id);
 		},
 		/**
-		 * collapse menus
-		 * @param id {string} menu id which keep expanding
-		 */
+   * collapse menus
+   * @param id {string} menu id which keep expanding
+   */
 		collapseMenus: function (id) {
 			var _this = this;
 			Object.keys(this.refs).forEach(function (key) {
 				if (key.endsWith('_link')) {
 					var linkId = key.substr(0, key.length - 5);
 					if (!id || !id.startsWith(linkId)) {
-						var ul = $(React.findDOMNode(_this.refs[linkId + '_child']));
+						var ul = $(ReactDOM.findDOMNode(_this.refs[linkId + '_child']));
 						ul.hide('fade', function () {
 							ul.find('ul').hide();
 						});
 					}
 				}
 			});
-			$(React.findDOMNode(this.refs[id + '_icon'])).toggleClass('fa-angle-double-down fa-angle-double-up');
+			$(ReactDOM.findDOMNode(this.refs[id + '_icon'])).toggleClass('fa-angle-double-down fa-angle-double-up');
 		},
 		/**
-		 * on close button clicked
-		 */
+   * on close button clicked
+   */
 		onCloseClicked: function () {
 			this.hide();
 		},
 		/**
-		 * show side menu
-		 */
+   * show side menu
+   */
 		show: function () {
 			if (this.state.willHide) {
 				clearTimeout(this.state.willHide);
 				this.state.willHide = null;
 			}
-			$(React.findDOMNode(this.refs.menus)).show('fade');
+			$(ReactDOM.findDOMNode(this.refs.menus)).show('fade');
 		},
 		/**
-		 * hide side menu
-		 */
+   * hide side menu
+   */
 		hide: function () {
 			var _this = this;
-			$(React.findDOMNode(this.refs.menus)).hide('fade', function () {
+			$(ReactDOM.findDOMNode(this.refs.menus)).hide('fade', function () {
 				_this.collapseMenus();
 			});
 		},
@@ -12664,12 +13177,12 @@
 		}
 	});
 	$pt.Components.NSideMenu = NSideMenu;
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * normal tab
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NTab = React.createClass({
 		displayName: 'NTab',
 		propTypes: {
@@ -12705,13 +13218,13 @@
 		getInitialState: function () {
 			return {};
 		},
-		componentDidUpdate: function() {
+		componentDidUpdate: function () {
 			this.renderRelatedDOM();
 		},
 		componentDidMount: function () {
 			this.renderRelatedDOM();
 		},
-		renderRelatedDOM: function() {
+		renderRelatedDOM: function () {
 			var activeTabIndex = this.getActiveTabIndex();
 			this.props.tabs.forEach(function (tab, index) {
 				if (activeTabIndex == index) {
@@ -12722,11 +13235,11 @@
 			});
 		},
 		/**
-		 * render icon
-		 * @param icon {string|XML}
-		 * @param size {string}
-		 * @returns {XML}
-		 */
+   * render icon
+   * @param icon {string|XML}
+   * @param size {string}
+   * @returns {XML}
+   */
 		renderIcon: function (icon, size) {
 			if (typeof icon === 'string') {
 				var css = {
@@ -12737,59 +13250,72 @@
 				if (size) {
 					css['fa-' + size] = true;
 				}
-				return React.createElement("span", {className: $pt.LayoutHelper.classSet(css)});
+				return React.createElement('span', { className: $pt.LayoutHelper.classSet(css) });
 			} else {
 				return icon;
 			}
 		},
 		/**
-		 * render label
-		 * @param label {string}
-		 * @returns {XML}
-		 */
+   * render label
+   * @param label {string}
+   * @returns {XML}
+   */
 		renderLabel: function (label) {
 			if (label) {
-				return React.createElement("span", null, ' ' + label);
+				return React.createElement(
+					'span',
+					null,
+					' ' + label
+				);
 			} else {
 				return null;
 			}
 		},
 		renderBadge: function (badge) {
 			if (badge) {
-				return React.createElement("span", {className: "badge"}, badge);
+				return React.createElement(
+					'span',
+					{ className: 'badge' },
+					badge
+				);
 			} else {
 				return null;
 			}
 		},
 		/**
-		 * render tab
-		 * @param tab {{active:boolean, label:string, icon:string, badge:string, removable: boolean, visible:boolean}}
-		 * @param index
-		 * @returns {XML}
-		 */
+   * render tab
+   * @param tab {{active:boolean, label:string, icon:string, badge:string, removable: boolean, visible:boolean}}
+   * @param index
+   * @returns {XML}
+   */
 		renderTab: function (tab, index) {
 			var css = $pt.LayoutHelper.classSet({
 				active: index == this.getActiveTabIndex(),
 				hide: tab.visible === false
 			});
-			var removeButton = (
-				React.createElement("a", {href: "javascript:void(0);", className: "n-tab-delete", 
-				   onClick: this.onRemoveClicked}, 
-					React.createElement("span", {className: "fa fa-fw fa-times"})
-				));
-			return (React.createElement("li", {role: "presentation", className: css, key: index}, 
-				React.createElement("a", {href: "javascript:void(0);", onClick: this.onClicked}, 
-					this.renderIcon(tab.icon, this.props.size), 
-					this.renderLabel(tab.label), 
+			var removeButton = React.createElement(
+				'a',
+				{ href: 'javascript:void(0);', className: 'n-tab-delete',
+					onClick: this.onRemoveClicked },
+				React.createElement('span', { className: 'fa fa-fw fa-times' })
+			);
+			return React.createElement(
+				'li',
+				{ role: 'presentation', className: css, key: index },
+				React.createElement(
+					'a',
+					{ href: 'javascript:void(0);', onClick: this.onClicked },
+					this.renderIcon(tab.icon, this.props.size),
+					this.renderLabel(tab.label),
 					this.renderBadge(tab.badge)
-				), 
+				),
 				this.canRemove(tab) ? removeButton : null
-			));
+			);
 		},
 		/**
-		 * render
-		 * @returns {XML}
-		 */
+   * render
+   * @returns {XML}
+   */
 		render: function () {
 			var css = {
 				'nav': true,
@@ -12801,17 +13327,21 @@
 			if (this.props.tabClassName) {
 				css[this.props.tabClassName] = true;
 			}
-			return (React.createElement("div", {className: "n-tab"}, 
-				React.createElement("ul", {className: $pt.LayoutHelper.classSet(css), ref: "tabs"}, 
+			return React.createElement(
+				'div',
+				{ className: 'n-tab' },
+				React.createElement(
+					'ul',
+					{ className: $pt.LayoutHelper.classSet(css), ref: 'tabs' },
 					this.props.tabs.map(this.renderTab)
 				)
-			));
+			);
 		},
 		/**
-		 * check the given tab can be removed or not
-		 * @param tab {{removable: boolean}}
-		 * @returns {boolean}
-		 */
+   * check the given tab can be removed or not
+   * @param tab {{removable: boolean}}
+   * @returns {boolean}
+   */
 		canRemove: function (tab) {
 			if (tab.removable != null) {
 				return tab.removable === true;
@@ -12820,9 +13350,9 @@
 			}
 		},
 		/**
-		 * get active tab index
-		 * @returns {number}
-		 */
+   * get active tab index
+   * @returns {number}
+   */
 		getActiveTabIndex: function () {
 			// find the active tab
 			var activeTabIndex = this.props.tabs.findIndex(function (tab, index) {
@@ -12831,7 +13361,7 @@
 			if (activeTabIndex == -1) {
 				// find the first visible tab if no active tab found
 				activeTabIndex = this.props.tabs.findIndex(function (tab, index) {
-					var visible =  tab.visible !== false;
+					var visible = tab.visible !== false;
 					if (visible) {
 						tab.active = true;
 						return true;
@@ -12841,23 +13371,23 @@
 			return activeTabIndex;
 		},
 		/**
-		 * set active tab index
-		 * @param {number}
-		 */
-		setActiveTabIndex: function(index) {
+   * set active tab index
+   * @param {number}
+   */
+		setActiveTabIndex: function (index) {
 			if (index < 0 || index >= this.props.tabs.length) {
 				window.console.warn('Tab index[' + index + '] out of bound.');
 			}
-			this.props.tabs.forEach(function(tab, tabIndex) {
-				tab.active = (tabIndex == index);
+			this.props.tabs.forEach(function (tab, tabIndex) {
+				tab.active = tabIndex == index;
 			});
 			this.forceUpdate();
 			return this;
 		},
 		/**
-		 * on tab clicked
-		 * @param evt
-		 */
+   * on tab clicked
+   * @param evt
+   */
 		onClicked: function (evt) {
 			var newTab = $(evt.target).closest('li');
 			var newTabIndex = newTab.index();
@@ -12881,9 +13411,9 @@
 			}
 		},
 		/**
-		 * on tab remove clicked
-		 * @param evt
-		 */
+   * on tab remove clicked
+   * @param evt
+   */
 		onRemoveClicked: function (evt) {
 			var selectedTab = $(evt.target).closest('li');
 			selectedTab.addClass('active');
@@ -12924,14 +13454,14 @@
 		}
 	});
 	$pt.Components.NTab = NTab;
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * table
  *
  * depends NIcon, NText, NModalForm, NConfirm, NPagination
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NTable = React.createClass($pt.defineCellComponent({
 		displayName: 'NTable',
 		statics: {
@@ -12942,9 +13472,9 @@
 			TOOLTIP_REMOVE: null,
 			TOOLTIP_MORE: 'More Operations...',
 			/**
-			 * set operation button width
-			 * @param width {number}
-			 */
+    * set operation button width
+    * @param width {number}
+    */
 			setOperationButtonWidth: function (width) {
 				NTable.__operationButtonWidth = width;
 			},
@@ -12966,7 +13496,7 @@
 			BOOLEAN_TRUE_DISPLAY_TEXT: 'Y',
 			BOOLEAN_FALSE_DISPLAY_TEXT: 'N',
 			PAGE_JUMPING_PROXY: null,
-			registerInlineEditor: function(type, definition) {
+			registerInlineEditor: function (type, definition) {
 				if (NTable.__inlineEditors[type] != null) {
 					window.console.warn("Inline editor[" + type + "] is repalced.");
 					window.console.warn("From:");
@@ -12976,41 +13506,40 @@
 				}
 				NTable.__inlineEditors[type] = definition;
 			},
-			getInlineEditor: function(type) {
+			getInlineEditor: function (type) {
 				var editor = NTable.__inlineEditors[type];
 				if (editor == null) {
 					editor = NTable['__' + type];
 				}
 				if (editor == null) {
-					throw $pt.createComponentException($pt.ComponentConstants.Err_Unsupported_Component,
-						"Inline component type[" + type + "] is not supported yet.");
+					throw $pt.createComponentException($pt.ComponentConstants.Err_Unsupported_Component, "Inline component type[" + type + "] is not supported yet.");
 				}
 				return editor;
 			},
 			__inlineEditors: {},
 			__text: {
 				comp: {
-					type: {type: $pt.ComponentConstants.Text, label: false}
+					type: { type: $pt.ComponentConstants.Text, label: false }
 				}
 			},
 			__check: {
 				comp: {
-					type: {type: $pt.ComponentConstants.Check, label: false}
+					type: { type: $pt.ComponentConstants.Check, label: false }
 				}
 			},
 			__date: {
 				comp: {
-					type: {type: $pt.ComponentConstants.Date, label: false}
+					type: { type: $pt.ComponentConstants.Date, label: false }
 				}
 			},
 			__select: {
 				comp: {
-					type: {type: $pt.ComponentConstants.Select, label: false}
+					type: { type: $pt.ComponentConstants.Select, label: false }
 				}
 			},
 			__radio: {
 				comp: {
-					type: {type: $pt.ComponentConstants.Radio, label: false}
+					type: { type: $pt.ComponentConstants.Radio, label: false }
 				}
 			}
 		},
@@ -13056,9 +13585,9 @@
 			};
 		},
 		/**
-		 * get initial state
-		 * @returns {*}
-		 */
+   * get initial state
+   * @returns {*}
+   */
 		getInitialState: function () {
 			var _this = this;
 			return {
@@ -13084,8 +13613,8 @@
 			};
 		},
 		/**
-		 * attach listeners
-		 */
+   * attach listeners
+   */
 		attachListeners: function () {
 			var _this = this;
 			this.getScrollBodyComponent().on("scroll", function (e) {
@@ -13111,12 +13640,12 @@
 			this.addPostValidateListener(this.onModelValidateChanged);
 		},
 		/**
-		 * detach listeners
-		 */
+   * detach listeners
+   */
 		detachListeners: function () {
 			this.getScrollBodyComponent().off("scroll");
 			this.getDivComponent().off("mouseenter", "tbody tr").off("mouseleave", "tbody tr");
-			$(React.findDOMNode(this.refs[this.getHeaderLabelId()])).popover("destroy");
+			$(ReactDOM.findDOMNode(this.refs[this.getHeaderLabelId()])).popover("destroy");
 			this.removePostChangeListener(this.onModelChanged);
 			this.state.searchModel.removePostChangeListener('text', this.onSearchBoxChanged);
 			this.removePostRemoveListener(this.onModelChanged);
@@ -13124,9 +13653,9 @@
 			this.removePostValidateListener(this.onModelValidateChanged);
 		},
 		/**
-		 * will update
-		 * @param nextProps
-		 */
+   * will update
+   * @param nextProps
+   */
 		componentWillUpdate: function (nextProps) {
 			this.detachListeners();
 			if (nextProps != this.props) {
@@ -13136,32 +13665,32 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
+   * did update
+   * @param prevProps
+   * @param prevState
+   */
 		componentDidUpdate: function (prevProps, prevState) {
 			this.attachListeners();
 			this.registerToComponentCentral();
 		},
 		/**
-		 * did mount
-		 */
+   * did mount
+   */
 		componentDidMount: function () {
 			this.attachListeners();
 			this.registerToComponentCentral();
 		},
 		/**
-		 * will unmount
-		 */
+   * will unmount
+   */
 		componentWillUnmount: function () {
 			this.detachListeners();
 			this.unregisterFromComponentCentral();
 			this.destroyPopover();
 		},
 		/**
-		 * render when IE8, fixed the height of table since IE8 doesn't support max-height
-		 */
+   * render when IE8, fixed the height of table since IE8 doesn't support max-height
+   */
 		renderIfIE8: function () {
 			if (!this.isIE8() || !this.hasVerticalScrollBar()) {
 				return;
@@ -13190,22 +13719,22 @@
 			return $.browser.msie;
 		},
 		/**
-		 * check browser is IE8 or not
-		 * @returns {boolean}
-		 */
+   * check browser is IE8 or not
+   * @returns {boolean}
+   */
 		isIE8: function () {
 			return $.browser.msie && $.browser.versionNumber == 8;
 		},
 		/**
-		 * check browser is firefox or not
-		 * @returns {boolean}
-		 */
+   * check browser is firefox or not
+   * @returns {boolean}
+   */
 		isFirefox: function () {
 			return $.browser.mozilla;
 		},
 		/**
-		 * prepare display options
-		 */
+   * prepare display options
+   */
 		prepareDisplayOptions: function () {
 			if (this.state.columns != null) {
 				// already initialized, do nothing and return
@@ -13237,7 +13766,7 @@
 			} else if (!Array.isArray(rowOperations)) {
 				rowOperations = [rowOperations];
 			}
-			rowOperations = rowOperations.filter(function(operation) {
+			rowOperations = rowOperations.filter(function (operation) {
 				if (_this.isViewMode()) {
 					// in view mode, filter the buttons only in editing
 					return operation.view != 'edit';
@@ -13256,7 +13785,7 @@
 				};
 				var maxButtonCount = this.getComponentOption('maxOperationButtonCount');
 				if (maxButtonCount) {
-					var actualButtonCount = (config.editable ? 1 : 0) + (config.removable ? 1: 0) + rowOperations.length;
+					var actualButtonCount = (config.editable ? 1 : 0) + (config.removable ? 1 : 0) + rowOperations.length;
 					if (maxButtonCount > actualButtonCount) {
 						// no button in popover
 						config.width = (config.editable ? NTable.__operationButtonWidth : 0) + (config.removable ? NTable.__operationButtonWidth : 0);
@@ -13307,39 +13836,41 @@
 			}
 		},
 		/**
-		 * render search  box
-		 * @returns {XML}
-		 */
+   * render search  box
+   * @returns {XML}
+   */
 		renderSearchBox: function () {
 			if (this.isSearchable()) {
-				return (React.createElement($pt.Components.NText, {model: this.state.searchModel, layout: this.state.searchLayout}));
+				return React.createElement($pt.Components.NText, { model: this.state.searchModel, layout: this.state.searchLayout });
 			} else {
 				return null;
 			}
 		},
 		/**
-		 * render heading buttons
-		 * @returns {XML}
-		 */
+   * render heading buttons
+   * @returns {XML}
+   */
 		renderHeadingButtons: function () {
 			if (this.isAddable()) {
-				return (React.createElement("a", {href: "javascript:void(0);", 
-				           onClick: this.onAddClicked, 
-				           className: "n-table-heading-buttons pull-right", 
-				           ref: "add-button", style: {
-					display: this.state.expanded ? 'block' : 'none'
-				}}, 
-					React.createElement($pt.Components.NIcon, {icon: NTable.ADD_BUTTON_ICON}), 
+				return React.createElement(
+					'a',
+					{ href: 'javascript:void(0);',
+						onClick: this.onAddClicked,
+						className: 'n-table-heading-buttons pull-right',
+						ref: 'add-button', style: {
+							display: this.state.expanded ? 'block' : 'none'
+						} },
+					React.createElement($pt.Components.NIcon, { icon: NTable.ADD_BUTTON_ICON }),
 					NTable.ADD_BUTTON_TEXT
-				));
+				);
 			} else {
 				return null;
 			}
 		},
 		/**
-		 * render panel heading label
-		 * @returns {XML}
-		 */
+   * render panel heading label
+   * @returns {XML}
+   */
 		renderPanelHeadingLabel: function () {
 			var css = "col-sm-3 col-md-3 col-lg-3";
 			if (this.getModel().hasError(this.getDataId())) {
@@ -13352,16 +13883,20 @@
 			if (this.isCollapsible()) {
 				spanCSS['n-table-heading-label-collapsible'] = true;
 			}
-			return (React.createElement("div", {className: css}, 
-				React.createElement("span", {className: this.getAdditionalCSS("headingLabel", $pt.LayoutHelper.classSet(spanCSS)), 
-				      ref: this.getHeaderLabelId(), onClick: this.isCollapsible() ? this.onTitleClicked : null}, 
+			return React.createElement(
+				'div',
+				{ className: css },
+				React.createElement(
+					'span',
+					{ className: this.getAdditionalCSS("headingLabel", $pt.LayoutHelper.classSet(spanCSS)),
+						ref: this.getHeaderLabelId(), onClick: this.isCollapsible() ? this.onTitleClicked : null },
 					this.getLayout().getLabel()
 				)
-			));
+			);
 		},
 		/**
-		 * render header popover
-		 */
+   * render header popover
+   */
 		renderHeaderPopover: function () {
 			if (this.getModel().hasError(this.getDataId())) {
 				var messages = this.getModel().getError(this.getDataId());
@@ -13373,7 +13908,7 @@
 						return "<span style='display:block'>" + NTable.DETAIL_ERROR_MESSAGE + "</span>";
 					}
 				});
-				$(React.findDOMNode(this.refs[this.getHeaderLabelId()])).popover({
+				$(ReactDOM.findDOMNode(this.refs[this.getHeaderLabelId()])).popover({
 					placement: 'top',
 					trigger: 'hover',
 					html: true,
@@ -13388,28 +13923,34 @@
 			}
 		},
 		/**
-		 * render panel heading
-		 * @returns {XML}
-		 */
+   * render panel heading
+   * @returns {XML}
+   */
 		renderPanelHeading: function () {
 			if (!this.isHeading()) {
 				return null;
 			}
-			return (React.createElement("div", {className: this.getAdditionalCSS("heading", "panel-heading n-table-heading")}, 
-				React.createElement("div", {className: "row"}, 
-					this.renderPanelHeadingLabel(), 
-					React.createElement("div", {className: "col-sm-9 col-md-9 col-lg-9"}, 
-						this.renderHeadingButtons(), 
+			return React.createElement(
+				'div',
+				{ className: this.getAdditionalCSS("heading", "panel-heading n-table-heading") },
+				React.createElement(
+					'div',
+					{ className: 'row' },
+					this.renderPanelHeadingLabel(),
+					React.createElement(
+						'div',
+						{ className: 'col-sm-9 col-md-9 col-lg-9' },
+						this.renderHeadingButtons(),
 						this.renderSearchBox()
 					)
 				)
-			));
+			);
 		},
 		/**
-		 * render sort button
-		 * @param column
-		 * @returns {XML}
-		 */
+   * render sort button
+   * @param column
+   * @returns {XML}
+   */
 		renderTableHeaderSortButton: function (column) {
 			if (this.isSortable(column)) {
 				var icon = NTable.SORT_ICON;
@@ -13422,17 +13963,19 @@
 						icon = NTable.SORT_DESC_ICON;
 					}
 				}
-				return (React.createElement("a", {href: "javascript:void(0);", className: sortClass, 
-				           onClick: this.onSortClicked.bind(this, column)}, 
-					React.createElement($pt.Components.NIcon, {icon: icon})
-				));
+				return React.createElement(
+					'a',
+					{ href: 'javascript:void(0);', className: sortClass,
+						onClick: this.onSortClicked.bind(this, column) },
+					React.createElement($pt.Components.NIcon, { icon: icon })
+				);
 			}
 		},
 		/**
-		 * render checkbox
-		 * @param column
-		 * @returns {XML}
-		 */
+   * render checkbox
+   * @param column
+   * @returns {XML}
+   */
 		renderTableHeaderCheckBox: function (column) {
 			var data = this.getDataToDisplay();
 			var range = this.computePagination(data);
@@ -13459,24 +14002,28 @@
 					_this.forceUpdate();
 				}
 			});
-			return React.createElement($pt.Components.NCheck, {model: model, layout: layout});
+			return React.createElement($pt.Components.NCheck, { model: model, layout: layout });
 		},
 		/**
-		 * render heading content.
-		 * at least and only one parameter can be true.
-		 * if more than one parameter is true, priority as all > leftFixed > rightFixed
-		 * @param all {boolean} render all columns?
-		 * @param leftFixed {boolean} render left fixed columns?
-		 * @param rightFixed {boolean} render right fixed columns?
-		 * @returns {XML}
-		 * @see #getRenderColumnIndexRange
-		 */
+   * render heading content.
+   * at least and only one parameter can be true.
+   * if more than one parameter is true, priority as all > leftFixed > rightFixed
+   * @param all {boolean} render all columns?
+   * @param leftFixed {boolean} render left fixed columns?
+   * @param rightFixed {boolean} render right fixed columns?
+   * @returns {XML}
+   * @see #getRenderColumnIndexRange
+   */
 		renderTableHeading: function (all, leftFixed, rightFixed) {
 			var indexToRender = this.getRenderColumnIndexRange(all, leftFixed, rightFixed);
 			var columnIndex = 0;
 			var _this = this;
-			return (React.createElement("thead", null, 
-				React.createElement("tr", null, 
+			return React.createElement(
+				'thead',
+				null,
+				React.createElement(
+					'tr',
+					null,
 					this.state.columns.map(function (column) {
 						if (columnIndex >= indexToRender.min && columnIndex <= indexToRender.max) {
 							// column is fixed.
@@ -13487,23 +14034,27 @@
 								style.display = "none";
 							}
 							if (column.rowSelectable) {
-								return (React.createElement("td", {style: style, key: columnIndex}, 
+								return React.createElement(
+									'td',
+									{ style: style, key: columnIndex },
 									_this.renderTableHeaderCheckBox(column)
-								));
+								);
 							} else {
-								return (React.createElement("td", {style: style, key: columnIndex}, 
-									column.title, 
+								return React.createElement(
+									'td',
+									{ style: style, key: columnIndex },
+									column.title,
 									_this.renderTableHeaderSortButton(column)
-								));
+								);
 							}
 						} else {
 							columnIndex++;
 						}
 					})
 				)
-			));
+			);
 		},
-		renderRowEditButton: function(rowModel) {
+		renderRowEditButton: function (rowModel) {
 			var layout = $pt.createCellLayout('editButton', {
 				comp: {
 					style: 'link',
@@ -13516,9 +14067,9 @@
 					comp: 'n-table-op-btn'
 				}
 			});
-			return React.createElement($pt.Components.NFormButton, {model: rowModel, layout: layout});
+			return React.createElement($pt.Components.NFormButton, { model: rowModel, layout: layout });
 		},
-		renderRowRemoveButton: function(rowModel) {
+		renderRowRemoveButton: function (rowModel) {
 			var layout = $pt.createCellLayout('removeButton', {
 				comp: {
 					style: 'link',
@@ -13531,9 +14082,9 @@
 					comp: 'n-table-op-btn'
 				}
 			});
-			return React.createElement($pt.Components.NFormButton, {model: rowModel, layout: layout});
+			return React.createElement($pt.Components.NFormButton, { model: rowModel, layout: layout });
 		},
-		renderRowOperationButton: function(operation, rowModel, operationIndex) {
+		renderRowOperationButton: function (operation, rowModel, operationIndex) {
 			var layout = $pt.createCellLayout('rowButton', {
 				comp: {
 					style: 'link',
@@ -13546,9 +14097,9 @@
 					comp: 'n-table-op-btn'
 				}
 			});
-			return React.createElement($pt.Components.NFormButton, {model: rowModel, layout: layout, key: operationIndex});
+			return React.createElement($pt.Components.NFormButton, { model: rowModel, layout: layout, key: operationIndex });
 		},
-		getRowOperations: function(column) {
+		getRowOperations: function (column) {
 			var rowOperations = column.rowOperations;
 			if (rowOperations === undefined || rowOperations === null) {
 				rowOperations = [];
@@ -13556,22 +14107,24 @@
 			return rowOperations;
 		},
 		/**
-		 * render flat operation cell, all operation button renderred as a line.
-		 */
-		renderFlatOperationCell: function(column, rowModel) {
+   * render flat operation cell, all operation button renderred as a line.
+   */
+		renderFlatOperationCell: function (column, rowModel) {
 			var editButton = column.editable ? this.renderRowEditButton(rowModel) : null;
 			var removeButton = column.removable ? this.renderRowRemoveButton(rowModel) : null;
 			var rowOperations = this.getRowOperations(column);
 			var _this = this;
-			return (React.createElement("div", {className: "btn-group n-table-op-btn-group", role: "group"}, 
+			return React.createElement(
+				'div',
+				{ className: 'btn-group n-table-op-btn-group', role: 'group' },
 				rowOperations.map(function (operation, operationIndex) {
 					return _this.renderRowOperationButton(operation, rowModel, operationIndex);
-				}), 
-				editButton, 
+				}),
+				editButton,
 				removeButton
-			));
+			);
 		},
-		renderPopoverContainer: function() {
+		renderPopoverContainer: function () {
 			if (this.state.popoverDiv == null) {
 				this.state.popoverDiv = $('<div>');
 				this.state.popoverDiv.appendTo($('body'));
@@ -13580,29 +14133,29 @@
 			this.state.popoverDiv.hide();
 		},
 		/**
-		 * check all row operation buttons in more popover are renderred as icon and tooltip or menu?
-		 * if operation with no icon declared, return false (render as menu)
-		 */
-		isRenderMoreOperationButtonsAsIcon: function(moreOperations) {
+   * check all row operation buttons in more popover are renderred as icon and tooltip or menu?
+   * if operation with no icon declared, return false (render as menu)
+   */
+		isRenderMoreOperationButtonsAsIcon: function (moreOperations) {
 			if (this.getComponentOption('moreAsMenu')) {
 				return true;
 			} else {
-				return !moreOperations.some(function(operation) {
+				return !moreOperations.some(function (operation) {
 					return operation.icon == null;
 				});
 			}
 		},
-		renderPopoverAsMenu: function(moreOperations, rowModel) {
-			var hasIcon = moreOperations.some(function(operation) {
+		renderPopoverAsMenu: function (moreOperations, rowModel) {
+			var hasIcon = moreOperations.some(function (operation) {
 				return operation.icon != null;
 			});
 			var _this = this;
-			var renderOperation = function(operation, operationIndex) {
+			var renderOperation = function (operation, operationIndex) {
 				var layout = $pt.createCellLayout('rowButton', {
 					label: operation.tooltip,
 					comp: {
 						style: 'link',
-						icon: hasIcon ? (operation.icon ? operation.icon : 'placeholder') : null,
+						icon: hasIcon ? operation.icon ? operation.icon : 'placeholder' : null,
 						enabled: operation.enabled,
 						click: _this.onRowOperationClicked.bind(_this, operation.click, rowModel.getCurrentModel())
 					},
@@ -13610,35 +14163,43 @@
 						comp: 'n-table-op-btn'
 					}
 				});
-				return (React.createElement("li", {key: operationIndex}, 
-					React.createElement($pt.Components.NFormButton, {model: rowModel, layout: layout})
-				));
+				return React.createElement(
+					'li',
+					{ key: operationIndex },
+					React.createElement($pt.Components.NFormButton, { model: rowModel, layout: layout })
+				);
 			};
-			return (React.createElement("ul", {className: "nav"}, moreOperations.map(renderOperation)));
+			return React.createElement(
+				'ul',
+				{ className: 'nav' },
+				moreOperations.map(renderOperation)
+			);
 		},
-		renderPopoverAsIcon: function(moreOperations, rowModel) {
-			return moreOperations.map(function(operation, operationIndex) {
+		renderPopoverAsIcon: function (moreOperations, rowModel) {
+			return moreOperations.map(function (operation, operationIndex) {
 				return _this.renderRowOperationButton(operation, rowModel, operationIndex);
 			});
 		},
-		renderPopover: function(moreOperations, rowModel, eventTarget) {
-			var styles = {display: 'block'};
+		renderPopover: function (moreOperations, rowModel, eventTarget) {
+			var styles = { display: 'block' };
 			var target = $(eventTarget.closest('a'));
 			var offset = target.offset();
 			styles.top = offset.top + target.outerHeight() - 5;
 			styles.left = offset.left;
 
 			var _this = this;
-			React.render((React.createElement("div", {role: "tooltip", className: "n-table-op-btn-popover popover bottom in", style: styles}, 
-				React.createElement("div", {className: "arrow"}), 
-				React.createElement("div", {className: "popover-content"}, 
-					this.isRenderMoreOperationButtonsAsIcon(moreOperations) ?
-						this.renderPopoverAsIcon(moreOperations, rowModel) :
-						this.renderPopoverAsMenu(moreOperations, rowModel)
+			ReactDOM.render(React.createElement(
+				'div',
+				{ role: 'tooltip', className: 'n-table-op-btn-popover popover bottom in', style: styles },
+				React.createElement('div', { className: 'arrow' }),
+				React.createElement(
+					'div',
+					{ className: 'popover-content' },
+					this.isRenderMoreOperationButtonsAsIcon(moreOperations) ? this.renderPopoverAsIcon(moreOperations, rowModel) : this.renderPopoverAsMenu(moreOperations, rowModel)
 				)
-			)), this.state.popoverDiv.get(0));
+			), this.state.popoverDiv.get(0));
 		},
-		showPopover: function(moreOperations, rowModel, eventTarget) {
+		showPopover: function (moreOperations, rowModel, eventTarget) {
 			this.renderPopoverContainer();
 			this.renderPopover(moreOperations, rowModel, eventTarget);
 			this.state.popoverDiv.show();
@@ -13652,37 +14213,37 @@
 			styles.left = offset.left + target.outerWidth() - popWidth + 10;
 			popover.css(styles);
 		},
-		hidePopover: function() {
+		hidePopover: function () {
 			if (this.state.popoverDiv && this.state.popoverDiv.is(':visible')) {
 				this.state.popoverDiv.hide();
-				React.render(React.createElement("noscript", null), this.state.popoverDiv.get(0));
+				ReactDOM.render(React.createElement('noscript', null), this.state.popoverDiv.get(0));
 			}
 		},
-		destroyPopover: function() {
+		destroyPopover: function () {
 			if (this.state.popoverDiv) {
 				$(document).off('click', this.onDocumentClicked).off('keyup', this.onDocumentKeyUp);
 				this.state.popoverDiv.remove();
 				delete this.state.popoverDiv;
 			}
 		},
-		onDocumentClicked: function(evt) {
+		onDocumentClicked: function (evt) {
 			var target = $(evt.target);
 			if (target.closest(this.state.popoverDiv).length == 0) {
 				this.hidePopover();
 			}
 		},
-		onDocumentKeyUp: function(evt) {
+		onDocumentKeyUp: function (evt) {
 			if (evt.keyCode === 27) {
 				this.hidePopover();
 			}
 		},
-		onRowOperationMoreClicked: function(moreOperations, rowModel, eventTarget) {
+		onRowOperationMoreClicked: function (moreOperations, rowModel, eventTarget) {
 			this.showPopover(moreOperations, rowModel, eventTarget);
 		},
 		/**
-		 * render more operations buttons
-		 */
-		renderRowOperationMoreButton: function(moreOperations, rowModel) {
+   * render more operations buttons
+   */
+		renderRowOperationMoreButton: function (moreOperations, rowModel) {
 			var layout = $pt.createCellLayout('rowButton', {
 				comp: {
 					style: 'link',
@@ -13694,25 +14255,25 @@
 					comp: 'n-table-op-btn more'
 				}
 			});
-			return React.createElement($pt.Components.NFormButton, {model: rowModel, layout: layout, key: "more-op"});
+			return React.createElement($pt.Components.NFormButton, { model: rowModel, layout: layout, key: 'more-op' });
 		},
 		/**
-		 * render dropdown operation cell, only buttons which before maxButtonCount are renderred as a line,
-		 * a dropdown button is renderred in last, other buttons are renderred in popover of dropdown button.
-		 */
-		renderDropDownOperationCell: function(column, rowModel, maxButtonCount) {
+   * render dropdown operation cell, only buttons which before maxButtonCount are renderred as a line,
+   * a dropdown button is renderred in last, other buttons are renderred in popover of dropdown button.
+   */
+		renderDropDownOperationCell: function (column, rowModel, maxButtonCount) {
 			var rowOperations = this.getRowOperations(column);
 			if (column.editable) {
-				rowOperations.push({editButton: true});
+				rowOperations.push({ editButton: true });
 			}
 			if (column.removable) {
-				rowOperations.push({removeButton: true});
+				rowOperations.push({ removeButton: true });
 			}
 
 			var _this = this;
 			var used = -1;
 			var buttons = [];
-			rowOperations.some(function(operation, operationIndex) {
+			rowOperations.some(function (operation, operationIndex) {
 				if (operation.editButton) {
 					buttons.push(_this.renderRowEditButton(rowModel));
 				} else if (operation.removeButton) {
@@ -13723,22 +14284,25 @@
 				used++;
 				return maxButtonCount - used == 1;
 			});
-			var hasDropdown = (rowOperations.length - used) > 1;
+			var hasDropdown = rowOperations.length - used > 1;
 			var dropdown = null;
 			if (hasDropdown) {
 				buttons.push(this.renderRowOperationMoreButton(rowOperations.slice(used + 1), rowModel));
 			}
 
-			return (React.createElement("div", {className: "btn-group n-table-op-btn-group", role: "group"}, 
-				buttons, dropdown
-			));
+			return React.createElement(
+				'div',
+				{ className: 'btn-group n-table-op-btn-group', role: 'group' },
+				buttons,
+				dropdown
+			);
 		},
 		/**
-		 * render operation cell
-		 * @param column
-		 * @param rowModel {ModelInterface} row model
-		 * @returns {XML}
-		 */
+   * render operation cell
+   * @param column
+   * @param rowModel {ModelInterface} row model
+   * @returns {XML}
+   */
 		renderOperationCell: function (column, rowModel) {
 			var needPopover = false;
 			var maxButtonCount = this.getComponentOption('maxOperationButtonCount');
@@ -13755,11 +14319,11 @@
 			}
 		},
 		/**
-		 * render row select cell
-		 * @param column
-		 * @param data
-		 * @returns {XML}
-		 */
+   * render row select cell
+   * @param column
+   * @param data
+   * @returns {XML}
+   */
 		renderRowSelectCell: function (column, data) {
 			var model = $pt.createModel(data);
 			model.useBaseAsCurrent();
@@ -13772,17 +14336,17 @@
 					type: $pt.ComponentConstants.Check
 				}
 			});
-			return (React.createElement($pt.Components.NCheck, {model: model, layout: layout}));
+			return React.createElement($pt.Components.NCheck, { model: model, layout: layout });
 		},
 		/**
-		 * render table body rows
-		 * @param row {*} data of row, json object
-		 * @param rowIndex {number}
-		 * @param all {boolean}
-		 * @param leftFixed {boolean}
-		 * @param rightFixed {boolean}
-		 * @returns {XML}
-		 */
+   * render table body rows
+   * @param row {*} data of row, json object
+   * @param rowIndex {number}
+   * @param all {boolean}
+   * @param leftFixed {boolean}
+   * @param rightFixed {boolean}
+   * @returns {XML}
+   */
 		renderTableBodyRow: function (row, rowIndex, all, leftFixed, rightFixed) {
 			var indexToRender = this.getRenderColumnIndexRange(all, leftFixed, rightFixed);
 			var columnIndex = 0;
@@ -13802,7 +14366,9 @@
 			}
 
 			var inlineModel = this.createInlineRowModel(row);
-			return (React.createElement("tr", {className: className, key: rowIndex}, 
+			return React.createElement(
+				'tr',
+				{ className: className, key: rowIndex },
 				this.state.columns.map(function (column) {
 					if (columnIndex >= indexToRender.min && columnIndex <= indexToRender.max) {
 						// column is fixed.
@@ -13827,63 +14393,67 @@
 							// inline editor or something, can be pre-defined or just declare as be constructed as a form layout
 							if (typeof column.inline === 'string') {
 								var layout = NTable.getInlineEditor(column.inline);
-								layout.pos = {width: 12};
+								layout.pos = { width: 12 };
 								if (layout.css) {
-									layout.css.cell = 'inline-editor' + (layout.css.cell) ? (' ' + layout.css.cell) : '';
+									layout.css.cell = 'inline-editor' + layout.css.cell ? ' ' + layout.css.cell : '';
 								} else {
-									layout.css = {cell: 'inline-editor'};
+									layout.css = { cell: 'inline-editor' };
 								}
 								if (column.inline === 'select' || column.inline === 'radio') {
 									// set code table
 									if (column.codes) {
-										layout = $.extend(true, {}, {comp: {data: column.codes}}, layout);
+										layout = $.extend(true, {}, { comp: { data: column.codes } }, layout);
 									}
 								}
 								// pre-defined, use with data together
-								data = React.createElement($pt.Components.NFormCell, {model: inlineModel, 
-												  layout: $pt.createCellLayout(column.data, layout), 
-												  direction: "horizontal", 
-												  view: _this.isViewMode()});
+								data = React.createElement($pt.Components.NFormCell, { model: inlineModel,
+									layout: $pt.createCellLayout(column.data, layout),
+									direction: 'horizontal',
+									view: _this.isViewMode() });
 							} else if (column.inline.inlineType == 'cell') {
-								column.inline.pos = {width: 12};
+								column.inline.pos = { width: 12 };
 								if (column.inline.css) {
-									column.inline.css.cell = 'inline-editor' + (column.inline.css.cell) ? (' ' + column.inline.css.cell) : '';
+									column.inline.css.cell = 'inline-editor' + column.inline.css.cell ? ' ' + column.inline.css.cell : '';
 								} else {
-									column.inline.css = {cell: 'inline-editor'};
+									column.inline.css = { cell: 'inline-editor' };
 								}
-								data = React.createElement($pt.Components.NFormCell, {model: inlineModel, 
-												  layout: $pt.createCellLayout(column.data, column.inline), 
-												  direction: "horizontal", 
-												  view: _this.isViewMode(), 
-												  className: column.inline.__className});
+								data = React.createElement($pt.Components.NFormCell, { model: inlineModel,
+									layout: $pt.createCellLayout(column.data, column.inline),
+									direction: 'horizontal',
+									view: _this.isViewMode(),
+									className: column.inline.__className });
 							} else {
 								// any other, treat as form layout
 								// column.data is not necessary
-								data = React.createElement($pt.Components.NForm, {model: inlineModel, 
-											  layout: $pt.createFormLayout(column.inline), 
-											  direction: "horizontal", 
-											  view: _this.isViewMode()});
+								data = React.createElement($pt.Components.NForm, { model: inlineModel,
+									layout: $pt.createFormLayout(column.inline),
+									direction: 'horizontal',
+									view: _this.isViewMode() });
 							}
 						} else {
 							// data is property name
 							data = _this.getDisplayTextOfColumn(column, row);
 						}
-						return (React.createElement("td", {style: style, key: columnIndex}, data));
+						return React.createElement(
+							'td',
+							{ style: style, key: columnIndex },
+							data
+						);
 					} else {
 						columnIndex++;
 					}
 				})
-			));
+			);
 		},
 		/**
-		 * render table body
-		 * at least and only one parameter can be true.
-		 * if more than one parameter is true, priority as all > leftFixed > rightFixed
-		 * @param all
-		 * @param leftFixed
-		 * @param rightFixed
-		 * @returns {XML}
-		 */
+   * render table body
+   * at least and only one parameter can be true.
+   * if more than one parameter is true, priority as all > leftFixed > rightFixed
+   * @param all
+   * @param leftFixed
+   * @param rightFixed
+   * @returns {XML}
+   */
 		renderTableBody: function (all, leftFixed, rightFixed) {
 			var data = this.getDataToDisplay();
 			if (data == null || data.length == 0) {
@@ -13893,35 +14463,41 @@
 			var rowIndex = 1;
 			var _this = this;
 			var range = this.computePagination(data);
-			return (React.createElement("tbody", null, 
-			data.map(function (element) {
-				if (rowIndex >= range.min && rowIndex <= range.max) {
-					return _this.renderTableBodyRow(element, rowIndex++, all, leftFixed, rightFixed);
-				} else {
-					rowIndex++;
-					return null;
-				}
-			})
-			));
+			return React.createElement(
+				'tbody',
+				null,
+				data.map(function (element) {
+					if (rowIndex >= range.min && rowIndex <= range.max) {
+						return _this.renderTableBodyRow(element, rowIndex++, all, leftFixed, rightFixed);
+					} else {
+						rowIndex++;
+						return null;
+					}
+				})
+			);
 		},
 		/**
-		 * render table with no scroll Y
-		 * @returns {XML}
-		 */
+   * render table with no scroll Y
+   * @returns {XML}
+   */
 		renderTableNoScrollY: function () {
-			return (React.createElement("div", {className: this.getAdditionalCSS("panelBody", "n-table-panel-body")}, 
-				React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border"), 
-				       style: this.computeTableStyle(), 
-				       ref: "table"}, 
-					this.renderTableHeading(true), 
+			return React.createElement(
+				'div',
+				{ className: this.getAdditionalCSS("panelBody", "n-table-panel-body") },
+				React.createElement(
+					'table',
+					{ cellSpacing: '0', className: this.getAdditionalCSS("table", "n-table cell-border"),
+						style: this.computeTableStyle(),
+						ref: 'table' },
+					this.renderTableHeading(true),
 					this.renderTableBody(true)
 				)
-			));
+			);
 		},
 		/**
-		 * render table with scroll Y
-		 * @returns {XML}
-		 */
+   * render table with scroll Y
+   * @returns {XML}
+   */
 		renderTableScrollY: function () {
 			var style = this.computeTableStyle();
 			var scrolledHeaderDivStyle = {
@@ -13931,28 +14507,40 @@
 				maxHeight: this.getComponentOption("scrollY"),
 				overflowY: "scroll"
 			};
-			return (React.createElement("div", {className: this.getAdditionalCSS("panelBody", "n-table-panel-body")}, 
-				React.createElement("div", {className: "n-table-scroll-head", ref: this.getScrolledHeaderDivId(), style: scrolledHeaderDivStyle}, 
-					React.createElement("div", {className: "n-table-scroll-head-inner", style: style}, 
-						React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border"), 
-						       style: style}, 
+			return React.createElement(
+				'div',
+				{ className: this.getAdditionalCSS("panelBody", "n-table-panel-body") },
+				React.createElement(
+					'div',
+					{ className: 'n-table-scroll-head', ref: this.getScrolledHeaderDivId(), style: scrolledHeaderDivStyle },
+					React.createElement(
+						'div',
+						{ className: 'n-table-scroll-head-inner', style: style },
+						React.createElement(
+							'table',
+							{ cellSpacing: '0', className: this.getAdditionalCSS("table", "n-table cell-border"),
+								style: style },
 							this.renderTableHeading(true)
 						)
 					)
-				), 
-				React.createElement("div", {className: "n-table-scroll-body", style: scrolledBodyDivStyle, ref: this.getScrolledBodyDivId()}, 
-					React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border"), 
-					       style: style, 
-					       ref: "table"}, 
+				),
+				React.createElement(
+					'div',
+					{ className: 'n-table-scroll-body', style: scrolledBodyDivStyle, ref: this.getScrolledBodyDivId() },
+					React.createElement(
+						'table',
+						{ cellSpacing: '0', className: this.getAdditionalCSS("table", "n-table cell-border"),
+							style: style,
+							ref: 'table' },
 						this.renderTableBody(true)
 					)
 				)
-			));
+			);
 		},
 		/**
-		 * render table
-		 * @returns {XML}
-		 */
+   * render table
+   * @returns {XML}
+   */
 		renderTable: function () {
 			if (this.hasVerticalScrollBar() && this.hasDataToDisplay()) {
 				return this.renderTableScrollY();
@@ -13961,9 +14549,9 @@
 			}
 		},
 		/**
-		 * render fixed left columns with scroll Y
-		 * @returns {XML}
-		 */
+   * render fixed left columns with scroll Y
+   * @returns {XML}
+   */
 		renderFixedLeftColumnsScrollY: function () {
 			var divStyle = {
 				width: this.computeFixedLeftColumnsWidth()
@@ -13974,30 +14562,36 @@
 			};
 			if (this.hasHorizontalScrollBar()) {
 				// for IE8 box model
-				bodyDivStyle.maxHeight = this.getComponentOption("scrollY") - ((this.isIE8()) ? 0 : 18);
+				bodyDivStyle.maxHeight = this.getComponentOption("scrollY") - (this.isIE8() ? 0 : 18);
 			}
 			var tableStyle = {
 				width: "100%"
 			};
-			return (
-				React.createElement("div", {className: "n-table-fix-left", style: divStyle}, 
-					React.createElement("table", {cellSpacing: "0", style: tableStyle, 
-					       className: this.getAdditionalCSS("table", "n-table cell-border")}, 
-						this.renderTableHeading(false, true)
-					), 
-					React.createElement("div", {ref: this.getFixedLeftBodyDivId(), style: bodyDivStyle}, 
-						React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border"), 
-						       style: tableStyle}, 
-							this.renderTableBody(false, true)
-						)
+			return React.createElement(
+				'div',
+				{ className: 'n-table-fix-left', style: divStyle },
+				React.createElement(
+					'table',
+					{ cellSpacing: '0', style: tableStyle,
+						className: this.getAdditionalCSS("table", "n-table cell-border") },
+					this.renderTableHeading(false, true)
+				),
+				React.createElement(
+					'div',
+					{ ref: this.getFixedLeftBodyDivId(), style: bodyDivStyle },
+					React.createElement(
+						'table',
+						{ cellSpacing: '0', className: this.getAdditionalCSS("table", "n-table cell-border"),
+							style: tableStyle },
+						this.renderTableBody(false, true)
 					)
 				)
 			);
 		},
 		/**
-		 * render fixed left columns with no scroll Y
-		 * @returns {XML}
-		 */
+   * render fixed left columns with no scroll Y
+   * @returns {XML}
+   */
 		renderFixedLeftColumnsNoScrollY: function () {
 			var divStyle = {
 				width: this.computeFixedLeftColumnsWidth()
@@ -14005,18 +14599,22 @@
 			var tableStyle = {
 				width: "100%"
 			};
-			return (React.createElement("div", {className: "n-table-fix-left", style: divStyle}, 
-				React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border"), 
-				       style: tableStyle}, 
-					this.renderTableHeading(false, true), 
+			return React.createElement(
+				'div',
+				{ className: 'n-table-fix-left', style: divStyle },
+				React.createElement(
+					'table',
+					{ cellSpacing: '0', className: this.getAdditionalCSS("table", "n-table cell-border"),
+						style: tableStyle },
+					this.renderTableHeading(false, true),
 					this.renderTableBody(false, true)
 				)
-			));
+			);
 		},
 		/**
-		 * render fixed left columns
-		 * @returns {XML}
-		 */
+   * render fixed left columns
+   * @returns {XML}
+   */
 		renderFixedLeftColumns: function () {
 			if (!this.hasFixedLeftColumns() && this.hasDataToDisplay()) {
 				return null;
@@ -14028,9 +14626,9 @@
 			}
 		},
 		/**
-		 * render fixed right columns with no scroll Y
-		 * @returns {XML}
-		 */
+   * render fixed right columns with no scroll Y
+   * @returns {XML}
+   */
 		renderFixedRightColumnsNoScrollY: function () {
 			var divStyle = {
 				width: this.computeFixedRightColumnsWidth()
@@ -14038,18 +14636,22 @@
 			var tableStyle = {
 				width: "100%"
 			};
-			return (React.createElement("div", {className: "n-table-fix-right", style: divStyle}, 
-				React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border"), 
-				       style: tableStyle}, 
-					this.renderTableHeading(false, false, true), 
+			return React.createElement(
+				'div',
+				{ className: 'n-table-fix-right', style: divStyle },
+				React.createElement(
+					'table',
+					{ cellSpacing: '0', className: this.getAdditionalCSS("table", "n-table cell-border"),
+						style: tableStyle },
+					this.renderTableHeading(false, false, true),
 					this.renderTableBody(false, false, true)
 				)
-			));
+			);
 		},
 		/**
-		 * render fixed right columns with scroll Y
-		 * @returns {XML}
-		 */
+   * render fixed right columns with scroll Y
+   * @returns {XML}
+   */
 		renderFixedRightColumnsScrollY: function () {
 			var divStyle = {
 				width: this.computeFixedRightColumnsWidth(),
@@ -14062,32 +14664,40 @@
 			if (this.hasHorizontalScrollBar()) {
 				// ie8 box mode, scrollbar is not in height.
 				// ie>8 or chrome, scrollbar is in height.
-				bodyDivStyle.maxHeight = this.getComponentOption("scrollY") - ((this.isIE8()) ? 0 : 18);
+				bodyDivStyle.maxHeight = this.getComponentOption("scrollY") - (this.isIE8() ? 0 : 18);
 			}
 			var tableStyle = {
 				width: "100%"
 			};
-			return (
-				React.createElement("div", {className: "n-table-fix-right", style: divStyle}, 
-					React.createElement("div", {className: "n-table-fix-right-head-wrapper"}, 
-						React.createElement("div", {className: "n-table-fix-right-top-corner"}), 
-						React.createElement("table", {cellSpacing: "0", style: tableStyle, 
-						       className: this.getAdditionalCSS("table", "n-table cell-border")}, 
-							this.renderTableHeading(false, false, true)
-						)
-					), 
-					React.createElement("div", {ref: this.getFixedRightBodyDivId(), style: bodyDivStyle}, 
-						React.createElement("table", {cellSpacing: "0", className: this.getAdditionalCSS("table", "n-table cell-border")}, 
-							this.renderTableBody(false, false, true)
-						)
+			return React.createElement(
+				'div',
+				{ className: 'n-table-fix-right', style: divStyle },
+				React.createElement(
+					'div',
+					{ className: 'n-table-fix-right-head-wrapper' },
+					React.createElement('div', { className: 'n-table-fix-right-top-corner' }),
+					React.createElement(
+						'table',
+						{ cellSpacing: '0', style: tableStyle,
+							className: this.getAdditionalCSS("table", "n-table cell-border") },
+						this.renderTableHeading(false, false, true)
+					)
+				),
+				React.createElement(
+					'div',
+					{ ref: this.getFixedRightBodyDivId(), style: bodyDivStyle },
+					React.createElement(
+						'table',
+						{ cellSpacing: '0', className: this.getAdditionalCSS("table", "n-table cell-border") },
+						this.renderTableBody(false, false, true)
 					)
 				)
 			);
 		},
 		/**
-		 * render fixed right columns
-		 * @returns {XML}
-		 */
+   * render fixed right columns
+   * @returns {XML}
+   */
 		renderFixedRightColumns: function () {
 			if (!this.hasFixedRightColumns() && this.hasDataToDisplay()) {
 				return null;
@@ -14099,25 +14709,33 @@
 			}
 		},
 		/**
-		 * render not data reminder label
-		 * @returns {XML}
-		 */
+   * render not data reminder label
+   * @returns {XML}
+   */
 		renderNoDataReminder: function () {
 			if (this.hasDataToDisplay()) {
 				return null;
 			} else {
-				return (React.createElement("div", {className: "n-table-no-data"}, React.createElement("span", null, NTable.NO_DATA_LABEL)));
+				return React.createElement(
+					'div',
+					{ className: 'n-table-no-data' },
+					React.createElement(
+						'span',
+						null,
+						NTable.NO_DATA_LABEL
+					)
+				);
 			}
 		},
 		/**
-		 * render pagination
-		 * @returns {XML}
-		 */
+   * render pagination
+   * @returns {XML}
+   */
 		renderPagination: function () {
 			if (this.isPageable() && this.hasDataToDisplay()) {
 				// only show when pageable and has data to display
-				return (React.createElement($pt.Components.NPagination, {className: "n-table-pagination", pageCount: this.state.pageCount, 
-				                     currentPageIndex: this.state.currentPageIndex, toPage: this.toPage}));
+				return React.createElement($pt.Components.NPagination, { className: 'n-table-pagination', pageCount: this.state.pageCount,
+					currentPageIndex: this.state.currentPageIndex, toPage: this.toPage });
 			} else {
 				return null;
 			}
@@ -14136,20 +14754,24 @@
 				if (this.hasHorizontalScrollBar()) {
 					// ie8 box mode, scrollbar is not in height.
 					// ie>8 or chrome, scrollbar is in height.
-					bodyDivStyle.maxHeight = this.getComponentOption("scrollY") - ((this.isIE8()) ? 0 : 18);
+					bodyDivStyle.maxHeight = this.getComponentOption("scrollY") - (this.isIE8() ? 0 : 18);
 				}
-				rightCorner = (React.createElement("div", {className: "n-table-fix-right", style: divStyle}, 
-					React.createElement("div", {className: "n-table-fix-right-head-wrapper"}, 
-						React.createElement("div", {className: "n-table-fix-right-top-corner"})
+				rightCorner = React.createElement(
+					'div',
+					{ className: 'n-table-fix-right', style: divStyle },
+					React.createElement(
+						'div',
+						{ className: 'n-table-fix-right-head-wrapper' },
+						React.createElement('div', { className: 'n-table-fix-right-top-corner' })
 					)
-				));
+				);
 			}
 			return rightCorner;
 		},
 		/**
-		 * render
-		 * @returns {XML}
-		 */
+   * render
+   * @returns {XML}
+   */
 		render: function () {
 			this.prepareDisplayOptions();
 			/*{this.renderNoDataReminder()}*/
@@ -14168,31 +14790,37 @@
 			var expandedStyle = {
 				display: this.isExpanded() ? 'block' : 'none'
 			};
-			return (React.createElement("div", {className: this.getComponentCSS($pt.LayoutHelper.classSet(css)), ref: "div"}, 
-				this.renderPanelHeading(), 
-				React.createElement("div", {ref: "table-panel-body", style: expandedStyle}, 
-					React.createElement("div", {className: this.getAdditionalCSS("body", "n-table-body-container panel-body")}, 
-						this.renderTable(), 
-						this.renderFixedLeftColumns(), 
-						this.renderFixedRightColumns(), 
+			return React.createElement(
+				'div',
+				{ className: this.getComponentCSS($pt.LayoutHelper.classSet(css)), ref: 'div' },
+				this.renderPanelHeading(),
+				React.createElement(
+					'div',
+					{ ref: 'table-panel-body', style: expandedStyle },
+					React.createElement(
+						'div',
+						{ className: this.getAdditionalCSS("body", "n-table-body-container panel-body") },
+						this.renderTable(),
+						this.renderFixedLeftColumns(),
+						this.renderFixedRightColumns(),
 						this.renderRightTopCorner()
-					), 
+					),
 					this.renderPagination()
 				)
-			));
+			);
 		},
 		/**
-		 * has vertical scroll bar
-		 * @returns {boolean}
-		 */
+   * has vertical scroll bar
+   * @returns {boolean}
+   */
 		hasVerticalScrollBar: function () {
 			var scrollY = this.getComponentOption("scrollY");
 			return scrollY !== false;
 		},
 		/**
-		 * has horizontal scroll bar
-		 * @returns {boolean}
-		 */
+   * has horizontal scroll bar
+   * @returns {boolean}
+   */
 		hasHorizontalScrollBar: function () {
 			var hasVerticalBar = this.hasVerticalScrollBar();
 			if (hasVerticalBar) {
@@ -14206,9 +14834,9 @@
 			return scrollX === true;
 		},
 		/**
-		 * compute table style
-		 * @returns {{width: number, maxWidth: number}}
-		 */
+   * compute table style
+   * @returns {{width: number, maxWidth: number}}
+   */
 		computeTableStyle: function () {
 			var width = 0;
 			if (this.hasHorizontalScrollBar()) {
@@ -14216,7 +14844,7 @@
 				// calculate width
 				this.state.columns.forEach(function (column) {
 					if (column.visible === undefined || column.visible === true) {
-						width += (column.width ? (column.width * 1) : 0);
+						width += column.width ? column.width * 1 : 0;
 					}
 				});
 			} else {
@@ -14228,9 +14856,9 @@
 			};
 		},
 		/**
-		 * compute fixed left columns width
-		 * @returns {number}
-		 */
+   * compute fixed left columns width
+   * @returns {number}
+   */
 		computeFixedLeftColumnsWidth: function () {
 			var width = 0;
 			var fixedLeftColumns = this.getMaxFixedLeftColumnIndex();
@@ -14238,16 +14866,16 @@
 			this.state.columns.forEach(function (element) {
 				if (columnIndex <= fixedLeftColumns && (element.visible === undefined || element.visible === true)) {
 					// column is fixed.
-					width += element.width ? (element.width * 1) : 0;
+					width += element.width ? element.width * 1 : 0;
 				}
 				columnIndex++;
 			});
 			return width + 1;
 		},
 		/**
-		 * compute fixed right columns width
-		 * @returns {number}
-		 */
+   * compute fixed right columns width
+   * @returns {number}
+   */
 		computeFixedRightColumnsWidth: function () {
 			var width = 0;
 			var fixedRightColumns = this.getMinFixedRightColumnIndex();
@@ -14263,14 +14891,14 @@
 		},
 
 		/**
-		 * get column index range for rendering
-		 * at least and only one parameter can be true.
-		 * if more than one parameter is true, priority as all > leftFixed > rightFixed
-		 * @param all
-		 * @param leftFixed
-		 * @param rightFixed
-		 * @returns {{min, max}}
-		 */
+   * get column index range for rendering
+   * at least and only one parameter can be true.
+   * if more than one parameter is true, priority as all > leftFixed > rightFixed
+   * @param all
+   * @param leftFixed
+   * @param rightFixed
+   * @returns {{min, max}}
+   */
 		getRenderColumnIndexRange: function (all, leftFixed, rightFixed) {
 			var index = {};
 			if (all) {
@@ -14286,34 +14914,34 @@
 			return index;
 		},
 		/**
-		 * get max fixed left column index. if no column is fixed in left, return -1
-		 * @returns {number}
-		 */
+   * get max fixed left column index. if no column is fixed in left, return -1
+   * @returns {number}
+   */
 		getMaxFixedLeftColumnIndex: function () {
 			return this.fixedLeftColumns - 1;
 		},
 		/**
-		 * get min fixed right column index. if no column is fixed in right, return
-		 * max column index.
-		 * eg. there are 3 columns in table, if no fixed right column, return 3. if
-		 * 1 fixed right column, return 2.
-		 * @returns {number}
-		 */
+   * get min fixed right column index. if no column is fixed in right, return
+   * max column index.
+   * eg. there are 3 columns in table, if no fixed right column, return 3. if
+   * 1 fixed right column, return 2.
+   * @returns {number}
+   */
 		getMinFixedRightColumnIndex: function () {
 			return this.state.columns.length() - this.fixedRightColumns;
 		},
 		/**
-		 * get query settings
-		 * @returns {*}
-		 */
+   * get query settings
+   * @returns {*}
+   */
 		getQuerySettings: function () {
 			return this.getComponentOption("criteria");
 		},
 		/**
-		 * compute pagination
-		 * @param data array of data
-		 * @returns {{min, max}}
-		 */
+   * compute pagination
+   * @param data array of data
+   * @returns {{min, max}}
+   */
 		computePagination: function (data) {
 			var minRowIndex = 0;
 			var maxRowIndex = 999999;
@@ -14323,7 +14951,7 @@
 					// no query criteria
 					this.state.countPerPage = this.getComponentOption("countPerPage");
 					var pageCount = data.length == 0 ? 1 : data.length / this.state.countPerPage;
-					this.state.pageCount = (Math.floor(pageCount) == pageCount) ? pageCount : (Math.floor(pageCount) + 1);
+					this.state.pageCount = Math.floor(pageCount) == pageCount ? pageCount : Math.floor(pageCount) + 1;
 					this.state.currentPageIndex = this.state.currentPageIndex > this.state.pageCount ? this.state.pageCount : this.state.currentPageIndex;
 					this.state.currentPageIndex = this.state.currentPageIndex <= 0 ? 1 : this.state.currentPageIndex;
 					minRowIndex = (this.state.currentPageIndex - 1) * this.state.countPerPage + 1;
@@ -14343,64 +14971,64 @@
 			};
 		},
 		/**
-		 * has fixed left columns
-		 * @returns {boolean}
-		 */
+   * has fixed left columns
+   * @returns {boolean}
+   */
 		hasFixedLeftColumns: function () {
 			return this.fixedLeftColumns > 0;
 		},
 		/**
-		 * has fixed right columns or not
-		 * @returns {boolean}
-		 */
+   * has fixed right columns or not
+   * @returns {boolean}
+   */
 		hasFixedRightColumns: function () {
 			return this.fixedRightColumns > 0;
 		},
 		/**
-		 * check the table is addable or not
-		 * @returns {boolean}
-		 */
+   * check the table is addable or not
+   * @returns {boolean}
+   */
 		isAddable: function () {
 			return this.getComponentOption("addable") && !this.isViewMode();
 		},
 		/**
-		 * check the table is editable or not
-		 * @returns {boolean}
-		 */
+   * check the table is editable or not
+   * @returns {boolean}
+   */
 		isEditable: function () {
 			return this.getComponentOption("editable");
 		},
-		getRowEditButtonEnabled: function() {
+		getRowEditButtonEnabled: function () {
 			return this.getComponentOption('rowEditEnabled');
 		},
 		/**
-		 * check the table is removable or not
-		 * @returns {boolean}
-		 */
+   * check the table is removable or not
+   * @returns {boolean}
+   */
 		isRemovable: function () {
 			return this.getComponentOption("removable") && !this.isViewMode();
 		},
-		getRowRemoveButtonEnabled: function() {
+		getRowRemoveButtonEnabled: function () {
 			return this.getComponentOption('rowRemoveEnabled');
 		},
 		/**
-		 * check the table is searchable or not
-		 * @returns {boolean}
-		 */
+   * check the table is searchable or not
+   * @returns {boolean}
+   */
 		isSearchable: function () {
 			return this.getComponentOption("searchable");
 		},
 		/**
-		 * check the table is indexable or not
-		 * @returns {boolean}
-		 */
+   * check the table is indexable or not
+   * @returns {boolean}
+   */
 		isIndexable: function () {
 			return this.getComponentOption("indexable");
 		},
 		/**
-		 * check the row can be selectable or not
-		 * @returns {boolean}
-		 */
+   * check the row can be selectable or not
+   * @returns {boolean}
+   */
 		isRowSelectable: function () {
 			if (this.isViewMode()) {
 				return false;
@@ -14408,16 +15036,16 @@
 			return this.getComponentOption('rowSelectable');
 		},
 		/**
-		 * check the table is pageable or not
-		 * @returns {boolean}
-		 */
+   * check the table is pageable or not
+   * @returns {boolean}
+   */
 		isPageable: function () {
 			return this.getComponentOption("pageable");
 		},
 		/**
-		 * check the table heading is displayed or not
-		 * @returns {*}
-		 */
+   * check the table heading is displayed or not
+   * @returns {*}
+   */
 		isHeading: function () {
 			return this.getComponentOption('header');
 		},
@@ -14431,10 +15059,10 @@
 			return this.state.expanded;
 		},
 		/**
-		 * check the column is sortable or not
-		 * @param column if no passed, check the table
-		 * @returns {boolean}
-		 */
+   * check the column is sortable or not
+   * @param column if no passed, check the table
+   * @returns {boolean}
+   */
 		isSortable: function (column) {
 			if (column === undefined) {
 				return this.getComponentOption("sortable");
@@ -14452,26 +15080,26 @@
 			}
 		},
 		/**
-		 * get sorter
-		 * @returns {function}
-		 */
+   * get sorter
+   * @returns {function}
+   */
 		getSorter: function () {
 			return this.getComponentOption('sorter');
 		},
 		/**
-		 * check has data to display or not
-		 * @returns {boolean}
-		 */
+   * check has data to display or not
+   * @returns {boolean}
+   */
 		hasDataToDisplay: function () {
 			var data = this.getDataToDisplay();
 			return data != null && data.length > 0;
 		},
 		/**
-		 * get display text of given column configuration
-		 * @param column column configuration
-		 * @param data row data
-		 * @return display text
-		 */
+   * get display text of given column configuration
+   * @param column column configuration
+   * @param data row data
+   * @return display text
+   */
 		getDisplayTextOfColumn: function (column, data) {
 			var text = null;
 			if (column.render) {
@@ -14491,12 +15119,12 @@
 			return text == null ? null : text.toString();
 		},
 		/**
-		 * filter data to display
-		 * @param row
-		 * @param rowIndex
-		 * @param all
-		 * @returns {boolean} true means data of row can match the search text
-		 */
+   * filter data to display
+   * @param row
+   * @param rowIndex
+   * @param all
+   * @returns {boolean} true means data of row can match the search text
+   */
 		filterData: function (row, rowIndex, all) {
 			var text = this.state.searchText.toUpperCase();
 			// do not use this.column, it maybe add index or operation columns
@@ -14511,9 +15139,9 @@
 			});
 		},
 		/**
-		 * get data to display
-		 * @returns {[*]}
-		 */
+   * get data to display
+   * @returns {[*]}
+   */
 		getDataToDisplay: function () {
 			var data = this.getValueFromModel();
 			if (data == null) {
@@ -14522,22 +15150,22 @@
 			return this.isSearching() ? data.filter(this.filterData) : data;
 		},
 		/**
-		 * is searching
-		 * @returns {boolean}
-		 */
+   * is searching
+   * @returns {boolean}
+   */
 		isSearching: function () {
 			return this.isSearchable() && this.state.searchText != null && this.state.searchText.length != 0;
 		},
 		/**
-		 * is current page all selected
-		 * @param column {{rowSelectable: string}}
-		 * @param data {{}[]}
-		 * @param range {{min: number, max: number}}
-		 * @returns {boolean}
-		 */
+   * is current page all selected
+   * @param column {{rowSelectable: string}}
+   * @param data {{}[]}
+   * @param range {{min: number, max: number}}
+   * @returns {boolean}
+   */
 		isCurrentPageAllSelected: function (column, data, range) {
 			var rowIndex = 1;
-			return data == null ? false : (!data.some(function (row) {
+			return data == null ? false : !data.some(function (row) {
 				if (rowIndex >= range.min && rowIndex <= range.max) {
 					rowIndex++;
 					return row[column.rowSelectable] !== true;
@@ -14545,21 +15173,21 @@
 					rowIndex++;
 					return false;
 				}
-			}));
+			});
 		},
 		onTitleClicked: function () {
 			this.state.expanded = !this.state.expanded;
 			if (this.state.expanded) {
-				$(React.findDOMNode(this.refs['table-panel-body'])).slideDown(300);
-				$(React.findDOMNode(this.refs['add-button'])).show();
+				$(ReactDOM.findDOMNode(this.refs['table-panel-body'])).slideDown(300);
+				$(ReactDOM.findDOMNode(this.refs['add-button'])).show();
 			} else {
-				$(React.findDOMNode(this.refs['table-panel-body'])).slideUp(300);
-				$(React.findDOMNode(this.refs['add-button'])).hide();
+				$(ReactDOM.findDOMNode(this.refs['table-panel-body'])).slideUp(300);
+				$(ReactDOM.findDOMNode(this.refs['add-button'])).hide();
 			}
 		},
 		/**
-		 * on add button clicked
-		 */
+   * on add button clicked
+   */
 		onAddClicked: function () {
 			var data = $pt.cloneJSON(this.getComponentOption("modelTemplate"));
 			var itemModel = this.createEditingModel(data);
@@ -14586,8 +15214,8 @@
 			}
 		},
 		/**
-		 * on add completed
-		 */
+   * on add completed
+   */
 		onAddCompleted: function () {
 			var hasError = false;
 			var editDialog = this.getEditDialog();
@@ -14602,9 +15230,9 @@
 			}
 		},
 		/**
-		 * on edit button clicked
-		 * @param data {*} data of row
-		 */
+   * on edit button clicked
+   * @param data {*} data of row
+   */
 		onEditClicked: function (data) {
 			var itemModel = this.createEditingModel(data);
 			var layout = this.getComponentOption("editLayout");
@@ -14629,15 +15257,17 @@
 						validate: this.getComponentOption('dialogValidateVisible'),
 						// use default cancel behavior when editing
 						// simply hide dialog when in view mode
-						cancel: this.isViewMode() ? function(model, hide) {hide();} : true
+						cancel: this.isViewMode() ? function (model, hide) {
+							hide();
+						} : true
 					},
 					view: this.isViewMode()
 				});
 			}
 		},
 		/**
-		 * on edit completed
-		 */
+   * on edit completed
+   */
 		onEditCompleted: function () {
 			var hasError = false;
 			var editDialog = this.getEditDialog();
@@ -14654,9 +15284,9 @@
 			}
 		},
 		/**
-		 * on remove button clicked
-		 * @param data {*} data of row
-		 */
+   * on remove button clicked
+   * @param data {*} data of row
+   */
 		onRemoveClicked: function (data) {
 			var removeRow = function (data) {
 				var canRemove = this.getComponentOption('canRemove');
@@ -14665,21 +15295,19 @@
 				}
 				$pt.Components.NConfirm.getConfirmModal().hide();
 			};
-			$pt.Components.NConfirm.getConfirmModal().show(NTable.REMOVE_CONFIRM_TITLE,
-				NTable.REMOVE_CONFIRM_MESSAGE,
-				removeRow.bind(this, data));
+			$pt.Components.NConfirm.getConfirmModal().show(NTable.REMOVE_CONFIRM_TITLE, NTable.REMOVE_CONFIRM_MESSAGE, removeRow.bind(this, data));
 		},
 		/**
-		 * on row user defined operation clicked
-		 * @param callback
-		 * @param data
-		 */
+   * on row user defined operation clicked
+   * @param callback
+   * @param data
+   */
 		onRowOperationClicked: function (callback, data) {
 			callback.call(this, data);
 		},
 		/**
-		 * on search box changed
-		 */
+   * on search box changed
+   */
 		onSearchBoxChanged: function () {
 			var value = this.state.searchModel.get('text');
 			// window.console.debug('Searching [text=' + value + '].');
@@ -14694,9 +15322,9 @@
 			}
 		},
 		/**
-		 * on sort icon clicked
-		 * @param column
-		 */
+   * on sort icon clicked
+   * @param column
+   */
 		onSortClicked: function (column) {
 			var valueArray = this.getValueFromModel();
 			if (valueArray == null) {
@@ -14734,13 +15362,12 @@
 				} else if (typeof column.sort === 'boolean') {
 					// do nothing, use default sorter
 				} else {
-					throw $pt.createComponentException($pt.ComponentConstants.Err_Unuspported_Column_Sort,
-						"Column sort [" + column.sort + "] is not supported yet.");
-				}
+						throw $pt.createComponentException($pt.ComponentConstants.Err_Unuspported_Column_Sort, "Column sort [" + column.sort + "] is not supported yet.");
+					}
 			}
 			var _this = this;
 			// if no sorter specific in column
-			sorter = sorter == null ? (function (a, b) {
+			sorter = sorter == null ? function (a, b) {
 				var v1 = _this.getDisplayTextOfColumn(column, a);
 				var v2 = _this.getDisplayTextOfColumn(column, b);
 				if (v1 == null) {
@@ -14761,7 +15388,7 @@
 						return 0;
 					}
 				}
-			}) : sorter;
+			} : sorter;
 
 			if (sortWay == "asc") {
 				valueArray.sort(sorter);
@@ -14776,9 +15403,9 @@
 			});
 		},
 		/**
-		 * create edit dialog
-		 * @returns {*}
-		 */
+   * create edit dialog
+   * @returns {*}
+   */
 		getEditDialog: function () {
 			if (this.state.editDialog === undefined || this.state.editDialog === null) {
 				this.state.editDialog = $pt.Components.NModalForm.createFormModal(this.getLayout().getLabel());
@@ -14786,9 +15413,9 @@
 			return this.state.editDialog;
 		},
 		/**
-		 * create editing model
-		 * @param item
-		 */
+   * create editing model
+   * @param item
+   */
 		createEditingModel: function (item) {
 			var modelValidator = this.getModel().getValidator();
 			var tableValidator = modelValidator ? modelValidator.getConfig()[this.getDataId()] : null;
@@ -14797,25 +15424,22 @@
 			editModel.parent(this.getModel());
 			return editModel;
 		},
-		createInlineRowModel: function(item) {
+		createInlineRowModel: function (item) {
 			var model = this.createEditingModel(item);
 			model.useBaseAsCurrent();
 			var listeners = this.getComponentOption('rowListener');
 			if (listeners) {
 				listeners = Array.isArray(listeners) ? listeners : [listeners];
-				listeners.forEach(function(listener) {
-					model.addListener(listener.id,
-						listener.time ? listener.time : 'post',
-						listener.type ? listener.type : 'change',
-					listener.listener);
+				listeners.forEach(function (listener) {
+					model.addListener(listener.id, listener.time ? listener.time : 'post', listener.type ? listener.type : 'change', listener.listener);
 				});
 			}
 			return model;
 		},
 		/**
-		 * on model change
-		 * @param evt
-		 */
+   * on model change
+   * @param evt
+   */
 		onModelChanged: function (evt) {
 			if (evt.type == "add") {
 				this.computePagination(this.getDataToDisplay());
@@ -14823,9 +15447,9 @@
 			} else if (evt.type == "remove") {
 				// do nothing
 			} else if (evt.type == "change") {
-				// do nothing
-				// window.console.log('Table[' + this.getDataId() + '] data changed.');
-			}
+					// do nothing
+					// window.console.log('Table[' + this.getDataId() + '] data changed.');
+				}
 
 			if (this.getModel().getValidator() != null) {
 				this.getModel().validate(this.getDataId());
@@ -14834,17 +15458,17 @@
 			}
 		},
 		/**
-		 * on model validate change
-		 * @param evt
-		 */
+   * on model validate change
+   * @param evt
+   */
 		onModelValidateChanged: function (evt) {
 			// maybe will introduce performance issue, cannot sure now.
 			this.forceUpdate();
 		},
 		/**
-		 * jump to page by given page index
-		 * @param pageIndex
-		 */
+   * jump to page by given page index
+   * @param pageIndex
+   */
 		toPage: function (pageIndex) {
 			if (this.state.currentPageIndex == pageIndex) {
 				// do nothing
@@ -14880,87 +15504,87 @@
 			}
 		},
 		getDivComponent: function () {
-			return $(React.findDOMNode(this.refs.div));
+			return $(ReactDOM.findDOMNode(this.refs.div));
 		},
 		getComponent: function () {
-			return $(React.findDOMNode(this.refs.table));
+			return $(ReactDOM.findDOMNode(this.refs.table));
 		},
 		/**
-		 * get header label id
-		 * @returns {string}
-		 */
+   * get header label id
+   * @returns {string}
+   */
 		getHeaderLabelId: function () {
 			return "n-table-header-label";
 		},
 		getScrollHeaderComponent: function () {
 			if (this.refs[this.getScrolledHeaderDivId()]) {
-				return $(React.findDOMNode(this.refs[this.getScrolledHeaderDivId()]));
+				return $(ReactDOM.findDOMNode(this.refs[this.getScrolledHeaderDivId()]));
 			} else {
 				return $("#___");
 			}
 		},
 		/**
-		 * get scrolled header div id
-		 * @returns {string}
-		 */
+   * get scrolled header div id
+   * @returns {string}
+   */
 		getScrolledHeaderDivId: function () {
 			return "n-table-scrolled-head";
 		},
 		getScrollBodyComponent: function () {
 			if (this.refs[this.getScrolledBodyDivId()]) {
-				return $(React.findDOMNode(this.refs[this.getScrolledBodyDivId()]));
+				return $(ReactDOM.findDOMNode(this.refs[this.getScrolledBodyDivId()]));
 			} else {
 				return $("#___");
 			}
 		},
 		/**
-		 * get scrolled body div id
-		 * @returns {string}
-		 */
+   * get scrolled body div id
+   * @returns {string}
+   */
 		getScrolledBodyDivId: function () {
 			return "n-table-scrolled-body";
 		},
 		getFixedLeftBodyComponent: function () {
 			if (this.refs[this.getFixedLeftBodyDivId()]) {
-				return $(React.findDOMNode(this.refs[this.getFixedLeftBodyDivId()]));
+				return $(ReactDOM.findDOMNode(this.refs[this.getFixedLeftBodyDivId()]));
 			} else {
 				return $("#___");
 			}
 		},
 		/**
-		 * get scrolled fixed left body div id
-		 * @returns {string}
-		 */
+   * get scrolled fixed left body div id
+   * @returns {string}
+   */
 		getFixedLeftBodyDivId: function () {
 			return "n-table-scrolled-left-body";
 		},
 		getFixedRightBodyComponent: function () {
 			if (this.refs[this.getFixedRightBodyDivId()]) {
-				return $(React.findDOMNode(this.refs[this.getFixedRightBodyDivId()]));
+				return $(ReactDOM.findDOMNode(this.refs[this.getFixedRightBodyDivId()]));
 			} else {
 				return $("#___");
 			}
 		},
 		/**
-		 * get scrolled fixed right body div id
-		 * @returns {string}
-		 */
+   * get scrolled fixed right body div id
+   * @returns {string}
+   */
 		getFixedRightBodyDivId: function () {
 			return "n-table-scrolled-right-body";
 		},
 		/**
-		 * clear columns definition
-		 */
-		clearColumnsDefinition: function() {
+   * clear columns definition
+   */
+		clearColumnsDefinition: function () {
 			this.state.columns = null;
 			this.forceUpdate();
 		}
 	}));
 	$pt.Components.NTable = NTable;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Table, function (model, layout, direction, viewMode) {
-		return React.createElement($pt.Components.NTable, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NTable, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
 	});
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * text input
@@ -15010,11 +15634,11 @@
  *      }
  * }
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NText = React.createClass($pt.defineCellComponent({
 		displayName: 'NText',
 		statics: {
-			NUMBER_FORMAT: function(value) {
+			NUMBER_FORMAT: function (value) {
 				var parts = (value + '').split('.');
 				var integral = parts[0];
 				var fraction = parts.length > 1 ? '.' + parts[1] : '';
@@ -15025,11 +15649,11 @@
 				return integral + fraction;
 			},
 			PERCENTAGE: {
-				model: function(value) {
-					return isNaN(value) ? value : ((value + '').movePointLeft(2));
+				model: function (value) {
+					return isNaN(value) ? value : (value + '').movePointLeft(2);
 				},
-				view: function(value) {
-					return isNaN(value) ? value : ((value + '').movePointRight(2));
+				view: function (value) {
+					return isNaN(value) ? value : (value + '').movePointRight(2);
 				}
 			}
 		},
@@ -15048,9 +15672,9 @@
 			return {};
 		},
 		/**
-		 * will update
-		 * @param nextProps
-		 */
+   * will update
+   * @param nextProps
+   */
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
@@ -15059,13 +15683,13 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
+   * did update
+   * @param prevProps
+   * @param prevState
+   */
 		componentDidUpdate: function (prevProps, prevState) {
 			var formattedValue = this.getValueFromModel();
-			if (!$(React.findDOMNode(this.refs.focusLine)).hasClass('focus')) {
+			if (!$(ReactDOM.findDOMNode(this.refs.focusLine)).hasClass('focus')) {
 				formattedValue = this.getFormattedValue(formattedValue);
 			}
 			if (this.getComponent().val() != formattedValue) {
@@ -15078,8 +15702,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * did mount
-		 */
+   * did mount
+   */
 		componentDidMount: function () {
 			// set model value to component
 			this.getComponent().val(this.getFormattedValue(this.getValueFromModel()));
@@ -15090,8 +15714,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * will unmount
-		 */
+   * will unmount
+   */
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
@@ -15100,51 +15724,51 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * render left add-on
-		 * @returns {XML}
-		 */
+   * render left add-on
+   * @returns {XML}
+   */
 		renderLeftAddon: function () {
 			return this.renderAddon(this.getComponentOption('leftAddon'));
 		},
 		/**
-		 * render text
-		 * @returns {XML}
-		 */
+   * render text
+   * @returns {XML}
+   */
 		renderText: function () {
 			// TODO needs to handle the control keys
 			var css = {
 				'form-control': true
 			};
-			return (React.createElement("input", {type: this.getComponentOption('pwd', false) ? 'password' : 'text', 
-			               className: $pt.LayoutHelper.classSet(css), 
-			               disabled: !this.isEnabled(), 
-			               placeholder: this.getComponentOption('placeholder'), 
+			return React.createElement('input', { type: this.getComponentOption('pwd', false) ? 'password' : 'text',
+				className: $pt.LayoutHelper.classSet(css),
+				disabled: !this.isEnabled(),
+				placeholder: this.getComponentOption('placeholder'),
 
-			               onKeyPress: this.onComponentChanged, 
-			               onChange: this.onComponentChanged, 
-			               onFocus: this.onComponentFocused, 
-			               onBlur: this.onComponentBlurred, 
-			               onKeyUp: this.onKeyUp, 
+				onKeyPress: this.onComponentChanged,
+				onChange: this.onComponentChanged,
+				onFocus: this.onComponentFocused,
+				onBlur: this.onComponentBlurred,
+				onKeyUp: this.onKeyUp,
 
-			               ref: "txt"}));
+				ref: 'txt' });
 		},
 		/**
-		 * render right add-on
-		 * @returns {XML}
-		 */
+   * render right add-on
+   * @returns {XML}
+   */
 		renderRightAddon: function () {
 			return this.renderAddon(this.getComponentOption('rightAddon'));
 		},
 		/**
-		 * render add-on
-		 * @param addon {{
-	 *              icon: string,
-	 *              text: string,
-	 *              iconFirst: boolean,
-	 *              click: function(model: object, value: object)
-	 *              }}
-		 * @returns {XML}
-		 */
+   * render add-on
+   * @param addon {{
+  *              icon: string,
+  *              text: string,
+  *              iconFirst: boolean,
+  *              click: function(model: object, value: object)
+  *              }}
+   * @returns {XML}
+   */
 		renderAddon: function (addon) {
 			if (addon == null) {
 				return null;
@@ -15164,20 +15788,22 @@
 			if (icon != null) {
 				iconCss['fa-' + icon] = true;
 			}
-			var iconPart = icon == null ? null : (React.createElement("span", {className: $pt.LayoutHelper.classSet(iconCss), key: "iconPart"}));
+			var iconPart = icon == null ? null : React.createElement('span', { className: $pt.LayoutHelper.classSet(iconCss), key: 'iconPart' });
 			var textPart = addon.text;
 			var innerParts = addon.iconFirst === false ? [textPart, iconPart] : [iconPart, textPart];
-			return (React.createElement("span", {className: $pt.LayoutHelper.classSet(spanCss), 
-			              onClick: this.onAddonClicked.bind(this, addon.click)}, 
+			return React.createElement(
+				'span',
+				{ className: $pt.LayoutHelper.classSet(spanCss),
+					onClick: this.onAddonClicked.bind(this, addon.click) },
 				innerParts.map(function (part) {
 					return part;
 				})
-			));
+			);
 		},
 		/**
-		 * render
-		 * @returns {XML}
-		 */
+   * render
+   * @returns {XML}
+   */
 		render: function () {
 			if (this.isViewMode()) {
 				return this.renderInViewMode();
@@ -15186,19 +15812,23 @@
 				'n-disabled': !this.isEnabled()
 			};
 			css[this.getComponentCSS('n-text')] = true;
-			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
-				React.createElement("div", {className: "input-group"}, 
-					this.renderLeftAddon(), 
-					this.renderText(), 
+			return React.createElement(
+				'div',
+				{ className: $pt.LayoutHelper.classSet(css) },
+				React.createElement(
+					'div',
+					{ className: 'input-group' },
+					this.renderLeftAddon(),
+					this.renderText(),
 					this.renderRightAddon()
-				), 
-				this.renderNormalLine(), 
+				),
+				this.renderNormalLine(),
 				this.renderFocusLine()
-			));
+			);
 		},
 		onComponentFocused: function () {
-			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 
 			var value = this.getValueFromModel();
 			if (value == this.getComponent().val()) {
@@ -15208,8 +15838,8 @@
 			// window.console.log("focused: " + this.getValueFromModel());
 		},
 		onComponentBlurred: function (evt) {
-			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 
 			// if (this.state.componentChanged) {
 			// 	clearTimeout(this.state.componentChanged);
@@ -15225,23 +15855,23 @@
 			this.setValueToModel(value);
 		},
 		/**
-		 * on component change
-		 * @param evt
-		 */
+   * on component change
+   * @param evt
+   */
 		onComponentChanged: function (evt) {
 			// window.console.debug('Text component changed[modelValue=' + this.getValueFromModel() + ', compValue=' + evt.target.value + '].');
 			this.setValueToModel(evt.target.value);
 		},
 		/**
-		 * on model change
-		 * @param evt
-		 */
+   * on model change
+   * @param evt
+   */
 		onModelChanged: function (evt) {
 			this.forceUpdate();
 			// return;
 			//
 			// var formattedValue = this.getValueFromModel();
-			// if (!$(React.findDOMNode(this.refs.focusLine)).hasClass('focus')) {
+			// if (!$(ReactDOM.findDOMNode(this.refs.focusLine)).hasClass('focus')) {
 			// 	formattedValue = this.getFormattedValue(formattedValue);
 			// }
 			// if (formattedValue == this.getComponent().val()) {
@@ -15257,34 +15887,34 @@
 			}
 		},
 		/**
-		 * on addon clicked
-		 * @param userDefinedClickFunc
-		 */
+   * on addon clicked
+   * @param userDefinedClickFunc
+   */
 		onAddonClicked: function (userDefinedClickFunc) {
 			if (this.isAddonClickable(userDefinedClickFunc)) {
 				userDefinedClickFunc.call(this, this.getModel(), this.getValueFromModel());
 			}
 		},
 		/**
-		 * get component
-		 * @returns {jQuery}
-		 * @override
-		 */
+   * get component
+   * @returns {jQuery}
+   * @override
+   */
 		getComponent: function () {
-			return $(React.findDOMNode(this.refs.txt));
+			return $(ReactDOM.findDOMNode(this.refs.txt));
 		},
 		/**
-		 * is add-on clickable
-		 * @param userDefinedClickFunc
-		 * @returns {*}
-		 */
+   * is add-on clickable
+   * @param userDefinedClickFunc
+   * @returns {*}
+   */
 		isAddonClickable: function (userDefinedClickFunc) {
 			return this.isEnabled() && userDefinedClickFunc;
 		},
-		getTextFormat: function() {
+		getTextFormat: function () {
 			return this.getComponentOption('format');
 		},
-		getFormattedValue: function(value) {
+		getFormattedValue: function (value) {
 			if (value) {
 				if (typeof value === 'number') {
 					value = value + '';
@@ -15304,10 +15934,10 @@
 			}
 			return value;
 		},
-		getTextConvertor: function() {
+		getTextConvertor: function () {
 			return this.getComponentOption('convertor');
 		},
-		getValueFromModel: function() {
+		getValueFromModel: function () {
 			var value = this.getModel().get(this.getDataId());
 			var convertor = this.getTextConvertor();
 			if (convertor) {
@@ -15327,9 +15957,9 @@
 	}));
 	$pt.Components.NText = NText;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Text, function (model, layout, direction, viewMode) {
-		return React.createElement($pt.Components.NText, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NText, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
 	});
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * text input
@@ -15367,7 +15997,7 @@
  *      }
  * }
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NTextArea = React.createClass($pt.defineCellComponent({
 		displayName: 'NTextArea',
 		propTypes: {
@@ -15384,9 +16014,9 @@
 			};
 		},
 		/**
-		 * will update
-		 * @param nextProps
-		 */
+   * will update
+   * @param nextProps
+   */
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
@@ -15395,10 +16025,10 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
+   * did update
+   * @param prevProps
+   * @param prevState
+   */
 		componentDidUpdate: function (prevProps, prevState) {
 			if (this.getComponent().val() != this.getValueFromModel()) {
 				this.getComponent().val(this.getValueFromModel());
@@ -15410,8 +16040,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * did mount
-		 */
+   * did mount
+   */
 		componentDidMount: function () {
 			// set model value to component
 			this.getComponent().val(this.getValueFromModel());
@@ -15422,8 +16052,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * will unmount
-		 */
+   * will unmount
+   */
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
@@ -15432,29 +16062,29 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * render text
-		 * @returns {XML}
-		 */
+   * render text
+   * @returns {XML}
+   */
 		renderText: function () {
 			var css = {
 				'form-control': true
 			};
 			css['l' + this.getComponentOption('lines')] = true;
-			return (React.createElement("textarea", {className: $pt.LayoutHelper.classSet(css), 
-			                  disabled: !this.isEnabled(), 
-			                  placeholder: this.getComponentOption('placeholder'), 
+			return React.createElement('textarea', { className: $pt.LayoutHelper.classSet(css),
+				disabled: !this.isEnabled(),
+				placeholder: this.getComponentOption('placeholder'),
 
-			                  onKeyPress: this.onComponentChanged, 
-			                  onChange: this.onComponentChanged, 
-			                  onFocus: this.onComponentFocused, 
-			                  onBlur: this.onComponentBlurred, 
+				onKeyPress: this.onComponentChanged,
+				onChange: this.onComponentChanged,
+				onFocus: this.onComponentFocused,
+				onBlur: this.onComponentBlurred,
 
-			                  ref: "txt"}));
+				ref: 'txt' });
 		},
 		/**
-		 * render
-		 * @returns {XML}
-		 */
+   * render
+   * @returns {XML}
+   */
 		render: function () {
 			if (this.isViewMode()) {
 				return this.renderInViewMode();
@@ -15463,31 +16093,33 @@
 				'n-disabled': !this.isEnabled()
 			};
 			css[this.getComponentCSS('n-textarea')] = true;
-			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
-				this.renderText(), 
-				this.renderNormalLine(), 
+			return React.createElement(
+				'div',
+				{ className: $pt.LayoutHelper.classSet(css) },
+				this.renderText(),
+				this.renderNormalLine(),
 				this.renderFocusLine()
-			));
+			);
 		},
 		onComponentFocused: function () {
-			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 		},
 		onComponentBlurred: function () {
-			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 		},
 		/**
-		 * on component change
-		 * @param evt
-		 */
+   * on component change
+   * @param evt
+   */
 		onComponentChanged: function (evt) {
 			this.setValueToModel(evt.target.value);
 		},
 		/**
-		 * on model change
-		 * @param evt
-		 */
+   * on model change
+   * @param evt
+   */
 		onModelChanged: function (evt) {
 			// var value = evt.new;
 			// if (value == this.getComponent().val()) {
@@ -15497,23 +16129,23 @@
 			this.forceUpdate();
 		},
 		/**
-		 * on addon clicked
-		 * @param userDefinedClickFunc
-		 */
+   * on addon clicked
+   * @param userDefinedClickFunc
+   */
 		onAddonClicked: function (userDefinedClickFunc) {
 			if (userDefinedClickFunc) {
 				userDefinedClickFunc.call(this, this.getModel(), this.getValueFromModel());
 			}
 		},
 		/**
-		 * get component
-		 * @returns {jQuery}
-		 * @override
-		 */
+   * get component
+   * @returns {jQuery}
+   * @override
+   */
 		getComponent: function () {
-			return $(React.findDOMNode(this.refs.txt));
+			return $(ReactDOM.findDOMNode(this.refs.txt));
 		},
-		getTextInViewMode: function() {
+		getTextInViewMode: function () {
 			var value = this.getValueFromModel();
 			if (value != null) {
 				value = value.split(/\r|\n/);
@@ -15523,14 +16155,14 @@
 	}));
 	$pt.Components.NTextArea = NTextArea;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.TextArea, function (model, layout, direction, viewMode) {
-		return React.createElement($pt.Components.NTextArea, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NTextArea, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
 	});
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
 /**
  * Created by brad.wu on 8/21/2015.
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NToggle = React.createClass($pt.defineCellComponent({
 		displayName: 'NToggle',
 		propTypes: {
@@ -15540,9 +16172,9 @@
 			layout: React.PropTypes.object
 		},
 		/**
-		 * will update
-		 * @param nextProps
-		 */
+   * will update
+   * @param nextProps
+   */
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
@@ -15550,10 +16182,10 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
+   * did update
+   * @param prevProps
+   * @param prevState
+   */
 		componentDidUpdate: function (prevProps, prevState) {
 			// set model value to component
 			this.getComponent().prop("checked", this.getValueFromModel());
@@ -15563,8 +16195,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * did mount
-		 */
+   * did mount
+   */
 		componentDidMount: function () {
 			// set model value to component
 			this.getComponent().prop("checked", this.getValueFromModel());
@@ -15574,8 +16206,8 @@
 			this.registerToComponentCentral();
 		},
 		/**
-		 * will unmount
-		 */
+   * will unmount
+   */
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
@@ -15583,18 +16215,20 @@
 			this.unregisterFromComponentCentral();
 		},
 		/**
-		 * render label
-		 * @returns {XML}
-		 */
+   * render label
+   * @returns {XML}
+   */
 		renderLabel: function (label, className) {
 			var css = {
 				'toggle-label': true,
 				disabled: !this.isEnabled()
 			};
 			css[className] = true;
-			return (React.createElement("span", {className: $pt.LayoutHelper.classSet(css)}, 
-	            label
-	        ));
+			return React.createElement(
+				"span",
+				{ className: $pt.LayoutHelper.classSet(css) },
+				label
+			);
 		},
 		renderLeftLabel: function () {
 			var labelAttached = this.getComponentOption('labelAttached');
@@ -15609,9 +16243,9 @@
 			}
 		},
 		/**
-		 * render check box, using font awesome instead
-		 * @returns {XML}
-		 */
+   * render check box, using font awesome instead
+   * @returns {XML}
+   */
 		renderToggleButton: function () {
 			var checked = this.isChecked();
 			var css = {
@@ -15620,20 +16254,22 @@
 				unchecked: !checked,
 				'toggle-container': true
 			};
-			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
-				React.createElement("span", {className: "n-toggle-line"}), 
-            React.createElement("span", {className: "n-toggle-true", 
-                  tabIndex: "-1", 
-                  onClick: this.onButtonClicked.bind(this, true)}), 
-            React.createElement("span", {className: "n-toggle-false", 
-                  tabIndex: "-1", 
-                  onClick: this.onButtonClicked.bind(this, false)})
-			));
+			return React.createElement(
+				"div",
+				{ className: $pt.LayoutHelper.classSet(css) },
+				React.createElement("span", { className: "n-toggle-line" }),
+				React.createElement("span", { className: "n-toggle-true",
+					tabIndex: "-1",
+					onClick: this.onButtonClicked.bind(this, true) }),
+				React.createElement("span", { className: "n-toggle-false",
+					tabIndex: "-1",
+					onClick: this.onButtonClicked.bind(this, false) })
+			);
 		},
 		/**
-		 * render
-		 * @returns {XML}
-		 */
+   * render
+   * @returns {XML}
+   */
 		render: function () {
 			var css = {
 				'n-disabled': !this.isEnabled(),
@@ -15641,60 +16277,62 @@
 			};
 			css[this.getComponentCSS('n-toggle')] = true;
 
-			return (React.createElement("div", {className: $pt.LayoutHelper.classSet(css)}, 
-				React.createElement("input", {type: "checkbox", style: {display: "none"}, 
-				       onChange: this.onComponentChanged, ref: "txt"}), 
-				this.renderLeftLabel(), 
-				this.renderToggleButton(), 
+			return React.createElement(
+				"div",
+				{ className: $pt.LayoutHelper.classSet(css) },
+				React.createElement("input", { type: "checkbox", style: { display: "none" },
+					onChange: this.onComponentChanged, ref: "txt" }),
+				this.renderLeftLabel(),
+				this.renderToggleButton(),
 				this.renderRightLabel()
-			));
+			);
 		},
 		/**
-		 * handle button clicked event
-		 */
+   * handle button clicked event
+   */
 		onButtonClicked: function (value) {
 			if (this.isEnabled() && !this.isViewMode()) {
 				this.setValueToModel(value);
 			}
 		},
 		/**
-		 * on component change
-		 * @param evt
-		 */
+   * on component change
+   * @param evt
+   */
 		onComponentChanged: function (evt) {
 			// synchronize value to model
 			this.setValueToModel(evt.target.checked);
 		},
 		/**
-		 * on model change
-		 * @param evt
-		 */
+   * on model change
+   * @param evt
+   */
 		onModelChanged: function (evt) {
 			this.getComponent().prop("checked", evt.new === true);
 			this.forceUpdate();
 		},
 		/**
-		 * is checked or not
-		 * @returns {boolean}
-		 */
+   * is checked or not
+   * @returns {boolean}
+   */
 		isChecked: function () {
 			return this.getValueFromModel() === true;
 		},
 		/**
-		 * get component
-		 * @returns {jQuery}
-		 */
+   * get component
+   * @returns {jQuery}
+   */
 		getComponent: function () {
-			return $(React.findDOMNode(this.refs.txt));
+			return $(ReactDOM.findDOMNode(this.refs.txt));
 		}
 	}));
 	$pt.Components.NToggle = NToggle;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Toggle, function (model, layout, direction, viewMode) {
-		return React.createElement($pt.Components.NToggle, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
+		return React.createElement($pt.Components.NToggle, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
 	});
-}(window, jQuery, React, $pt));
+})(window, jQuery, React, ReactDOM, $pt);
 
-(function(window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
     var NTree = React.createClass($pt.defineCellComponent({
         displayName: 'NTree',
         statics: {
@@ -15706,12 +16344,12 @@
             OP_FOLDER_ICON: 'angle-double-right',
             OP_FOLDER_OPEN_ICON: 'angle-double-down',
             OP_FILE_ICON: '',
-            NODE_SEPARATOR : '|',
-            ROOT_ID : '0',
-            convertValueTreeToArray: function(nodeValues, id) {
+            NODE_SEPARATOR: '|',
+            ROOT_ID: '0',
+            convertValueTreeToArray: function (nodeValues, id) {
                 var array = [];
-                var push = function(node, id) {
-                    Object.keys(node).forEach(function(key) {
+                var push = function (node, id) {
+                    Object.keys(node).forEach(function (key) {
                         if (key == 'selected' && node[key]) {
                             if (id != NTree.ROOT_ID) {
                                 array.push(id);
@@ -15733,7 +16371,7 @@
             // CellLayout
             layout: React.PropTypes.object
         },
-        getDefaultProps: function() {
+        getDefaultProps: function () {
             return {
                 defaultOptions: {
                     root: true,
@@ -15760,7 +16398,7 @@
                 }
             };
         },
-        getInitialState: function() {
+        getInitialState: function () {
             var expandBtn = $.extend(true, {}, this.getComponentOption('expandButton'));
             if (expandBtn) {
                 if (!expandBtn.comp.click) {
@@ -15777,31 +16415,31 @@
             }
             return {
                 activeNodes: {},
-                root: {text: this.getRootLabel(), id: NTree.ROOT_ID},
+                root: { text: this.getRootLabel(), id: NTree.ROOT_ID },
                 expandButton: expandBtn,
-                collapseButton: collapseBtn,
+                collapseButton: collapseBtn
             };
         },
         /**
-    	 * will update
-    	 * @param nextProps
-    	 */
-    	componentWillUpdate: function (nextProps) {
-    		// remove post change listener to handle model change
-    		this.removePostChangeListener(this.__forceUpdate);
+        * will update
+        * @param nextProps
+        */
+        componentWillUpdate: function (nextProps) {
+            // remove post change listener to handle model change
+            this.removePostChangeListener(this.__forceUpdate);
             this.unregisterFromComponentCentral();
-    	},
-    	/**
-    	 * did update
-    	 * @param prevProps
-    	 * @param prevState
-    	 */
-    	componentDidUpdate: function (prevProps, prevState) {
-    		// add post change listener to handle model change
-    		this.addPostChangeListener(this.__forceUpdate);
+        },
+        /**
+         * did update
+         * @param prevProps
+         * @param prevState
+         */
+        componentDidUpdate: function (prevProps, prevState) {
+            // add post change listener to handle model change
+            this.addPostChangeListener(this.__forceUpdate);
             this.registerToComponentCentral();
-    	},
-        componentWillMount: function() {
+        },
+        componentWillMount: function () {
             var expandLevel = this.getComponentOption('expandLevel');
             if (expandLevel == null) {
                 // default expand root
@@ -15811,12 +16449,12 @@
                 expandLevel = 9999;
             }
             var _this = this;
-            var expand = function(parentId, node, level) {
+            var expand = function (parentId, node, level) {
                 if (level < expandLevel) {
                     var nodeId = _this.getNodeId(parentId, node);
                     _this.state.activeNodes[nodeId] = node;
                     if (node.children) {
-                        node.children.forEach(function(child) {
+                        node.children.forEach(function (child) {
                             expand(nodeId, child, level + 1);
                         });
                     }
@@ -15825,30 +16463,30 @@
             this.state.root.children = this.getTopLevelNodes();
             expand(null, this.state.root, 0);
         },
-    	/**
-    	 * did mount
-    	 */
-    	componentDidMount: function () {
-    		// add post change listener to handle model change
-    		this.addPostChangeListener(this.__forceUpdate);
+        /**
+         * did mount
+         */
+        componentDidMount: function () {
+            // add post change listener to handle model change
+            this.addPostChangeListener(this.__forceUpdate);
             this.registerToComponentCentral();
-    	},
-    	/**
-    	 * will unmount
-    	 */
-    	componentWillUnmount: function () {
-    		// remove post change listener to handle model change
-    		this.removePostChangeListener(this.__forceUpdate);
+        },
+        /**
+         * will unmount
+         */
+        componentWillUnmount: function () {
+            // remove post change listener to handle model change
+            this.removePostChangeListener(this.__forceUpdate);
             this.unregisterFromComponentCentral();
-    	},
-        renderCheck: function(node, nodeId) {
+        },
+        renderCheck: function (node, nodeId) {
             var canSelected = this.isNodeCanSelect(node);
             if (!canSelected) {
                 return null;
             }
             var modelValue = this.getValueFromModel();
             modelValue = modelValue ? modelValue : {};
-            var model = $pt.createModel({selected: this.isNodeChecked(nodeId)});
+            var model = $pt.createModel({ selected: this.isNodeChecked(nodeId) });
             model.useBaseAsCurrent();
             var layout = $pt.createCellLayout('selected', {
                 comp: {
@@ -15856,9 +16494,9 @@
                 }
             });
             model.addPostChangeListener('selected', this.onNodeCheckChanged.bind(this, node, nodeId));
-            return React.createElement($pt.Components.NCheck, {model: model, layout: layout, view: this.isViewMode()});
+            return React.createElement($pt.Components.NCheck, { model: model, layout: layout, view: this.isViewMode() });
         },
-        renderNode: function(parentNodeId, node) {
+        renderNode: function (parentNodeId, node) {
             var nodeId = this.getNodeId(parentNodeId, node);
 
             var opIcon = null;
@@ -15868,70 +16506,85 @@
                     fixWidth: true,
                     icon: this.getNodeOperationIcon(node, nodeId)
                 };
-                opIcon = (React.createElement("a", {href: "javascript:void(0);", 
-                            onClick: this.onNodeClicked.bind(this, node, nodeId)}, 
-                    React.createElement($pt.Components.NIcon, React.__spread({},  expandableIconAttrs))
-                ));
+                opIcon = React.createElement(
+                    'a',
+                    { href: 'javascript:void(0);',
+                        onClick: this.onNodeClicked.bind(this, node, nodeId) },
+                    React.createElement($pt.Components.NIcon, expandableIconAttrs)
+                );
             }
             var folderIconAttrs = {
                 icon: this.getNodeIcon(node, nodeId),
                 fixWidth: true,
                 iconClassName: 'node-icon'
             };
-            var folderIcon = (React.createElement("a", {href: "javascript:void(0);", 
-                            onClick: this.onNodeClicked.bind(this, node, nodeId)}, 
-                React.createElement($pt.Components.NIcon, React.__spread({},  folderIconAttrs))
-            ));
+            var folderIcon = React.createElement(
+                'a',
+                { href: 'javascript:void(0);',
+                    onClick: this.onNodeClicked.bind(this, node, nodeId) },
+                React.createElement($pt.Components.NIcon, folderIconAttrs)
+            );
 
             var active = this.isActive(nodeId) ? 'active' : null;
-            return (
-                React.createElement("li", {className: active, key: nodeId}, 
-                    opIcon, 
-                    folderIcon, 
-                    this.renderCheck(node, nodeId), 
-                    React.createElement("a", {
-                        href: "javascript:void(0);", 
-                        onClick: this.onNodeClicked.bind(this, node, nodeId)}, 
-                        React.createElement("span", {className: "node-text"}, this.getNodeText(node))
-                    ), 
-                    this.renderNodes(node, nodeId)
-                )
+            return React.createElement(
+                'li',
+                { className: active, key: nodeId },
+                opIcon,
+                folderIcon,
+                this.renderCheck(node, nodeId),
+                React.createElement(
+                    'a',
+                    {
+                        href: 'javascript:void(0);',
+                        onClick: this.onNodeClicked.bind(this, node, nodeId) },
+                    React.createElement(
+                        'span',
+                        { className: 'node-text' },
+                        this.getNodeText(node)
+                    )
+                ),
+                this.renderNodes(node, nodeId)
             );
         },
-        renderNodes: function(parent, parentNodeId) {
-            var children =  parent.children;
+        renderNodes: function (parent, parentNodeId) {
+            var children = parent.children;
             if (children && children.length > 0) {
-                return (
-                    React.createElement("ul", {className: "nav"}, 
-                        children.map(this.renderNode.bind(this, parentNodeId))
-                    )
+                return React.createElement(
+                    'ul',
+                    { className: 'nav' },
+                    children.map(this.renderNode.bind(this, parentNodeId))
                 );
             } else {
                 return null;
             }
         },
-        renderRoot: function() {
-            return (React.createElement("ul", {className: "nav"}, 
+        renderRoot: function () {
+            return React.createElement(
+                'ul',
+                { className: 'nav' },
                 this.renderNode(null, this.state.root)
-            ));
+            );
         },
-        renderTopLevel: function() {
+        renderTopLevel: function () {
             var root = this.state.root;
             root.children = this.getTopLevelNodes();
             return this.isRootPaint() ? this.renderRoot() : this.renderNodes(root, this.getNodeId(null, root));
         },
-        renderButtons: function() {
-            var expand = this.state.expandButton ? React.createElement($pt.Components.NFormButton, {model: this.getModel(), layout: this.state.expandButton}) : null;
-            var collapse = this.state.collapseButton ? React.createElement($pt.Components.NFormButton, {model: this.getModel(), layout: this.state.collapseButton}) : null;
+        renderButtons: function () {
+            var expand = this.state.expandButton ? React.createElement($pt.Components.NFormButton, { model: this.getModel(), layout: this.state.expandButton }) : null;
+            var collapse = this.state.collapseButton ? React.createElement($pt.Components.NFormButton, { model: this.getModel(), layout: this.state.collapseButton }) : null;
             if (expand || collapse) {
-                return (React.createElement("span", {className: "buttons"}, 
-                    expand, collapse
-                ));
+                return React.createElement(
+                    'span',
+                    { className: 'buttons' },
+                    expand,
+                    collapse
+                );
             } else {
                 return null;
             }
         },
-        render: function() {
+        render: function () {
             var styles = {};
             if (this.getComponentOption('height')) {
                 styles.height = this.getComponentOption('height');
@@ -15943,14 +16596,14 @@
             if (this.getComponentOption('border')) {
                 css += ' border';
             }
-            return (
-                React.createElement("div", {className: css, style: styles}, 
-                    this.renderTopLevel(), 
-                    this.renderButtons()
-                )
+            return React.createElement(
+                'div',
+                { className: css, style: styles },
+                this.renderTopLevel(),
+                this.renderButtons()
             );
         },
-        onNodeClicked: function(node, nodeId) {
+        onNodeClicked: function (node, nodeId) {
             if (!this.isLeaf(node)) {
                 if (this.state.activeNodes[nodeId]) {
                     this.collapseNode(node, nodeId);
@@ -15963,7 +16616,7 @@
                 nodeClick.call(this, node);
             }
         },
-        onNodeCheckChanged: function(node, nodeId, evt, toChildOnly) {
+        onNodeCheckChanged: function (node, nodeId, evt, toChildOnly) {
             var hierarchyCheck = this.isHierarchyCheck();
             var modelValue = this.getValueFromModel();
             if (this.isValueAsArray()) {
@@ -16002,13 +16655,13 @@
                 }
             }
         },
-        isValueAsArray: function() {
+        isValueAsArray: function () {
             return this.getComponentOption('valueAsArray');
         },
         /**
          * check or uncheck node. will not fire post change event.
          */
-        checkNode: function(nodeId, value, modelValue) {
+        checkNode: function (nodeId, value, modelValue) {
             if (this.isValueAsArray()) {
                 if (!this.isMultipleSelection()) {
                     // no multiple selection
@@ -16019,7 +16672,7 @@
                 } else {
                     var ids = nodeId.split(NTree.NODE_SEPARATOR);
                     var id = ids[ids.length - 1];
-                    var index = modelValue.findIndex(function(value) {
+                    var index = modelValue.findIndex(function (value) {
                         return value == id;
                     });
                     if (value && index == -1) {
@@ -16031,7 +16684,7 @@
             } else {
                 if (!this.isMultipleSelection()) {
                     // no multiple selection
-                    Object.keys(modelValue).forEach(function(key) {
+                    Object.keys(modelValue).forEach(function (key) {
                         delete modelValue[key];
                     });
                 }
@@ -16047,18 +16700,18 @@
         /**
          * check or uncheck node hierarchy. will not fire post change event.
          */
-        checkNodeHierarchy: function(node, nodeId, value, modelValue) {
+        checkNodeHierarchy: function (node, nodeId, value, modelValue) {
             modelValue = this.checkNode(nodeId, value, modelValue);
             if (node.children) {
                 var _this = this;
-                node.children.forEach(function(child) {
+                node.children.forEach(function (child) {
                     var childId = _this.getNodeId(nodeId, child);
                     _this.checkNodeHierarchy(child, childId, value, modelValue);
                 });
             }
             return modelValue;
         },
-        isNodeChecked: function(nodeId, modelValue) {
+        isNodeChecked: function (nodeId, modelValue) {
             modelValue = modelValue ? modelValue : this.getValueFromModel();
             modelValue = modelValue ? modelValue : {};
             if (Array.isArray(modelValue)) {
@@ -16067,7 +16720,7 @@
                 } else {
                     var ids = nodeId.split(NTree.NODE_SEPARATOR);
                     var id = ids[ids.length - 1];
-                    return -1 != modelValue.findIndex(function(value) {
+                    return -1 != modelValue.findIndex(function (value) {
                         return value == id;
                     });
                 }
@@ -16079,12 +16732,12 @@
                 }
             }
         },
-        hierarchyCheckToAncestors: function(nodeId, modelValue) {
+        hierarchyCheckToAncestors: function (nodeId, modelValue) {
             var _this = this;
-            var checkNodeOnChildren = function(node, nodeId) {
+            var checkNodeOnChildren = function (node, nodeId) {
                 if (node.children) {
                     var hasUncheckedChild = false;
-                    node.children.forEach(function(child) {
+                    node.children.forEach(function (child) {
                         var checked = checkNodeOnChildren(child, _this.getNodeId(nodeId, child));
                         if (!checked) {
                             hasUncheckedChild = true;
@@ -16102,15 +16755,15 @@
             checkNodeOnChildren(this.state.root, this.getNodeId(null, this.state.root));
             // window.console.log(modelValue);
         },
-        expandAll: function() {
+        expandAll: function () {
             var activeNodes = $.extend({}, this.state.activeNodes);
             var root = this.state.root;
-            var expand = function(node, parentNodeId) {
+            var expand = function (node, parentNodeId) {
                 if (!this.isLeaf(node)) {
                     var nodeId = this.getNodeId(parentNodeId, node);
                     activeNodes[nodeId] = node;
                     var _this = this;
-                    node.children.forEach(function(child) {
+                    node.children.forEach(function (child) {
                         expand.call(_this, child, nodeId);
                     });
                 }
@@ -16119,10 +16772,10 @@
             // this.setState({activeNodes: activeNodes});
             var _this = this;
             var previousActiveNodes = null;
-            this.setState(function(previousState, currentProps) {
+            this.setState(function (previousState, currentProps) {
                 previousActiveNodes = previousState.activeNodes;
-                return {activeNodes: activeNodes};
-            }, function() {
+                return { activeNodes: activeNodes };
+            }, function () {
                 _this.notifyEvent({
                     type: 'expand',
                     before: previousActiveNodes,
@@ -16130,7 +16783,7 @@
                 });
             });
         },
-        collapseAll: function() {
+        collapseAll: function () {
             var _this = this;
             var root = this.state.root;
             var nodeIds = null;
@@ -16143,25 +16796,25 @@
                     // root.children.forEach(function(node) {
                     //     this.collapseNode(node, this.getNodeId(rootNodeId, node));
                     // }.bind(this));
-                    nodeIds = root.children.map(function(node) {
+                    nodeIds = root.children.map(function (node) {
                         return _this.getNodeId(rootNodeId, node);
                     });
                 }
             }
-            var regexp = new RegExp(nodeIds.map(function(nodeId) {
+            var regexp = new RegExp(nodeIds.map(function (nodeId) {
                 return '(' + nodeId + ')';
             }).join('|'));
             var activeNodes = $.extend({}, this.state.activeNodes);
-            Object.keys(activeNodes).forEach(function(key) {
+            Object.keys(activeNodes).forEach(function (key) {
                 if (key.match(regexp)) {
                     delete activeNodes[key];
                 }
             });
             var previousActiveNodes = null;
-            this.setState(function(previousState, currentProps) {
+            this.setState(function (previousState, currentProps) {
                 previousActiveNodes = previousState.activeNodes;
-                return {activeNodes: activeNodes};
-            }, function() {
+                return { activeNodes: activeNodes };
+            }, function () {
                 _this.notifyEvent({
                     type: 'collapse',
                     before: previousActiveNodes,
@@ -16169,10 +16822,10 @@
                 });
             });
         },
-        isRootPaint: function() {
+        isRootPaint: function () {
             return this.getComponentOption('root');
         },
-        getRootLabel: function() {
+        getRootLabel: function () {
             var root = this.getComponentOption('root');
             if (typeof root === 'string') {
                 return root;
@@ -16180,19 +16833,19 @@
                 return NTree.ROOT_LABEL;
             }
         },
-        isActive: function(nodeId) {
+        isActive: function (nodeId) {
             return this.state.activeNodes[nodeId];
         },
-        isLeaf: function(node) {
+        isLeaf: function (node) {
             return !node.children || node.children.length == 0;
         },
-        isInactiveSlibingWhenActive: function() {
+        isInactiveSlibingWhenActive: function () {
             return this.getComponentOption('inactiveSlibing');
         },
-        collapseNode: function(node, nodeId) {
+        collapseNode: function (node, nodeId) {
             var regexp = new RegExp(nodeId);
             var activeNodes = $.extend({}, this.state.activeNodes);
-            Object.keys(activeNodes).forEach(function(key) {
+            Object.keys(activeNodes).forEach(function (key) {
                 if (key.match(regexp)) {
                     delete activeNodes[key];
                 }
@@ -16200,10 +16853,10 @@
             // this.setState({activeNodes: activeNodes});
             var _this = this;
             var previousActiveNodes = null;
-            this.setState(function(previousState, currentProps) {
+            this.setState(function (previousState, currentProps) {
                 previousActiveNodes = previousState.activeNodes;
-                return {activeNodes: activeNodes};
-            }, function() {
+                return { activeNodes: activeNodes };
+            }, function () {
                 _this.notifyEvent({
                     type: 'collapse',
                     before: previousActiveNodes,
@@ -16211,14 +16864,14 @@
                 });
             });
         },
-        expandNode: function(node, nodeId) {
+        expandNode: function (node, nodeId) {
             var activeNodes = $.extend({}, this.state.activeNodes);
             if (this.isInactiveSlibingWhenActive() && !this.isLeaf(node)) {
                 // remove all slibings and their children from active list
                 var lastHyphen = nodeId.lastIndexOf(NTree.NODE_SEPARATOR);
                 if (lastHyphen > 0) {
                     var regexp = new RegExp(nodeId.substring(0, lastHyphen + 1));
-                    Object.keys(activeNodes).forEach(function(key) {
+                    Object.keys(activeNodes).forEach(function (key) {
                         if (key.match(regexp)) {
                             delete activeNodes[key];
                         }
@@ -16233,10 +16886,10 @@
             // this.setState({activeNodes: activeNodes});
             var _this = this;
             var previousActiveNodes = null;
-            this.setState(function(previousState, currentProps) {
+            this.setState(function (previousState, currentProps) {
                 previousActiveNodes = previousState.activeNodes;
-                return {activeNodes: activeNodes};
-            }, function() {
+                return { activeNodes: activeNodes };
+            }, function () {
                 _this.notifyEvent({
                     type: 'expand',
                     before: previousActiveNodes,
@@ -16248,22 +16901,22 @@
          * get top level nodes
          * @returns {{}[]}
          */
-        getTopLevelNodes: function() {
+        getTopLevelNodes: function () {
             return this.getAvailableNodes().list();
         },
         /**
          * get avaiable top level nodes
          * @returns {CodeTable}
          */
-        getAvailableNodes: function() {
+        getAvailableNodes: function () {
             return this.getComponentOption('data');
         },
-        getNodeIcon: function(node, nodeId) {
+        getNodeIcon: function (node, nodeId) {
             var isLeaf = this.isLeaf(node);
             // not leaf, must be a folder, or node is defined as folder
             var isFolder = !isLeaf || node.folder;
             var active = this.isActive(nodeId);
-            if (isFolder)  {
+            if (isFolder) {
                 if (isLeaf) {
                     return this.getCustomNodeIcon({
                         node: node,
@@ -16295,14 +16948,14 @@
                 }, NTree.FILE_ICON);
             }
         },
-        getNodeText: function(node) {
+        getNodeText: function (node) {
             return node.text;
         },
         /**
          * get customized node icon
          * @param options {node: JSON, active: boolean, folder: boolean, leaf: boolean}
          */
-        getCustomNodeIcon: function(options, defaultIcon) {
+        getCustomNodeIcon: function (options, defaultIcon) {
             var icon = this.getComponentOption('nodeIcon');
             if (typeof icon === 'function') {
                 return icon.call(this, options);
@@ -16312,7 +16965,7 @@
                 return defaultIcon;
             }
         },
-        getNodeOperationIcon: function(node, nodeId) {
+        getNodeOperationIcon: function (node, nodeId) {
             var isLeaf = this.isLeaf(node);
             // not leaf, must be a folder, or node is defined as folder
             var isFolder = !isLeaf || node.folder;
@@ -16355,7 +17008,7 @@
          * get customized node operation icon
          * @param options {node: JSON, active: boolean, folder: boolean, leaf: boolean}
          */
-        getCustomNodeOperationIcon: function(options, defaultIcon) {
+        getCustomNodeOperationIcon: function (options, defaultIcon) {
             var icon = this.getComponentOption('opNodeIcon');
             if (typeof icon === 'function') {
                 return icon.call(this, options);
@@ -16365,7 +17018,7 @@
                 return defaultIcon;
             }
         },
-        isNodeCanSelect: function(node) {
+        isNodeCanSelect: function (node) {
             var check = this.getComponentOption('check');
             if (typeof check === 'function') {
                 return check.call(this, node);
@@ -16379,17 +17032,17 @@
          * is multiple selection allowed
          * @returns {boolean}
          */
-        isMultipleSelection: function() {
+        isMultipleSelection: function () {
             return this.getComponentOption('multiple');
         },
         /**
          * is hierarchy check, effective only when multiple is true
          * @returns {boolean}
          */
-        isHierarchyCheck: function() {
+        isHierarchyCheck: function () {
             return this.getComponentOption('hierarchyCheck') && this.isMultipleSelection();
         },
-        getNodeId: function(parentNodeId, node) {
+        getNodeId: function (parentNodeId, node) {
             var nodeId = null;
             if (parentNodeId) {
                 nodeId = parentNodeId + NTree.NODE_SEPARATOR + node.id;
@@ -16403,9 +17056,9 @@
     // expose to global
     $pt.Components.NTree = NTree;
     $pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Tree, function (model, layout, direction, viewMode) {
-		return React.createElement($pt.Components.NTree, React.__spread({},  $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)));
-	});
-}(window, jQuery, React, $pt));
+        return React.createElement($pt.Components.NTree, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
+    });
+})(window, jQuery, React, ReactDOM, $pt);
 
 // only packaged in browser environment
 (function (window, $pt) {
@@ -16413,7 +17066,7 @@
 	if (typeof DONT_EXPOSE_PARROT_TO_GLOBAL === 'undefined' || DONT_EXPOSE_PARROT_TO_GLOBAL !== true) {
 		$pt.exposeComponents(window);
 	}
-}(window, $pt));
+})(window, $pt);
 
 
 	// reset to old $pt

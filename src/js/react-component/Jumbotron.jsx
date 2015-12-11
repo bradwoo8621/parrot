@@ -1,7 +1,7 @@
 /**
  * Jumbortron
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NJumbortron = React.createClass({
 		displayName: 'NJumbortron',
 		propTypes: {
@@ -27,4 +27,4 @@
 		}
 	});
 	$pt.Components.NJumbortron = NJumbortron;
-}(window, jQuery, React, $pt));
+}(window, jQuery, React, ReactDOM, $pt));

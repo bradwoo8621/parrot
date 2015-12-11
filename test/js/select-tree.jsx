@@ -99,5 +99,5 @@
 		</div>
 		<div style={{height: "1000px"}}/>
 	</div>);
-	React.render(panel, document.getElementById('main'));
+	ReactDOM.render(panel, document.getElementById('main'));
 })();

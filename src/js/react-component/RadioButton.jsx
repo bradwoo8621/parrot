@@ -29,7 +29,7 @@
  *      }
  * }
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NRadio = React.createClass($pt.defineCellComponent({
 		displayName: 'NRadio',
 		propTypes: {
@@ -150,7 +150,7 @@
 		 * @param option
 		 */
 		onInnerClicked: function (option) {
-			$(React.findDOMNode(this.refs['out-' + option.id])).focus();
+			$(ReactDOM.findDOMNode(this.refs['out-' + option.id])).focus();
 		},
 		/**
 		 * on button clicked
@@ -185,7 +185,7 @@
 		 * @returns {jQuery}
 		 */
 		// getComponent: function () {
-		// 	return $(React.findDOMNode(this.refs.txt));
+		// 	return $(ReactDOM.findDOMNode(this.refs.txt));
 		// },
 		isLabelAtLeft: function () {
 			return this.getComponentOption('labelAtLeft');
@@ -195,4 +195,4 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Radio, function (model, layout, direction, viewMode) {
 		return <$pt.Components.NRadio {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(window, jQuery, React, $pt));
+}(window, jQuery, React, ReactDOM, $pt));

@@ -18,5 +18,5 @@
         alert('Search text[' + text + '].');
     };
     var header = (<NPageHeader brand='Test Case' menus={menus} search={search}/>);
-    React.render(header, document.getElementById('header'));
+    ReactDOM.render(header, document.getElementById('header'));
 })();

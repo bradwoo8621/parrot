@@ -1,4 +1,4 @@
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NFile = React.createClass($pt.defineCellComponent({
 		displayName: 'NFile',
 		statics: {},
@@ -36,7 +36,7 @@
 			this.registerToComponentCentral();
 		},
 		componentDidMount: function () {
-			var input = $(React.findDOMNode(this.refs.file));
+			var input = $(ReactDOM.findDOMNode(this.refs.file));
 			input.fileinput(this.createDisplayOptions({
 				ajaxDeleteSettings: null,
 				ajaxSettings: null,
@@ -137,7 +137,7 @@
 				input.on(eventKey, monitors[eventKey]);
 			});
 
-			var comp = $(React.findDOMNode(this.refs.comp));
+			var comp = $(ReactDOM.findDOMNode(this.refs.comp));
 			comp.find('.kv-fileinput-caption')
 				.focus(this.onComponentFocused)
 				.blur(this.onComponentBlurred);
@@ -147,7 +147,7 @@
 			this.registerToComponentCentral();
 		},
 		componentWillUnmount: function () {
-			var input = $(React.findDOMNode(this.refs.file));
+			var input = $(ReactDOM.findDOMNode(this.refs.file));
 			// event monitor
 			var monitors = this.getEventMonitor();
 			Object.keys(monitors).forEach(function (eventKey) {
@@ -187,16 +187,16 @@
 			return this.getComponentOption('multiple');
 		},
 		onComponentFocused: function () {
-			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 		},
 		onComponentBlurred: function () {
-			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 		}
 	}));
 	$pt.Components.NFile = NFile;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.File, function (model, layout, direction, viewMode) {
 		return <$pt.Components.NFile {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(window, jQuery, React, $pt));
+}(window, jQuery, React, ReactDOM, $pt));

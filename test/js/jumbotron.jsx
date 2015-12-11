@@ -10,5 +10,5 @@
             <NJumbortron highlightText={['Hello, World','Goodbye, World']}/>
         </div>
     </div>);
-    React.render(panel, document.getElementById('main'));
+    ReactDOM.render(panel, document.getElementById('main'));
 })();

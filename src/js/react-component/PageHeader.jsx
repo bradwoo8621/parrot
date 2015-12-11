@@ -1,7 +1,7 @@
 /**
  * Page Header<br>
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NPageHeader = React.createClass({
 		displayName: 'NPageHeader',
 		statics: {
@@ -183,4 +183,4 @@
 		}
 	});
 	$pt.Components.NPageHeader = NPageHeader;
-}(window, jQuery, React, $pt));
+}(window, jQuery, React, ReactDOM, $pt));

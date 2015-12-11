@@ -35,7 +35,7 @@
  *      }
  * }
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NPanel = React.createClass($pt.defineCellComponent({
 		displayName: 'NPanel',
 		propTypes: {
@@ -360,12 +360,12 @@
 			if (expanded) {
 				if (this.canExpanded()) {
 					// panel can be expanded
-					$(React.findDOMNode(this.refs.body)).slideDown(300, function () {
+					$(ReactDOM.findDOMNode(this.refs.body)).slideDown(300, function () {
 						this.setState({expanded: true});
 					}.bind(this));
 				}
 			} else {
-				$(React.findDOMNode(this.refs.body)).slideUp(300, function () {
+				$(ReactDOM.findDOMNode(this.refs.body)).slideUp(300, function () {
 					this.setState({expanded: false});
 				}.bind(this));
 			}
@@ -393,4 +393,4 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Panel, function (model, layout, direction, viewMode) {
 		return <$pt.Components.NPanel {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(window, jQuery, React, $pt));
+}(window, jQuery, React, ReactDOM, $pt));

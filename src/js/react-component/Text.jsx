@@ -46,7 +46,7 @@
  *      }
  * }
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NText = React.createClass($pt.defineCellComponent({
 		displayName: 'NText',
 		statics: {
@@ -101,7 +101,7 @@
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
 			var formattedValue = this.getValueFromModel();
-			if (!$(React.findDOMNode(this.refs.focusLine)).hasClass('focus')) {
+			if (!$(ReactDOM.findDOMNode(this.refs.focusLine)).hasClass('focus')) {
 				formattedValue = this.getFormattedValue(formattedValue);
 			}
 			if (this.getComponent().val() != formattedValue) {
@@ -233,8 +233,8 @@
 			</div>);
 		},
 		onComponentFocused: function () {
-			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 
 			var value = this.getValueFromModel();
 			if (value == this.getComponent().val()) {
@@ -244,8 +244,8 @@
 			// window.console.log("focused: " + this.getValueFromModel());
 		},
 		onComponentBlurred: function (evt) {
-			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 
 			// if (this.state.componentChanged) {
 			// 	clearTimeout(this.state.componentChanged);
@@ -277,7 +277,7 @@
 			// return;
 			//
 			// var formattedValue = this.getValueFromModel();
-			// if (!$(React.findDOMNode(this.refs.focusLine)).hasClass('focus')) {
+			// if (!$(ReactDOM.findDOMNode(this.refs.focusLine)).hasClass('focus')) {
 			// 	formattedValue = this.getFormattedValue(formattedValue);
 			// }
 			// if (formattedValue == this.getComponent().val()) {
@@ -307,7 +307,7 @@
 		 * @override
 		 */
 		getComponent: function () {
-			return $(React.findDOMNode(this.refs.txt));
+			return $(ReactDOM.findDOMNode(this.refs.txt));
 		},
 		/**
 		 * is add-on clickable
@@ -365,4 +365,4 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Text, function (model, layout, direction, viewMode) {
 		return <$pt.Components.NText {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(window, jQuery, React, $pt));
+}(window, jQuery, React, ReactDOM, $pt));

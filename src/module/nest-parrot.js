@@ -7,15 +7,15 @@
 	} else if ( typeof define === 'function' && define.amd ) {
         // AMD. Register as parrot
 		// TODO how to define the jquery plugin here?
-        define('parrot', ['jquery', 'jsface', 'moment', 'react'], factory);
+        define('parrot', ['jquery', 'jsface', 'moment', 'react', 'react-dom'], factory);
 	} else {
 		// in browser, global is window.
 		// all dependencies were loaded already.
 		// bootstrap and jquery's plugin are all attached to jquery,
 		// expose $pt and all components to window.
-		factory(global, jQuery, jsface, moment, React);
+		factory(global, jQuery, jsface, moment, React, ReactDOM);
 	}
-}(typeof window !== "undefined" ? window : this, function(window, jQuery, jsface, moment, React, DONT_EXPOSE_PARROT_TO_GLOBAL) {
+}(typeof window !== "undefined" ? window : this, function(window, jQuery, jsface, moment, React, ReactDOM, DONT_EXPOSE_PARROT_TO_GLOBAL) {
 	var _pt = window.$pt;
 	var $pt = {};
 	window.$pt = $pt;

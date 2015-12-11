@@ -1,4 +1,4 @@
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NSelect = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelect',
 		statics: {
@@ -209,7 +209,7 @@
 					{this.renderPopoverContent(filterText)}
 				</div>
 			</div>);
-			React.render(popover, this.state.popoverDiv.get(0), this.onPopoverRenderComplete);
+			ReactDOM.render(popover, this.state.popoverDiv.get(0), this.onPopoverRenderComplete);
 		},
 		showPopover: function(filterText) {
 			this.renderPopoverContainer();
@@ -435,7 +435,7 @@
 			return this.hasParent() ? this.getComponentOption("availableWhenNoParentValue") : true;
 		},
 		getComponent: function() {
-			return $(React.findDOMNode(this.refs.comp));
+			return $(ReactDOM.findDOMNode(this.refs.comp));
 		},
 		getTextInViewMode: function() {
 			var value = this.getValueFromModel();
@@ -461,4 +461,4 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Select, function (model, layout, direction, viewMode) {
 		return <$pt.Components.NSelect {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(window, jQuery, React, $pt));
+}(window, jQuery, React, ReactDOM, $pt));

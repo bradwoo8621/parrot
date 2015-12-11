@@ -262,5 +262,5 @@
             <NText model={model} layout={plainText} view={true}/>
         </div>
     </div>);
-    React.render(panel, document.getElementById('main'));
+    ReactDOM.render(panel, document.getElementById('main'));
 })();

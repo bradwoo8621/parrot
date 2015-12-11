@@ -6,7 +6,7 @@
  * 		2.3 mouse wheel
  *		2.4 window resize
  */
-(function(window, $, moment, React, $pt) {
+(function(window, $, moment, React, ReactDOM, $pt) {
 	var NDateTime = React.createClass($pt.defineCellComponent({
 		displayName: 'NDateTime',
 		statics: {
@@ -729,7 +729,7 @@
 				<div className="arrow"></div>
 				{this.renderPopoverContent(options.date, options.type)}
 			</div>);
-			React.render(popover, this.state.popover.get(0));
+			ReactDOM.render(popover, this.state.popover.get(0));
 		},
 		renderPopoverContainer: function() {
 			if (this.state.popover == null) {
@@ -853,12 +853,12 @@
 			this.getTextInput().focus();
 		},
 		onTextInputFocused: function () {
-			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 		},
 		onTextInputBlurred: function () {
-			$(React.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-			$(React.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
+			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 
 			var text = this.getTextInput().val();
 			if (text.length == 0 || text.isBlank())  {
@@ -1073,10 +1073,10 @@
 			}
 		},
 		getComponent: function() {
-			return $(React.findDOMNode(this.refs.comp));
+			return $(ReactDOM.findDOMNode(this.refs.comp));
 		},
 		getTextInput: function() {
-			return $(React.findDOMNode(this.refs.text));
+			return $(ReactDOM.findDOMNode(this.refs.text));
 		},
 		/**
 		 * get display format
@@ -1155,4 +1155,4 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Date, function (model, layout, direction, viewMode) {
 		return <$pt.Components.NDateTime {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(window, jQuery, moment, React, $pt));
+}(window, jQuery, moment, React, ReactDOM, $pt));

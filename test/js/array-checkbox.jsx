@@ -74,5 +74,5 @@
             <NArrayCheck model={model} layout={disabledLabelInLeft}/>
         </div>
     </div>);
-    React.render(panel, document.getElementById('main'));
+    ReactDOM.render(panel, document.getElementById('main'));
 })();

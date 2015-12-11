@@ -3,7 +3,7 @@
  *
  * depends NPanelFooter, NForm, NConfirm
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NModalForm = React.createClass({
 		displayName: 'NModalForm',
 		statics: {
@@ -30,7 +30,7 @@
 				if (className) {
 					css[className] = true;
 				}
-				return React.render(<$pt.Components.NModalForm title={title} className={$pt.LayoutHelper.classSet(css)}
+				return ReactDOM.render(<$pt.Components.NModalForm title={title} className={$pt.LayoutHelper.classSet(css)}
 				                                zIndex={$pt.formModalIndex}/>,
 					document.getElementById(containerId));
 			},
@@ -62,7 +62,7 @@
 			if (!this.isDraggable() || !this.refs.top) {
 				return;
 			}
-			var top = $(React.findDOMNode(this.refs.top));
+			var top = $(ReactDOM.findDOMNode(this.refs.top));
 			var modal = top.children('.modal');
 			modal.drags({handle: '.modal-header'});
 			modal.css({
@@ -117,7 +117,7 @@
 		},
 		stopDraggable: function() {
 			if (this.refs.top) {
-				var top = $(React.findDOMNode(this.refs.top));
+				var top = $(ReactDOM.findDOMNode(this.refs.top));
 				var modal = top.children('.modal');
 				modal.stopDrags({handle: '.modal-header'});
 			}
@@ -540,4 +540,4 @@
 
 		return $el.off('mousedown mouseup');
 	};
-}(window, jQuery, React, $pt));
+}(window, jQuery, React, ReactDOM, $pt));

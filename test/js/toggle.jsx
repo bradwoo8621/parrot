@@ -47,5 +47,5 @@
 			<NToggle model={model} layout={toggle} view={true}/>
 		</div>
 	</div>);
-	React.render(panel, document.getElementById('main'));
+	ReactDOM.render(panel, document.getElementById('main'));
 })();

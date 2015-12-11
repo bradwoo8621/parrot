@@ -40,6 +40,9 @@ console.log('moment loaded: ' + (global.moment != null));
 global.React = require('react');
 console.log('react loaded: ' + (global.React != null));
 
+global.ReactDOM = require('react-dom');
+console.log('react-dom loaded: ' + (global.ReactDOM != null));
+
 global.jsface = require('jsface');
 console.log('jsface loaded: ' + (global.jsface != null));
 

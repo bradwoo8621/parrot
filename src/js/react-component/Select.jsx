@@ -40,7 +40,7 @@
  *      }
  * }
  */
-(function (window, $, React, $pt) {
+(function (window, $, React, ReactDOM, $pt) {
 	var NSelect2 = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelect2',
 		statics: {
@@ -166,7 +166,7 @@
 			this.renderBorderBottom();
 		},
 		renderBorderBottom: function () {
-			var top = $(React.findDOMNode(this.refs.div));
+			var top = $(ReactDOM.findDOMNode(this.refs.div));
 			var selection = top.find('.select2-selection');
 			if (selection.find('hr.normal-line').length == 0) {
 				selection.append('<hr class="' + this.getAdditionalCSS('normal-line', 'normal-line') + '"/>')
@@ -211,7 +211,7 @@
 		 */
 		removeTooltip: function () {
 			//$("#select2-" + this.getId() + "-container").removeAttr("title");
-			var top = $(React.findDOMNode(this.refs.div));
+			var top = $(ReactDOM.findDOMNode(this.refs.div));
 			var renderer = top.find('.select2-selection__rendered');
 			renderer.removeAttr('title');
 		},
@@ -370,7 +370,7 @@
 			}
 		},
 		getComponent: function () {
-			return $(React.findDOMNode(this.refs.select));
+			return $(ReactDOM.findDOMNode(this.refs.select));
 		},
 		getTextInViewMode: function() {
 			var value = this.getValueFromModel();
@@ -466,4 +466,4 @@
 	$pt.LayoutHelper.registerComponentRenderer('select2', function (model, layout, direction, viewMode) {
 		return <$pt.Components.NSelect2 {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
-}(window, jQuery, React, $pt));
+}(window, jQuery, React, ReactDOM, $pt));

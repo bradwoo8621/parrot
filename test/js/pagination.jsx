@@ -16,5 +16,5 @@
             <NPagination pageCount={10} currentPageIndex={6} toPage={toPage} showStatus={false}/>
         </div>
     </div>);
-    React.render(panel, document.getElementById('main'));
+    ReactDOM.render(panel, document.getElementById('main'));
 })();
