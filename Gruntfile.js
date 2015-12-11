@@ -3,9 +3,11 @@ module.exports = function(grunt) {
 	grunt
 		.initConfig({
 			pkg: grunt.file.readJSON('package.json'),
+			sourcePath: 'src',
 			targetPath: 'target',
 			middlePath: 'intermediate',
 			bowerPath: 'bower_components',
+			nodeModulePath: 'node_modules',
 			clean: {
 				all: ['<%= targetPath %>/parrot/', '<%= middlePath %>'],
 				mid: ['<%= middlePath %>'],
@@ -169,200 +171,204 @@ module.exports = function(grunt) {
 				fonts: {
 					files: [{
 						expand: true,
-						cwd: 'src/fonts/',
+						cwd: '<%= sourcePath %>/fonts/',
 						src: ['**'],
 						dest: '<%= targetPath %>/fonts/'
 					}]
 				},
-				// copy bower dependencies
-				'bower-dependency': {
-					files: [
-						// bootstrap3
-						{
-							expand: true,
-							cwd: '<%= bowerPath %>/bootstrap/dist/',
-							src: ['**/*', '!**/npm.js'],
-							dest: '<%= targetPath %>/bootstrap3/'
-						},
-						// bootstrap3 ie10 viewport bug workaround
-						{
-							expand: true,
-							cwd: '<%= bowerPath %>/bootstrap3-ie10-viewport-bug-workaround/',
-							src: ['ie10-viewport-bug-workaround.js'],
-							dest: '<%= targetPath %>/bootstrap3/js/'
-						},
-						// bootstrap datetime picker
-						{
-							expand: true,
-							cwd: '<%= bowerPath %>/eonasdan-bootstrap-datetimepicker/src/js/',
-							src: ['bootstrap-datetimepicker.js'],
-							dest: '<%= targetPath %>/bootstrap3/js/'
-						},
-						{
-							expand: true,
-							cwd: '<%= bowerPath %>/eonasdan-bootstrap-datetimepicker/build/',
-							src: ['**/*'],
-							dest: '<%= targetPath %>/bootstrap3/'
-						},
-						// bootstrap file-input
-						{
-							expand: true,
-							cwd: '<%= bowerPath %>/bootstrap-fileinput/js/',
-							src: ['fileinput.js', 'fileinput.min.js'],
-							dest: '<%= targetPath %>/bootstrap3/js/'
-						},
-						{
-							expand: true,
-							cwd: '<%= bowerPath %>/bootstrap-fileinput/js/',
-							src: ['fileinput_*.js'],
-							dest: '<%= targetPath %>/bootstrap3/js/file-input/'
-						},
-						{
-							expand: true,
-							cwd: '<%= bowerPath %>/bootstrap-fileinput/css/',
-							src: ['*.css'],
-							dest: '<%= targetPath %>/bootstrap3/css/'
-						},
-						{
-							expand: true,
-							cwd: '<%= bowerPath %>/bootstrap-fileinput/img/',
-							src: ['*.gif'],
-							dest: '<%= targetPath %>/bootstrap3/img/'
-						},
-						// es5-shim
-						{
-							expand: true,
-							cwd: '<%= bowerPath %>/es5-shim/',
-							src: ['*.js', '*.map'],
-							dest: '<%= targetPath %>/es5-shim/'
-						},
-						// html5shiv
-						{
-							expand: true,
-							cwd: '<%= bowerPath %>/html5shiv/dist/',
-							src: ['*.js'],
-							dest: '<%= targetPath %>/html5shiv/'
-						},
-						// jquery
-						{
-							expand: true,
-							cwd: '<%= bowerPath %>/jquery/dist/',
-							src: ['*.js', '*.map'],
-							dest: '<%= targetPath %>/jquery/'
-						},
-						// jquery mousewheel
-						{
-							expand: true,
-							cwd: '<%= bowerPath %>/jquery-mousewheel',
-							src: ['*.js', '*.map'],
-							dest: '<%= targetPath %>/jquery/'
-						},
-						// jquery brower
-						{
-							expand: true,
-							cwd: '<%= bowerPath %>/jquery.browser/dist/',
-							src: ['*.js'],
-							dest: '<%= targetPath %>/jquery/'
-						},
-						// jquery mockjax
-						{
-							expand: true,
-							cwd: '<%= bowerPath %>/jquery-mockjax/dist/',
-							src: ['*.js'],
-							dest: '<%= targetPath %>/jquery/'
-						},
-						// jquery deparam
-						{
-							expand: true,
-							cwd: '<%= bowerPath %>/jquery-deparam/',
-							src: ['jquery-deparam.js'],
-							dest: '<%= targetPath %>/jquery/'
-						},
-						// jquery storage api
-						{
-							expand: true,
-							cwd: '<%= bowerPath %>/jQuery-Storage-API/',
-							src: ['*.js'],
-							dest: '<%= targetPath %>/jquery/'
-						},
-						// jsface
-						{
-							expand: true,
-							cwd: '<%= bowerPath %>/jsface/',
-							src: ['*.js'],
-							dest: '<%= targetPath %>/jsface/'
-						},
-						// moment
-						{
-							expand: true,
-							cwd: '<%= bowerPath %>/moment/min/',
-							src: ['moment-with-locales.js', 'moment-with-locales.min.js'],
-							dest: '<%= targetPath %>/moment/'
-						},
-						// moment-taiwan
-						{
-							expand: true,
-							cwd: '<%= bowerPath %>/moment-taiwan/target/',
-							src: ['**'],
-							dest: '<%= targetPath %>/moment/'
-						},
-						// react
-						{
-							expand: true,
-							cwd: '<%= bowerPath %>/react/',
-							src: ['JSXTransformer.js', 'react-with-addons.js', 'react-with-addons.min.js'],
-							dest: '<%= targetPath %>/react/'
-						},
-						// react bootstrap
-						{
-							expand: true,
-							cwd: '<%= bowerPath %>/react-bootstrap/',
-							src: ['**/*.js', '**/*.map'],
-							dest: '<%= targetPath %>/react-bootstrap/'
-						},
-						// respond
-						{
-							expand: true,
-							cwd: '<%= bowerPath %>/Respond/dest/',
-							src: ['respond.matchmedia.addListener.min.js', 'respond.min.js'],
-							dest: '<%= targetPath %>/respond/'
-						},
-						{
-							src: ['<%= bowerPath %>/Respond/dest/respond.matchmedia.addListener.src.js'],
-							dest: '<%= targetPath %>/respond/respond.matchmedia.addListener.js'
-						},
-						{
-							src: ['<%= bowerPath %>/Respond/dest/respond.src.js'],
-							dest: '<%= targetPath %>/respond/respond.js'
-						},
-						// select2
-						{
-							expand: true,
-							cwd: '<%= bowerPath %>/select2/dist/',
-							src: ['**/*'],
-							dest: '<%= targetPath %>/select2/'
-						},
-						// font awesome
-						{
-							expand: true,
-							cwd: '<%= bowerPath %>/fontawesome/css/',
-							src: ['**/*'],
-							dest: '<%= targetPath %>/fontawesome/css/'
-						},
-						{
-							expand: true,
-							cwd: '<%= bowerPath %>/fontawesome/fonts/',
-							src: ['**/*'],
-							dest: '<%= targetPath %>/fontawesome/fonts/'
-						},
-						// js-cookie
-						{
-							expand: true,
-							cwd: '<%= bowerPath %>/js-cookie/src/',
-							src: ['*.js'],
-							dest: '<%= targetPath %>/js-cookie/'
-						}
-					]
+				bootstrap: {
+					files: [{
+						expand: true,
+						cwd: '<%= nodeModulePath %>/bootstrap/dist/',
+						src: ['**/*', '!**/npm.js'],
+						dest: '<%= targetPath %>/bootstrap3/'
+					}]
+				},
+				ie10_viewport: {
+					files: [{
+						expand: true,
+						cwd: '<%= bowerPath %>/bootstrap3-ie10-viewport-bug-workaround/',
+						src: ['ie10-viewport-bug-workaround.js'],
+						dest: '<%= targetPath %>/bootstrap3/js/'
+					}]
+				},
+				bootstrap_datetime_picker: {
+					files: [{
+						expand: true,
+						cwd: '<%= nodeModulePath %>/eonasdan-bootstrap-datetimepicker/src/js/',
+						src: ['bootstrap-datetimepicker.js'],
+						dest: '<%= targetPath %>/bootstrap3/js/'
+					}, {
+						expand: true,
+						cwd: '<%= nodeModulePath %>/eonasdan-bootstrap-datetimepicker/build/',
+						src: ['**/*'],
+						dest: '<%= targetPath %>/bootstrap3/'
+					}]
+				},
+				bootstrap_fileinput: {
+					files: [{
+						expand: true,
+						cwd: '<%= nodeModulePath %>/bootstrap-fileinput/js/',
+						src: ['fileinput.js', 'fileinput.min.js'],
+						dest: '<%= targetPath %>/bootstrap3/js/'
+					}, {
+						expand: true,
+						cwd: '<%= nodeModulePath %>/bootstrap-fileinput/js/',
+						src: ['fileinput_*.js'],
+						dest: '<%= targetPath %>/bootstrap3/js/file-input/'
+					}, {
+						expand: true,
+						cwd: '<%= nodeModulePath %>/bootstrap-fileinput/css/',
+						src: ['*.css'],
+						dest: '<%= targetPath %>/bootstrap3/css/'
+					}, {
+						expand: true,
+						cwd: '<%= nodeModulePath %>/bootstrap-fileinput/img/',
+						src: ['*.gif'],
+						dest: '<%= targetPath %>/bootstrap3/img/'
+					}]
+				},
+				font_awesome: {
+					files: [{
+						expand: true,
+						cwd: '<%= nodeModulePath %>/font-awesome/css/',
+						src: ['**/*'],
+						dest: '<%= targetPath %>/fontawesome/css/'
+					},
+					{
+						expand: true,
+						cwd: '<%= nodeModulePath %>/font-awesome/fonts/',
+						src: ['**/*'],
+						dest: '<%= targetPath %>/font-awesome/fonts/'
+					}]
+				},
+				es5_shim: {
+					files: [{
+						expand: true,
+						cwd: '<%= nodeModulePath %>/es5-shim/',
+						src: ['*.js', '*.map'],
+						dest: '<%= targetPath %>/es5-shim/'
+					}]
+				},
+				html5_shiv: {
+					files: [{
+						expand: true,
+						cwd: '<%= nodeModulePath %>/html5shiv/dist/',
+						src: ['*.js'],
+						dest: '<%= targetPath %>/html5shiv/'
+					}]
+				},
+				jquery: {
+					files: [{
+						expand: true,
+						cwd: '<%= nodeModulePath %>/jquery/dist/',
+						src: ['*.js', '*.map'],
+						dest: '<%= targetPath %>/jquery/'
+					}]
+				},
+				jquery_browser: {
+					files: [{
+						expand: true,
+						cwd: '<%= nodeModulePath %>/jquery.browser/dist/',
+						src: ['*.js'],
+						dest: '<%= targetPath %>/jquery/'
+					}]
+				},
+				jquery_deparam: {
+					files: [{
+						expand: true,
+						cwd: '<%= nodeModulePath %>/jquery-deparam/',
+						src: ['jquery-deparam.js'],
+						dest: '<%= targetPath %>/jquery/'
+					}]
+				},
+				jquery_mockjax: {
+					files: [{
+						expand: true,
+						cwd: '<%= nodeModulePath %>/jquery-mockjax/dist/',
+						src: ['*.js'],
+						dest: '<%= targetPath %>/jquery/'
+					}]
+				},
+				jquery_mousewheel: {
+					files: [{
+						expand: true,
+						cwd: '<%= nodeModulePath %>/jquery-mousewheel',
+						src: ['*.js', '*.map'],
+						dest: '<%= targetPath %>/jquery/'
+					}]
+				},
+				jquery_storage_api: {
+					files: [{
+						expand: true,
+						cwd: '<%= nodeModulePath %>/jquery-storage-api/',
+						src: ['*.js'],
+						dest: '<%= targetPath %>/jquery/'
+					}]
+				},
+				js_cookie: {
+					files: [{
+						expand: true,
+						cwd: '<%= nodeModulePath %>/js-cookie/src/',
+						src: ['*.js'],
+						dest: '<%= targetPath %>/js-cookie/'
+					}]
+				},
+				jsface: {
+					files: [{
+						expand: true,
+						cwd: '<%= nodeModulePath %>/jsface/',
+						src: ['j*.js'],
+						dest: '<%= targetPath %>/jsface/'
+					}]
+				},
+				moment: {
+					files: [{
+						expand: true,
+						cwd: '<%= nodeModulePath %>/moment/min/',
+						src: ['moment-with-locales.js', 'moment-with-locales.min.js'],
+						dest: '<%= targetPath %>/moment/'
+					}]
+				},
+				moment_taiwan: {
+					files: [{
+						expand: true,
+						cwd: '<%= nodeModulePath %>/moment-taiwan/target/',
+						src: ['**'],
+						dest: '<%= targetPath %>/moment/'
+					}]
+				},
+				react: {
+					files: [{
+						expand: true,
+						cwd: '<%= nodeModulePath %>/react/dist/',
+						src: ['JSXTransformer.js', 'react-with-addons.js', 'react-with-addons.min.js'],
+						dest: '<%= targetPath %>/react/'
+					}]
+				},
+				respond_js: {
+					files: [{
+						expand: true,
+						cwd: '<%= nodeModulePath %>/respond.js/dest/',
+						src: ['respond.matchmedia.addListener.min.js', 'respond.min.js'],
+						dest: '<%= targetPath %>/respond/'
+					},
+					{
+						src: ['<%= nodeModulePath %>/respond.js/dest/respond.matchmedia.addListener.src.js'],
+						dest: '<%= targetPath %>/respond/respond.matchmedia.addListener.js'
+					},
+					{
+						src: ['<%= nodeModulePath %>/respond.js/dest/respond.src.js'],
+						dest: '<%= targetPath %>/respond/respond.js'
+					}]
+				},
+				select2: {
+					files: [{
+						expand: true,
+						cwd: '<%= nodeModulePath %>/select2/dist/',
+						src: ['**/*'],
+						dest: '<%= targetPath %>/select2/'
+					}]
 				},
 				'parrot-min-css-pre': {
 					files: [
@@ -413,7 +419,7 @@ module.exports = function(grunt) {
 					files: [
 						{
 							expand: true,
-							cwd: '<%= bowerPath %>/bootswatch/',
+							cwd: '<%= nodeModulePath %>/bootswatch/',
 							src: '**/bootstrap.css',
 							dest: '<%= middlePath %>/bootswatch/original/',
 							rename: function(dest, src) {
@@ -473,13 +479,24 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-replace');
 
 	// copy bower files to target
-	grunt.registerTask('bower-copy', ['copy:bower-dependency']);
-	grunt.registerTask('js-compile', ['react:parrot', 'jshint:parrot', 'concat:parrot', 'uglify:parrot']);
+	grunt.registerTask('dependency-copy',
+		['copy:bootstrap', 'copy:ie10_viewport', 'copy:bootstrap_datetime_picker', 'copy:bootstrap_fileinput',
+			'copy:font_awesome',
+			'copy:es5_shim',
+			'copy:html5_shiv',
+			'copy:jquery', 'copy:jquery_browser', 'copy:jquery_deparam', 'copy:jquery_mockjax', 'copy:jquery_mousewheel', 'copy:jquery_storage_api',
+			'copy:jsface',
+			'copy:js_cookie',
+			'copy:moment', 'copy:moment_taiwan',
+			'copy:react',
+			'copy:respond_js',
+			'copy:select2']);
+	grunt.registerTask('parrot-browser-compile', ['react:parrot', 'jshint:parrot', 'concat:parrot', 'uglify:parrot']);
 	grunt.registerTask('bootswatch', ['copy:bootswatch-pre', 'replace:bootswatch', 'cssmin:bootswatch', 'copy:bootswatch-post']);
 	grunt.registerTask('css-parrot', ['less:parrot', 'copy:parrot-min-css-pre', 'cssmin:parrot', 'copy:parrot-min-css-post', 'copy:parrot-css']);
 	grunt.registerTask('css-compile', ['bootswatch', 'css-parrot']);
-	grunt.registerTask('deploy', ['clean:all', 'bower-copy', 'js-compile', 'module', 'css-compile', 'copy:fonts', 'clean:mid']);
+	grunt.registerTask('deploy', ['clean:all', 'dependency-copy', 'parrot-browser-compile', 'module', 'css-compile', 'copy:fonts', 'clean:mid']);
 	grunt.registerTask('module', ['replace:module', 'uglify:module']);
-	grunt.registerTask('default', ['clean:compile', 'js-compile', 'module', 'css-parrot', 'clean:mid']);
+	grunt.registerTask('default', ['clean:compile', 'parrot-browser-compile', 'module', 'css-parrot', 'clean:mid']);
 	grunt.registerTask('test', ['nodeunit']);
 };

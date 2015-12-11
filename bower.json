@@ -1,11 +1,11 @@
 {
     "name": "parrot",
-    "version": "0.0.4",
+    "version": "0.1.0",
     "authors": [
         "brad.wu <bradwoo8621@gmail.com>"
     ],
     "description": "Fast form render tools build on reactjs",
-    "main": "target/parrot/js/com.github.nest.parrot.js",
+    "main": "target/parrot/js/nest-parrot.js",
     "keywords": [
         "form",
         "fast",
@@ -14,31 +14,30 @@
     "license": "MIT",
     "homepage": "https://bradwoo8621.github.io/parrot",
     "dependencies": {
-        "bootstrap": "3.3.5",
-        "bootstrap-fileinput": "4.2.7",
-        "bootswatch": "3.3.5",
-        "fontawesome": "4.4.0",
-        "jquery": "2.1.4",
-        "jsface": "2.4.6",
-        "moment": "2.10.6",
+        "bootstrap": "^3.3.6",
+        "bootstrap-fileinput": "^4.2.8",
+        "bootswatch": "^3.3.6",
+        "font-awesome": "^4.5.0",
+        "jquery": "^2.1.4",
+        "jquery-deparam": "^0.4.2",
+        "jquery.browser": "^0.1.0",
+        "jquery-mousewheel": "^3.1.13",
+        "jsface": "^2.4.9",
         "react": "0.13.3",
-        "jquery.browser": "0.0.6",
-        "jquery-deparam": "0.3.0",
-        "jquery-mousewheel": "3.1.13"
+        "moment": "^2.10.6"
     },
     "devDependencies": {
         "bootstrap3-ie10-viewport-bug-workaround": "1.0.0",
-        "classnames":"2.1.2",
-        "es5-shim": "4.1.7",
-        "html5shiv": "3.7.2",
-        "jquery-mockjax": "2.0.1",
-        "jQuery-Storage-API": "1.7.4",
-        "js-cookie": "2.0.3",
-        "moment-taiwan": "0.0.1",
-        "Respond": "1.4.2",
-        "eonasdan-bootstrap-datetimepicker": "4.15.35",
-        "react-bootstrap": "0.23.6",
-        "select2": "4.0.0"
+        "classnames": "^2.2.1",
+        "eonasdan-bootstrap-datetimepicker": "^4.15.35",
+        "es5-shim": "^4.3.1",
+        "html5shiv": "^3.7.3",
+        "jquery-mockjax": "^2.0.1",
+        "jquery-storage-api": "^1.7.5",
+        "js-cookie": "^2.0.4",
+        "moment-taiwan": "0.0.3",
+        "respond.js": "^1.4.2",
+        "select2": "^4.0.1"
     },
     "ignore": [
         "test",
