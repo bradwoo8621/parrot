@@ -150,7 +150,7 @@
 				$(document).on('keyup', this.onDocumentKeyUp);
 			}
 		},
-		componentDidUnmount: function() {
+		componentWillUnmount: function() {
 			this.stopDraggable();
 			if (this.isDialogCloseShown()) {
 				$(document).off('keyup', this.onDocumentKeyUp);
