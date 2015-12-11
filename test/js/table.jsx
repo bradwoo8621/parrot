@@ -423,7 +423,9 @@
                     var table = $pt.LayoutHelper.getComponent('test');
                     var columns = this.getComponentOption("columns");
                     columns.splice(0, 1);
-                    table.clearColumnsDefinition();
+                    table.forEach(function(table){
+                        table.clearColumnsDefinition();    
+                    })
                 },
                 enabled: {
                     depends: 'name',

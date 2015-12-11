@@ -435,6 +435,14 @@ input[type=tel].form-control[disabled] {
 .badge {
   padding: 3px 7px;
 }
+.btn-link:hover,
+.btn-link:active:hover {
+  background-color: transparent;
+}
+.btn-link:active {
+  background-color: transparent;
+  background-image: none;
+}
 .modal-content .modal-header {
   padding-top: 10px;
   padding-bottom: 10px;
@@ -2311,6 +2319,20 @@ div.n-button a.btn.disabled {
 div.n-button a.btn.btn-default:hover,
 div.n-button a.btn.btn-default:focus {
   border-color: #e0e0e0;
+}
+div.n-button a.btn.btn-link,
+div.n-button a.btn.btn-link:hover,
+div.n-button a.btn.btn-link:active,
+div.n-button a.btn.btn-link:active:hover,
+div.n-button a.btn.btn-link:active:focus,
+div.n-button a.btn.btn-link:active:focus:hover,
+div.n-button a.btn.btn-link:focus,
+div.n-button a.btn.btn-link:focus:hover {
+  box-shadow: none;
+  -o-box-shadow: none;
+  -webkit-box-shadow: none;
+  background-color: transparent;
+  background-image: none;
 }
 div.n-button.n-disabled {
   cursor: not-allowed;

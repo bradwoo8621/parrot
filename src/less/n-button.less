@@ -61,6 +61,20 @@ div.n-button {
 				border-color: @border-color;
 			}
 		}
+		&.btn-link,
+		&.btn-link:hover,
+		&.btn-link:active,
+		&.btn-link:active:hover,
+		&.btn-link:active:focus,
+		&.btn-link:active:focus:hover,
+		&.btn-link:focus,
+		&.btn-link:focus:hover {
+			box-shadow: none;
+			-o-box-shadow: none;
+			-webkit-box-shadow: none;
+			background-color: transparent;
+			background-image: none;
+		}
 	}
 	&.n-disabled {
 		cursor: @disabled-cursor;

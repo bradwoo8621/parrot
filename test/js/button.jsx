@@ -20,6 +20,15 @@
         },
         pos: {row: 1, col: 1}
     });
+    var linkIconButton = $pt.createCellLayout('name', {
+        label: 'Click me',
+        comp: {
+            type: $pt.ComponentConstants.Button,
+            icon: 'pencil',
+            style: 'link'
+        },
+        pos: {row: 1, col: 1}
+    });
     var primaryIconButton = $pt.createCellLayout('name', {
         label: 'Click me',
         comp: {
@@ -92,6 +101,21 @@
                 depends: 'name'
             },
             icon: 'pencil'
+        },
+        pos: {row: 1, col: 1}
+    });
+    var disabledLinkIconButton = $pt.createCellLayout('name', {
+        label: 'Click me',
+        comp: {
+            type: $pt.ComponentConstants.Button,
+            enabled: {
+                when: function () {
+                    return false;
+                },
+                depends: 'name'
+            },
+            icon: 'pencil',
+            style: 'link'
         },
         pos: {row: 1, col: 1}
     });
@@ -180,6 +204,8 @@
             <NFormButton model={model} layout={button}/>
             <span>Icon Button</span>
             <NFormButton model={model} layout={iconButton}/>
+            <span>Link Icon Button</span>
+            <NFormButton model={model} layout={linkIconButton}/>
             <span>Primary Icon Button</span>
             <NFormButton model={model} layout={primaryIconButton}/>
             <span>Danger Icon Button</span>
@@ -196,6 +222,8 @@
             <NFormButton model={model} layout={disabledButton}/>
             <span>Disabled Icon Button</span>
             <NFormButton model={model} layout={disabledIconButton}/>
+            <span>Disabled Link Icon Button</span>
+            <NFormButton model={model} layout={disabledLinkIconButton}/>
             <span>Disabled Primary Icon Button</span>
             <NFormButton model={model} layout={disabledPrimaryIconButton}/>
             <span>Disabled Danger Icon Button</span>
