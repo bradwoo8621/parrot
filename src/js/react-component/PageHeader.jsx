@@ -176,6 +176,7 @@
 						<div className="collapse navbar-collapse" id="navbar-1">
 							{this.props.menus ? this.renderMenus() : null}
 							{this.props.search ? this.renderSearchBox() : null}
+							{this.props.custom ? this.props.custom.call(this) : null}
 						</div>
 					</div>
 				</nav>
