@@ -1888,7 +1888,7 @@ table.n-table tbody tr.even.has-error {
   right: 15px;
 }
 .n-table-op-btn-popover.popover.bottom .popover-content {
-  padding: 5px;
+  padding: 5px 5px 0;
   margin-bottom: -5px;
 }
 .n-table-op-btn-popover.popover.bottom .popover-content .n-button.n-table-op-btn {
@@ -1918,6 +1918,9 @@ table.n-table tbody tr.even.has-error {
   -webkit-box-shadow: none;
   -o-box-shadow: none;
   color: #9f9f9f;
+}
+.n-table-op-btn-popover.popover.bottom .popover-content ul.nav {
+  padding-bottom: 5px;
 }
 .n-table-op-btn-popover.popover.bottom .popover-content ul.nav li {
   line-height: 1.5;

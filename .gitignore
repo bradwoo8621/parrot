@@ -2,8 +2,8 @@
 /.project
 /.idea/
 /temp-test/
-/bower_components/
-/node_modules/
+/bower_components
+/node_modules
 /src/fonts
 /target/bootstrap3
 /target/es5-shim

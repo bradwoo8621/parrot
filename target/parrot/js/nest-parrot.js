@@ -1,4 +1,4 @@
-/** nest-parrot.V0.1.0 2015-12-11 */
+/** nest-parrot.V0.1.0 2015-12-14 */
 (function (window, $, browser) {
 	var patches = {
 		console: function () {
@@ -14145,6 +14145,7 @@
 			);
 		},
 		renderPopoverAsIcon: function (moreOperations, rowModel) {
+			var _this = this;
 			return moreOperations.map(function (operation, operationIndex) {
 				return _this.renderRowOperationButton(operation, rowModel, operationIndex);
 			});

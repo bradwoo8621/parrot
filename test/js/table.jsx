@@ -415,7 +415,7 @@
                     }
                 }
             }, {
-                // icon: 'hand-paper-o',
+                icon: 'hand-paper-o',
                 tooltip: 'Hand',
                 view: 'edit',
                 click: function(row) {
@@ -424,7 +424,7 @@
                     var columns = this.getComponentOption("columns");
                     columns.splice(0, 1);
                     table.forEach(function(table){
-                        table.clearColumnsDefinition();    
+                        table.clearColumnsDefinition();
                     })
                 },
                 enabled: {

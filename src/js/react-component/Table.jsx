@@ -689,6 +689,7 @@
 			return (<ul className='nav'>{moreOperations.map(renderOperation)}</ul>);
 		},
 		renderPopoverAsIcon: function(moreOperations, rowModel) {
+			var _this = this;
 			return moreOperations.map(function(operation, operationIndex) {
 				return _this.renderRowOperationButton(operation, rowModel, operationIndex);
 			});
