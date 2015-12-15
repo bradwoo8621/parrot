@@ -8,7 +8,7 @@
 			var console = window.console = window.console || {};
 
 			while (length--) {
-				method = methods[length];
+				var method = methods[length];
 
 				// Only stub undefined methods.
 				if (!console[method]) {
@@ -3263,9 +3263,10 @@
 		/**
    * get option
    * @param key
+   * @param defaultValue
    */
-		getComponentOption: function (key) {
-			var option = this.getLayout().getComponentOption(key);
+		getComponentOption: function (key, defaultValue) {
+			var option = this.getLayout().getComponentOption(key, defaultValue);
 			if (option == null && this.props.defaultOptions != null) {
 				option = this.props.defaultOptions[key];
 			}
