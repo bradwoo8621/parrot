@@ -5,7 +5,7 @@
 		var parties = [
 			{name: 'JQuery', url: 'https://jquery.com/'},
 			{name: 'JQuery MouseWheel', url: 'https://github.com/jquery/jquery-mousewheel'},
-			{name: 'JQuery Browser', url: 'https://github.com/gabceb/jquery-browser-plugin'},
+			{name: 'JQuery Browser (Not Used Now)', url: 'https://github.com/gabceb/jquery-browser-plugin'},
 			{name: 'JQuery Mockjax (Optional)', url: 'https://github.com/jakerella/jquery-mockjax'},
 			{name: 'JQuery Deparam (Only in URL API)', url: 'https://github.com/AceMetrix/jquery-deparam'},
 			{name: 'JQuery Storage API (Not Used Now)', url: 'https://github.com/julien-maurel/jQuery-Storage-API'},

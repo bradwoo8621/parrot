@@ -19,9 +19,6 @@ function propagateToGlobal (window) {
 global.jQuery = global.$ = require('jquery');
 console.log('jQuery loaded: ' + (global.jQuery != null && global.jQuery === jQuery));
 
-require('jquery.browser');
-console.log('jQuery.browser loaded: ' + (jQuery.browser != null));
-
 require('jquery-deparam');
 console.log('jQuery-deparam loaded: ' + (jQuery.deparam != null));
 

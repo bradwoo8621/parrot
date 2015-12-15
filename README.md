@@ -24,7 +24,6 @@ See wiki for [Version History](https://github.com/bradwoo8621/parrot/wiki/Versio
 
 <script src="path/to/jquery.min.js"></script>
 <script src="path/to/jquery.mousewheel.min.js"></script>
-<script src="path/to/jquery.browser.min.js"></script>
 <script src="path/to/jquery-deparam.min.js"></script>
 <script src="path/to/bootstrap.min.js"></script>
 <script src="path/to/ie10-viewport-bug-workaround.js"></script>
@@ -56,7 +55,6 @@ function propagateToGlobal (window) {
 }
 
 global.jQuery = global.$ = require('jquery');
-require('jquery.browser');
 require('jquery-deparam');
 require('jquery-mousewheel')(jQuery);
 require('bootstrap');

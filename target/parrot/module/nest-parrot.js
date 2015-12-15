@@ -29,26 +29,24 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.1.0 2015-12-14 */
-(function (window, $, browser) {
+	/** nest-parrot.V0.1.0 2015-12-15 */
+(function (window) {
 	var patches = {
 		console: function () {
-			if (browser && browser.msie && browser.versionNumber <= 10) {
-				var method;
-				var noop = function () {};
-				var methods = ['assert', 'clear', 'count', 'debug', 'dir', 'dirxml', 'error', 'exception', 'group', 'groupCollapsed', 'groupEnd', 'info', 'log', 'markTimeline', 'profile', 'profileEnd', 'table', 'time', 'timeEnd', 'timeStamp', 'trace', 'warn'];
-				var length = methods.length;
-				var console = window.console = window.console || {};
+			var noop = function () {};
+			var methods = ['assert', 'clear', 'count', 'debug', 'dir', 'dirxml', 'error', 'exception', 'group', 'groupCollapsed', 'groupEnd', 'info', 'log', 'markTimeline', 'profile', 'profileEnd', 'table', 'time', 'timeEnd', 'timeStamp', 'trace', 'warn'];
+			var length = methods.length;
+			var console = window.console = window.console || {};
 
-				while (length--) {
-					method = methods[length];
+			while (length--) {
+				method = methods[length];
 
-					// Only stub undefined methods.
-					if (!console[method]) {
-						console[method] = noop;
-					}
+				// Only stub undefined methods.
+				if (!console[method]) {
+					console[method] = noop;
 				}
 			}
+			window.console = window.console ? window.console : console;
 		},
 		string: function () {
 			if (String.prototype.upperFirst === undefined) {
@@ -253,7 +251,7 @@
 	patches.string();
 	patches.number();
 	patches.array();
-})(window, jQuery, jQuery.browser);
+})(window);
 
 (function (window) {
 	var $pt = window.$pt;
