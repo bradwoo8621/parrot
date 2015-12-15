@@ -318,34 +318,14 @@
 					return operation.view != 'view';
 				}
 			});
-			var hasUserDefinedRowOperations = rowOperations.length != 0;
-			if (editable || removable || hasUserDefinedRowOperations) {
+			if (editable || removable || rowOperations.length != 0) {
 				config = {
 					editable: editable,
 					removable: removable,
 					rowOperations: rowOperations,
-					title: ""
+					title: "",
+					width: this.calcOperationColumnWidth(editable, removable, rowOperations)
 				};
-				var maxButtonCount = this.getComponentOption('maxOperationButtonCount');
-				if (maxButtonCount) {
-					var actualButtonCount = (config.editable ? 1 : 0) + (config.removable ? 1: 0) + rowOperations.length;
-					if (maxButtonCount > actualButtonCount) {
-						// no button in popover
-						config.width = (config.editable ? NTable.__operationButtonWidth : 0) + (config.removable ? NTable.__operationButtonWidth : 0);
-						if (hasUserDefinedRowOperations) {
-							config.width += NTable.__operationButtonWidth * config.rowOperations.length;
-						}
-					} else {
-						// still some buttons in popover
-						config.width = (maxButtonCount + 1) * NTable.__operationButtonWidth;
-					}
-				} else {
-					config.width = (config.editable ? NTable.__operationButtonWidth : 0) + (config.removable ? NTable.__operationButtonWidth : 0);
-					if (hasUserDefinedRowOperations) {
-						config.width += NTable.__operationButtonWidth * config.rowOperations.length;
-					}
-				}
-				config.width = config.width < NTable.__minOperationButtonWidth ? NTable.__minOperationButtonWidth : config.width;
 				this.state.columns.push(config);
 				if (this.fixedRightColumns > 0 || this.getComponentOption("operationFixed") === true) {
 					this.fixedRightColumns++;
@@ -377,6 +357,33 @@
 					this.fixedLeftColumns++;
 				}
 			}
+		},
+		calcOperationColumnWidth: function(editable, removable, rowOperations) {
+			var width = this.getComponentOption('operationColumnWidth');
+			if (width != null) {
+				return width;
+			}
+
+			var maxButtonCount = this.getComponentOption('maxOperationButtonCount');
+			if (maxButtonCount) {
+				var actualButtonCount = (editable ? 1 : 0) + (removable ? 1: 0) + rowOperations.length;
+				if (maxButtonCount > actualButtonCount) {
+					// no button in popover
+					width = (editable ? NTable.__operationButtonWidth : 0) + (removable ? NTable.__operationButtonWidth : 0);
+					if (rowOperations.length != 0) {
+						width += NTable.__operationButtonWidth * rowOperations.length;
+					}
+				} else {
+					// still some buttons in popover
+					width = (maxButtonCount + 1) * NTable.__operationButtonWidth;
+				}
+			} else {
+				width = (editable ? NTable.__operationButtonWidth : 0) + (removable ? NTable.__operationButtonWidth : 0);
+				if (rowOperations.length != 0) {
+					width += NTable.__operationButtonWidth * rowOperations.length;
+				}
+			}
+			return width < NTable.__minOperationButtonWidth ? NTable.__minOperationButtonWidth : width;
 		},
 		/**
 		 * render search  box
@@ -607,6 +614,7 @@
 		},
 		renderRowOperationButton: function(operation, rowModel, operationIndex) {
 			var layout = $pt.createCellLayout('rowButton', {
+				label: operation.icon ? null : operation.tooltip,
 				comp: {
 					style: 'link',
 					icon: operation.icon,

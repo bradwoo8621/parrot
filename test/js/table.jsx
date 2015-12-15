@@ -401,12 +401,25 @@
     }));
     var dropdown = $pt.createCellLayout('table', $.extend(true, {}, layoutTemplate, {
         comp: {
-            maxOperationButtonCount: 1,
+            maxOperationButtonCount: 2,
+            operationColumnWidth: 200,
             rowOperations: [{
-                icon: 'cart-plus',
+                // icon: 'cart-plus',
                 tooltip: 'Cart',
                 click: function(row) {
                     alert('Row Clicked, add [' + row.name + '] to cart.');
+                },
+                enabled: {
+                    depends: 'name',
+                    when: function(row) {
+                        return row.get('name') != 'abc';
+                    }
+                }
+            }, {
+                icon: 'cart-plus',
+                tooltip: 'Cart 2',
+                click: function(row) {
+                    alert('Row Clicked, add [' + row.name + '] to cart 2.');
                 },
                 enabled: {
                     depends: 'name',
