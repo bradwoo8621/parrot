@@ -9,7 +9,7 @@
 		},
 		propTypes: {
 			// brand string
-			brand: React.PropTypes.string.isRequired,
+			brand: React.PropTypes.oneOfType([React.PropTypes.object, React.PropTypes.string]).isRequired,
 			brandUrl: React.PropTypes.string,
 			brandFunc: React.PropTypes.func,
 			// menu object

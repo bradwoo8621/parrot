@@ -1,4 +1,4 @@
-/** nest-parrot.V0.1.0 2015-12-15 */
+/** nest-parrot.V0.1.0 2015-12-18 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -9623,7 +9623,7 @@
 		},
 		propTypes: {
 			// brand string
-			brand: React.PropTypes.string.isRequired,
+			brand: React.PropTypes.oneOfType([React.PropTypes.object, React.PropTypes.string]).isRequired,
 			brandUrl: React.PropTypes.string,
 			brandFunc: React.PropTypes.func,
 			// menu object
