@@ -294,9 +294,12 @@
 				css['col-md-' + width] = true;
 				css['col-lg-' + width] = true;
 			} else {
-				css['col-sm-' + (width.sm ? width.sm : width.width)] = true;
-				css['col-md-' + (width.md ? width.md : width.width)] = true;
-				css['col-lg-' + (width.lg ? width.lg : width.width)] = true;
+				Object.keys(width).forEach(function(key) {
+					css['col-' + key + '-' + width[key]] = true;
+				});
+				// css['col-sm-' + (width.sm ? width.sm : width.width)] = true;
+				// css['col-md-' + (width.md ? width.md : width.width)] = true;
+				// css['col-lg-' + (width.lg ? width.lg : width.width)] = true;
 			}
 			return this.getLayout().getCellCSS($pt.LayoutHelper.classSet(css));
 		},
