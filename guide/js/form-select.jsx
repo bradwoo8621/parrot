@@ -143,7 +143,6 @@
 						json: {
 							comp: {
 								allowClear: null,
-								placeholder: null,
 								minimumResultsForSearch: null
 							}
 						}
@@ -160,7 +159,9 @@
 						variable: 'NSelect',
 						json: {
 							statics: {
-								PLACEHOLDER: NSelect.PLACEHOLDER
+								PLACEHOLDER: NSelect.PLACEHOLDER,
+								NO_OPTION_FOUND: 'No Option Found',
+								FILTER_PLACEHOLDER: 'Search...'
 							}
 						}
 					})
