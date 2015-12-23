@@ -72,7 +72,23 @@ module.exports = function(grunt) {
 							dest: '<%= targetPath %>/parrot/module/'
 						}
 					]
-				}
+				},
+				'parrot-css': {
+	                options: {
+	                    patterns: [
+	                        {
+	                            match: /("sources":\[")((.*\/)*)(.*css"\])/,
+	                            replacement: '$1$4'
+	                        }
+	                    ]
+	                },
+	                files: [{
+	                    expand: true,
+	                    cwd: '<%= targetPath %>/parrot/css/',
+	                    src: ['**/*.min.css.map'],
+	                    dest: '<%= targetPath %>/parrot/css/'
+	                }]
+	            }
 			},
 			cssmin: {
 				options: {
@@ -511,7 +527,14 @@ module.exports = function(grunt) {
 			'copy:select2']);
 	grunt.registerTask('parrot-browser-compile', ['babel:parrot', 'jshint:parrot', 'concat:parrot', 'uglify:parrot']);
 	grunt.registerTask('bootswatch', ['copy:bootswatch-pre', 'replace:bootswatch', 'cssmin:bootswatch', 'copy:bootswatch-post']);
-	grunt.registerTask('css-parrot', ['less:parrot', 'copy:parrot-min-css-pre', 'cssmin:parrot', 'copy:parrot-min-css-post', 'copy:parrot-css']);
+	grunt.registerTask('css-parrot', [
+		'less:parrot',
+		'copy:parrot-min-css-pre',
+		'cssmin:parrot',
+		'copy:parrot-min-css-post',
+		'copy:parrot-css',
+		'replace:parrot-css'
+	]);
 	grunt.registerTask('css-compile', ['bootswatch', 'css-parrot']);
 	grunt.registerTask('deploy', ['clean:all', 'dependency-copy', 'parrot-browser-compile', 'module', 'css-compile', 'copy:fonts', 'clean:mid']);
 	grunt.registerTask('module', ['replace:module', 'uglify:module']);
