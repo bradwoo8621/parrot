@@ -1,4 +1,4 @@
-/** nest-parrot.V0.1.1 2015-12-23 */
+/** nest-parrot.V0.1.1 2015-12-24 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -12048,7 +12048,7 @@
 			css[this.getComponentCSS('n-select')] = true;
 			return React.createElement(
 				'div',
-				{ className: $pt.LayoutHelper.classSet(css), tabIndex: '0' },
+				{ className: $pt.LayoutHelper.classSet(css), tabIndex: '0', 'aria-readonly': 'true' },
 				this.renderText(),
 				this.renderNormalLine(),
 				this.renderFocusLine()

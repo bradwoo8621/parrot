@@ -88,6 +88,22 @@ module.exports = function(grunt) {
 	                    src: ['**/*.min.css.map'],
 	                    dest: '<%= targetPath %>/parrot/css/'
 	                }]
+	            },
+				'bootswatch-css': {
+	                options: {
+	                    patterns: [
+	                        {
+	                            match: /("sources":\[")((.*\/)*)(.*css"\])/,
+	                            replacement: '$1$4'
+	                        }
+	                    ]
+	                },
+	                files: [{
+	                    expand: true,
+	                    cwd: '<%= middlePath %>/bootswatch/temp2/',
+	                    src: ['**/*.min.css.map'],
+	                    dest: '<%= middlePath %>/bootswatch/temp2/'
+	                }]
 	            }
 			},
 			cssmin: {
@@ -524,9 +540,20 @@ module.exports = function(grunt) {
 			'copy:moment', 'copy:moment_taiwan',
 			'copy:react',
 			'copy:respond_js',
-			'copy:select2']);
-	grunt.registerTask('parrot-browser-compile', ['babel:parrot', 'jshint:parrot', 'concat:parrot', 'uglify:parrot']);
-	grunt.registerTask('bootswatch', ['copy:bootswatch-pre', 'replace:bootswatch', 'cssmin:bootswatch', 'copy:bootswatch-post']);
+			'copy:select2'
+		]);
+	grunt.registerTask('parrot-browser-compile', [
+		'babel:parrot',
+		'jshint:parrot',
+		'concat:parrot',
+		'uglify:parrot'
+	]);
+	grunt.registerTask('bootswatch', [
+		'copy:bootswatch-pre',
+		'replace:bootswatch',
+		'cssmin:bootswatch',
+		'replace:bootswatch-css',
+		'copy:bootswatch-post']);
 	grunt.registerTask('css-parrot', [
 		'less:parrot',
 		'copy:parrot-min-css-pre',
