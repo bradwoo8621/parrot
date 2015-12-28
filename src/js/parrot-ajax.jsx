@@ -5,6 +5,15 @@
 		window.$pt = $pt;
 	}
 
+	$pt.AjaxConstants = {
+		ContentType: {
+			POST: "application/json; charset=UTF-8",
+			GET: "application/json; charset=UTF-8",
+			DELETE: "application/json; charset=UTF-8",
+			PUT: "application/json; charset=UTF-8"
+		}
+	};
+
 	/**
 	 * submit to server
 	 * @param options {*} same as jquery ajax options, three more properties
@@ -75,10 +84,10 @@
 		return submit($.extend({
 			method: "POST",
 			dataType: "json",
-			contentType: "application/json; charset=UTF-8"
+			contentType: $pt.AjaxConstants.ContentType.POST
 		}, settings, {
 			url: url,
-			data: JSON.stringify(data)
+			data: data
 		}));
 	};
 	/**
@@ -92,10 +101,10 @@
 		return submit($.extend({
 			method: "PUT",
 			dataType: "json",
-			contentType: "application/json; charset=UTF-8"
+			contentType: $pt.AjaxConstants.ContentType.PUT
 		}, settings, {
 			url: url,
-			data: JSON.stringify(data)
+			data: data
 		}));
 	};
 	/**
@@ -109,7 +118,7 @@
 		return submit($.extend({
 			method: "GET",
 			dataType: "json",
-			contentType: "text/plain; charset=UTF-8"
+			contentType: $pt.AjaxConstants.ContentType.GET
 		}, settings, {
 			url: url,
 			data: data
@@ -126,7 +135,7 @@
 		return submit($.extend({
 			method: "DELETE",
 			dataType: "json",
-			contentType: "text/plain; charset=UTF-8"
+			contentType: $pt.AjaxConstants.ContentType.DELETE
 		}, settings, {
 			url: url,
 			data: data

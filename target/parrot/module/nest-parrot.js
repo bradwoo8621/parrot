@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.1.1 2015-12-24 */
+	/** nest-parrot.V0.1.1 2015-12-28 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -369,6 +369,32 @@
 		}
 	};
 
+	(function () {
+		var matched,
+		    userAgent = navigator.userAgent || "";
+
+		// merge jquery.browser here
+		var uaMatch = function (ua) {
+			ua = ua.toLowerCase();
+
+			var match = /(chrome)[ \/]([\w.]+)/.exec(ua) || /(webkit)[ \/]([\w.]+)/.exec(ua) || /(opera)(?:.*version)?[ \/]([\w.]+)/.exec(ua) || /(msie) ([\w.]+)/.exec(ua) || ua.indexOf("compatible") < 0 && /(mozilla)(?:.*? rv:([\w.]+))?/.exec(ua) || [];
+
+			return {
+				browser: match[1] || "",
+				version: match[2] || "0"
+			};
+		};
+		matched = uaMatch(userAgent);
+		$pt.browser = {};
+		if (matched.browser) {
+			$pt.browser[matched.browser] = true;
+			$pt.browser.version = matched.version;
+		}
+		if ($pt.browser.webkit) {
+			$pt.browser.safari = true;
+		}
+	})();
+
 	var _context = window;
 	$pt.getService = function (context, serviceName) {
 		var innerContext = context ? context : _context;
@@ -386,6 +412,15 @@
 		$pt = {};
 		window.$pt = $pt;
 	}
+
+	$pt.AjaxConstants = {
+		ContentType: {
+			POST: "application/json; charset=UTF-8",
+			GET: "application/json; charset=UTF-8",
+			DELETE: "application/json; charset=UTF-8",
+			PUT: "application/json; charset=UTF-8"
+		}
+	};
 
 	/**
   * submit to server
@@ -452,10 +487,10 @@
 		return submit($.extend({
 			method: "POST",
 			dataType: "json",
-			contentType: "application/json; charset=UTF-8"
+			contentType: $pt.AjaxConstants.ContentType.POST
 		}, settings, {
 			url: url,
-			data: JSON.stringify(data)
+			data: data
 		}));
 	};
 	/**
@@ -469,10 +504,10 @@
 		return submit($.extend({
 			method: "PUT",
 			dataType: "json",
-			contentType: "application/json; charset=UTF-8"
+			contentType: $pt.AjaxConstants.ContentType.PUT
 		}, settings, {
 			url: url,
-			data: JSON.stringify(data)
+			data: data
 		}));
 	};
 	/**
@@ -486,7 +521,7 @@
 		return submit($.extend({
 			method: "GET",
 			dataType: "json",
-			contentType: "text/plain; charset=UTF-8"
+			contentType: $pt.AjaxConstants.ContentType.GET
 		}, settings, {
 			url: url,
 			data: data
@@ -503,7 +538,7 @@
 		return submit($.extend({
 			method: "DELETE",
 			dataType: "json",
-			contentType: "text/plain; charset=UTF-8"
+			contentType: $pt.AjaxConstants.ContentType.DELETE
 		}, settings, {
 			url: url,
 			data: data
@@ -13719,21 +13754,21 @@
 			});
 		},
 		isIE: function () {
-			return $.browser.msie;
+			return $pt.browser.msie;
 		},
 		/**
    * check browser is IE8 or not
    * @returns {boolean}
    */
 		isIE8: function () {
-			return $.browser.msie && $.browser.versionNumber == 8;
+			return $pt.browser.msie && $pt.browser.version == 8;
 		},
 		/**
    * check browser is firefox or not
    * @returns {boolean}
    */
 		isFirefox: function () {
-			return $.browser.mozilla;
+			return $pt.browser.mozilla;
 		},
 		/**
    * prepare display options
@@ -15504,14 +15539,25 @@
 				if (NTable.PAGE_JUMPING_PROXY) {
 					criteria = NTable.PAGE_JUMPING_PROXY.call(this, criteria);
 				}
-				$pt.doPost(url, criteria).done(function (data) {
-					if (typeof data === 'string') {
-						data = JSON.parse(data);
-					}
-					model.mergeCurrentModel(data);
-					// refresh
-					_this.forceUpdate();
-				});
+				var pageChangeListener = this.getEventMonitor('pageChange');
+				if (pageChangeListener) {
+					this.notifyEvent({
+						type: 'pageChange',
+						criteria: criteria
+					});
+				} else {
+					$pt.doPost(url, criteria).done(function (data) {
+						if (typeof data === 'string') {
+							data = JSON.parse(data);
+						}
+						model.mergeCurrentModel(data);
+						// refresh
+						// _this.forceUpdate();
+						_this.setState({
+							currentPageIndex: pageIndex
+						});
+					});
+				}
 				// todo how to handle failure?
 			}
 		},

@@ -259,21 +259,21 @@
 			});
 		},
 		isIE: function () {
-			return $.browser.msie;
+			return $pt.browser.msie;
 		},
 		/**
 		 * check browser is IE8 or not
 		 * @returns {boolean}
 		 */
 		isIE8: function () {
-			return $.browser.msie && $.browser.versionNumber == 8;
+			return $pt.browser.msie && $pt.browser.version == 8;
 		},
 		/**
 		 * check browser is firefox or not
 		 * @returns {boolean}
 		 */
 		isFirefox: function () {
-			return $.browser.mozilla;
+			return $pt.browser.mozilla;
 		},
 		/**
 		 * prepare display options
@@ -1949,14 +1949,25 @@
 				if (NTable.PAGE_JUMPING_PROXY) {
 					criteria = NTable.PAGE_JUMPING_PROXY.call(this, criteria);
 				}
-				$pt.doPost(url, criteria).done(function (data) {
-					if (typeof data === 'string') {
-						data = JSON.parse(data);
-					}
-					model.mergeCurrentModel(data);
-					// refresh
-					_this.forceUpdate();
-				});
+				var pageChangeListener = this.getEventMonitor('pageChange');
+				if (pageChangeListener) {
+					this.notifyEvent({
+						type: 'pageChange',
+						criteria: criteria
+					});
+				} else {
+					$pt.doPost(url, criteria).done(function (data) {
+						if (typeof data === 'string') {
+							data = JSON.parse(data);
+						}
+						model.mergeCurrentModel(data);
+						// refresh
+						// _this.forceUpdate();
+						_this.setState({
+							currentPageIndex: pageIndex
+						});
+					});
+				}
 				// todo how to handle failure?
 			}
 		},
