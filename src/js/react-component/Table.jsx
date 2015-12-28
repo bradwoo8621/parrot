@@ -1953,7 +1953,8 @@
 				if (pageChangeListener) {
 					this.notifyEvent({
 						type: 'pageChange',
-						criteria: criteria
+						criteria: criteria,
+						target: this
 					});
 				} else {
 					$pt.doPost(url, criteria).done(function (data) {
@@ -1962,10 +1963,10 @@
 						}
 						model.mergeCurrentModel(data);
 						// refresh
-						// _this.forceUpdate();
-						_this.setState({
-							currentPageIndex: pageIndex
-						});
+						_this.forceUpdate();
+						// _this.setState({
+						// 	currentPageIndex: pageIndex
+						// });
 					});
 				}
 				// todo how to handle failure?

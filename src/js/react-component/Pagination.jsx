@@ -137,10 +137,9 @@
 			}
 			var _this = this;
 			return buttons.map(function (index) {
-				var css = {};
-				if (index == _this.getCurrentPageIndex()) {
-					css.active = true;
-				}
+				var css = {
+					active: index == _this.getCurrentPageIndex()
+				};
 				return (<li key={index}>
 					<a href="javascript:void(0);"
 					   onClick={_this.toPage}
@@ -308,8 +307,8 @@
 			if (pageIndex - this.getCurrentPageIndex() == 0) {
 				return;
 			}
-			this.props.currentPageIndex = pageIndex;
-			this.forceUpdate();
+			// this.props.currentPageIndex = pageIndex;
+			// this.forceUpdate();
 			if (this.props.toPage) {
 				this.props.toPage.call(this, pageIndex);
 			}

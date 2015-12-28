@@ -10072,10 +10072,9 @@
 			}
 			var _this = this;
 			return buttons.map(function (index) {
-				var css = {};
-				if (index == _this.getCurrentPageIndex()) {
-					css.active = true;
-				}
+				var css = {
+					active: index == _this.getCurrentPageIndex()
+				};
 				return React.createElement(
 					"li",
 					{ key: index },
@@ -10274,8 +10273,8 @@
 			if (pageIndex - this.getCurrentPageIndex() == 0) {
 				return;
 			}
-			this.props.currentPageIndex = pageIndex;
-			this.forceUpdate();
+			// this.props.currentPageIndex = pageIndex;
+			// this.forceUpdate();
 			if (this.props.toPage) {
 				this.props.toPage.call(this, pageIndex);
 			}
@@ -15543,7 +15542,8 @@
 				if (pageChangeListener) {
 					this.notifyEvent({
 						type: 'pageChange',
-						criteria: criteria
+						criteria: criteria,
+						target: this
 					});
 				} else {
 					$pt.doPost(url, criteria).done(function (data) {
@@ -15552,10 +15552,10 @@
 						}
 						model.mergeCurrentModel(data);
 						// refresh
-						// _this.forceUpdate();
-						_this.setState({
-							currentPageIndex: pageIndex
-						});
+						_this.forceUpdate();
+						// _this.setState({
+						// 	currentPageIndex: pageIndex
+						// });
 					});
 				}
 				// todo how to handle failure?
