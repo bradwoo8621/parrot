@@ -113,6 +113,16 @@
 			"506": "Application Exception"
 		}
 	};
+	$pt.parseJSON = function(object) {
+		if (object == null) {
+			return null;
+		}
+		if (typeof object === 'string') {
+			return JSON.parse(object);
+		} else {
+			return object;
+		}
+	};
 
 	(function() {
 		var matched, userAgent = navigator.userAgent || "";

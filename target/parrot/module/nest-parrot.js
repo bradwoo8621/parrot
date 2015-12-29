@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.1.1 2015-12-28 */
+	/** nest-parrot.V0.1.1 2015-12-29 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -366,6 +366,16 @@
 			"505": "HTTP Version Not Supported",
 			// customize
 			"506": "Application Exception"
+		}
+	};
+	$pt.parseJSON = function (object) {
+		if (object == null) {
+			return null;
+		}
+		if (typeof object === 'string') {
+			return JSON.parse(object);
+		} else {
+			return object;
 		}
 	};
 
