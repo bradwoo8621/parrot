@@ -87,7 +87,8 @@
 			contentType: $pt.AjaxConstants.ContentType.POST
 		}, settings, {
 			url: url,
-			data: data
+			// always send string to server side
+			data: ((typeof data === 'string') ? data : JSON.stringify(data))
 		}));
 	};
 	/**
@@ -104,7 +105,7 @@
 			contentType: $pt.AjaxConstants.ContentType.PUT
 		}, settings, {
 			url: url,
-			data: data
+			data: ((typeof data === 'string') ? data : JSON.stringify(data))
 		}));
 	};
 	/**
@@ -115,6 +116,9 @@
 	 * @returns {jqXHR}
 	 */
 	$pt.doGet = function (url, data, settings) {
+		if (settings.stringify) {
+			data = (typeof data === 'string') ? data : JSON.stringify(data);
+		}
 		return submit($.extend({
 			method: "GET",
 			dataType: "json",
@@ -132,6 +136,9 @@
 	 * @returns {jqXHR}
 	 */
 	$pt.doDelete = function (url, data, settings) {
+		if (settings.stringify) {
+			data = (typeof data === 'string') ? data : JSON.stringify(data);
+		}
 		return submit($.extend({
 			method: "DELETE",
 			dataType: "json",

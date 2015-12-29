@@ -163,12 +163,12 @@
 			}
 		},
 		number: function () {
-			if (Number.prototype.currencyFormat === undefined) {
-				Number.prototype.currencyFormat = function (fraction) {
-					fraction = fraction ? fraction : 0;
-					return value.toFixed(fraction).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
-				};
-			}
+			// if (Number.prototype.currencyFormat === undefined) {
+			// 	Number.prototype.currencyFormat = function (fraction) {
+			// 		fraction = fraction ? fraction : 0;
+			// 		return value.toFixed(fraction).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+			// 	};
+			// }
 		},
 		array: function () {
 			if (!Array.prototype.find) {

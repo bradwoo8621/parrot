@@ -192,12 +192,12 @@
 			}
 		},
 		number: function () {
-			if (Number.prototype.currencyFormat === undefined) {
-				Number.prototype.currencyFormat = function (fraction) {
-					fraction = fraction ? fraction : 0;
-					return value.toFixed(fraction).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
-				};
-			}
+			// if (Number.prototype.currencyFormat === undefined) {
+			// 	Number.prototype.currencyFormat = function (fraction) {
+			// 		fraction = fraction ? fraction : 0;
+			// 		return value.toFixed(fraction).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+			// 	};
+			// }
 		},
 		array: function () {
 			if (!Array.prototype.find) {
@@ -500,7 +500,8 @@
 			contentType: $pt.AjaxConstants.ContentType.POST
 		}, settings, {
 			url: url,
-			data: data
+			// always send string to server side
+			data: typeof data === 'string' ? data : JSON.stringify(data)
 		}));
 	};
 	/**
@@ -517,7 +518,7 @@
 			contentType: $pt.AjaxConstants.ContentType.PUT
 		}, settings, {
 			url: url,
-			data: data
+			data: typeof data === 'string' ? data : JSON.stringify(data)
 		}));
 	};
 	/**
@@ -528,6 +529,9 @@
   * @returns {jqXHR}
   */
 	$pt.doGet = function (url, data, settings) {
+		if (settings.stringify) {
+			data = typeof data === 'string' ? data : JSON.stringify(data);
+		}
 		return submit($.extend({
 			method: "GET",
 			dataType: "json",
@@ -545,6 +549,9 @@
   * @returns {jqXHR}
   */
 	$pt.doDelete = function (url, data, settings) {
+		if (settings.stringify) {
+			data = typeof data === 'string' ? data : JSON.stringify(data);
+		}
 		return submit($.extend({
 			method: "DELETE",
 			dataType: "json",
@@ -998,6 +1005,66 @@
 	$pt.cloneJSON = function (jsonObject) {
 		return $.extend(true, {}, jsonObject);
 	};
+
+	$pt.mergeObject = function (params) {
+		var deep = params.deep;
+		var target = params.target ? params.target : {};
+		var sources = Array.isArray(params.sources) ? params.sources : [params.sources];
+		console.log(target);
+		console.log(sources);
+
+		var source,
+		    propName,
+		    sourceIndex = 0,
+		    sourceCount = sources.length,
+		    targetPropValue,
+		    sourcePropValue,
+		    sourcePropValueIsArray,
+		    destPropValue;
+
+		// Handle case when target is a string or something (possible in deep copy)
+		if (typeof target !== "object" && !$.isFunction(target)) {
+			target = {};
+		}
+
+		for (; sourceIndex < sourceCount; sourceIndex++) {
+			// Only deal with non-null/undefined values
+			if ((source = sources[sourceIndex]) != null) {
+				// Extend the base object
+				console.log(source);
+				for (propName in source) {
+					console.log(propName);
+					targetPropValue = target[propName];
+					sourcePropValue = source[propName];
+
+					// Prevent never-ending loop
+					if (target === sourcePropValue) {
+						continue;
+					}
+
+					// Recurse if we're merging plain objects or arrays
+					if (deep && sourcePropValue && ($.isPlainObject(sourcePropValue) || (sourcePropValueIsArray = $.isArray(sourcePropValue)))) {
+						if (sourcePropValueIsArray) {
+							sourcePropValueIsArray = false;
+							// always create new array, change from jQuery
+							destPropValue = [];
+						} else {
+							destPropValue = targetPropValue && $.isPlainObject(targetPropValue) ? targetPropValue : {};
+						}
+
+						// Never move original objects, clone them
+						target[propName] = $pt.mergeObject({ deep: deep, target: destPropValue, sources: [sourcePropValue] });
+						// Don't bring in undefined values
+					} else if (sourcePropValue !== undefined) {
+							target[propName] = sourcePropValue;
+						}
+				}
+			}
+		}
+		// Return the modified object
+		return target;
+	};
+
 	/**
   * get value from json object
   * @param jsonObject {{}}
@@ -1634,7 +1701,7 @@
    * @param newModel {{}}
    */
 		mergeCurrentModel: function (newModel) {
-			this.__model = $.extend(true, this.__model, newModel);
+			this.__model = $pt.mergeObject({ deep: true, target: this.__model, sources: newModel });
 			return this;
 		},
 		/**
