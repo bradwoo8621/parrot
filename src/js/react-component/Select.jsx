@@ -1,50 +1,10 @@
-/**
- * select component, see select2 from jQuery
- *
- * layout: {
- *      label: string,
- *      dataId: string,
- *      pos: {
- *          row: number,
- *          col: number,
- *          width: number,
- *          section: string,
- *          card: string
- *      },
- *      css: {
- *          cell: string,
- *          comp: string,
- *          'normal-line': string,
- *          'focus-line': string
- *      },
- *      comp: {
- *          type: $pt.ComponentConstants.Select,
- *          placeholder: string,
- *          allowClear: true,
- *          minimumResultsForSearch: number,
- *          placeholder: string,
- *          width: string,
- *          data: {}[],
- *          availableWhenNoParentValue: boolean,
- *          parentPropId: string,
- *          parentModel: object,
- *          parentFilter: string|function
- *          enabled: {
- *              when: function,
- *              depends: string|string[]
- *          },
- *          visible: {
- *              when: function,
- *              depends: string|string[]
- *          }
- *      }
- * }
- */
 (function (window, $, React, ReactDOM, $pt) {
-	var NSelect2 = React.createClass($pt.defineCellComponent({
-		displayName: 'NSelect2',
+	var NSelect = React.createClass($pt.defineCellComponent({
+		displayName: 'NSelect',
 		statics: {
-			PLACEHOLDER: "Please Select..."
+			PLACEHOLDER: "Please Select...",
+			NO_OPTION_FOUND: 'No Option Found',
+			FILTER_PLACEHOLDER: 'Search...'
 		},
 		propTypes: {
 			// model
@@ -58,7 +18,6 @@
 				defaultOptions: {
 					allowClear: true,
 					minimumResultsForSearch: 1,
-					width: "100%",
 					data: [],
 
 					availableWhenNoParentValue: false
@@ -74,6 +33,9 @@
 					 */
 				}
 			};
+		},
+		getInitialState: function() {
+			return {};
 		},
 		/**
 		 * will update
@@ -93,43 +55,25 @@
 		 * @param prevState
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
-			// react will not clear the options when component updating,
-			// so have to reset select options manually
-			if (prevProps.model != this.props.model) {
-				var options = this.createDisplayOptions({
-					allowClear: null,
-					placeholder: null,
-					minimumResultsForSearch: null,
-					data: null
-				});
-				// TODO might has issue, not clarify yet.
-				this.resetOptions(options);
-			}
-			// reset the value when component update
-			this.getComponent().val(this.getValueFromModel()).trigger("change");
-			this.addEnableDependencyMonitor();
 			this.addPostChangeListener(this.onModelChanged);
+			this.addEnableDependencyMonitor();
 			if (this.hasParent()) {
 				// remove post change listener from parent model
 				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
 			}
 
-			this.removeTooltip();
 			this.registerToComponentCentral();
 		},
 		/**
 		 * did mount
 		 */
 		componentDidMount: function () {
-			// Set up Select2
-			this.createComponent();
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
 			if (this.hasParent()) {
 				// add post change listener into parent model
 				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
 			}
-			this.removeTooltip();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -143,77 +87,34 @@
 				// remove post change listener from parent model
 				this.getParentModel().removeListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
 			}
-			// remove the jquery dom element
-			this.getComponent().next("span").remove();
 			this.unregisterFromComponentCentral();
 		},
-		/**
-		 * create component
-		 */
-		createComponent: function () {
-			var options = this.createDisplayOptions({
-				allowClear: null,
-				placeholder: null,
-				minimumResultsForSearch: null,
-				data: null
-			}, this.getLayout());
-			this.getComponent().fireOnDisable()
-				.select2(options)
-				.val(this.getValueFromModel())
-				.trigger("change")
-				.change(this.onComponentChanged);
-
-			this.renderBorderBottom();
-		},
-		renderBorderBottom: function () {
-			var top = $(ReactDOM.findDOMNode(this.refs.div));
-			var selection = top.find('.select2-selection');
-			if (selection.find('hr.normal-line').length == 0) {
-				selection.append('<hr class="' + this.getAdditionalCSS('normal-line', 'normal-line') + '"/>')
-					.append('<hr class="' + this.getAdditionalCSS('focus-line', 'focus-line') + '"/>');
+		renderClear: function() {
+			if (!this.getComponentOption('allowClear')) {
+				return null;
 			}
+			return (<span className='fa fa-fw fa-close clear'
+						  onClick={this.onClearClick} />);
 		},
-		/**
-		 * create display options
-		 * @param options
-		 */
-		createDisplayOptions: function (options) {
-			var _this = this;
-			Object.keys(options).forEach(function (key) {
-				options[key] = _this.getComponentOption(key);
-			});
-			if (options.placeholder == null) {
-				options.placeholder = NSelect2.PLACEHOLDER;
+		renderText: function() {
+			var value = this.getValueFromModel();
+			var itemText = null;
+			if (value != null) {
+				var item = this.getAvailableOptions().find(function(item) {
+					return item.id == value;
+				});
+				if (item) {
+					itemText = item.text;
+				}
 			}
-			// if has parent, filter options by parent property value
-			if (this.hasParent()) {
-				options.data = this.getAvailableOptions(this.getParentPropertyValue());
-			} else {
-				options.data = this.convertDataOptions(options.data);
+			if (itemText == null) {
+				itemText = NSelect.PLACEHOLDER;
 			}
-
-			// TODO hard code, multiple is not supported yet
-			options.multiple = false;
-
-			return options;
-		},
-		/**
-		 * convert data options, options can be CodeTable object or an array
-		 * @param options
-		 * @returns {*}
-		 */
-		convertDataOptions: function (options) {
-			return Array.isArray(options) ? options : options.list();
-		},
-		/**
-		 * remove tooltip, which is default set by select2 component.
-		 * it's unnecessary.
-		 */
-		removeTooltip: function () {
-			//$("#select2-" + this.getId() + "-container").removeAttr("title");
-			var top = $(ReactDOM.findDOMNode(this.refs.div));
-			var renderer = top.find('.select2-selection__rendered');
-			renderer.removeAttr('title');
+			return (<div className='input-group form-control' onClick={this.onComponentClicked} ref='comp'>
+				<span className='text'>{itemText}</span>
+				{this.renderClear()}
+				<span className='fa fa-fw fa-sort-down drop' />
+			</div>);
 		},
 		/**
 		 * render
@@ -224,49 +125,236 @@
 				return this.renderInViewMode();
 			}
 			var css = {
-				'n-disabled': !this.isEnabled()
+				'n-disabled': !this.isEnabled(),
+				'n-view-mode': this.isViewMode()
 			};
 			css[this.getComponentCSS('n-select')] = true;
-			return (<div className={$pt.LayoutHelper.classSet(css)}
-			            ref='div'>
-				<select style={{width: this.getComponentOption("width")}}
-				        disabled={!this.isEnabled()}
-				        ref='select'/>
+			return (<div className={$pt.LayoutHelper.classSet(css)} tabIndex='0' aria-readonly='true'>
+				{this.renderText()}
+				{this.renderNormalLine()}
+				{this.renderFocusLine()}
 			</div>);
 		},
-		/**
-		 * on component change
-		 * @param evt
-		 */
-		onComponentChanged: function (evt) {
-			var value = this.getComponent().val();
-			if (value != this.getValueFromModel()) {
-				// synchronize value to model
-				this.setValueToModel(this.getComponent().val());
+		renderPopoverContainer: function() {
+			if (this.state.popoverDiv == null) {
+				this.state.popoverDiv = $('<div>');
+				this.state.popoverDiv.appendTo($('body'));
+				$(document).on('mousedown', this.onDocumentMouseDown)
+					.on('keyup', this.onDocumentKeyUp)
+					.on('mousewheel', this.onDocumentMouseWheel);
+				$(window).on('resize', this.onWindowResize);
 			}
-			this.removeTooltip();
+			this.state.popoverDiv.hide();
+		},
+		renderOptions: function(options, filterText) {
+			if (options == null || options.length == 0) {
+				return null;
+			}
+			if (filterText != null && !filterText.isBlank()) {
+				options = options == null ? null : options.filter(function(item) {
+					return item.text.toLowerCase().indexOf(filterText) != -1;
+				});
+			}
+			var _this = this;
+			return (<ul>
+				{options.map(function(item, itemIndex) {
+					return (<li onClick={_this.onOptionClick.bind(_this, item)} key={itemIndex}>
+						<span>{item.text}</span>
+					</li>);
+				})}
+			</ul>);
+		},
+		renderNoOption: function(options) {
+			if (options == null || options.length == 0) {
+				return <div className='no-option'><span>{NSelect.NO_OPTION_FOUND}</span></div>;
+			}
+			return null;
+		},
+		renderFilterText: function(options, filterText) {
+			if (options == null || options.length == 0) {
+				return;
+			}
+			var minimumResultsForSearch = this.getComponentOption('minimumResultsForSearch');
+			if (minimumResultsForSearch >=0 && minimumResultsForSearch != Infinity) {
+				var model = $pt.createModel({text: filterText});
+				var layout = $pt.createCellLayout('text', {
+					comp: {
+						placeholder: NSelect.FILTER_PLACEHOLDER
+					}
+				});
+				model.addPostChangeListener('text', this.onFilterTextChange);
+				return <$pt.Components.NText model={model} layout={layout} />;
+			} else {
+				return null;
+			}
+		},
+		renderPopoverContent: function(filterText) {
+			var options = this.getAvailableOptions();
+			return (<div>
+				{this.renderFilterText(options, filterText)}
+				{this.renderNoOption(options)}
+				{this.renderOptions(options, filterText)}
+			</div>);
+		},
+		renderPopover: function(filterText) {
+			var styles = {display: 'block'};
+			var component = this.getComponent();
+			styles.width = component.outerWidth();
+			var offset = component.offset();
+			styles.top = -10000; // let it out of screen
+			styles.left = 0;
+			var popover = (<div role="tooltip" className="n-select-popover popover bottom in" style={styles}>
+				<div className="arrow"></div>
+				<div className="popover-content">
+					{this.renderPopoverContent(filterText)}
+				</div>
+			</div>);
+			ReactDOM.render(popover, this.state.popoverDiv.get(0), this.onPopoverRenderComplete);
+		},
+		showPopover: function(filterText) {
+			this.renderPopoverContainer();
+			this.renderPopover(filterText);
+		},
+		onPopoverRenderComplete: function() {
+			this.state.popoverDiv.show();
+			var popover = this.state.popoverDiv.children('.popover');
+			var styles = {};
+			var component = this.getComponent();
+			styles.width = component.outerWidth();
+			var offset = component.offset();
+			styles.top = offset.top + component.outerHeight();
+			styles.left = offset.left;
+
+			var onTop = false;
+			var rightToLeft = false;
+			var realHeight = popover.outerHeight();
+			var realWidth = popover.outerWidth();
+			// set the real top, assumpt it is on bottom
+			styles.top = offset.top + component.outerHeight();
+			// check popover in top or bottom
+			if ((styles.top + realHeight) > ($(window).height() + $(window).scrollTop())) {
+				// cannot show in bottom and in current viewport
+				// check it is enough top or not
+				if ((offset.top - $(window).scrollTop()) >= realHeight) {
+					// enough
+					styles.top = offset.top - realHeight;
+					onTop = true;
+				} else if ((styles.top + realHeight) <= $(document).height()) {
+					// cannot show in bottom and in current document
+					onTop = false;
+				} else if (offset.top < realHeight) {
+					// cannot show in top and in current document
+					onTop = false;
+				} else {
+					styles.top = offset.top - realHeight;
+					onTop = true;
+				}
+			} else {
+				// can show in bottom and in current viewport
+				onTop = false;
+			}
+
+			// check popover to left or right
+			if (realWidth > styles.width) {
+				width = $(document).width();
+				if ((styles.left + realWidth) <= width) {
+					// normal from left to right, do nothing
+				} else if ((styles.left + styles.width) >= realWidth) {
+					// from right to left
+					styles.left = styles.left + styles.width - realWidth;
+					rightToLeft = true;
+				} else {
+					// still left to right, do nothing
+				}
+			}
+
+			if (onTop) {
+				popover.addClass('top');
+				popover.removeClass('bottom');
+			} else {
+				popover.removeClass('top');
+				popover.addClass('bottom');
+			}
+			if (rightToLeft) {
+				popover.addClass('right-to-left');
+			}
+			popover.css({top: styles.top, left: styles.left});
+		},
+		hidePopover: function() {
+			this.destroyPopover();
+		},
+		destroyPopover: function() {
+			if (this.state.popoverDiv) {
+				$(document).off('mousedown', this.onDocumentMouseDown)
+					.off('keyup', this.onDocumentKeyUp)
+					.off('mousewheel', this.onDocumentMouseWheel);
+				$(window).off('resize', this.onWindowResize);
+				this.state.popoverDiv.remove();
+				delete this.state.popoverDiv;
+			}
+		},
+		onComponentClicked: function() {
+			if (!this.isEnabled() || this.isViewMode()) {
+				// do nothing
+				return;
+			}
+			if (!this.state.popoverDiv || !this.state.popoverDiv.is(':visible')) {
+				this.showPopover();
+			}
+		},
+		onDocumentMouseDown: function(evt) {
+			var target = $(evt.target);
+			if (target.closest(this.getComponent()).length == 0 && target.closest(this.state.popoverDiv).length == 0) {
+				this.hidePopover();
+			}
+		},
+		onDocumentMouseWheel: function(evt) {
+			var target = $(evt.target);
+			if (target.closest(this.state.popoverDiv).length == 0) {
+				this.hidePopover();
+			}
+		},
+		onDocumentKeyUp: function(evt) {
+			if (evt.keyCode === 27 || evt.keyCode === 9) { // escape and tab
+				this.hidePopover();
+			}
+		},
+		onWindowResize: function() {
+			this.hidePopover();
+		},
+		onOptionClick: function(item) {
+			this.setValueToModel(item.id);
+			this.hidePopover();
+		},
+		onClearClick: function() {
+			if (!this.isEnabled() || this.isViewMode()) {
+				return;
+			}
+			this.setValueToModel(null);
+		},
+		onFilterTextChange: function(evt) {
+			this.showPopover(evt.new);
 		},
 		/**
 		 * on model change
 		 * @param evt
 		 */
 		onModelChanged: function (evt) {
-			var oldValue = this.getComponent().val();
-			if (oldValue == evt.new) {
-				// do nothing
-				return;
-			} else {
-				// this.getComponent().val(evt.new).trigger("change");
-				this.forceUpdate();
-			}
+			this.forceUpdate();
 		},
 		/**
 		 * on parent model change
 		 * @param evt
 		 */
 		onParentModelChanged: function (evt) {
-			var data = this.getAvailableOptions(evt.new);
-			this.resetOptions({data: data});
+			var options = this.getAvailableOptions();
+			var currentValue = this.getValueFromModel();
+			var index = options.findIndex(function(item) {
+				return item.id == currentValue;
+			});
+			if (index == -1) {
+				this.setValueToModel(null);
+			}
 		},
 		/**
 		 * get parent model
@@ -298,28 +386,40 @@
 			return this.getParentPropertyId() != null;
 		},
 		/**
+		 * convert data options, options can be CodeTable object or an array
+		 * @param options
+		 * @returns {*}
+		 */
+		convertDataOptions: function (options) {
+			return Array.isArray(options) ? options : options.list();
+		},
+		/**
 		 * get available options.
 		 * if no parent assigned, return all data options
-		 * @param parentValue
 		 * @returns {[*]}
 		 */
-		getAvailableOptions: function (parentValue) {
-			if (parentValue == null) {
-				return this.isAvailableWhenNoParentValue() ? this.convertDataOptions(this.getComponentOption("data")) : [];
+		getAvailableOptions: function () {
+			if (!this.hasParent()) {
+				return this.convertDataOptions(this.getComponentOption('data'));
 			} else {
-				var filter = this.getComponentOption("parentFilter");
-				if (typeof filter === 'object') {
-					// call code table filter
-					return this.convertDataOptions(this.getComponentOption('data').filter($.extend({}, filter, {value: parentValue})));
+				var parentValue = this.getParentPropertyValue();
+				if (parentValue == null) {
+					return this.isAvailableWhenNoParentValue() ? this.convertDataOptions(this.getComponentOption("data")) : [];
 				} else {
-					// call local filter
-					var data = this.convertDataOptions(this.getComponentOption("data"));
-					if (typeof filter === "function") {
-						return filter.call(this, parentValue, data);
+					var filter = this.getComponentOption("parentFilter");
+					if (typeof filter === 'object') {
+						// call code table filter
+						return this.convertDataOptions(this.getComponentOption('data').filter($.extend({}, filter, {value: parentValue})));
 					} else {
-						return data.filter(function (item) {
-							return item[filter] == parentValue;
-						});
+						// call local filter
+						var data = this.convertDataOptions(this.getComponentOption("data"));
+						if (typeof filter === "function") {
+							return filter.call(this, parentValue, data);
+						} else {
+							return data.filter(function (item) {
+								return item[filter] == parentValue;
+							});
+						}
 					}
 				}
 			}
@@ -334,43 +434,8 @@
 			// or return true
 			return this.hasParent() ? this.getComponentOption("availableWhenNoParentValue") : true;
 		},
-		/**
-		 * reset select options
-		 * @param newOptions
-		 */
-		resetOptions: function (newOptions) {
-			if (this.isViewMode()) {
-				return;
-			}
-			// really sucks because select2 doesn't support change the options dynamically
-			var component = this.getComponent();
-			var orgValue = this.getValueFromModel(); //component.val();
-			var orgSelected = false;
-			// first is Options object, second is really options
-			var originalOptions = component.data("select2").options.options;
-			component.html("");
-			// data
-			$.extend(originalOptions, newOptions);
-			var innerHTML = "";
-			originalOptions.data.forEach(function (element) {
-				if (element.id == orgValue) {
-					innerHTML += "<option value=\"" + element.id + "\"" + (element.id == orgValue ? " selected" : "") + ">" + element.text + "</option>";
-					orgSelected = true;
-				} else {
-					innerHTML += "<option value=\"" + element.id + "\">" + element.text + "</option>";
-				}
-			});
-			component.append(innerHTML);
-			component.select2(originalOptions);
-			this.renderBorderBottom();
-
-			if (!orgSelected) {
-				// if the original value cannot match the available option, set to null.
-				component.val("").trigger("change");
-			}
-		},
-		getComponent: function () {
-			return $(ReactDOM.findDOMNode(this.refs.select));
+		getComponent: function() {
+			return $(ReactDOM.findDOMNode(this.refs.comp));
 		},
 		getTextInViewMode: function() {
 			var value = this.getValueFromModel();
@@ -392,78 +457,8 @@
 			return value;
 		}
 	}));
-
-// to fix the select2 disabled property not work in IE8-10
-// provided by https://gist.github.com/cmcnulty/7036509
-	(function ($) {
-		"use strict";
-
-		$.fn.fireOnDisable = function (settings) {
-			// Only perform this DOM change if we have to watch changes with
-			// propertychange
-			// Also only perform if getOwnPropertyDescriptor exists - IE>=8
-			// I suppose I could test for "propertychange fires, but not when form
-			// element is disabled" - but it would be overkill
-			if (!( 'onpropertychange' in document.createElement('input') ) || Object.getOwnPropertyDescriptor === undefined) {
-				return this;
-			}
-
-			// IE9-10 use HTMLElement proto, IE8 uses Element proto
-			var someProto = window.HTMLElement === undefined ? window.Element.prototype : window.HTMLElement.prototype,
-				someTrigger = function () {
-				},
-				origDisabled = Object.getOwnPropertyDescriptor(someProto, 'disabled');
-
-			if (document.createEvent) {
-				someTrigger = function (newVal) {
-					var event = document.createEvent('MutationEvent');
-					/*
-					 * Instantiate the event as close to native as possible:
-					 * event.initMutationEvent(eventType, canBubble, cancelable,
-					 * relatedNodeArg, prevValueArg, newValueArg, attrNameArg,
-					 * attrChangeArg);
-					 */
-					event.initMutationEvent('DOMAttrModified', true, false, this.getAttributeNode('disabled'), '', '', 'disabled', 1);
-					this.dispatchEvent(event);
-				};
-			} else if (document.fireEvent) {
-				someTrigger = function () {
-					this.fireEvent('onpropertychange');
-				};
-			}
-
-			return this.each(function () {
-				// call prototype's set, and then trigger the change.
-				Object.defineProperty(this, 'disabled', {
-					set: function (isDisabled) {
-						// We store preDisabled here, so that when we inquire as to
-						// the result after throwing the event, it will be accurate
-						// We can't throw the event after the native send, because
-						// it won't be be sent.
-						// We must do a native fire/dispatch, because native
-						// listeners don't catch jquery trigger 'propertychange'
-						// events
-						$.data(this, 'preDisabled', isDisabled);
-						if (isDisabled) {
-							// Trigger with dispatchEvent
-							someTrigger.call(this, isDisabled);
-						}
-
-						return origDisabled.set.call(this, isDisabled);
-					},
-					get: function () {
-						var isDisabled = $.data(this, 'preDisabled');
-						if (isDisabled === undefined) {
-							isDisabled = origDisabled.get.call(this);
-						}
-						return isDisabled;
-					}
-				});
-			});
-		};
-	})(jQuery);
-	$pt.Components.NSelect2 = NSelect2;
-	$pt.LayoutHelper.registerComponentRenderer('select2', function (model, layout, direction, viewMode) {
-		return <$pt.Components.NSelect2 {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+	$pt.Components.NSelect = NSelect;
+	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Select, function (model, layout, direction, viewMode) {
+		return <$pt.Components.NSelect {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
 	});
 }(window, jQuery, React, ReactDOM, $pt));
