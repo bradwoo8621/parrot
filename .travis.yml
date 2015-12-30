@@ -25,3 +25,7 @@ install:
   - npm install react-dom
   - npm install bootstrap-fileinput-npm
   - npm install bootstrap
+  
+after_success:
+  - npm version patch
+  - npm publish
