@@ -1139,7 +1139,7 @@
 					1. The data model of table has a property which named <code>items</code> to store the data array.
 					Link to NTable component by cell layout definition.<br/>
 					2. To invoke remote search by pagination buttons, define a <code>{"{comp: {criteria: 'temp'}}"}</code>,
-					<code>temp</code> is the criteria object, also in data model of table.
+					<code>temp</code> is the criteria object, also in data model which contains table data.
 					So far, the data model of table should be <code>{"{items: [], temp: {}}"}</code>.<br/>
 					3. Define the initial status of pagination in <code>temp</code>, there are four properties:<br/>
 					3.a <code>countPerPage</code>, row count of per page.
@@ -1147,12 +1147,17 @@
 					3.b <code>pageIndex</code>, current page index, starts from 1,<br/>
 					3.c <code>pageCount</code>, total page count, starts from 1,<br/>
 					3.d <code>url</code>, url for handle the pagination request.
-					The return data should be same pattern as data model,
+					The return data from server must have the same pattern as data model,
 					in this case, it should be <code>{"{items: [], temp: {}}"}</code>.
 					For <code>temp</code>, only <code>pageIndex</code> and <code>pageCount</code> is necessary.<br/>
 					<br/>
 					Table will merge the returned data from server side to data model automatically, and refresh the display.<br/>
 					And make sure only one page of data is returned from server side.<br/>
+					<br/>
+					4. Or define <code>{"{evt: {pageChange: function(evt)}}"}</code> to handle the pagination request by yourself.
+					Of course, merge data into table, update table UI by yourself.<br/>
+					4.a <code>table</code>, current NTable,<br/>
+					4.b <code>evt</code>, JSON object of last query criteria and event type.<br/>
 					</span>,
 					index: 20
 				};
