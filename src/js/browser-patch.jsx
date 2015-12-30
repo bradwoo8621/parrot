@@ -84,7 +84,7 @@
 				String.prototype.padLeft = function(nSize, ch){
 				    var len = 0;
 				    var s = this ? this : "";
-				    ch = ch ? ch : '0';//默认补0
+				    ch = ch ? ch : '0';// default add 0
 				    len = s.length;
 				    while(len < nSize){
 				        s = ch + s;

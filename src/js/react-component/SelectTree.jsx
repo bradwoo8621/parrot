@@ -287,7 +287,7 @@
 
 			// check popover to left or right
 			if (realWidth > styles.width) {
-				width = $(document).width();
+				var width = $(document).width();
 				if ((styles.left + realWidth) <= width) {
 					// normal from left to right, do nothing
 				} else if ((styles.left + styles.width) >= realWidth) {

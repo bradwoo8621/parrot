@@ -113,7 +113,7 @@
 				String.prototype.padLeft = function (nSize, ch) {
 					var len = 0;
 					var s = this ? this : "";
-					ch = ch ? ch : '0'; //默认补0
+					ch = ch ? ch : '0'; // default add 0
 					len = s.length;
 					while (len < nSize) {
 						s = ch + s;
@@ -302,7 +302,7 @@
 	$pt.Components = {};
 	$pt.exposeComponents = function (context) {
 		Object.keys($pt.Components).forEach(function (component) {
-			window[component] = $pt.Components[component];
+			context[component] = $pt.Components[component];
 		});
 	};
 	// component constants
@@ -1010,8 +1010,8 @@
 		var deep = params.deep;
 		var target = params.target ? params.target : {};
 		var sources = Array.isArray(params.sources) ? params.sources : [params.sources];
-		console.log(target);
-		console.log(sources);
+		// console.log(target);
+		// console.log(sources);
 
 		var source,
 		    propName,
@@ -1031,9 +1031,9 @@
 			// Only deal with non-null/undefined values
 			if ((source = sources[sourceIndex]) != null) {
 				// Extend the base object
-				console.log(source);
+				// console.log(source);
 				for (propName in source) {
-					console.log(propName);
+					// console.log(propName);
 					targetPropValue = target[propName];
 					sourcePropValue = source[propName];
 
@@ -11471,7 +11471,7 @@
 
 			// check popover to left or right
 			if (realWidth > styles.width) {
-				width = $(document).width();
+				var width = $(document).width();
 				if (styles.left + realWidth <= width) {
 					// normal from left to right, do nothing
 				} else if (styles.left + styles.width >= realWidth) {
@@ -11975,7 +11975,7 @@
 
 			// check popover to left or right
 			if (realWidth > styles.width) {
-				width = $(document).width();
+				var width = $(document).width();
 				if (styles.left + realWidth <= width) {
 					// normal from left to right, do nothing
 				} else if (styles.left + styles.width >= realWidth) {

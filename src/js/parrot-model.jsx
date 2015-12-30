@@ -24,8 +24,8 @@
 		var deep = params.deep;
 		var target = params.target ? params.target : {};
 		var sources = Array.isArray(params.sources) ? params.sources : [params.sources];
-		console.log(target);
-		console.log(sources);
+		// console.log(target);
+		// console.log(sources);
 
 		var source, propName, sourceIndex = 0, sourceCount = sources.length,
 			targetPropValue,
@@ -41,9 +41,9 @@
 			// Only deal with non-null/undefined values
 			if ((source = sources[sourceIndex]) != null) {
 				// Extend the base object
-				console.log(source);
+				// console.log(source);
 				for (propName in source) {
-					console.log(propName);
+					// console.log(propName);
 					targetPropValue = target[propName];
 					sourcePropValue = source[propName];
 
