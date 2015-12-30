@@ -27,5 +27,6 @@ install:
   - npm install bootstrap
   
 after_success:
+  - git config --global user.email "bradwoo8621@gmail.com"
+  - git config --global user.name "bradwoo8621"
   - npm version patch
-  - npm publish
