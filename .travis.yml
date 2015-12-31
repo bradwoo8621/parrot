@@ -25,8 +25,17 @@ install:
   - npm install react-dom
   - npm install bootstrap-fileinput-npm
   - npm install bootstrap
-  
+
 #after_success:
 #  - git config --global user.email "bradwoo8621@gmail.com"
 #  - git config --global user.name "bradwoo8621"
 #  - npm version patch
+
+#notifications:
+#  slack: nest-parrot:z3jqw9krJbPu0CcQBKS90AnZ
+
+notifications:
+  slack:
+    rooms:
+      - nest-parrot:z3jqw9krJbPu0CcQBKS90AnZ#build
+#      - nest-parrot:z3jqw9krJbPu0CcQBKS90AnZ#random
