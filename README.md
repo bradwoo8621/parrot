@@ -9,6 +9,9 @@ Parrot is a sub module of NEST.
 ### Status
 [![Build Status](https://travis-ci.org/bradwoo8621/parrot.svg?branch=master)](https://travis-ci.org/bradwoo8621/parrot) [![Codacy Badge](https://api.codacy.com/project/badge/grade/2c3fa38232a947079918f76282330bd6)](https://www.codacy.com/app/bradwoo8621/parrot)
 
+### Slack
+[nest-parrot.slack.com](https://slack.global.ssl.fastly.net/66f9/img/icons/ios-32.png)
+
 # Development Guide
 [Guide](http://bradwoo8621.github.io/parrot/guide/index.html)
 
