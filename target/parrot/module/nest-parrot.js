@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.2.0 2015-12-30 */
+	/** nest-parrot.V0.2.0 2016-01-05 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -15613,7 +15613,7 @@
             OP_FOLDER_ICON: 'angle-double-right',
             OP_FOLDER_OPEN_ICON: 'angle-double-down',
             OP_FILE_ICON: '',
-            NODE_SEPARATOR: '|',
+            NODE_SEPARATOR: ';',
             ROOT_ID: '0',
             convertValueTreeToArray: function (nodeValues, id) {
                 var array = [];
@@ -16072,7 +16072,7 @@
             }
             var regexp = new RegExp(nodeIds.map(function (nodeId) {
                 return '(' + nodeId + ')';
-            }).join('|'));
+            }).join(NTree.NODE_SEPARATOR));
             var activeNodes = $.extend({}, this.state.activeNodes);
             Object.keys(activeNodes).forEach(function (key) {
                 if (key.match(regexp)) {

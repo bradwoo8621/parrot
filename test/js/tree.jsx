@@ -7,8 +7,22 @@
 			id: 1,
 			text: 'Languages',
 			children: [
-				{id: 2, text:'Java'},
-				{id: 3, text:'C#'}
+				{
+					id: 2,
+					text:'Java',
+					children: [
+						{id: 8, text: 'OracleJDK'},
+						{id: 9, text: 'OpenJDK'}
+					]
+				},
+				{
+					id: 3,
+					text:'C#',
+					children: [
+						{id: 10, text: '5.0'},
+						{id: 11, text: '6.0'}
+					]
+				}
 			]
 		}, {
 			id: 4,
@@ -37,7 +51,7 @@
 			hierarchyCheck: true,
 			// multiple: false,
 			expandLevel: 1,
-			inactiveSlibing: false,
+			inactiveSlibing: true,
 			border: true
 		},
 		pos: {row: 1, col: 1}
