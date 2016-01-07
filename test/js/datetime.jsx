@@ -5,6 +5,9 @@
     var model = $pt.createModel({
         name: null
     });
+    $pt.ComponentConstants.Default_Date_Format = 'YYYY-MM-DDTHH:mm:ss';
+    NDateTime.VALUE_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
+    window.model = model;
     var defaultFormat = $pt.createCellLayout('name', {
         label: 'Plain Text',
         comp: {
