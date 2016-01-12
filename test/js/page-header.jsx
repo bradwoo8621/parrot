@@ -17,6 +17,6 @@
     var search = function (text) {
         alert('Search text[' + text + '].');
     };
-    var header = (<NPageHeader brand='Test Case' menus={menus} search={search}/>);
+    var header = (<NPageHeader brand='Test Case' menus={menus} search={search} side={true}/>);
     ReactDOM.render(header, document.getElementById('header'));
 })();

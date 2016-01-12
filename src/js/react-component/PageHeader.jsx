@@ -34,6 +34,11 @@
 				})
 			};
 		},
+		componentDidMount: function() {
+			if (this.props.side) {
+				this.state.sideMenu = NSideMenu.getSideMenu(this.props.menus, null, null, true);
+			}
+		},
 		/**
 		 * render search box
 		 * @returns {XML}
@@ -89,9 +94,6 @@
 		 */
 		renderMenus: function () {
 			var _this = this;
-			if (this.props.side) {
-				this.state.sideMenu = NSideMenu.getSideMenu(this.props.menus, null, null, true);
-			}
 			var css = {
 				'nav navbar-nav': true
 			};

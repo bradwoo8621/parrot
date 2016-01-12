@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.2.0 2016-01-05 */
+	/** nest-parrot.V0.2.0 2016-01-12 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -9394,6 +9394,11 @@
 				})
 			};
 		},
+		componentDidMount: function () {
+			if (this.props.side) {
+				this.state.sideMenu = NSideMenu.getSideMenu(this.props.menus, null, null, true);
+			}
+		},
 		/**
    * render search box
    * @returns {XML}
@@ -9471,9 +9476,6 @@
    */
 		renderMenus: function () {
 			var _this = this;
-			if (this.props.side) {
-				this.state.sideMenu = NSideMenu.getSideMenu(this.props.menus, null, null, true);
-			}
 			var css = {
 				'nav navbar-nav': true
 			};
