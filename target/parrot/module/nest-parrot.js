@@ -9395,7 +9395,7 @@
 			};
 		},
 		componentDidMount: function () {
-			if (this.props.side) {
+			if (this.props.side && this.props.menus) {
 				this.state.sideMenu = NSideMenu.getSideMenu(this.props.menus, null, null, true);
 			}
 		},
