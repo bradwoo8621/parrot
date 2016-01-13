@@ -211,7 +211,10 @@
 					"Trigger digits cannot be null in search text.");
 			}
 
-			if (value == null || value.isBlank() || (value.length != triggerDigits && triggerDigits != -1)) {
+			if (value == null) {
+				value = '';
+			}
+			if (value.isBlank() || (value.length != triggerDigits && triggerDigits != -1)) {
 				this.setLabelText(null);
 				return;
 			}

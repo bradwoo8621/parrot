@@ -11013,7 +11013,10 @@
 				throw new $pt.createComponentException($pt.ComponentConstants.Err_Search_Text_Trigger_Digits_Not_Defined, "Trigger digits cannot be null in search text.");
 			}
 
-			if (value == null || value.isBlank() || value.length != triggerDigits && triggerDigits != -1) {
+			if (value == null) {
+				value = '';
+			}
+			if (value.isBlank() || value.length != triggerDigits && triggerDigits != -1) {
 				this.setLabelText(null);
 				return;
 			}
