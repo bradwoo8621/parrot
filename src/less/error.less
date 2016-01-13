@@ -16,36 +16,6 @@ div.has-error {
 	input[type=tel].form-control {
 		color: @error-color;
 	}
-	span.select2-selection {
-		border-color: @error-color;
-		color: @error-color;
-	}
-	.select2-container--default,
-	.select2-container--default.select2-container--disabled {
-		.select2-selection--single {
-			.select2-selection__rendered {
-				color: @error-color;
-			}
-			.select2-selection__arrow b {
-				border-color: @error-color transparent transparent transparent;
-			}
-			.select2-selection__placeholder {
-				color: @error-color;
-			}
-		}
-		&.select2-container--open {
-			.select2-selection--single {
-				.select2-selection__arrow b {
-					border-color: transparent transparent @error-color transparent;
-				}
-			}
-		}
-		&.select2-container--focus hr.focus-line {
-			transform: scaleX(1);
-			-o-transform: scaleX(1);
-			-webkit-transform: scaleX(1);
-		}
-	}
 	div.popover {
 		max-width: 500px;
 		border-color: @error-color;
