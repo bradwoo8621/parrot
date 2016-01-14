@@ -1,4 +1,4 @@
-/** nest-parrot.V0.2.0 2016-01-13 */
+/** nest-parrot.V0.2.0 2016-01-14 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -11094,7 +11094,7 @@
 											data = JSON.parse(data);
 										}
 										model.mergeCurrentModel(data);
-										model.set('criteria_url', this.getAdvancedSearchUrl());
+										model.set('criteria' + $pt.PROPERTY_SEPARATOR + 'url', this.getAdvancedSearchUrl());
 										window.console.debug(model.getCurrentModel());
 										this.state.searchDialog.forceUpdate();
 									}).bind(_this)
