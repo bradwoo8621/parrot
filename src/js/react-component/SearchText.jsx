@@ -95,7 +95,7 @@
 					       disabled={!enabled} onFocus={this.onComponentFocused} onBlur={this.onComponentBlurred}/>
 					<span className="input-group-btn" style={middleSpanStyle}/>
 					<input type="text" className="form-control search-label" onFocus={this.onLabelFocused} ref="label"
-					       disabled={!enabled}/>
+					       disabled={!enabled} tabIndex={-1}/>
 				<span className="input-group-addon advanced-search-btn"
 				      onClick={enabled ? this.showAdvancedSearchDialog : null}>
 					<span className={'fa fa-fw fa-' + NSearchText.ADVANCED_SEARCH_BUTTON_ICON}/>

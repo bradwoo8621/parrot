@@ -1,4 +1,4 @@
-/** nest-parrot.V0.2.0 2016-01-14 */
+/** nest-parrot.V0.2.0 2016-01-20 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -10866,7 +10866,7 @@
 						disabled: !enabled, onFocus: this.onComponentFocused, onBlur: this.onComponentBlurred }),
 					React.createElement('span', { className: 'input-group-btn', style: middleSpanStyle }),
 					React.createElement('input', { type: 'text', className: 'form-control search-label', onFocus: this.onLabelFocused, ref: 'label',
-						disabled: !enabled }),
+						disabled: !enabled, tabIndex: -1 }),
 					React.createElement(
 						'span',
 						{ className: 'input-group-addon advanced-search-btn',
