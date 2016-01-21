@@ -152,7 +152,7 @@
 			}
 			if (filterText != null && !filterText.isBlank()) {
 				options = options == null ? null : options.filter(function(item) {
-					return item.text.toLowerCase().indexOf(filterText) != -1;
+					return item.text.toLowerCase().indexOf(filterText.toLowerCase()) != -1;
 				});
 			}
 			var _this = this;

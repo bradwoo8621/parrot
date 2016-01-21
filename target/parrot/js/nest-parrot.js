@@ -1,4 +1,4 @@
-/** nest-parrot.V0.2.0 2016-01-20 */
+/** nest-parrot.V0.2.0 2016-01-21 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -11319,7 +11319,7 @@
 			}
 			if (filterText != null && !filterText.isBlank()) {
 				options = options == null ? null : options.filter(function (item) {
-					return item.text.toLowerCase().indexOf(filterText) != -1;
+					return item.text.toLowerCase().indexOf(filterText.toLowerCase()) != -1;
 				});
 			}
 			var _this = this;
