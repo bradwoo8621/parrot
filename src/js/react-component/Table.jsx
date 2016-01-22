@@ -612,6 +612,14 @@
 			});
 			return <$pt.Components.NFormButton model={rowModel} layout={layout} />;
 		},
+		isRowOperationVisible: function(operation, rowModel)  {
+			var visible = operation.visible;
+			if (visible) {
+				return this.getRuleValue(visible, true, rowModel);
+			} else {
+				return true;
+			}
+		},
 		renderRowOperationButton: function(operation, rowModel, operationIndex) {
 			var layout = $pt.createCellLayout('rowButton', {
 				label: operation.icon ? null : operation.tooltip,
@@ -619,6 +627,7 @@
 					style: 'link',
 					icon: operation.icon,
 					enabled: operation.enabled,
+					visible: operation.visible,
 					click: this.onRowOperationClicked.bind(this, operation.click, rowModel.getCurrentModel()),
 					tooltip: operation.tooltip
 				},
@@ -643,6 +652,9 @@
 			var removeButton = column.removable ? this.renderRowRemoveButton(rowModel) : null;
 			var rowOperations = this.getRowOperations(column);
 			var _this = this;
+			// rowOperations = rowOperations.filter(function(rowOperation) {
+			// 	return _this.isRowOperationVisible(rowOperation, rowModel);
+			// });
 			return (<div className="btn-group n-table-op-btn-group" role='group'>
 				{rowOperations.map(function (operation, operationIndex) {
 					return _this.renderRowOperationButton(operation, rowModel, operationIndex);
@@ -782,6 +794,7 @@
 		 * a dropdown button is renderred in last, other buttons are renderred in popover of dropdown button.
 		 */
 		renderDropDownOperationCell: function(column, rowModel, maxButtonCount) {
+			var _this = this;
 			var rowOperations = this.getRowOperations(column);
 			if (column.editable) {
 				rowOperations.push({editButton: true});
@@ -789,8 +802,11 @@
 			if (column.removable) {
 				rowOperations.push({removeButton: true});
 			}
+			// filter invisible operations, will not monitor the attributes in depends property
+			rowOperations = rowOperations.filter(function(rowOperation) {
+				return _this.isRowOperationVisible(rowOperation, rowModel);
+			});
 
-			var _this = this;
 			var used = -1;
 			var buttons = [];
 			rowOperations.some(function(operation, operationIndex) {
@@ -898,7 +914,7 @@
 						if (column.editable || column.removable || column.rowOperations != null) {
 							// operation column
 							data = _this.renderOperationCell(column, inlineModel);
-							style.textAlign = "center";
+							style.textAlign = "left";
 						} else if (column.indexable) {
 							// index column
 							data = rowIndex;

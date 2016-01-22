@@ -421,6 +421,12 @@
                 click: function(row) {
                     alert('Row Clicked, add [' + row.name + '] to cart 2.');
                 },
+                visible: {
+                    depends: 'name',
+                    when: function(row) {
+                        return row.get('name') != 'Michael';
+                    }
+                },
                 enabled: {
                     depends: 'name',
                     when: function(row) {
