@@ -307,6 +307,23 @@
 					code: [codesCode, modelCode, layoutCode, compCode],
 					index: 30
 				};
+			},
+			appoint: function() {
+				var layoutTemplate = {comp: {check: function(node) {return node.id != '1';}, multiple: false, data: codes}};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'nodes',
+					template: layoutTemplate
+				});
+				return {
+					id: 'tree-style-check-appoint',
+					title: 'Appointed Check',
+					desc: <span>Check box can be set for single node by define <code>check</code> as a function.<br/>
+					Do not use <code>hierarchyCheck</code> in this case.</span>,
+					xml: <NTree model={model} layout={$pt.createCellLayout('nodes', layoutTemplate)}/>,
+					code: [codesCode, modelCode, layoutCode, compCode],
+					index: 40
+				};
 			}
 		};
 
