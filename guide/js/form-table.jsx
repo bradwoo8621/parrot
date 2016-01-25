@@ -1382,7 +1382,7 @@
 					title: 'Constants',
 					desc: <span>Available constants. Constants must be change before construct component.<br/>
 						<code>NTable.PAGE_JUMPING_PROXY</code> is a function which proxy the page jumping,
-						before send criteria to remote, can set this proxy function to change the format of criteria JSON.
+						before send criteria to remote, set this proxy function to change the format of criteria JSON.
 					</span>,
 					index: 900,
 					code: $demo.convertJSON({

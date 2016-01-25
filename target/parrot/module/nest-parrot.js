@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.2.0 2016-01-22 */
+	/** nest-parrot.V0.2.0 2016-01-25 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -10808,7 +10808,9 @@
 			ADVANCED_SEARCH_DIALOG_BUTTON_TEXT: 'Search',
 			ADVANCED_SEARCH_DIALOG_CODE_LABEL: 'Code',
 			ADVANCED_SEARCH_DIALOG_RESULT_TITLE: 'Search Result',
-			NOT_FOUND: 'Not Found'
+			NOT_FOUND: 'Not Found',
+			SEARCH_PROXY: null,
+			ADVANCED_SEARCH_PROXY: null
 		},
 		propTypes: {
 			// model
@@ -11023,9 +11025,13 @@
 
 			var _this = this;
 			this.state.search = setTimeout(function () {
-				$pt.doPost(_this.getSearchUrl(), {
+				var postData = {
 					code: value
-				}, {
+				};
+				if (NSearchText.SEARCH_PROXY) {
+					postData = NSearchText.SEARCH_PROXY.call(this, postData);
+				}
+				$pt.doPost(_this.getSearchUrl(), postData, {
 					quiet: true
 				}).done(function (data) {
 					if (typeof data === 'string') {
@@ -11118,6 +11124,10 @@
 								// remove query result and pagination criteria JSON, only remain the criteria data.
 								delete currentModel.items;
 								delete currentModel.criteria;
+
+								if (NSearchText.ADVANCED_SEARCH_PROXY) {
+									currentModel = NSearchText.ADVANCED_SEARCH_PROXY.call(this, currentModel);
+								}
 
 								$pt.doPost(_this.getAdvancedSearchUrl(), currentModel, {
 									done: (function (data) {

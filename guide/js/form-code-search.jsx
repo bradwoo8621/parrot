@@ -213,7 +213,11 @@
 				return {
 					id: 'code-search-constants',
 					title: 'Constants',
-					desc: 'Available constants. Constants must be change before construct component.',
+					desc: <span>Available constants. Constants must be change before construct component.'<br/>
+					<code>NSearchText.SEARCH_PROXY</code> and <code>NSearchText.ADVANCED_SEARCH_PROXY</code>
+					are functions which proxy the remote request data. Before send to remote,
+					set these proxy functions to change the format of post data JSON.
+					</span>,
 					index: 30,
 					code: $demo.convertJSON({
 						variable: 'NSearchText',
@@ -223,7 +227,10 @@
 								ADVANCED_SEARCH_DIALOG_NAME_LABEL: 'Name',
 								ADVANCED_SEARCH_DIALOG_BUTTON_TEXT: 'Search',
 								ADVANCED_SEARCH_DIALOG_CODE_LABEL: 'Code',
-								ADVANCED_SEARCH_DIALOG_RESULT_TITLE: 'Search Result'
+								ADVANCED_SEARCH_DIALOG_RESULT_TITLE: 'Search Result',
+								NOT_FOUND: 'Not Found',
+								SEARCH_PROXY: null,
+								ADVANCED_SEARCH_PROXY: null
 							}
 						}
 					})
