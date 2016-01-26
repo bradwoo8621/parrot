@@ -1,4 +1,4 @@
-/** nest-parrot.V0.2.0 2016-01-25 */
+/** nest-parrot.V0.2.0 2016-01-26 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -10966,6 +10966,14 @@
 			} else {
 				$(ReactDOM.findDOMNode(this.refs.label)).val(text);
 			}
+			// if label property id defined, and value changed, set to model
+			var labelPropertyId = this.getComponentOption('labelPropId');
+			if (labelPropertyId) {
+				var name = this.getModel().get(labelPropertyId);
+				if (name != text) {
+					this.getModel().set(labelPropertyId, name);
+				}
+			}
 		},
 		/**
    * get label text from remote
@@ -13693,7 +13701,7 @@
 						}
 						return React.createElement(
 							'td',
-							{ style: style, key: columnIndex },
+							{ style: style, key: columnIndex, className: column.css },
 							data
 						);
 					} else {

@@ -965,7 +965,7 @@
 							// data is property name
 							data = _this.getDisplayTextOfColumn(column, row);
 						}
-						return (<td style={style} key={columnIndex}>{data}</td>);
+						return (<td style={style} key={columnIndex} className={column.css}>{data}</td>);
 					} else {
 						columnIndex++;
 					}

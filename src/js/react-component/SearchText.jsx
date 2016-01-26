@@ -193,6 +193,14 @@
 			} else {
 				$(ReactDOM.findDOMNode(this.refs.label)).val(text);
 			}
+			// if label property id defined, and value changed, set to model
+			var labelPropertyId = this.getComponentOption('labelPropId');
+			if (labelPropertyId) {
+				var name = this.getModel().get(labelPropertyId);
+				if (name != text) {
+					this.getModel().set(labelPropertyId, name);
+				}
+			}
 		},
 		/**
 		 * get label text from remote

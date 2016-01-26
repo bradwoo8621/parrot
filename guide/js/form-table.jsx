@@ -1262,6 +1262,14 @@
 						modelCode, layoutCode, compCode],
 					index: 20
 				};
+			},
+			css: function () {
+				return {
+					id: 'table-render-css',
+					title: 'Cell CSS',
+					desc: <span>Cell CSS can be defined via <code>column.css</code>, css class name needs to be defined in CSS files.</span>,
+					index: 30
+				};
 			}
 		};
 

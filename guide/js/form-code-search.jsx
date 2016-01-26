@@ -84,7 +84,8 @@
 					title: 'Default',
 					desc: <span>A simple code search box.<br/>
 					Set <code>labelPropId</code> to initial label value by data model,
-					or send remote request to retrieve label by code value. <br/>
+					or send remote request to retrieve label by code value.
+					Text of code will be set to data model if this attribute defined.<br/>
 					Remote request may cause the performance issue in some scenarios, so set <code>labelPropId</code> is recommended.</span>,
 					xml: {
 						width: 6,
