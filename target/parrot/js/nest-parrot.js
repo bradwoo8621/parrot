@@ -10779,6 +10779,7 @@
 			ADVANCED_SEARCH_DIALOG_RESULT_TITLE: 'Search Result',
 			NOT_FOUND: 'Not Found',
 			SEARCH_PROXY: null,
+			SEARCH_PROXY_CALLBACK: null,
 			ADVANCED_SEARCH_PROXY: null
 		},
 		propTypes: {
@@ -11014,12 +11015,16 @@
 					if (typeof data === 'string') {
 						data = JSON.parse(data);
 					}
-					_this.setLabelText(data.name);
+					var name = data.name;
+					if (NSearchText.SEARCH_PROXY_CALLBACK) {
+						name = NSearchText.SEARCH_PROXY_CALLBACK.call(this, data);
+					}
+					_this.setLabelText(name);
 				}).fail(function () {
 					window.console.error('Error occured when retrieve label from remote in NSearch.');
-					arguments.slice(0).forEach(function (argu) {
-						window.console.error(argu);
-					});
+					// arguments.slice(0).forEach(function(argu) {
+					// 	window.console.error(argu);
+					// });
 				});
 			}, 300);
 		},

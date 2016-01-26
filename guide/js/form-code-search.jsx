@@ -231,6 +231,7 @@
 								ADVANCED_SEARCH_DIALOG_RESULT_TITLE: 'Search Result',
 								NOT_FOUND: 'Not Found',
 								SEARCH_PROXY: null,
+								SEARCH_PROXY_CALLBACK: null,
 								ADVANCED_SEARCH_PROXY: null
 							}
 						}
