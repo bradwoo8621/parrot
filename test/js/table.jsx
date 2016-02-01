@@ -65,10 +65,12 @@
                 gender: '2',
                 object: {
                     age: 30
-                }
+                },
+                birth: '01/02/2015'
             }
         ]
     });
+    NDateTime.VALUE_FORMAT = 'MM/DD/YYYY';
     var layoutTemplate = {
         label: 'Table',
         dataId: 'items',
