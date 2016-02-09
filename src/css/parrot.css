@@ -1557,6 +1557,7 @@ div.n-table-container div.n-table-heading span.n-table-heading-label.n-table-hea
 }
 div.n-table-container div.n-table-heading a.n-table-heading-buttons {
   padding-top: 5px;
+  padding-left: 8px;
   color: #ffffff;
   outline: 0;
 }

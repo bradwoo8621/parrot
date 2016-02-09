@@ -22,6 +22,10 @@
 			},
 			ADD_BUTTON_ICON: "plus",
 			ADD_BUTTON_TEXT: "",
+			DOWNLOAD_BUTTON_ICON: "cloud-download",
+			DOWNLOAD_BUTTON_TEXT: "",
+			NO_DATA_DOWNLOAD_TITLE: 'Downloading...',
+			NO_DATA_DOWNLOAD: "No data needs to be downloaded...",
 			SEARCH_PLACE_HOLDER: "Search...",
 			ROW_EDIT_BUTTON_ICON: "pencil",
 			ROW_REMOVE_BUTTON_ICON: "trash-o",
@@ -38,7 +42,7 @@
 			BOOLEAN_TRUE_DISPLAY_TEXT: 'Y',
 			BOOLEAN_FALSE_DISPLAY_TEXT: 'N',
 			PAGE_JUMPING_PROXY: null,
-			registerInlineEditor: function(type, definition) {
+			registerInlineEditor: function (type, definition) {
 				if (NTable.__inlineEditors[type] != null) {
 					window.console.warn("Inline editor[" + type + "] is repalced.");
 					window.console.warn("From:");
@@ -48,7 +52,7 @@
 				}
 				NTable.__inlineEditors[type] = definition;
 			},
-			getInlineEditor: function(type) {
+			getInlineEditor: function (type) {
 				var editor = NTable.__inlineEditors[type];
 				if (editor == null) {
 					editor = NTable['__' + type];
@@ -104,6 +108,7 @@
 
 					addable: false,
 					searchable: true,
+					downloadable: true,
 
 					operationFixed: false,
 					editable: false,
@@ -132,7 +137,7 @@
 		 * @returns {*}
 		 */
 		getInitialState: function () {
-			var _this = this;
+			//var _this = this;
 			return {
 				sortColumn: null,
 				sortWay: null, // asc|desc
@@ -166,11 +171,11 @@
 				_this.getFixedLeftBodyComponent().scrollTop($this.scrollTop());
 				_this.getFixedRightBodyComponent().scrollTop($this.scrollTop());
 			});
-			this.getDivComponent().on("mouseenter", "tbody tr", function (e) {
+			this.getDivComponent().on("mouseenter", "tbody tr", function () {
 				//$(this).addClass("hover");
 				var index = $(this).parent().children().index($(this));
 				_this.getDivComponent().find("tbody tr:nth-child(" + (index + 1) + ")").addClass("hover");
-			}).on("mouseleave", "tbody tr", function (e) {
+			}).on("mouseleave", "tbody tr", function () {
 				var index = $(this).parent().children().index($(this));
 				_this.getDivComponent().find("tbody tr:nth-child(" + (index + 1) + ")").removeClass("hover");
 			});
@@ -309,7 +314,7 @@
 			} else if (!Array.isArray(rowOperations)) {
 				rowOperations = [rowOperations];
 			}
-			rowOperations = rowOperations.filter(function(operation) {
+			rowOperations = rowOperations.filter(function (operation) {
 				if (_this.isViewMode()) {
 					// in view mode, filter the buttons only in editing
 					return operation.view != 'edit';
@@ -358,7 +363,7 @@
 				}
 			}
 		},
-		calcOperationColumnWidth: function(editable, removable, rowOperations) {
+		calcOperationColumnWidth: function (editable, removable, rowOperations) {
 			var width = this.getComponentOption('operationColumnWidth');
 			if (width != null) {
 				return width;
@@ -366,7 +371,7 @@
 
 			var maxButtonCount = this.getComponentOption('maxOperationButtonCount');
 			if (maxButtonCount) {
-				var actualButtonCount = (editable ? 1 : 0) + (removable ? 1: 0) + rowOperations.length;
+				var actualButtonCount = (editable ? 1 : 0) + (removable ? 1 : 0) + rowOperations.length;
 				if (maxButtonCount > actualButtonCount) {
 					// no button in popover
 					width = (editable ? NTable.__operationButtonWidth : 0) + (removable ? NTable.__operationButtonWidth : 0);
@@ -398,22 +403,34 @@
 		},
 		/**
 		 * render heading buttons
-		 * @returns {XML}
+		 * @returns {*}
 		 */
 		renderHeadingButtons: function () {
+			var style = {display: this.state.expanded ? 'block' : 'none'};
+			var buttons = [];
 			if (this.isAddable()) {
-				return (<a href="javascript:void(0);"
-				           onClick={this.onAddClicked}
-				           className="n-table-heading-buttons pull-right"
-				           ref='add-button' style={{
-					display: this.state.expanded ? 'block' : 'none'
-				}}>
+				buttons.push(<a href="javascript:void(0);"
+				                onClick={this.onAddClicked}
+				                className="n-table-heading-buttons pull-right"
+				                ref='add-button'
+				                style={style}
+								key='add-button'>
 					<$pt.Components.NIcon icon={NTable.ADD_BUTTON_ICON}/>
 					{NTable.ADD_BUTTON_TEXT}
 				</a>);
-			} else {
-				return null;
 			}
+			if (this.isDownloadable()) {
+				buttons.push(<a href="javascript:void(0);"
+				                     onClick={this.onDownloadClicked}
+				                     className="n-table-heading-buttons pull-right"
+				                     ref='download-button'
+				                     style={style}
+									 key='download-button'>
+					<$pt.Components.NIcon icon={NTable.DOWNLOAD_BUTTON_ICON}/>
+					{NTable.DOWNLOAD_BUTTON_TEXT}
+				</a>);
+			}
+			return buttons;
 		},
 		/**
 		 * render panel heading label
@@ -555,34 +572,34 @@
 			var columnIndex = 0;
 			var _this = this;
 			return (<thead>
-				<tr>
-					{this.state.columns.map(function (column) {
-						if (columnIndex >= indexToRender.min && columnIndex <= indexToRender.max) {
-							// column is fixed.
-							columnIndex++;
-							var style = {};
-							style.width = column.width;
-							if (!(column.visible === undefined || column.visible === true)) {
-								style.display = "none";
-							}
-							if (column.rowSelectable) {
-								return (<td style={style} key={columnIndex}>
-									{_this.renderTableHeaderCheckBox(column)}
-								</td>);
-							} else {
-								return (<td style={style} key={columnIndex}>
-									{column.title}
-									{_this.renderTableHeaderSortButton(column)}
-								</td>);
-							}
-						} else {
-							columnIndex++;
+			<tr>
+				{this.state.columns.map(function (column) {
+					if (columnIndex >= indexToRender.min && columnIndex <= indexToRender.max) {
+						// column is fixed.
+						columnIndex++;
+						var style = {};
+						style.width = column.width;
+						if (!(column.visible === undefined || column.visible === true)) {
+							style.display = "none";
 						}
-					})}
-				</tr>
+						if (column.rowSelectable) {
+							return (<td style={style} key={columnIndex}>
+								{_this.renderTableHeaderCheckBox(column)}
+							</td>);
+						} else {
+							return (<td style={style} key={columnIndex}>
+								{column.title}
+								{_this.renderTableHeaderSortButton(column)}
+							</td>);
+						}
+					} else {
+						columnIndex++;
+					}
+				})}
+			</tr>
 			</thead>);
 		},
-		renderRowEditButton: function(rowModel) {
+		renderRowEditButton: function (rowModel) {
 			var layout = $pt.createCellLayout('editButton', {
 				comp: {
 					style: 'link',
@@ -595,9 +612,9 @@
 					comp: 'n-table-op-btn'
 				}
 			});
-			return <$pt.Components.NFormButton model={rowModel} layout={layout} />;
+			return <$pt.Components.NFormButton model={rowModel} layout={layout}/>;
 		},
-		renderRowRemoveButton: function(rowModel) {
+		renderRowRemoveButton: function (rowModel) {
 			var layout = $pt.createCellLayout('removeButton', {
 				comp: {
 					style: 'link',
@@ -610,9 +627,9 @@
 					comp: 'n-table-op-btn'
 				}
 			});
-			return <$pt.Components.NFormButton model={rowModel} layout={layout} />;
+			return <$pt.Components.NFormButton model={rowModel} layout={layout}/>;
 		},
-		isRowOperationVisible: function(operation, rowModel)  {
+		isRowOperationVisible: function (operation, rowModel) {
 			var visible = operation.visible;
 			if (visible) {
 				return this.getRuleValue(visible, true, rowModel);
@@ -620,7 +637,7 @@
 				return true;
 			}
 		},
-		renderRowOperationButton: function(operation, rowModel, operationIndex) {
+		renderRowOperationButton: function (operation, rowModel, operationIndex) {
 			var layout = $pt.createCellLayout('rowButton', {
 				label: operation.icon ? null : operation.tooltip,
 				comp: {
@@ -637,7 +654,7 @@
 			});
 			return <$pt.Components.NFormButton model={rowModel} layout={layout} key={operationIndex}/>;
 		},
-		getRowOperations: function(column) {
+		getRowOperations: function (column) {
 			var rowOperations = column.rowOperations;
 			if (rowOperations === undefined || rowOperations === null) {
 				rowOperations = [];
@@ -647,7 +664,7 @@
 		/**
 		 * render flat operation cell, all operation button renderred as a line.
 		 */
-		renderFlatOperationCell: function(column, rowModel) {
+		renderFlatOperationCell: function (column, rowModel) {
 			var editButton = column.editable ? this.renderRowEditButton(rowModel) : null;
 			var removeButton = column.removable ? this.renderRowRemoveButton(rowModel) : null;
 			var rowOperations = this.getRowOperations(column);
@@ -663,7 +680,7 @@
 				{removeButton}
 			</div>);
 		},
-		renderPopoverContainer: function() {
+		renderPopoverContainer: function () {
 			if (this.state.popoverDiv == null) {
 				this.state.popoverDiv = $('<div>');
 				this.state.popoverDiv.appendTo($('body'));
@@ -675,21 +692,21 @@
 		 * check all row operation buttons in more popover are renderred as icon and tooltip or menu?
 		 * if operation with no icon declared, return false (render as menu)
 		 */
-		isRenderMoreOperationButtonsAsIcon: function(moreOperations) {
+		isRenderMoreOperationButtonsAsIcon: function (moreOperations) {
 			if (this.getComponentOption('moreAsMenu')) {
 				return true;
 			} else {
-				return !moreOperations.some(function(operation) {
+				return !moreOperations.some(function (operation) {
 					return operation.icon == null;
 				});
 			}
 		},
-		renderPopoverAsMenu: function(moreOperations, rowModel) {
-			var hasIcon = moreOperations.some(function(operation) {
+		renderPopoverAsMenu: function (moreOperations, rowModel) {
+			var hasIcon = moreOperations.some(function (operation) {
 				return operation.icon != null;
 			});
 			var _this = this;
-			var renderOperation = function(operation, operationIndex) {
+			var renderOperation = function (operation, operationIndex) {
 				var layout = $pt.createCellLayout('rowButton', {
 					label: operation.tooltip,
 					comp: {
@@ -703,25 +720,25 @@
 					}
 				});
 				return (<li key={operationIndex}>
-					<$pt.Components.NFormButton model={rowModel} layout={layout} />
+					<$pt.Components.NFormButton model={rowModel} layout={layout}/>
 				</li>);
 			};
 			return (<ul className='nav'>{moreOperations.map(renderOperation)}</ul>);
 		},
-		renderPopoverAsIcon: function(moreOperations, rowModel) {
+		renderPopoverAsIcon: function (moreOperations, rowModel) {
 			var _this = this;
-			return moreOperations.map(function(operation, operationIndex) {
+			return moreOperations.map(function (operation, operationIndex) {
 				return _this.renderRowOperationButton(operation, rowModel, operationIndex);
 			});
 		},
-		renderPopover: function(moreOperations, rowModel, eventTarget) {
+		renderPopover: function (moreOperations, rowModel, eventTarget) {
 			var styles = {display: 'block'};
 			var target = $(eventTarget.closest('a'));
 			var offset = target.offset();
 			styles.top = offset.top + target.outerHeight() - 5;
 			styles.left = offset.left;
 
-			var _this = this;
+			//var _this = this;
 			ReactDOM.render((<div role="tooltip" className="n-table-op-btn-popover popover bottom in" style={styles}>
 				<div className="arrow"></div>
 				<div className="popover-content">
@@ -731,7 +748,7 @@
 				</div>
 			</div>), this.state.popoverDiv.get(0));
 		},
-		showPopover: function(moreOperations, rowModel, eventTarget) {
+		showPopover: function (moreOperations, rowModel, eventTarget) {
 			this.renderPopoverContainer();
 			this.renderPopover(moreOperations, rowModel, eventTarget);
 			this.state.popoverDiv.show();
@@ -745,37 +762,37 @@
 			styles.left = offset.left + target.outerWidth() - popWidth + 10;
 			popover.css(styles);
 		},
-		hidePopover: function() {
+		hidePopover: function () {
 			if (this.state.popoverDiv && this.state.popoverDiv.is(':visible')) {
 				this.state.popoverDiv.hide();
 				ReactDOM.render(<noscript/>, this.state.popoverDiv.get(0));
 			}
 		},
-		destroyPopover: function() {
+		destroyPopover: function () {
 			if (this.state.popoverDiv) {
 				$(document).off('click', this.onDocumentClicked).off('keyup', this.onDocumentKeyUp);
 				this.state.popoverDiv.remove();
 				delete this.state.popoverDiv;
 			}
 		},
-		onDocumentClicked: function(evt) {
+		onDocumentClicked: function (evt) {
 			var target = $(evt.target);
 			if (target.closest(this.state.popoverDiv).length == 0) {
 				this.hidePopover();
 			}
 		},
-		onDocumentKeyUp: function(evt) {
+		onDocumentKeyUp: function (evt) {
 			if (evt.keyCode === 27) {
 				this.hidePopover();
 			}
 		},
-		onRowOperationMoreClicked: function(moreOperations, rowModel, eventTarget) {
+		onRowOperationMoreClicked: function (moreOperations, rowModel, eventTarget) {
 			this.showPopover(moreOperations, rowModel, eventTarget);
 		},
 		/**
 		 * render more operations buttons
 		 */
-		renderRowOperationMoreButton: function(moreOperations, rowModel) {
+		renderRowOperationMoreButton: function (moreOperations, rowModel) {
 			var layout = $pt.createCellLayout('rowButton', {
 				comp: {
 					style: 'link',
@@ -793,7 +810,7 @@
 		 * render dropdown operation cell, only buttons which before maxButtonCount are renderred as a line,
 		 * a dropdown button is renderred in last, other buttons are renderred in popover of dropdown button.
 		 */
-		renderDropDownOperationCell: function(column, rowModel, maxButtonCount) {
+		renderDropDownOperationCell: function (column, rowModel, maxButtonCount) {
 			var _this = this;
 			var rowOperations = this.getRowOperations(column);
 			if (column.editable) {
@@ -803,13 +820,13 @@
 				rowOperations.push({removeButton: true});
 			}
 			// filter invisible operations, will not monitor the attributes in depends property
-			rowOperations = rowOperations.filter(function(rowOperation) {
+			rowOperations = rowOperations.filter(function (rowOperation) {
 				return _this.isRowOperationVisible(rowOperation, rowModel);
 			});
 
 			var used = -1;
 			var buttons = [];
-			rowOperations.some(function(operation, operationIndex) {
+			rowOperations.some(function (operation, operationIndex) {
 				if (operation.editButton) {
 					buttons.push(_this.renderRowEditButton(rowModel));
 				} else if (operation.removeButton) {
@@ -827,7 +844,8 @@
 			}
 
 			return (<div className="btn-group n-table-op-btn-group" role='group'>
-				{buttons}{dropdown}
+				{buttons}
+				{dropdown}
 			</div>);
 		},
 		/**
@@ -938,9 +956,9 @@
 								}
 								// pre-defined, use with data together
 								data = <$pt.Components.NFormCell model={inlineModel}
-												  layout={$pt.createCellLayout(column.data, layout)}
-												  direction='horizontal'
-												  view={_this.isViewMode()}/>;
+								                                 layout={$pt.createCellLayout(column.data, layout)}
+								                                 direction='horizontal'
+								                                 view={_this.isViewMode()}/>;
 							} else if (column.inline.inlineType == 'cell') {
 								column.inline.pos = {width: 12};
 								if (column.inline.css) {
@@ -949,17 +967,17 @@
 									column.inline.css = {cell: 'inline-editor'};
 								}
 								data = <$pt.Components.NFormCell model={inlineModel}
-												  layout={$pt.createCellLayout(column.data, column.inline)}
-												  direction='horizontal'
-												  view={_this.isViewMode()}
-												  className={column.inline.__className} />;
+								                                 layout={$pt.createCellLayout(column.data, column.inline)}
+								                                 direction='horizontal'
+								                                 view={_this.isViewMode()}
+								                                 className={column.inline.__className}/>;
 							} else {
 								// any other, treat as form layout
 								// column.data is not necessary
 								data = <$pt.Components.NForm model={inlineModel}
-											  layout={$pt.createFormLayout(column.inline)}
-											  direction='horizontal'
-											  view={_this.isViewMode()} />;
+								                             layout={$pt.createFormLayout(column.inline)}
+								                             direction='horizontal'
+								                             view={_this.isViewMode()}/>;
 							}
 						} else {
 							// data is property name
@@ -1214,7 +1232,8 @@
 			if (this.isPageable() && this.hasDataToDisplay()) {
 				// only show when pageable and has data to display
 				return (<$pt.Components.NPagination className="n-table-pagination" pageCount={this.state.pageCount}
-				                     currentPageIndex={this.state.currentPageIndex} toPage={this.toPage}/>);
+				                                    currentPageIndex={this.state.currentPageIndex}
+				                                    toPage={this.toPage}/>);
 			} else {
 				return null;
 			}
@@ -1467,7 +1486,7 @@
 		isEditable: function () {
 			return this.getComponentOption("editable");
 		},
-		getRowEditButtonEnabled: function() {
+		getRowEditButtonEnabled: function () {
 			return this.getComponentOption('rowEditEnabled');
 		},
 		/**
@@ -1477,8 +1496,11 @@
 		isRemovable: function () {
 			return this.getComponentOption("removable") && !this.isViewMode();
 		},
-		getRowRemoveButtonEnabled: function() {
+		getRowRemoveButtonEnabled: function () {
 			return this.getComponentOption('rowRemoveEnabled');
+		},
+		isDownloadable: function () {
+			return this.getComponentOption('downloadable');
 		},
 		/**
 		 * check the table is searchable or not
@@ -1726,7 +1748,9 @@
 						validate: this.getComponentOption('dialogValidateVisible'),
 						// use default cancel behavior when editing
 						// simply hide dialog when in view mode
-						cancel: this.isViewMode() ? function(model, hide) {hide();} : true
+						cancel: this.isViewMode() ? function (model, hide) {
+							hide();
+						} : true
 					},
 					view: this.isViewMode()
 				});
@@ -1773,6 +1797,110 @@
 		 */
 		onRowOperationClicked: function (callback, data) {
 			callback.call(this, data);
+		},
+		/**
+		 * on download clicked
+		 */
+		onDownloadClicked: function () {
+			var data = null;
+			var queryCriteria = this.getQuerySettings();
+			if (queryCriteria === null) {
+				// no query criteria, all data is on local
+				data = this.getValueFromModel();
+				this.exposeDownloading(data);
+			} else {
+				var model = this.getModel();
+				var criteria = model.get(queryCriteria);
+				criteria = $.extend({}, criteria);
+				var url = criteria.url;
+				delete criteria.url;
+				delete criteria.pageCount;
+				criteria.pageIndex = -1;
+				if (NTable.PAGE_JUMPING_PROXY) {
+					criteria = NTable.PAGE_JUMPING_PROXY.call(this, criteria);
+				}
+				var downloadListener = this.getEventMonitor('download');
+				if (downloadListener) {
+					this.notifyEvent({
+						type: 'pageChange',
+						criteria: criteria,
+						target: this
+					});
+				} else {
+					var _this = this;
+					$pt.doPost(url, criteria).done(function (data) {
+						if (typeof data === 'string') {
+							data = JSON.parse(data);
+						}
+						_this.exposeDownloading(data);
+					});
+				}
+				// todo how to handle failure?
+			}
+		},
+		exposeDownloading: function(data) {
+			if (data == null || data.length == 0) {
+				NConfirm.getConfirmModal().show({
+					title: NTable.NO_DATA_DOWNLOAD_TITLE,
+					messages: NTable.NO_DATA_DOWNLOAD,
+					disableConfirm: true,
+					close: true
+				});
+			} else {
+				this.tableToExcel(data);
+			}
+		},
+		tableToExcel: function(data) {
+			//creating a temporary HTML link element (they support setting file names)
+	        var a = document.createElement('a');
+	        //getting data from our div that contains the HTML table
+	        var dataType = 'data:application/vnd.ms-excel';
+			var tableHeaderHtml = this.generateTableExcelHeader();
+			var tableBodyHtml = '<tbody>' + data.map(this.generateTableExcelBodyRow).join('') + '</tbody>';
+	        var tableHtml = '<table>' + tableHeaderHtml + tableBodyHtml + '</table>';
+			tableHtml = tableHtml.replace(/ /g, '%20');
+	        a.href = dataType + ', ' + tableHtml;
+	        //setting the file name
+	        a.download = 'exported_data.xls';
+	        //triggering the function
+	        a.click();
+		},
+		generateTableExcelHeader: function() {
+			var columns = this.state.columns.map(function (column) {
+				if (!(column.visible === undefined || column.visible === true)) {
+					return '';
+				}
+				if (column.editable || column.removable || column.rowOperations != null) {
+					return '';
+				} else if (column.indexable) {
+					return '';
+				} else if (column.rowSelectable) {
+					return '';
+				} else {
+					return '<td>' + column.title + '</td>';
+				}
+			});
+			return '<thead><tr>' + columns.join('') + '</tr></thead>';
+		},
+		generateTableExcelBodyRow: function(row) {
+			var _this = this;
+			var columns = this.state.columns.map(function (column) {
+				if (!(column.visible === undefined || column.visible === true)) {
+					return '';
+				}
+				if (column.editable || column.removable || column.rowOperations != null) {
+					return '';
+				} else if (column.indexable) {
+					return '';
+				} else if (column.rowSelectable) {
+					return '';
+				} else {
+					// data is property name
+					var data = _this.getDisplayTextOfColumn(column, row);
+					return '<td>' + (data == null ? '' : data) + '</td>';
+				}
+			});
+			return '<tr>' + columns.join('') + '</tr>';
 		},
 		/**
 		 * on search box changed
@@ -1894,17 +2022,17 @@
 			editModel.parent(this.getModel());
 			return editModel;
 		},
-		createInlineRowModel: function(item) {
+		createInlineRowModel: function (item) {
 			var model = this.createEditingModel(item);
 			model.useBaseAsCurrent();
 			var listeners = this.getComponentOption('rowListener');
 			if (listeners) {
 				listeners = Array.isArray(listeners) ? listeners : [listeners];
-				listeners.forEach(function(listener) {
+				listeners.forEach(function (listener) {
 					model.addListener(listener.id,
 						listener.time ? listener.time : 'post',
 						listener.type ? listener.type : 'change',
-					listener.listener);
+						listener.listener);
 				});
 			}
 			return model;
@@ -2060,7 +2188,7 @@
 		/**
 		 * clear columns definition
 		 */
-		clearColumnsDefinition: function() {
+		clearColumnsDefinition: function () {
 			this.state.columns = null;
 			this.forceUpdate();
 		}

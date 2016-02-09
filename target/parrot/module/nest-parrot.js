@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.2.0 2016-01-26 */
+	/** nest-parrot.V0.2.0 2016-02-09 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -12756,6 +12756,10 @@
 			},
 			ADD_BUTTON_ICON: "plus",
 			ADD_BUTTON_TEXT: "",
+			DOWNLOAD_BUTTON_ICON: "cloud-download",
+			DOWNLOAD_BUTTON_TEXT: "",
+			NO_DATA_DOWNLOAD_TITLE: 'Downloading...',
+			NO_DATA_DOWNLOAD: "No data needs to be downloaded...",
 			SEARCH_PLACE_HOLDER: "Search...",
 			ROW_EDIT_BUTTON_ICON: "pencil",
 			ROW_REMOVE_BUTTON_ICON: "trash-o",
@@ -12837,6 +12841,7 @@
 
 					addable: false,
 					searchable: true,
+					downloadable: true,
 
 					operationFixed: false,
 					editable: false,
@@ -12865,7 +12870,7 @@
    * @returns {*}
    */
 		getInitialState: function () {
-			var _this = this;
+			//var _this = this;
 			return {
 				sortColumn: null,
 				sortWay: null, // asc|desc
@@ -12899,11 +12904,11 @@
 				_this.getFixedLeftBodyComponent().scrollTop($this.scrollTop());
 				_this.getFixedRightBodyComponent().scrollTop($this.scrollTop());
 			});
-			this.getDivComponent().on("mouseenter", "tbody tr", function (e) {
+			this.getDivComponent().on("mouseenter", "tbody tr", function () {
 				//$(this).addClass("hover");
 				var index = $(this).parent().children().index($(this));
 				_this.getDivComponent().find("tbody tr:nth-child(" + (index + 1) + ")").addClass("hover");
-			}).on("mouseleave", "tbody tr", function (e) {
+			}).on("mouseleave", "tbody tr", function () {
 				var index = $(this).parent().children().index($(this));
 				_this.getDivComponent().find("tbody tr:nth-child(" + (index + 1) + ")").removeClass("hover");
 			});
@@ -13131,24 +13136,38 @@
 		},
 		/**
    * render heading buttons
-   * @returns {XML}
+   * @returns {*}
    */
 		renderHeadingButtons: function () {
+			var style = { display: this.state.expanded ? 'block' : 'none' };
+			var buttons = [];
 			if (this.isAddable()) {
-				return React.createElement(
+				buttons.push(React.createElement(
 					'a',
 					{ href: 'javascript:void(0);',
 						onClick: this.onAddClicked,
 						className: 'n-table-heading-buttons pull-right',
-						ref: 'add-button', style: {
-							display: this.state.expanded ? 'block' : 'none'
-						} },
+						ref: 'add-button',
+						style: style,
+						key: 'add-button' },
 					React.createElement($pt.Components.NIcon, { icon: NTable.ADD_BUTTON_ICON }),
 					NTable.ADD_BUTTON_TEXT
-				);
-			} else {
-				return null;
+				));
 			}
+			if (this.isDownloadable()) {
+				buttons.push(React.createElement(
+					'a',
+					{ href: 'javascript:void(0);',
+						onClick: this.onDownloadClicked,
+						className: 'n-table-heading-buttons pull-right',
+						ref: 'download-button',
+						style: style,
+						key: 'download-button' },
+					React.createElement($pt.Components.NIcon, { icon: NTable.DOWNLOAD_BUTTON_ICON }),
+					NTable.DOWNLOAD_BUTTON_TEXT
+				));
+			}
+			return buttons;
 		},
 		/**
    * render panel heading label
@@ -13484,7 +13503,7 @@
 			styles.top = offset.top + target.outerHeight() - 5;
 			styles.left = offset.left;
 
-			var _this = this;
+			//var _this = this;
 			ReactDOM.render(React.createElement(
 				'div',
 				{ role: 'tooltip', className: 'n-table-op-btn-popover popover bottom in', style: styles },
@@ -14036,7 +14055,8 @@
 			if (this.isPageable() && this.hasDataToDisplay()) {
 				// only show when pageable and has data to display
 				return React.createElement($pt.Components.NPagination, { className: 'n-table-pagination', pageCount: this.state.pageCount,
-					currentPageIndex: this.state.currentPageIndex, toPage: this.toPage });
+					currentPageIndex: this.state.currentPageIndex,
+					toPage: this.toPage });
 			} else {
 				return null;
 			}
@@ -14311,6 +14331,9 @@
 		},
 		getRowRemoveButtonEnabled: function () {
 			return this.getComponentOption('rowRemoveEnabled');
+		},
+		isDownloadable: function () {
+			return this.getComponentOption('downloadable');
 		},
 		/**
    * check the table is searchable or not
@@ -14605,6 +14628,110 @@
    */
 		onRowOperationClicked: function (callback, data) {
 			callback.call(this, data);
+		},
+		/**
+   * on download clicked
+   */
+		onDownloadClicked: function () {
+			var data = null;
+			var queryCriteria = this.getQuerySettings();
+			if (queryCriteria === null) {
+				// no query criteria, all data is on local
+				data = this.getValueFromModel();
+				this.exposeDownloading(data);
+			} else {
+				var model = this.getModel();
+				var criteria = model.get(queryCriteria);
+				criteria = $.extend({}, criteria);
+				var url = criteria.url;
+				delete criteria.url;
+				delete criteria.pageCount;
+				criteria.pageIndex = -1;
+				if (NTable.PAGE_JUMPING_PROXY) {
+					criteria = NTable.PAGE_JUMPING_PROXY.call(this, criteria);
+				}
+				var downloadListener = this.getEventMonitor('download');
+				if (downloadListener) {
+					this.notifyEvent({
+						type: 'pageChange',
+						criteria: criteria,
+						target: this
+					});
+				} else {
+					var _this = this;
+					$pt.doPost(url, criteria).done(function (data) {
+						if (typeof data === 'string') {
+							data = JSON.parse(data);
+						}
+						_this.exposeDownloading(data);
+					});
+				}
+				// todo how to handle failure?
+			}
+		},
+		exposeDownloading: function (data) {
+			if (data == null || data.length == 0) {
+				NConfirm.getConfirmModal().show({
+					title: NTable.NO_DATA_DOWNLOAD_TITLE,
+					messages: NTable.NO_DATA_DOWNLOAD,
+					disableConfirm: true,
+					close: true
+				});
+			} else {
+				this.tableToExcel(data);
+			}
+		},
+		tableToExcel: function (data) {
+			//creating a temporary HTML link element (they support setting file names)
+			var a = document.createElement('a');
+			//getting data from our div that contains the HTML table
+			var dataType = 'data:application/vnd.ms-excel';
+			var tableHeaderHtml = this.generateTableExcelHeader();
+			var tableBodyHtml = '<tbody>' + data.map(this.generateTableExcelBodyRow).join('') + '</tbody>';
+			var tableHtml = '<table>' + tableHeaderHtml + tableBodyHtml + '</table>';
+			tableHtml = tableHtml.replace(/ /g, '%20');
+			a.href = dataType + ', ' + tableHtml;
+			//setting the file name
+			a.download = 'exported_data.xls';
+			//triggering the function
+			a.click();
+		},
+		generateTableExcelHeader: function () {
+			var columns = this.state.columns.map(function (column) {
+				if (!(column.visible === undefined || column.visible === true)) {
+					return '';
+				}
+				if (column.editable || column.removable || column.rowOperations != null) {
+					return '';
+				} else if (column.indexable) {
+					return '';
+				} else if (column.rowSelectable) {
+					return '';
+				} else {
+					return '<td>' + column.title + '</td>';
+				}
+			});
+			return '<thead><tr>' + columns.join('') + '</tr></thead>';
+		},
+		generateTableExcelBodyRow: function (row) {
+			var _this = this;
+			var columns = this.state.columns.map(function (column) {
+				if (!(column.visible === undefined || column.visible === true)) {
+					return '';
+				}
+				if (column.editable || column.removable || column.rowOperations != null) {
+					return '';
+				} else if (column.indexable) {
+					return '';
+				} else if (column.rowSelectable) {
+					return '';
+				} else {
+					// data is property name
+					var data = _this.getDisplayTextOfColumn(column, row);
+					return '<td>' + (data == null ? '' : data) + '</td>';
+				}
+			});
+			return '<tr>' + columns.join('') + '</tr>';
 		},
 		/**
    * on search box changed

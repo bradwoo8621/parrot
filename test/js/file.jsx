@@ -33,12 +33,31 @@
         }
     }));
     var eventMonitor = $pt.createCellLayout('file', $.extend(true, {}, layoutTemplate, {
+        comp: {
+            uploadUrl: '/test',
+            uploadAsync: false
+        },
         evt: {
             filebrowse: function(evt) {
                 console.log(evt);
+            },
+            fileuploaded: function(event, data, previewId, index) {
+                console.log(event);
+                console.log(data);
+                console.log(previewId);
+                console.log(index);
             }
         }
     }));
+    $.mockjax({
+        url: "/test",
+        response: function (settings) {
+            this.responseText = {
+                code: 'code',
+                name: 'name'
+            }
+        }
+    });
 
     var panel = (<div className='row'>
         <div className='col-md-6 col-lg-6 col-sm-6'>
