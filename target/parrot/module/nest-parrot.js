@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.2.0 2016-02-09 */
+	/** nest-parrot.V0.2.0 2016-02-18 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -5854,7 +5854,7 @@
 			};
 			if ((popoverType & NDateTime.FORMAT_TYPES.DAY) != 0) {
 				// has day, YMD
-				this.startClockInterval(NDateTime.FORMAT_TYPES.DAY);
+				this.startClockInterval(NDateTime.FORMAT_TYPES.DAY, date);
 				return React.createElement(
 					'div',
 					{ className: 'popover-content row' },
@@ -5869,7 +5869,7 @@
 				);
 			} else if ((popoverType & NDateTime.FORMAT_TYPES.MONTH) != 0) {
 				// has month, YM
-				this.startClockInterval(NDateTime.FORMAT_TYPES.MONTH);
+				this.startClockInterval(NDateTime.FORMAT_TYPES.MONTH, date);
 				return React.createElement(
 					'div',
 					{ className: 'popover-content row' },
@@ -5884,7 +5884,7 @@
 				);
 			} else if ((popoverType & NDateTime.FORMAT_TYPES.YEAR) != 0) {
 				// has year, YEAR
-				this.startClockInterval(NDateTime.FORMAT_TYPES.YEAR);
+				this.startClockInterval(NDateTime.FORMAT_TYPES.YEAR, date);
 				return React.createElement(
 					'div',
 					{ className: 'popover-content row' },
@@ -5898,7 +5898,7 @@
 					this.renderTime(date, NDateTime.FORMAT_TYPES.YEAR)
 				);
 			} else {
-				this.startClockInterval(popoverType);
+				this.startClockInterval(popoverType, date);
 				// only time
 				return React.createElement(
 					'div',
@@ -5994,23 +5994,21 @@
 		},
 		stopClockInterval: function () {
 			if (this.state.clockInterval) {
-				clearInterval(this.state.clockInterval.handler);
+				clearTimeout(this.state.clockInterval.handler);
 				this.state.clockInterval = null;
 			}
 		},
-		startClockInterval: function (popoverType) {
+		startClockInterval: function (popoverType, currentTime) {
 			var _this = this;
 			var value = this.getValueFromModel();
 			if (value == null) {
-				if (!this.state.clockInterval || this.state.clockInterval.type != popoverType) {
-					this.stopClockInterval();
-					this.state.clockInterval = {
-						handler: setInterval(function () {
-							_this.renderPopover({ date: moment(), type: popoverType });
-						}, 1000),
-						type: popoverType
-					};
-				}
+				this.stopClockInterval();
+				this.state.clockInterval = {
+					handler: setTimeout(function () {
+						_this.renderPopover({ date: currentTime.add(1, 's'), type: popoverType });
+					}, 1000),
+					type: popoverType
+				};
 			} else {
 				this.stopClockInterval();
 			}

@@ -1330,6 +1330,31 @@
 					index: 60
 				};
 			},
+			download: function () {
+				var layout = $.extend(true, {}, layoutTemplate, {comp: {downloadable: true}});
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'value',
+					template: layout
+				});
+				return {
+					id: 'table-download',
+					title: 'Download',
+					desc: <span>Table content default can be downloaded by download button in panel header.<br/>
+						Set <code>downloadable</code> as false to disable this feature.<br/>
+						If table is delared as pageable, download button will send a standard request
+						(same as pagination request except pageIndex is -1) to server side to get all data and trigger excel exporting.<br/>
+						And an event <code>download</code> is predefined to handle the download event,
+						if download is defined in component options, then the standard behavior is ignored.
+					</span>,
+					xml: {
+						width: 12,
+						xml: <NTable model={model} layout={$pt.createCellLayout('items', layout)}/>
+					},
+					code: [modelCode, layoutCode, compCode],
+					index: 61
+				};
+			},
 			render: function () {
 				return {
 					id: 'table-render',
