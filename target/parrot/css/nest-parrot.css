@@ -520,15 +520,6 @@ input[type=tel].form-control[disabled] {
 .dropdown-menu .divider {
   margin: 5px 0;
 }
-.bootstrap-datetimepicker-widget a[data-action] {
-  -webkit-box-shadow: none;
-  box-shadow: none;
-  -o-box-shadow: none;
-}
-.bootstrap-datetimepicker-widget .datepicker-decades .decade {
-  float: left;
-  text-align: center;
-}
 div.n-datetime {
   position: relative;
 }
@@ -1431,65 +1422,6 @@ div.n-modal-form .modal-title > a:focus {
 div.n-modal-form .modal-title > a:hover {
   text-decoration: underline;
 }
-.select2-container.select2-container--default .select2-selection--single {
-  height: auto;
-  line-height: 32px;
-  border: 0;
-  outline: 0;
-  background-color: transparent;
-}
-.select2-container.select2-container--default .select2-selection--single .select2-selection__rendered {
-  line-height: 30px;
-  color: #666666;
-  padding-left: 0;
-}
-.select2-container.select2-container--default .select2-selection--single .select2-selection__arrow {
-  height: 30px;
-  /* change height from 26px to 30px to fit the bootstrap height */
-}
-.select2-container.select2-container--default .select2-selection--single .select2-selection__placeholder {
-  color: #666666;
-}
-.select2-container.select2-container--default.select2-container--open .select2-dropdown {
-  z-index: 8000;
-  border-color: #e0e0e0;
-}
-.select2-container.select2-container--default.select2-container--open .select2-dropdown.select2-dropdown--above {
-  border-bottom: solid 1px #e0e0e0;
-}
-.select2-container.select2-container--default.select2-container--open .select2-dropdown .select2-search--dropdown .select2-search__field {
-  outline: 0;
-  border: solid 1px #e0e0e0;
-  border-radius: 4px;
-}
-.select2-container.select2-container--default.select2-container--focus hr.focus-line,
-.select2-container.select2-container--default.select2-container--open hr.focus-line {
-  transform: scaleX(1);
-  -o-transform: scaleX(1);
-  -webkit-transform: scaleX(1);
-}
-.select2-container.select2-container--default.select2-container--disabled .select2-selection--single {
-  background-color: transparent;
-  cursor: not-allowed;
-}
-.select2-container.select2-container--default.select2-container--disabled .select2-selection--single .select2-selection__placeholder,
-.select2-container.select2-container--default.select2-container--disabled .select2-selection--single .select2-selection__rendered {
-  color: #9f9f9f;
-}
-.select2-container.select2-container--default.select2-container--disabled .select2-selection--single .select2-selection__arrow b {
-  border-color: #9f9f9f transparent transparent transparent;
-}
-.select2-container.select2-container--default.select2-container--disabled.select2-container--open .select2-selection--single .select2-selection__arrow b {
-  border-color: transparent transparent #9f9f9f transparent;
-}
-.select2-container.select2-container--default.select2-container--disabled hr.normal-line {
-  border-bottom: dashed 1px #e0e0e0;
-}
-.select2-container.select2-container--default.select2-container--disabled.select2-container--focus hr.focus-line {
-  transform: scaleX(0);
-  -o-transform: scaleX(0);
-  -webkit-transform: scaleX(0);
-}
 div.n-select {
   outline: none;
   position: relative;
@@ -1625,6 +1557,7 @@ div.n-table-container div.n-table-heading span.n-table-heading-label.n-table-hea
 }
 div.n-table-container div.n-table-heading a.n-table-heading-buttons {
   padding-top: 5px;
+  padding-left: 8px;
   color: #ffffff;
   outline: 0;
 }
@@ -3117,32 +3050,6 @@ div.has-error input[type=password].form-control,
 div.has-error input[type=email].form-control,
 div.has-error input[type=tel].form-control {
   color: #f44336;
-}
-div.has-error span.select2-selection {
-  border-color: #f44336;
-  color: #f44336;
-}
-div.has-error .select2-container--default .select2-selection--single .select2-selection__rendered,
-div.has-error .select2-container--default.select2-container--disabled .select2-selection--single .select2-selection__rendered {
-  color: #f44336;
-}
-div.has-error .select2-container--default .select2-selection--single .select2-selection__arrow b,
-div.has-error .select2-container--default.select2-container--disabled .select2-selection--single .select2-selection__arrow b {
-  border-color: #f44336 transparent transparent transparent;
-}
-div.has-error .select2-container--default .select2-selection--single .select2-selection__placeholder,
-div.has-error .select2-container--default.select2-container--disabled .select2-selection--single .select2-selection__placeholder {
-  color: #f44336;
-}
-div.has-error .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b,
-div.has-error .select2-container--default.select2-container--disabled.select2-container--open .select2-selection--single .select2-selection__arrow b {
-  border-color: transparent transparent #f44336 transparent;
-}
-div.has-error .select2-container--default.select2-container--focus hr.focus-line,
-div.has-error .select2-container--default.select2-container--disabled.select2-container--focus hr.focus-line {
-  transform: scaleX(1);
-  -o-transform: scaleX(1);
-  -webkit-transform: scaleX(1);
 }
 div.has-error div.popover {
   max-width: 500px;

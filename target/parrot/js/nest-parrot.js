@@ -1,4 +1,4 @@
-/** nest-parrot.V0.1.1 2015-12-29 */
+/** nest-parrot.V0.2.0 2016-02-18 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -82,7 +82,7 @@
 				String.prototype.padLeft = function (nSize, ch) {
 					var len = 0;
 					var s = this ? this : "";
-					ch = ch ? ch : '0'; //默认补0
+					ch = ch ? ch : '0'; // default add 0
 					len = s.length;
 					while (len < nSize) {
 						s = ch + s;
@@ -271,7 +271,7 @@
 	$pt.Components = {};
 	$pt.exposeComponents = function (context) {
 		Object.keys($pt.Components).forEach(function (component) {
-			window[component] = $pt.Components[component];
+			context[component] = $pt.Components[component];
 		});
 	};
 	// component constants
@@ -979,8 +979,8 @@
 		var deep = params.deep;
 		var target = params.target ? params.target : {};
 		var sources = Array.isArray(params.sources) ? params.sources : [params.sources];
-		console.log(target);
-		console.log(sources);
+		// console.log(target);
+		// console.log(sources);
 
 		var source,
 		    propName,
@@ -1000,9 +1000,9 @@
 			// Only deal with non-null/undefined values
 			if ((source = sources[sourceIndex]) != null) {
 				// Extend the base object
-				console.log(source);
+				// console.log(source);
 				for (propName in source) {
-					console.log(propName);
+					// console.log(propName);
 					targetPropValue = target[propName];
 					sourcePropValue = source[propName];
 
@@ -5823,7 +5823,7 @@
 			};
 			if ((popoverType & NDateTime.FORMAT_TYPES.DAY) != 0) {
 				// has day, YMD
-				this.startClockInterval(NDateTime.FORMAT_TYPES.DAY);
+				this.startClockInterval(NDateTime.FORMAT_TYPES.DAY, date);
 				return React.createElement(
 					'div',
 					{ className: 'popover-content row' },
@@ -5838,7 +5838,7 @@
 				);
 			} else if ((popoverType & NDateTime.FORMAT_TYPES.MONTH) != 0) {
 				// has month, YM
-				this.startClockInterval(NDateTime.FORMAT_TYPES.MONTH);
+				this.startClockInterval(NDateTime.FORMAT_TYPES.MONTH, date);
 				return React.createElement(
 					'div',
 					{ className: 'popover-content row' },
@@ -5853,7 +5853,7 @@
 				);
 			} else if ((popoverType & NDateTime.FORMAT_TYPES.YEAR) != 0) {
 				// has year, YEAR
-				this.startClockInterval(NDateTime.FORMAT_TYPES.YEAR);
+				this.startClockInterval(NDateTime.FORMAT_TYPES.YEAR, date);
 				return React.createElement(
 					'div',
 					{ className: 'popover-content row' },
@@ -5867,7 +5867,7 @@
 					this.renderTime(date, NDateTime.FORMAT_TYPES.YEAR)
 				);
 			} else {
-				this.startClockInterval(popoverType);
+				this.startClockInterval(popoverType, date);
 				// only time
 				return React.createElement(
 					'div',
@@ -5963,23 +5963,21 @@
 		},
 		stopClockInterval: function () {
 			if (this.state.clockInterval) {
-				clearInterval(this.state.clockInterval.handler);
+				clearTimeout(this.state.clockInterval.handler);
 				this.state.clockInterval = null;
 			}
 		},
-		startClockInterval: function (popoverType) {
+		startClockInterval: function (popoverType, currentTime) {
 			var _this = this;
 			var value = this.getValueFromModel();
 			if (value == null) {
-				if (!this.state.clockInterval || this.state.clockInterval.type != popoverType) {
-					this.stopClockInterval();
-					this.state.clockInterval = {
-						handler: setInterval(function () {
-							_this.renderPopover({ date: moment(), type: popoverType });
-						}, 1000),
-						type: popoverType
-					};
-				}
+				this.stopClockInterval();
+				this.state.clockInterval = {
+					handler: setTimeout(function () {
+						_this.renderPopover({ date: currentTime.add(1, 's'), type: popoverType });
+					}, 1000),
+					type: popoverType
+				};
 			} else {
 				this.stopClockInterval();
 			}
@@ -6364,406 +6362,6 @@
 	$pt.Components.NDateTime = NDateTime;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Date, function (model, layout, direction, viewMode) {
 		return React.createElement($pt.Components.NDateTime, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
-	});
-})(window, jQuery, moment, React, ReactDOM, $pt);
-
-/**
- * datetime picker, see datetimepicker from bootstrap
- *
- * layout: {
- *      label: string,
- *      dataId: string,
- *      pos: {
- *          row: number,
- *          col: number,
- *          width: number,
- *          section: string,
- *          card: string
- *      },
- *      css: {
- *          cell: string,
- *          comp: string,
- *          'normal-line': string,
- *          'focus-line': string
- *      },
- *      comp: {
- *          type: $pt.ComponentConstants.Date,
- *          enabled: {
- *              when: function,
- *              depends: string|string[]
- *          },
- *          visible: {
- *              when: function,
- *              depends: string|string[]
- *          },
- *          valueFormat: $pt.ComponentConstants.Default_Date_Format
- *          // other properties see official doc please
- *      }
- * }
- */
-(function (window, $, moment, React, ReactDOM, $pt) {
-	var NDateTime2 = React.createClass($pt.defineCellComponent({
-		displayName: 'NDateTime2',
-		statics: {
-			FORMAT: 'YYYY/MM/DD',
-			DAY_VIEW_HEADER_FORMAT: 'MMMM YYYY',
-			HEADER_YEAR_FORMAT: null,
-			VALUE_FORMAT: $pt.ComponentConstants.Default_Date_Format,
-			LOCALE: 'en',
-			DATE_PICKER_VERTICAL_OFFSET: 35 // equals row height according to current testing
-		},
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object
-		},
-		getDefaultProps: function () {
-			return {
-				defaultOptions: {
-					//format: "YYYY/MM/DD",
-					//dayViewHeaderFormat: "MMMM YYYY",
-					//locale: 'en',
-					stepping: 1,
-					useCurrent: false,
-					minDate: false,
-					maxDate: false,
-					collapse: true,
-					defaultDate: false,
-					disabledDates: false,
-					enabledDates: false,
-					icons: {
-						time: 'glyphicon glyphicon-time',
-						date: 'glyphicon glyphicon-calendar',
-						up: 'glyphicon glyphicon-chevron-up',
-						down: 'glyphicon glyphicon-chevron-down',
-						previous: 'glyphicon glyphicon-chevron-left',
-						next: 'glyphicon glyphicon-chevron-right',
-						today: 'glyphicon glyphicon-screenshot',
-						clear: 'glyphicon glyphicon-trash'
-					},
-					useStrict: false,
-					sideBySide: true,
-					daysOfWeekDisabled: [],
-					calendarWeeks: false,
-					viewMode: 'days',
-					toolbarPlacement: 'default',
-					showTodayButton: true,
-					showClear: true,
-					showClose: true,
-					tooltips: {
-						today: 'Go to today',
-						clear: 'Clear selection',
-						close: 'Close the picker',
-						selectMonth: 'Select Month',
-						prevMonth: 'Previous Month',
-						nextMonth: 'Next Month',
-						selectYear: 'Select Year',
-						prevYear: 'Previous Year',
-						nextYear: 'Next Year',
-						selectDecade: 'Select Decade',
-						prevDecade: 'Previous Decade',
-						nextDecade: 'Next Decade',
-						prevCentury: 'Previous Century',
-						nextCentury: 'Next Century'
-					}
-					//,
-					// value format can be different with display format
-					//valueFormat: $pt.ComponentConstants.Default_Date_Format
-				}
-			};
-		},
-		/**
-   * will update
-   * @param nextProps
-   */
-		componentWillUpdate: function (nextProps) {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChange);
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
-		/**
-   * overrride react method
-   * @param prevProps
-   * @param prevState
-   * @override
-   */
-		componentDidUpdate: function (prevProps, prevState) {
-			if (!this.isViewMode()) {
-				this.getComponent().data("DateTimePicker").date(this.getValueFromModel());
-			}
-			// add post change listener
-			this.addPostChangeListener(this.onModelChange);
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-   * override react method
-   * @override
-   */
-		componentDidMount: function () {
-			this.createComponent();
-			if (!this.isViewMode()) {
-				this.getComponent().data("DateTimePicker").date(this.getValueFromModel());
-			}
-			// add post change listener
-			this.addPostChangeListener(this.onModelChange);
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-   * override react method
-   * @override
-   */
-		componentWillUnmount: function () {
-			// remove post change listener
-			this.removePostChangeListener(this.onModelChange);
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
-		/**
-   * create component
-   */
-		createComponent: function () {
-			var _this = this;
-			var component = this.getComponent().datetimepicker(this.createDisplayOptions({
-				format: NDateTime2.FORMAT,
-				dayViewHeaderFormat: NDateTime2.DAY_VIEW_HEADER_FORMAT,
-				locale: NDateTime2.LOCALE,
-				stepping: null,
-				useCurrent: null,
-				minDate: null,
-				maxDate: null,
-				collapse: null,
-				disabledDates: null,
-				enabledDates: null,
-				icons: null,
-				useStrict: null,
-				sideBySide: null,
-				daysOfWeekDisabled: null,
-				calendarWeeks: null,
-				viewMode: null,
-				toolbarPlacement: null,
-				showTodayButton: null,
-				showClear: null,
-				showClose: null,
-				tooltips: null
-			})).on("dp.change", this.onComponentChange);
-
-			var picker = component.data('DateTimePicker');
-			component.on('dp.show', function (evt) {
-				_this.resetPopupContent.call(_this, picker, evt.target);
-			}).on('dp.update', function (evt) {
-				_this.resetPopupContent.call(_this, picker, evt.target);
-			});
-		},
-		resetPopupContent: function (picker, target) {
-			var widget = $(target).children('div.bootstrap-datetimepicker-widget');
-			if (widget.closest('.n-table').length != 0) {
-				var tableBodyContainer = $(target).closest('.n-table-body-container');
-				// date time picker in table, move the popover to body,
-				// Don't know why the popup hasn't place on body in original library, the z-index really sucks.
-				var inputOffset = widget.prev().offset();
-				var widgetOffset = widget.offset();
-				var widgetHeight = widget.outerHeight(true);
-				// window.console.log("Widget height: " + widgetHeight);
-				if (widgetOffset.top == null || widgetOffset.top == 'auto' || inputOffset.top > widgetOffset.top) {
-					// on top
-					widgetOffset.top = inputOffset.top - widgetHeight + NDateTime2.DATE_PICKER_VERTICAL_OFFSET;
-				} else {
-					// on bottom
-					widgetOffset.top = inputOffset.top + widget.prev().height();
-				}
-				// window.console.log("Input Offset: " + JSON.stringify(inputOffset));
-				// window.console.log("Widget Offset: " + JSON.stringify(widgetOffset));
-				var css = { top: widgetOffset.top, left: widgetOffset.left, bottom: "auto", right: "auto", height: 'auto' };
-				var modalForm = $(target).closest('.n-modal-form');
-				if (modalForm.length != 0) {
-					css["z-index"] = modalForm.css("z-index") + 1;
-				}
-				widget.css(css);
-				widget.detach().appendTo($('body'));
-				// window.console.log(widget.css("top") + "," + widget.css("left") + "," + widget.css("bottom") + "," + widget.css("right") + "," + widget.outerHeight(true));
-				tableBodyContainer.hide().show(0);
-			}
-
-			var headerYearFormat = this.getHeaderYearFormat();
-			//var yearsFormat = this.getComponentOption('yearsFormat');
-			if (headerYearFormat) {
-				var viewDate = picker.viewDate();
-
-				var monthsView = widget.find('.datepicker-months');
-				var monthsViewHeader = monthsView.find('th');
-				monthsViewHeader.eq(1).text(viewDate.format(headerYearFormat));
-
-				//var startYear = viewDate.clone().subtract(5, 'y');
-				//var endYear = viewDate.clone().add(6, 'y');
-				//var yearsView = widget.find('.datepicker-years');
-				//var yearsViewHeader = yearsView.find('th');
-				//yearsViewHeader.eq(1).text(startYear.format(headerYearFormat) + '-' + endYear.format(headerYearFormat));
-				//if (yearsFormat) {
-				//    yearsView.find('td').children('span.year').each(function () {
-				//        var $this = $(this);
-				//        $this.text(moment($this.text() * 1, 'YYYY').format(yearsFormat));
-				//    });
-				//}
-			}
-			//var startDecade = viewDate.clone().subtract(49, 'y');
-			//var endDecade = startDecade.clone().add(100, 'y');
-			//var decadesView = widget.find('.datepicker-decades');
-			//var decadesViewHeader = decadesView.find('th');
-			//var header = headerYearFormat ? (startDecade.format(headerYearFormat) + '-' + endDecade.format(headerYearFormat)) : (startDecade.year() + ' - ' + endDecade.year());
-			//decadesViewHeader.eq(1).text(header);
-			//yearsFormat = yearsFormat ? yearsFormat : 'YYYY';
-			//decadesView.find('td').children('span').each(function (index) {
-			//    var $this = $(this);
-			//    var text = $this.text();
-			//    if (text.isBlank()) {
-			//        return;
-			//    }
-			//    var start = startDecade.clone().add(index * 10, 'y');
-			//    var end = start.clone().add(10, 'y');
-			//    $this.html(start.format(yearsFormat) + '</br>- ' + end.format(yearsFormat));
-			//});
-		},
-		/**
-   * create display options
-   * @param options
-   */
-		createDisplayOptions: function (options) {
-			var _this = this;
-			Object.keys(options).forEach(function (key) {
-				var value = _this.getComponentOption(key);
-				if (value !== null) {
-					options[key] = value;
-				}
-			});
-			return options;
-		},
-		/**
-   * render
-   * @returns {XML}
-   */
-		render: function () {
-			if (this.isViewMode()) {
-				return this.renderInViewMode();
-			}
-			var css = {
-				'input-group-addon': true,
-				link: true,
-				disabled: !this.isEnabled()
-			};
-			var divCSS = {
-				'n-datetime': true,
-				'n-disabled': !this.isEnabled()
-			};
-			return React.createElement(
-				'div',
-				{ className: $pt.LayoutHelper.classSet(divCSS) },
-				React.createElement(
-					'div',
-					{ className: 'input-group', ref: 'div' },
-					React.createElement('input', { type: 'text',
-						className: 'form-control',
-						disabled: !this.isEnabled(),
-
-						onFocus: this.onComponentFocused,
-						onBlur: this.onComponentBlurred }),
-					React.createElement(
-						'span',
-						{ className: $pt.LayoutHelper.classSet(css) },
-						React.createElement('span', { className: 'fa fa-fw fa-calendar' })
-					)
-				),
-				this.renderNormalLine(),
-				this.renderFocusLine()
-			);
-		},
-		onComponentFocused: function () {
-			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
-		},
-		onComponentBlurred: function () {
-			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
-			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
-		},
-		/**
-   * on component change
-   * @param evt
-   */
-		onComponentChange: function (evt) {
-			// synchronize value to model
-			if (evt.date !== false) {
-				this.setValueToModel(evt.date);
-			} else {
-				this.setValueToModel(null);
-			}
-		},
-		/**
-   * on model change
-   * @param evt
-   */
-		onModelChange: function (evt) {
-			// this.getComponent().data('DateTimePicker').date(this.convertValueFromModel(evt.new));
-			this.forceUpdate();
-		},
-		/**
-   * get component
-   * @returns {*|jQuery|HTMLElement}
-   * @override
-   */
-		getComponent: function () {
-			return $(ReactDOM.findDOMNode(this.refs.div));
-		},
-		/**
-   * get value from model
-   * @returns {*}
-   * @override
-   */
-		getValueFromModel: function () {
-			return this.convertValueFromModel(this.getModel().get(this.getDataId()));
-		},
-		/**
-   * set value to model
-   * @param value momentjs object
-   * @override
-   */
-		setValueToModel: function (value) {
-			this.getModel().set(this.getDataId(), value == null ? null : value.format(this.getValueFormat()));
-		},
-		/**
-   * convert value from model
-   * @param value string date with value format
-   * @returns {*} moment date
-   */
-		convertValueFromModel: function (value) {
-			return value == null ? null : moment(value, this.getValueFormat());
-		},
-		/**
-   * get value format
-   * @returns {string}
-   */
-		getValueFormat: function () {
-			var valueFormat = this.getComponentOption('valueFormat');
-			return valueFormat ? valueFormat : NDateTime2.VALUE_FORMAT;
-		},
-		getHeaderYearFormat: function () {
-			var format = this.getComponentOption('headerYearFormat');
-			return format ? format : NDateTime2.HEADER_YEAR_FORMAT;
-		},
-		getTextInViewMode: function () {
-			var value = this.getValueFromModel();
-			return value == null ? null : value.format(this.getDisplayFormat());
-		},
-		getDisplayFormat: function () {
-			var format = this.getComponentOption('format');
-			return format ? format : NDateTime2.FORMAT;
-		}
-	}));
-	$pt.Components.NDateTime2 = NDateTime2;
-	$pt.LayoutHelper.registerComponentRenderer('date2', function (model, layout, direction, viewMode) {
-		return React.createElement($pt.Components.NDateTime2, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
 	});
 })(window, jQuery, moment, React, ReactDOM, $pt);
 
@@ -9763,6 +9361,11 @@
 				})
 			};
 		},
+		componentDidMount: function () {
+			if (this.props.side && this.props.menus) {
+				this.state.sideMenu = NSideMenu.getSideMenu(this.props.menus, null, null, true);
+			}
+		},
 		/**
    * render search box
    * @returns {XML}
@@ -9840,9 +9443,6 @@
    */
 		renderMenus: function () {
 			var _this = this;
-			if (this.props.side) {
-				this.state.sideMenu = NSideMenu.getSideMenu(this.props.menus, null, null, true);
-			}
 			var css = {
 				'nav navbar-nav': true
 			};
@@ -11175,7 +10775,10 @@
 			ADVANCED_SEARCH_DIALOG_BUTTON_TEXT: 'Search',
 			ADVANCED_SEARCH_DIALOG_CODE_LABEL: 'Code',
 			ADVANCED_SEARCH_DIALOG_RESULT_TITLE: 'Search Result',
-			NOT_FOUND: 'Not Found'
+			NOT_FOUND: 'Not Found',
+			SEARCH_PROXY: null,
+			SEARCH_PROXY_CALLBACK: null,
+			ADVANCED_SEARCH_PROXY: null
 		},
 		propTypes: {
 			// model
@@ -11264,7 +10867,7 @@
 						disabled: !enabled, onFocus: this.onComponentFocused, onBlur: this.onComponentBlurred }),
 					React.createElement('span', { className: 'input-group-btn', style: middleSpanStyle }),
 					React.createElement('input', { type: 'text', className: 'form-control search-label', onFocus: this.onLabelFocused, ref: 'label',
-						disabled: !enabled }),
+						disabled: !enabled, tabIndex: -1 }),
 					React.createElement(
 						'span',
 						{ className: 'input-group-addon advanced-search-btn',
@@ -11362,6 +10965,14 @@
 			} else {
 				$(ReactDOM.findDOMNode(this.refs.label)).val(text);
 			}
+			// if label property id defined, and value changed, set to model
+			var labelPropertyId = this.getComponentOption('labelPropId');
+			if (labelPropertyId) {
+				var name = this.getModel().get(labelPropertyId);
+				if (name != text) {
+					this.getModel().set(labelPropertyId, name);
+				}
+			}
 		},
 		/**
    * get label text from remote
@@ -11380,27 +10991,38 @@
 				throw new $pt.createComponentException($pt.ComponentConstants.Err_Search_Text_Trigger_Digits_Not_Defined, "Trigger digits cannot be null in search text.");
 			}
 
-			if (value == null || value.isBlank() || value.length != triggerDigits && triggerDigits != -1) {
+			if (value == null) {
+				value = '';
+			}
+			if (value.isBlank() || value.length != triggerDigits && triggerDigits != -1) {
 				this.setLabelText(null);
 				return;
 			}
 
 			var _this = this;
 			this.state.search = setTimeout(function () {
-				$pt.doPost(_this.getSearchUrl(), {
+				var postData = {
 					code: value
-				}, {
+				};
+				if (NSearchText.SEARCH_PROXY) {
+					postData = NSearchText.SEARCH_PROXY.call(this, postData);
+				}
+				$pt.doPost(_this.getSearchUrl(), postData, {
 					quiet: true
 				}).done(function (data) {
 					if (typeof data === 'string') {
 						data = JSON.parse(data);
 					}
-					_this.setLabelText(data.name);
+					var name = data.name;
+					if (NSearchText.SEARCH_PROXY_CALLBACK) {
+						name = NSearchText.SEARCH_PROXY_CALLBACK.call(this, data);
+					}
+					_this.setLabelText(name);
 				}).fail(function () {
 					window.console.error('Error occured when retrieve label from remote in NSearch.');
-					arguments.slice(0).forEach(function (argu) {
-						window.console.error(argu);
-					});
+					// arguments.slice(0).forEach(function(argu) {
+					// 	window.console.error(argu);
+					// });
 				});
 			}, 300);
 		},
@@ -11483,13 +11105,17 @@
 								delete currentModel.items;
 								delete currentModel.criteria;
 
+								if (NSearchText.ADVANCED_SEARCH_PROXY) {
+									currentModel = NSearchText.ADVANCED_SEARCH_PROXY.call(this, currentModel);
+								}
+
 								$pt.doPost(_this.getAdvancedSearchUrl(), currentModel, {
 									done: (function (data) {
 										if (typeof data === 'string') {
 											data = JSON.parse(data);
 										}
 										model.mergeCurrentModel(data);
-										model.set('criteria_url', this.getAdvancedSearchUrl());
+										model.set('criteria' + $pt.PROPERTY_SEPARATOR + 'url', this.getAdvancedSearchUrl());
 										window.console.debug(model.getCurrentModel());
 										this.state.searchDialog.forceUpdate();
 									}).bind(_this)
@@ -11551,472 +11177,6 @@
 	$pt.Components.NSearchText = NSearchText;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Search, function (model, layout, direction, viewMode) {
 		return React.createElement($pt.Components.NSearchText, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
-	});
-})(window, jQuery, React, ReactDOM, $pt);
-
-/**
- * select component, see select2 from jQuery
- *
- * layout: {
- *      label: string,
- *      dataId: string,
- *      pos: {
- *          row: number,
- *          col: number,
- *          width: number,
- *          section: string,
- *          card: string
- *      },
- *      css: {
- *          cell: string,
- *          comp: string,
- *          'normal-line': string,
- *          'focus-line': string
- *      },
- *      comp: {
- *          type: $pt.ComponentConstants.Select,
- *          placeholder: string,
- *          allowClear: true,
- *          minimumResultsForSearch: number,
- *          placeholder: string,
- *          width: string,
- *          data: {}[],
- *          availableWhenNoParentValue: boolean,
- *          parentPropId: string,
- *          parentModel: object,
- *          parentFilter: string|function
- *          enabled: {
- *              when: function,
- *              depends: string|string[]
- *          },
- *          visible: {
- *              when: function,
- *              depends: string|string[]
- *          }
- *      }
- * }
- */
-(function (window, $, React, ReactDOM, $pt) {
-	var NSelect2 = React.createClass($pt.defineCellComponent({
-		displayName: 'NSelect2',
-		statics: {
-			PLACEHOLDER: "Please Select..."
-		},
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object,
-			view: React.PropTypes.bool
-		},
-		getDefaultProps: function () {
-			return {
-				defaultOptions: {
-					allowClear: true,
-					minimumResultsForSearch: 1,
-					width: "100%",
-					data: [],
-
-					availableWhenNoParentValue: false
-					// other
-					/*
-      parentPropId: parent property id
-      parentModel: parent model, default is this.props.model is not defined
-      parentFilter: filter of options according to parent property value,
-      can be property of self options
-      or a function with parameters
-      1: parent value
-      2: self options array
-      */
-				}
-			};
-		},
-		/**
-   * will update
-   */
-		componentWillUpdate: function (nextProps) {
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeEnableDependencyMonitor();
-			if (this.hasParent()) {
-				// add post change listener into parent model
-				this.getParentModel().removeListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
-			}
-			this.unregisterFromComponentCentral();
-		},
-		/**
-   * did update
-   * @param prevProps
-   * @param prevState
-   */
-		componentDidUpdate: function (prevProps, prevState) {
-			// react will not clear the options when component updating,
-			// so have to reset select options manually
-			if (prevProps.model != this.props.model) {
-				var options = this.createDisplayOptions({
-					allowClear: null,
-					placeholder: null,
-					minimumResultsForSearch: null,
-					data: null
-				});
-				// TODO might has issue, not clarify yet.
-				this.resetOptions(options);
-			}
-			// reset the value when component update
-			this.getComponent().val(this.getValueFromModel()).trigger("change");
-			this.addEnableDependencyMonitor();
-			this.addPostChangeListener(this.onModelChanged);
-			if (this.hasParent()) {
-				// remove post change listener from parent model
-				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
-			}
-
-			this.removeTooltip();
-			this.registerToComponentCentral();
-		},
-		/**
-   * did mount
-   */
-		componentDidMount: function () {
-			// Set up Select2
-			this.createComponent();
-			this.addPostChangeListener(this.onModelChanged);
-			this.addEnableDependencyMonitor();
-			if (this.hasParent()) {
-				// add post change listener into parent model
-				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
-			}
-			this.removeTooltip();
-			this.registerToComponentCentral();
-		},
-		/**
-   * will unmount
-   */
-		componentWillUnmount: function () {
-			// remove post change listener
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeEnableDependencyMonitor();
-			if (this.hasParent()) {
-				// remove post change listener from parent model
-				this.getParentModel().removeListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
-			}
-			// remove the jquery dom element
-			this.getComponent().next("span").remove();
-			this.unregisterFromComponentCentral();
-		},
-		/**
-   * create component
-   */
-		createComponent: function () {
-			var options = this.createDisplayOptions({
-				allowClear: null,
-				placeholder: null,
-				minimumResultsForSearch: null,
-				data: null
-			}, this.getLayout());
-			this.getComponent().fireOnDisable().select2(options).val(this.getValueFromModel()).trigger("change").change(this.onComponentChanged);
-
-			this.renderBorderBottom();
-		},
-		renderBorderBottom: function () {
-			var top = $(ReactDOM.findDOMNode(this.refs.div));
-			var selection = top.find('.select2-selection');
-			if (selection.find('hr.normal-line').length == 0) {
-				selection.append('<hr class="' + this.getAdditionalCSS('normal-line', 'normal-line') + '"/>').append('<hr class="' + this.getAdditionalCSS('focus-line', 'focus-line') + '"/>');
-			}
-		},
-		/**
-   * create display options
-   * @param options
-   */
-		createDisplayOptions: function (options) {
-			var _this = this;
-			Object.keys(options).forEach(function (key) {
-				options[key] = _this.getComponentOption(key);
-			});
-			if (options.placeholder == null) {
-				options.placeholder = NSelect2.PLACEHOLDER;
-			}
-			// if has parent, filter options by parent property value
-			if (this.hasParent()) {
-				options.data = this.getAvailableOptions(this.getParentPropertyValue());
-			} else {
-				options.data = this.convertDataOptions(options.data);
-			}
-
-			// TODO hard code, multiple is not supported yet
-			options.multiple = false;
-
-			return options;
-		},
-		/**
-   * convert data options, options can be CodeTable object or an array
-   * @param options
-   * @returns {*}
-   */
-		convertDataOptions: function (options) {
-			return Array.isArray(options) ? options : options.list();
-		},
-		/**
-   * remove tooltip, which is default set by select2 component.
-   * it's unnecessary.
-   */
-		removeTooltip: function () {
-			//$("#select2-" + this.getId() + "-container").removeAttr("title");
-			var top = $(ReactDOM.findDOMNode(this.refs.div));
-			var renderer = top.find('.select2-selection__rendered');
-			renderer.removeAttr('title');
-		},
-		/**
-   * render
-   * @returns {XML}
-   */
-		render: function () {
-			if (this.isViewMode()) {
-				return this.renderInViewMode();
-			}
-			var css = {
-				'n-disabled': !this.isEnabled()
-			};
-			css[this.getComponentCSS('n-select')] = true;
-			return React.createElement(
-				"div",
-				{ className: $pt.LayoutHelper.classSet(css),
-					ref: "div" },
-				React.createElement("select", { style: { width: this.getComponentOption("width") },
-					disabled: !this.isEnabled(),
-					ref: "select" })
-			);
-		},
-		/**
-   * on component change
-   * @param evt
-   */
-		onComponentChanged: function (evt) {
-			var value = this.getComponent().val();
-			if (value != this.getValueFromModel()) {
-				// synchronize value to model
-				this.setValueToModel(this.getComponent().val());
-			}
-			this.removeTooltip();
-		},
-		/**
-   * on model change
-   * @param evt
-   */
-		onModelChanged: function (evt) {
-			var oldValue = this.getComponent().val();
-			if (oldValue == evt.new) {
-				// do nothing
-				return;
-			} else {
-				// this.getComponent().val(evt.new).trigger("change");
-				this.forceUpdate();
-			}
-		},
-		/**
-   * on parent model change
-   * @param evt
-   */
-		onParentModelChanged: function (evt) {
-			var data = this.getAvailableOptions(evt.new);
-			this.resetOptions({ data: data });
-		},
-		/**
-   * get parent model
-   * @returns {*}
-   */
-		getParentModel: function () {
-			var parentModel = this.getComponentOption("parentModel");
-			return parentModel == null ? this.getModel() : parentModel;
-		},
-		/**
-   * get parent property value
-   * @returns {*}
-   */
-		getParentPropertyValue: function () {
-			return this.getParentModel().get(this.getParentPropertyId());
-		},
-		/**
-   * get parent property id
-   * @returns {string}
-   */
-		getParentPropertyId: function () {
-			return this.getComponentOption("parentPropId");
-		},
-		/**
-   * has parent or not
-   * @returns {boolean}
-   */
-		hasParent: function () {
-			return this.getParentPropertyId() != null;
-		},
-		/**
-   * get available options.
-   * if no parent assigned, return all data options
-   * @param parentValue
-   * @returns {[*]}
-   */
-		getAvailableOptions: function (parentValue) {
-			if (parentValue == null) {
-				return this.isAvailableWhenNoParentValue() ? this.convertDataOptions(this.getComponentOption("data")) : [];
-			} else {
-				var filter = this.getComponentOption("parentFilter");
-				if (typeof filter === 'object') {
-					// call code table filter
-					return this.convertDataOptions(this.getComponentOption('data').filter($.extend({}, filter, { value: parentValue })));
-				} else {
-					// call local filter
-					var data = this.convertDataOptions(this.getComponentOption("data"));
-					if (typeof filter === "function") {
-						return filter.call(this, parentValue, data);
-					} else {
-						return data.filter(function (item) {
-							return item[filter] == parentValue;
-						});
-					}
-				}
-			}
-		},
-		/**
-   * is available when no parent value.
-   * if no parent assigned, always return true.
-   * @returns {boolean}
-   */
-		isAvailableWhenNoParentValue: function () {
-			// when has parent, return availableWhenNoParentValue
-			// or return true
-			return this.hasParent() ? this.getComponentOption("availableWhenNoParentValue") : true;
-		},
-		/**
-   * reset select options
-   * @param newOptions
-   */
-		resetOptions: function (newOptions) {
-			if (this.isViewMode()) {
-				return;
-			}
-			// really sucks because select2 doesn't support change the options dynamically
-			var component = this.getComponent();
-			var orgValue = this.getValueFromModel(); //component.val();
-			var orgSelected = false;
-			// first is Options object, second is really options
-			var originalOptions = component.data("select2").options.options;
-			component.html("");
-			// data
-			$.extend(originalOptions, newOptions);
-			var innerHTML = "";
-			originalOptions.data.forEach(function (element) {
-				if (element.id == orgValue) {
-					innerHTML += "<option value=\"" + element.id + "\"" + (element.id == orgValue ? " selected" : "") + ">" + element.text + "</option>";
-					orgSelected = true;
-				} else {
-					innerHTML += "<option value=\"" + element.id + "\">" + element.text + "</option>";
-				}
-			});
-			component.append(innerHTML);
-			component.select2(originalOptions);
-			this.renderBorderBottom();
-
-			if (!orgSelected) {
-				// if the original value cannot match the available option, set to null.
-				component.val("").trigger("change");
-			}
-		},
-		getComponent: function () {
-			return $(ReactDOM.findDOMNode(this.refs.select));
-		},
-		getTextInViewMode: function () {
-			var value = this.getValueFromModel();
-			if (value != null) {
-				var data = null;
-				if (this.hasParent()) {
-					data = this.getAvailableOptions(this.getParentPropertyValue());
-				} else {
-					data = this.convertDataOptions(this.getComponentOption('data'));
-				}
-				data.some(function (item) {
-					if (item.id == value) {
-						value = item.text;
-						return true;
-					}
-					return false;
-				});
-			}
-			return value;
-		}
-	}));
-
-	// to fix the select2 disabled property not work in IE8-10
-	// provided by https://gist.github.com/cmcnulty/7036509
-	(function ($) {
-		"use strict";
-
-		$.fn.fireOnDisable = function (settings) {
-			// Only perform this DOM change if we have to watch changes with
-			// propertychange
-			// Also only perform if getOwnPropertyDescriptor exists - IE>=8
-			// I suppose I could test for "propertychange fires, but not when form
-			// element is disabled" - but it would be overkill
-			if (!('onpropertychange' in document.createElement('input')) || Object.getOwnPropertyDescriptor === undefined) {
-				return this;
-			}
-
-			// IE9-10 use HTMLElement proto, IE8 uses Element proto
-			var someProto = window.HTMLElement === undefined ? window.Element.prototype : window.HTMLElement.prototype,
-			    someTrigger = function () {},
-			    origDisabled = Object.getOwnPropertyDescriptor(someProto, 'disabled');
-
-			if (document.createEvent) {
-				someTrigger = function (newVal) {
-					var event = document.createEvent('MutationEvent');
-					/*
-      * Instantiate the event as close to native as possible:
-      * event.initMutationEvent(eventType, canBubble, cancelable,
-      * relatedNodeArg, prevValueArg, newValueArg, attrNameArg,
-      * attrChangeArg);
-      */
-					event.initMutationEvent('DOMAttrModified', true, false, this.getAttributeNode('disabled'), '', '', 'disabled', 1);
-					this.dispatchEvent(event);
-				};
-			} else if (document.fireEvent) {
-				someTrigger = function () {
-					this.fireEvent('onpropertychange');
-				};
-			}
-
-			return this.each(function () {
-				// call prototype's set, and then trigger the change.
-				Object.defineProperty(this, 'disabled', {
-					set: function (isDisabled) {
-						// We store preDisabled here, so that when we inquire as to
-						// the result after throwing the event, it will be accurate
-						// We can't throw the event after the native send, because
-						// it won't be be sent.
-						// We must do a native fire/dispatch, because native
-						// listeners don't catch jquery trigger 'propertychange'
-						// events
-						$.data(this, 'preDisabled', isDisabled);
-						if (isDisabled) {
-							// Trigger with dispatchEvent
-							someTrigger.call(this, isDisabled);
-						}
-
-						return origDisabled.set.call(this, isDisabled);
-					},
-					get: function () {
-						var isDisabled = $.data(this, 'preDisabled');
-						if (isDisabled === undefined) {
-							isDisabled = origDisabled.get.call(this);
-						}
-						return isDisabled;
-					}
-				});
-			});
-		};
-	})(jQuery);
-	$pt.Components.NSelect2 = NSelect2;
-	$pt.LayoutHelper.registerComponentRenderer('select2', function (model, layout, direction, viewMode) {
-		return React.createElement($pt.Components.NSelect2, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
 	});
 })(window, jQuery, React, ReactDOM, $pt);
 
@@ -12180,7 +11340,7 @@
 			}
 			if (filterText != null && !filterText.isBlank()) {
 				options = options == null ? null : options.filter(function (item) {
-					return item.text.toLowerCase().indexOf(filterText) != -1;
+					return item.text.toLowerCase().indexOf(filterText.toLowerCase()) != -1;
 				});
 			}
 			var _this = this;
@@ -12306,7 +11466,7 @@
 
 			// check popover to left or right
 			if (realWidth > styles.width) {
-				width = $(document).width();
+				var width = $(document).width();
 				if (styles.left + realWidth <= width) {
 					// normal from left to right, do nothing
 				} else if (styles.left + styles.width >= realWidth) {
@@ -12810,7 +11970,7 @@
 
 			// check popover to left or right
 			if (realWidth > styles.width) {
-				width = $(document).width();
+				var width = $(document).width();
 				if (styles.left + realWidth <= width) {
 					// normal from left to right, do nothing
 				} else if (styles.left + styles.width >= realWidth) {
@@ -13563,6 +12723,10 @@
 			},
 			ADD_BUTTON_ICON: "plus",
 			ADD_BUTTON_TEXT: "",
+			DOWNLOAD_BUTTON_ICON: "cloud-download",
+			DOWNLOAD_BUTTON_TEXT: "",
+			NO_DATA_DOWNLOAD_TITLE: 'Downloading...',
+			NO_DATA_DOWNLOAD: "No data needs to be downloaded...",
 			SEARCH_PLACE_HOLDER: "Search...",
 			ROW_EDIT_BUTTON_ICON: "pencil",
 			ROW_REMOVE_BUTTON_ICON: "trash-o",
@@ -13644,6 +12808,7 @@
 
 					addable: false,
 					searchable: true,
+					downloadable: true,
 
 					operationFixed: false,
 					editable: false,
@@ -13672,7 +12837,7 @@
    * @returns {*}
    */
 		getInitialState: function () {
-			var _this = this;
+			//var _this = this;
 			return {
 				sortColumn: null,
 				sortWay: null, // asc|desc
@@ -13706,11 +12871,11 @@
 				_this.getFixedLeftBodyComponent().scrollTop($this.scrollTop());
 				_this.getFixedRightBodyComponent().scrollTop($this.scrollTop());
 			});
-			this.getDivComponent().on("mouseenter", "tbody tr", function (e) {
+			this.getDivComponent().on("mouseenter", "tbody tr", function () {
 				//$(this).addClass("hover");
 				var index = $(this).parent().children().index($(this));
 				_this.getDivComponent().find("tbody tr:nth-child(" + (index + 1) + ")").addClass("hover");
-			}).on("mouseleave", "tbody tr", function (e) {
+			}).on("mouseleave", "tbody tr", function () {
 				var index = $(this).parent().children().index($(this));
 				_this.getDivComponent().find("tbody tr:nth-child(" + (index + 1) + ")").removeClass("hover");
 			});
@@ -13938,24 +13103,38 @@
 		},
 		/**
    * render heading buttons
-   * @returns {XML}
+   * @returns {*}
    */
 		renderHeadingButtons: function () {
+			var style = { display: this.state.expanded ? 'block' : 'none' };
+			var buttons = [];
 			if (this.isAddable()) {
-				return React.createElement(
+				buttons.push(React.createElement(
 					'a',
 					{ href: 'javascript:void(0);',
 						onClick: this.onAddClicked,
 						className: 'n-table-heading-buttons pull-right',
-						ref: 'add-button', style: {
-							display: this.state.expanded ? 'block' : 'none'
-						} },
+						ref: 'add-button',
+						style: style,
+						key: 'add-button' },
 					React.createElement($pt.Components.NIcon, { icon: NTable.ADD_BUTTON_ICON }),
 					NTable.ADD_BUTTON_TEXT
-				);
-			} else {
-				return null;
+				));
 			}
+			if (this.isDownloadable()) {
+				buttons.push(React.createElement(
+					'a',
+					{ href: 'javascript:void(0);',
+						onClick: this.onDownloadClicked,
+						className: 'n-table-heading-buttons pull-right',
+						ref: 'download-button',
+						style: style,
+						key: 'download-button' },
+					React.createElement($pt.Components.NIcon, { icon: NTable.DOWNLOAD_BUTTON_ICON }),
+					NTable.DOWNLOAD_BUTTON_TEXT
+				));
+			}
+			return buttons;
 		},
 		/**
    * render panel heading label
@@ -14174,6 +13353,14 @@
 			});
 			return React.createElement($pt.Components.NFormButton, { model: rowModel, layout: layout });
 		},
+		isRowOperationVisible: function (operation, rowModel) {
+			var visible = operation.visible;
+			if (visible) {
+				return this.getRuleValue(visible, true, rowModel);
+			} else {
+				return true;
+			}
+		},
 		renderRowOperationButton: function (operation, rowModel, operationIndex) {
 			var layout = $pt.createCellLayout('rowButton', {
 				label: operation.icon ? null : operation.tooltip,
@@ -14181,6 +13368,7 @@
 					style: 'link',
 					icon: operation.icon,
 					enabled: operation.enabled,
+					visible: operation.visible,
 					click: this.onRowOperationClicked.bind(this, operation.click, rowModel.getCurrentModel()),
 					tooltip: operation.tooltip
 				},
@@ -14205,6 +13393,9 @@
 			var removeButton = column.removable ? this.renderRowRemoveButton(rowModel) : null;
 			var rowOperations = this.getRowOperations(column);
 			var _this = this;
+			// rowOperations = rowOperations.filter(function(rowOperation) {
+			// 	return _this.isRowOperationVisible(rowOperation, rowModel);
+			// });
 			return React.createElement(
 				'div',
 				{ className: 'btn-group n-table-op-btn-group', role: 'group' },
@@ -14279,7 +13470,7 @@
 			styles.top = offset.top + target.outerHeight() - 5;
 			styles.left = offset.left;
 
-			var _this = this;
+			//var _this = this;
 			ReactDOM.render(React.createElement(
 				'div',
 				{ role: 'tooltip', className: 'n-table-op-btn-popover popover bottom in', style: styles },
@@ -14354,6 +13545,7 @@
    * a dropdown button is renderred in last, other buttons are renderred in popover of dropdown button.
    */
 		renderDropDownOperationCell: function (column, rowModel, maxButtonCount) {
+			var _this = this;
 			var rowOperations = this.getRowOperations(column);
 			if (column.editable) {
 				rowOperations.push({ editButton: true });
@@ -14361,8 +13553,11 @@
 			if (column.removable) {
 				rowOperations.push({ removeButton: true });
 			}
+			// filter invisible operations, will not monitor the attributes in depends property
+			rowOperations = rowOperations.filter(function (rowOperation) {
+				return _this.isRowOperationVisible(rowOperation, rowModel);
+			});
 
-			var _this = this;
 			var used = -1;
 			var buttons = [];
 			rowOperations.some(function (operation, operationIndex) {
@@ -14475,7 +13670,7 @@
 						if (column.editable || column.removable || column.rowOperations != null) {
 							// operation column
 							data = _this.renderOperationCell(column, inlineModel);
-							style.textAlign = "center";
+							style.textAlign = "left";
 						} else if (column.indexable) {
 							// index column
 							data = rowIndex;
@@ -14528,7 +13723,7 @@
 						}
 						return React.createElement(
 							'td',
-							{ style: style, key: columnIndex },
+							{ style: style, key: columnIndex, className: column.css },
 							data
 						);
 					} else {
@@ -14827,7 +14022,8 @@
 			if (this.isPageable() && this.hasDataToDisplay()) {
 				// only show when pageable and has data to display
 				return React.createElement($pt.Components.NPagination, { className: 'n-table-pagination', pageCount: this.state.pageCount,
-					currentPageIndex: this.state.currentPageIndex, toPage: this.toPage });
+					currentPageIndex: this.state.currentPageIndex,
+					toPage: this.toPage });
 			} else {
 				return null;
 			}
@@ -15102,6 +14298,9 @@
 		},
 		getRowRemoveButtonEnabled: function () {
 			return this.getComponentOption('rowRemoveEnabled');
+		},
+		isDownloadable: function () {
+			return this.getComponentOption('downloadable');
 		},
 		/**
    * check the table is searchable or not
@@ -15396,6 +14595,110 @@
    */
 		onRowOperationClicked: function (callback, data) {
 			callback.call(this, data);
+		},
+		/**
+   * on download clicked
+   */
+		onDownloadClicked: function () {
+			var data = null;
+			var queryCriteria = this.getQuerySettings();
+			if (queryCriteria === null) {
+				// no query criteria, all data is on local
+				data = this.getValueFromModel();
+				this.exposeDownloading(data);
+			} else {
+				var model = this.getModel();
+				var criteria = model.get(queryCriteria);
+				criteria = $.extend({}, criteria);
+				var url = criteria.url;
+				delete criteria.url;
+				delete criteria.pageCount;
+				criteria.pageIndex = -1;
+				if (NTable.PAGE_JUMPING_PROXY) {
+					criteria = NTable.PAGE_JUMPING_PROXY.call(this, criteria);
+				}
+				var downloadListener = this.getEventMonitor('download');
+				if (downloadListener) {
+					this.notifyEvent({
+						type: 'pageChange',
+						criteria: criteria,
+						target: this
+					});
+				} else {
+					var _this = this;
+					$pt.doPost(url, criteria).done(function (data) {
+						if (typeof data === 'string') {
+							data = JSON.parse(data);
+						}
+						_this.exposeDownloading(data);
+					});
+				}
+				// todo how to handle failure?
+			}
+		},
+		exposeDownloading: function (data) {
+			if (data == null || data.length == 0) {
+				NConfirm.getConfirmModal().show({
+					title: NTable.NO_DATA_DOWNLOAD_TITLE,
+					messages: NTable.NO_DATA_DOWNLOAD,
+					disableConfirm: true,
+					close: true
+				});
+			} else {
+				this.tableToExcel(data);
+			}
+		},
+		tableToExcel: function (data) {
+			//creating a temporary HTML link element (they support setting file names)
+			var a = document.createElement('a');
+			//getting data from our div that contains the HTML table
+			var dataType = 'data:application/vnd.ms-excel';
+			var tableHeaderHtml = this.generateTableExcelHeader();
+			var tableBodyHtml = '<tbody>' + data.map(this.generateTableExcelBodyRow).join('') + '</tbody>';
+			var tableHtml = '<table>' + tableHeaderHtml + tableBodyHtml + '</table>';
+			tableHtml = tableHtml.replace(/ /g, '%20');
+			a.href = dataType + ', ' + tableHtml;
+			//setting the file name
+			a.download = 'exported_data.xls';
+			//triggering the function
+			a.click();
+		},
+		generateTableExcelHeader: function () {
+			var columns = this.state.columns.map(function (column) {
+				if (!(column.visible === undefined || column.visible === true)) {
+					return '';
+				}
+				if (column.editable || column.removable || column.rowOperations != null) {
+					return '';
+				} else if (column.indexable) {
+					return '';
+				} else if (column.rowSelectable) {
+					return '';
+				} else {
+					return '<td>' + column.title + '</td>';
+				}
+			});
+			return '<thead><tr>' + columns.join('') + '</tr></thead>';
+		},
+		generateTableExcelBodyRow: function (row) {
+			var _this = this;
+			var columns = this.state.columns.map(function (column) {
+				if (!(column.visible === undefined || column.visible === true)) {
+					return '';
+				}
+				if (column.editable || column.removable || column.rowOperations != null) {
+					return '';
+				} else if (column.indexable) {
+					return '';
+				} else if (column.rowSelectable) {
+					return '';
+				} else {
+					// data is property name
+					var data = _this.getDisplayTextOfColumn(column, row);
+					return '<td>' + (data == null ? '' : data) + '</td>';
+				}
+			});
+			return '<tr>' + columns.join('') + '</tr>';
 		},
 		/**
    * on search box changed
@@ -16448,7 +15751,7 @@
             OP_FOLDER_ICON: 'angle-double-right',
             OP_FOLDER_OPEN_ICON: 'angle-double-down',
             OP_FILE_ICON: '',
-            NODE_SEPARATOR: '|',
+            NODE_SEPARATOR: ';',
             ROOT_ID: '0',
             convertValueTreeToArray: function (nodeValues, id) {
                 var array = [];
@@ -16907,7 +16210,7 @@
             }
             var regexp = new RegExp(nodeIds.map(function (nodeId) {
                 return '(' + nodeId + ')';
-            }).join('|'));
+            }).join(NTree.NODE_SEPARATOR));
             var activeNodes = $.extend({}, this.state.activeNodes);
             Object.keys(activeNodes).forEach(function (key) {
                 if (key.match(regexp)) {

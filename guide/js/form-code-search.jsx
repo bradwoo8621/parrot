@@ -84,7 +84,8 @@
 					title: 'Default',
 					desc: <span>A simple code search box.<br/>
 					Set <code>labelPropId</code> to initial label value by data model,
-					or send remote request to retrieve label by code value. <br/>
+					or send remote request to retrieve label by code value.
+					Text of code will be set to data model if this attribute defined.<br/>
 					Remote request may cause the performance issue in some scenarios, so set <code>labelPropId</code> is recommended.</span>,
 					xml: {
 						width: 6,
@@ -213,7 +214,11 @@
 				return {
 					id: 'code-search-constants',
 					title: 'Constants',
-					desc: 'Available constants. Constants must be change before construct component.',
+					desc: <span>Available constants. Constants must be change before construct component.'<br/>
+					<code>NSearchText.SEARCH_PROXY</code> and <code>NSearchText.ADVANCED_SEARCH_PROXY</code>
+					are functions which proxy the remote request data. Before send to remote,
+					set these proxy functions to change the format of post data JSON.
+					</span>,
 					index: 30,
 					code: $demo.convertJSON({
 						variable: 'NSearchText',
@@ -223,7 +228,11 @@
 								ADVANCED_SEARCH_DIALOG_NAME_LABEL: 'Name',
 								ADVANCED_SEARCH_DIALOG_BUTTON_TEXT: 'Search',
 								ADVANCED_SEARCH_DIALOG_CODE_LABEL: 'Code',
-								ADVANCED_SEARCH_DIALOG_RESULT_TITLE: 'Search Result'
+								ADVANCED_SEARCH_DIALOG_RESULT_TITLE: 'Search Result',
+								NOT_FOUND: 'Not Found',
+								SEARCH_PROXY: null,
+								SEARCH_PROXY_CALLBACK: null,
+								ADVANCED_SEARCH_PROXY: null
 							}
 						}
 					})

@@ -1262,6 +1262,14 @@
 						modelCode, layoutCode, compCode],
 					index: 20
 				};
+			},
+			css: function () {
+				return {
+					id: 'table-render-css',
+					title: 'Cell CSS',
+					desc: <span>Cell CSS can be defined via <code>column.css</code>, css class name needs to be defined in CSS files.</span>,
+					index: 30
+				};
 			}
 		};
 
@@ -1320,6 +1328,31 @@
 					},
 					code: [modelCode, layoutCode, compCode],
 					index: 60
+				};
+			},
+			download: function () {
+				var layout = $.extend(true, {}, layoutTemplate, {comp: {downloadable: true}});
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'value',
+					template: layout
+				});
+				return {
+					id: 'table-download',
+					title: 'Download',
+					desc: <span>Table content default can be downloaded by download button in panel header.<br/>
+						Set <code>downloadable</code> as false to disable this feature.<br/>
+						If table is delared as pageable, download button will send a standard request
+						(same as pagination request except pageIndex is -1) to server side to get all data and trigger excel exporting.<br/>
+						And an event <code>download</code> is predefined to handle the download event,
+						if download is defined in component options, then the standard behavior is ignored.
+					</span>,
+					xml: {
+						width: 12,
+						xml: <NTable model={model} layout={$pt.createCellLayout('items', layout)}/>
+					},
+					code: [modelCode, layoutCode, compCode],
+					index: 61
 				};
 			},
 			render: function () {
@@ -1382,7 +1415,7 @@
 					title: 'Constants',
 					desc: <span>Available constants. Constants must be change before construct component.<br/>
 						<code>NTable.PAGE_JUMPING_PROXY</code> is a function which proxy the page jumping,
-						before send criteria to remote, can set this proxy function to change the format of criteria JSON.
+						before send criteria to remote, set this proxy function to change the format of criteria JSON.
 					</span>,
 					index: 900,
 					code: $demo.convertJSON({
