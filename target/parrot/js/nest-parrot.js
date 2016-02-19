@@ -1,4 +1,4 @@
-/** nest-parrot.V0.2.0 2016-02-18 */
+/** nest-parrot.V0.2.0 2016-02-19 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -13465,7 +13465,7 @@
 		},
 		renderPopover: function (moreOperations, rowModel, eventTarget) {
 			var styles = { display: 'block' };
-			var target = $(eventTarget.closest('a'));
+			var target = $(eventTarget).closest('a');
 			var offset = target.offset();
 			styles.top = offset.top + target.outerHeight() - 5;
 			styles.left = offset.left;
@@ -13489,7 +13489,7 @@
 
 			// reset position
 			var styles = {};
-			var target = $(eventTarget.closest('a'));
+			var target = $(eventTarget).closest('a');
 			var offset = target.offset();
 			var popover = this.state.popoverDiv.children('.popover');
 			var popWidth = popover.outerWidth();
