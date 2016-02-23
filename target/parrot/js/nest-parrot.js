@@ -1,4 +1,4 @@
-/** nest-parrot.V0.2.0 2016-02-19 */
+/** nest-parrot.V0.2.0 2016-02-23 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -10778,7 +10778,8 @@
 			NOT_FOUND: 'Not Found',
 			SEARCH_PROXY: null,
 			SEARCH_PROXY_CALLBACK: null,
-			ADVANCED_SEARCH_PROXY: null
+			ADVANCED_SEARCH_PROXY: null,
+			ADVANCED_SEARCH_PROXY_CALLBACK: null
 		},
 		propTypes: {
 			// model
@@ -11113,6 +11114,9 @@
 									done: (function (data) {
 										if (typeof data === 'string') {
 											data = JSON.parse(data);
+										}
+										if (NSearchText.ADVANCED_SEARCH_PROXY_CALLBACK) {
+											data = NSearchText.ADVANCED_SEARCH_PROXY_CALLBACK.call(this, data, this.getDataId());
 										}
 										model.mergeCurrentModel(data);
 										model.set('criteria' + $pt.PROPERTY_SEPARATOR + 'url', this.getAdvancedSearchUrl());
@@ -12743,6 +12747,7 @@
 			BOOLEAN_TRUE_DISPLAY_TEXT: 'Y',
 			BOOLEAN_FALSE_DISPLAY_TEXT: 'N',
 			PAGE_JUMPING_PROXY: null,
+			PAGE_JUMPING_PROXY_CALLBACK: null,
 			registerInlineEditor: function (type, definition) {
 				if (NTable.__inlineEditors[type] != null) {
 					window.console.warn("Inline editor[" + type + "] is repalced.");
@@ -14898,6 +14903,9 @@
 					$pt.doPost(url, criteria).done(function (data) {
 						if (typeof data === 'string') {
 							data = JSON.parse(data);
+						}
+						if (NTable.PAGE_JUMPING_PROXY_CALLBACK) {
+							data = NTable.PAGE_JUMPING_PROXY_CALLBACK.call(_this, data, _this.getDataId());
 						}
 						model.mergeCurrentModel(data);
 						// refresh

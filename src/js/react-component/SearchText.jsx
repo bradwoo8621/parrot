@@ -13,7 +13,8 @@
 			NOT_FOUND: 'Not Found',
 			SEARCH_PROXY: null,
 			SEARCH_PROXY_CALLBACK: null,
-			ADVANCED_SEARCH_PROXY: null
+			ADVANCED_SEARCH_PROXY: null,
+			ADVANCED_SEARCH_PROXY_CALLBACK: null,
 		},
 		propTypes: {
 			// model
@@ -344,6 +345,9 @@
 									done: function (data) {
 										if (typeof data === 'string') {
 											data = JSON.parse(data);
+										}
+										if (NSearchText.ADVANCED_SEARCH_PROXY_CALLBACK) {
+											data = NSearchText.ADVANCED_SEARCH_PROXY_CALLBACK.call(this, data, this.getDataId());
 										}
 										model.mergeCurrentModel(data);
 										model.set('criteria' + $pt.PROPERTY_SEPARATOR + 'url', this.getAdvancedSearchUrl());
