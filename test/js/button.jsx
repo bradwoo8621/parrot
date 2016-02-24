@@ -77,6 +77,20 @@
         },
         pos: {row: 1, col: 1}
     });
+    var successIconButton1 = $pt.createCellLayout('name', {
+        comp: {
+            type: $pt.ComponentConstants.Button,
+            icon: 'pencil',
+            style: 'success',
+            click: function() {},
+            more: [
+                {icon: 'commenting-o', text: 'commenting', click: function(model) {alert('Commenting');}},
+                {divider: true},
+                {icon: 'balance-scale', text: 'Balance', click: function(model) {alert('Balance');}}
+            ]
+        },
+        pos: {row: 1, col: 1}
+    });
     var disabledButton = $pt.createCellLayout('name', {
         label: 'Click me',
         comp: {
@@ -216,6 +230,8 @@
             <NFormButton model={model} layout={infoIconButton}/>
             <span>Success Icon Button</span>
             <NFormButton model={model} layout={successIconButton}/>
+            <span>Success Icon Button 1</span>
+            <NFormButton model={model} layout={successIconButton1}/>
         </div>
         <div className='col-md-3 col-lg-3 col-sm-3'>
             <span>Disabled Button</span>

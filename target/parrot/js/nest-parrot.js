@@ -1,4 +1,4 @@
-/** nest-parrot.V0.2.0 2016-02-23 */
+/** nest-parrot.V0.2.0 2016-02-24 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -2225,7 +2225,7 @@
 
 			// check if the cell definition is referenced by pre-definition
 			if (cell.base) {
-				cell = $.extend({}, cell.base, cell);
+				cell = $.extend(true, {}, cell.base, cell);
 			}
 
 			this.__dataId = cell.dataId ? cell.dataId : this.__id;
@@ -4734,6 +4734,7 @@
 						'aria-haspopup': 'true',
 						'aria-expanded': 'false',
 						key: 'a' },
+					!this.getComponentOption('click') ? this.getButtonContext() : null,
 					React.createElement('span', { className: 'caret' })
 				);
 				var emptyFunction = function () {};
@@ -4769,6 +4770,25 @@
 				return null;
 			}
 		},
+		getButtonContext: function () {
+			var label = this.getLabel();
+			var icon = this.renderButtonIcon();
+			var buttonContext = null;
+			if (this.getLabelPosition() === 'left') {
+				// label in left
+				if (label && icon) {
+					label = label + ' ';
+				}
+				buttonContext = [label, icon];
+			} else {
+				// default label in right
+				if (label && icon) {
+					label = ' ' + label;
+				}
+				buttonContext = [icon, label];
+			}
+			return buttonContext;
+		},
 		render: function () {
 			if (!this.isVisible()) {
 				return null;
@@ -4781,59 +4801,31 @@
 				disabled: !this.isEnabled()
 			};
 			css['btn-' + this.getStyle()] = true;
-			var label = this.getLabel();
-			var icon = this.renderButtonIcon();
-			if (this.getLabelPosition() === 'left') {
-				if (label && icon) {
-					label = label + ' ';
-				}
-				// label in left
-				return React.createElement(
-					'div',
-					{ className: $pt.LayoutHelper.classSet(compCSS) },
-					React.createElement(
-						'div',
-						{ className: 'btn-group' },
-						React.createElement(
-							'a',
-							{ href: 'javascript:void(0);',
-								className: $pt.LayoutHelper.classSet(css),
-								onClick: this.onClicked,
-								disabled: !this.isEnabled(),
-								title: this.getComponentOption('tooltip'),
-								ref: 'a' },
-							label,
-							icon
-						),
-						this.renderMoreButtons(css)
-					)
-				);
-			} else {
-				if (label && icon) {
-					label = ' ' + label;
-				}
-				// default label in right
-				return React.createElement(
-					'div',
-					{ className: $pt.LayoutHelper.classSet(compCSS) },
-					React.createElement(
-						'div',
-						{ className: 'btn-group' },
-						React.createElement(
-							'a',
-							{ href: 'javascript:void(0);',
-								className: $pt.LayoutHelper.classSet(css),
-								onClick: this.onClicked,
-								disabled: !this.isEnabled(),
-								title: this.getComponentOption('tooltip'),
-								ref: 'a' },
-							icon,
-							label
-						),
-						this.renderMoreButtons(css)
-					)
+			var defaultClick = this.getComponentOption("click");
+			var more = this.getComponentOption('more');
+			var defaultButton = null;
+			if (defaultClick || !more) {
+				defaultButton = React.createElement(
+					'a',
+					{ href: 'javascript:void(0);',
+						className: $pt.LayoutHelper.classSet(css),
+						onClick: this.onClicked,
+						disabled: !this.isEnabled(),
+						title: this.getComponentOption('tooltip'),
+						ref: 'a' },
+					this.getButtonContext()
 				);
 			}
+			return React.createElement(
+				'div',
+				{ className: $pt.LayoutHelper.classSet(compCSS) },
+				React.createElement(
+					'div',
+					{ className: 'btn-group' },
+					defaultButton,
+					this.renderMoreButtons(css)
+				)
+			);
 		},
 		onClicked: function (evt) {
 			if (this.isEnabled()) {

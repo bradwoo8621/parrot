@@ -2283,6 +2283,14 @@ div.n-button a.btn.dropdown-toggle.effect:focus:before {
   animation: none;
   -o-animation: none;
 }
+div.n-button a.btn:first-child.dropdown-toggle {
+  padding-right: 40px;
+}
+div.n-button a.btn:first-child.dropdown-toggle > span.caret {
+  position: absolute;
+  top: 45%;
+  right: 10%;
+}
 @keyframes buttonRippleOn {
   0% {
     opacity: 0;

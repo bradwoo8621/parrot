@@ -41,7 +41,7 @@
 
 			// check if the cell definition is referenced by pre-definition
 			if (cell.base) {
-				cell = $.extend({}, cell.base, cell);
+				cell = $.extend(true, {}, cell.base, cell);
 			}
 
 			this.__dataId = cell.dataId ? cell.dataId : this.__id;

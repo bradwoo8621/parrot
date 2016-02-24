@@ -134,7 +134,8 @@
 					title: 'Dropdown',
 					desc: ['Dropdown buttons.',
 						<span>Dropdown item has <code>icon</code>, <code>text</code> and <code>click</code>.
-						Or declared as a divider via <code>divider: true</code>.</span>],
+						Or declared as a divider via <code>divider: true</code>.<br/>
+						If no <code>click</code> defined in component, it is a single dropdown, otherwise is split dropdown.</span>],
 					xml: <NFormButton model={model} layout={$pt.createCellLayout('button', layoutTemplate)}/>,
 					code: [modelCode, layoutCode, compCode],
 					index: 35

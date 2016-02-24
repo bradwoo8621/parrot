@@ -111,6 +111,7 @@
 					aria-haspopup="true"
 					aria-expanded="false"
 					key='a'>
+					{!this.getComponentOption('click') ? this.getButtonContext() : null}
 				   	<span className="caret"></span>
 				</a>);
 				var emptyFunction = function(){};
@@ -139,6 +140,25 @@
 				return null;
 			}
 		},
+		getButtonContext: function() {
+			var label = this.getLabel();
+			var icon = this.renderButtonIcon();
+			var buttonContext = null;
+			if (this.getLabelPosition() === 'left') {
+				// label in left
+				if (label && icon) {
+					label = label + ' ';
+				}
+				buttonContext = [label, icon];
+			} else {
+				// default label in right
+				if (label && icon) {
+					label = ' ' + label;
+				}
+				buttonContext = [icon, label];
+			}
+			return buttonContext;
+		},
 		render: function () {
 			if (!this.isVisible()) {
 				return null;
@@ -151,45 +171,25 @@
 				disabled: !this.isEnabled()
 			};
 			css['btn-' + this.getStyle()] = true;
-			var label = this.getLabel();
-			var icon = this.renderButtonIcon();
-			if (this.getLabelPosition() === 'left') {
-				if (label && icon) {
-					label = label + ' ';
-				}
-				// label in left
-				return (<div className={$pt.LayoutHelper.classSet(compCSS)}>
-					<div className='btn-group'>
-						<a href='javascript:void(0);'
-						   className={$pt.LayoutHelper.classSet(css)}
-						   onClick={this.onClicked}
-						   disabled={!this.isEnabled()}
-						   title={this.getComponentOption('tooltip')}
-						   ref='a'>
-							{label}{icon}
-						</a>
-						{this.renderMoreButtons(css)}
-					</div>
-				</div>);
-			} else {
-				if (label && icon) {
-					label = ' ' + label;
-				}
-				// default label in right
-				return (<div className={$pt.LayoutHelper.classSet(compCSS)}>
-					<div className='btn-group'>
-						<a href='javascript:void(0);'
-						   className={$pt.LayoutHelper.classSet(css)}
-						   onClick={this.onClicked}
-						   disabled={!this.isEnabled()}
-						   title={this.getComponentOption('tooltip')}
-						   ref='a'>
-							{icon}{label}
-						</a>
-						{this.renderMoreButtons(css)}
-					</div>
-				</div>);
+			var defaultClick = this.getComponentOption("click");
+			var more = this.getComponentOption('more');
+			var defaultButton = null;
+			if (defaultClick || !more) {
+				defaultButton = (<a href='javascript:void(0);'
+				   className={$pt.LayoutHelper.classSet(css)}
+				   onClick={this.onClicked}
+				   disabled={!this.isEnabled()}
+				   title={this.getComponentOption('tooltip')}
+				   ref='a'>
+					{this.getButtonContext()}
+				</a>);
 			}
+			return (<div className={$pt.LayoutHelper.classSet(compCSS)}>
+				<div className='btn-group'>
+					{defaultButton}
+					{this.renderMoreButtons(css)}
+				</div>
+			</div>);
 		},
 		onClicked: function (evt) {
 			if (this.isEnabled()) {
