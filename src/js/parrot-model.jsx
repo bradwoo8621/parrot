@@ -728,6 +728,13 @@
 		getValidator: function () {
 			return this.__validator;
 		},
+		setValidator: function(validator, clearError) {
+			this.__validator = validator;
+			if (clearError) {
+				this.__validateResults = {};
+			}
+			return this;
+		},
 		/**
 		 * get value by given id
 		 * @param id {string} property id

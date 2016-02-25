@@ -90,7 +90,7 @@
 					'fa-fw': true
 				};
 				css['fa-' + icon] = true;
-				return <span className={$pt.LayoutHelper.classSet(css)}/>;
+				return <span className={$pt.LayoutHelper.classSet(css)} key='icon'/>;
 			}
 		},
 		/**
@@ -147,13 +147,13 @@
 			if (this.getLabelPosition() === 'left') {
 				// label in left
 				if (label && icon) {
-					label = label + ' ';
+					label = <span key='lbl'>{label + ' '}</span>;
 				}
 				buttonContext = [label, icon];
 			} else {
 				// default label in right
 				if (label && icon) {
-					label = ' ' + label;
+					label = <span key='lbl'>{' ' + label}</span>;
 				}
 				buttonContext = [icon, label];
 			}

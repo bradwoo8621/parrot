@@ -1,4 +1,4 @@
-/** nest-parrot.V0.2.0 2016-02-24 */
+/** nest-parrot.V0.2.0 2016-02-25 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -426,10 +426,22 @@
 		if (quiet === true) {} else {
 			$pt.Components.NOnRequestModal.getOnRequestModal().show();
 		}
+		var hideOnRequest = function () {
+			if (quiet === true) {} else {
+				$pt.Components.NOnRequestModal.getOnRequestModal().hide();
+			}
+		};
 
 		return $.ajax(url, options).done(function (data, textStatus, jqXHR) {
 			if (done !== undefined && done !== null) {
-				done(data, textStatus, jqXHR);
+				try {
+					done(data, textStatus, jqXHR);
+				} catch (err) {
+					console.error(data);
+					console.error(textStatus);
+					console.error(jqXHR);
+					$pt.Components.NExceptionModal.getExceptionModal().show('Javascript Error', err);
+				}
 			}
 		}).fail(function (jqXHR, textStatus, errorThrown) {
 			if (fail !== undefined && fail !== null) {
@@ -440,7 +452,14 @@
 					callback = fail["" + jqXHR.status];
 				}
 				if (callback != null) {
-					callback(jqXHR, textStatus, errorThrown);
+					try {
+						callback(jqXHR, textStatus, errorThrown);
+					} catch (err) {
+						console.error(data);
+						console.error(textStatus);
+						console.error(jqXHR);
+						$pt.Components.NExceptionModal.getExceptionModal().show('Javascript Error', err);
+					}
 				} else {
 					$pt.Components.NExceptionModal.getExceptionModal().show("" + jqXHR.status, jqXHR.responseText);
 				}
@@ -449,9 +468,7 @@
 			}
 		}).always(function () {
 			// hide
-			if (quiet === true) {} else {
-				$pt.Components.NOnRequestModal.getOnRequestModal().hide();
-			}
+			hideOnRequest();
 		});
 	};
 
@@ -566,7 +583,7 @@
 				return {};
 			}
 		}
-		return deparam(paramsString);
+		return $.deparam(paramsString);
 	};
 	/**
   * mock ajax
@@ -1686,6 +1703,13 @@
    */
 		getValidator: function () {
 			return this.__validator;
+		},
+		setValidator: function (validator, clearError) {
+			this.__validator = validator;
+			if (clearError) {
+				this.__validateResults = {};
+			}
+			return this;
 		},
 		/**
    * get value by given id
@@ -4711,7 +4735,7 @@
 					'fa-fw': true
 				};
 				css['fa-' + icon] = true;
-				return React.createElement('span', { className: $pt.LayoutHelper.classSet(css) });
+				return React.createElement('span', { className: $pt.LayoutHelper.classSet(css), key: 'icon' });
 			}
 		},
 		/**
@@ -4777,13 +4801,21 @@
 			if (this.getLabelPosition() === 'left') {
 				// label in left
 				if (label && icon) {
-					label = label + ' ';
+					label = React.createElement(
+						'span',
+						{ key: 'lbl' },
+						label + ' '
+					);
 				}
 				buttonContext = [label, icon];
 			} else {
 				// default label in right
 				if (label && icon) {
-					label = ' ' + label;
+					label = React.createElement(
+						'span',
+						{ key: 'lbl' },
+						' ' + label
+					);
 				}
 				buttonContext = [icon, label];
 			}
