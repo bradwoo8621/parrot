@@ -158,6 +158,8 @@
 		 * @returns {XML}
 		 */
 		renderLabel: function () {
+			var labelIcon = this.getComponentOption('labelIcon');
+			var iconLabel = labelIcon ? <span className={'label-icon fa fa-fw fa-' + labelIcon} /> : null;
 			var requiredPaint = this.getComponentOption("paintRequired");
 			var requireIconCSS = {
 				fa: true,
@@ -180,11 +182,14 @@
 				tooltipCSS['fa-' + NFormCell.TOOLTIP_ICON] = true;
 				tooltipIcon = <span className={$pt.LayoutHelper.classSet(tooltipCSS)} title={tooltip}/>;
 			}
-			return (<span className={this.getLayout().getLabelCSS()} onClick={this.onLabelClicked} ref="label">
-			{this.getLayout().getLabel()}
+			return (<span className={this.getLayout().getLabelCSS()}
+						onClick={this.onLabelClicked}
+						ref="label">
+				{iconLabel}
+				{this.getLayout().getLabel()}
 				{tooltipIcon}
 				{requiredLabel}
-		</span>);
+			</span>);
 		},
 		/**
 		 * render
@@ -258,21 +263,21 @@
 		 */
 		onModelValidateChanged: function (evt) {
 			// TODO maybe will introduce performance issue, cannot sure now.
-			// this.forceUpdate();
-			var div;
-			if (this.getModel().hasError(this.getDataId())) {
-				this.renderPopover();
-				div = this.refs.div;
-				if (div != null) {
-					$(ReactDOM.findDOMNode(div)).addClass('has-error');
-				}
-			} else {
-				this.destroyPopover();
-				div = this.refs.div;
-				if (div != null) {
-					$(ReactDOM.findDOMNode(div)).removeClass('has-error');
-				}
-			}
+			this.forceUpdate();
+			// var div;
+			// if (this.getModel().hasError(this.getDataId())) {
+			// 	this.renderPopover();
+			// 	div = this.refs.div;
+			// 	if (div != null) {
+			// 		$(ReactDOM.findDOMNode(div)).addClass('has-error');
+			// 	}
+			// } else {
+			// 	this.destroyPopover();
+			// 	div = this.refs.div;
+			// 	if (div != null) {
+			// 		$(ReactDOM.findDOMNode(div)).removeClass('has-error');
+			// 	}
+			// }
 		},
 		/**
 		 * on label clicked

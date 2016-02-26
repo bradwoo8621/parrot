@@ -965,6 +965,9 @@ div.horizontal-label > div.row > div:first-child > span {
   display: inline-block;
   overflow: hidden;
 }
+div.horizontal-label > div.row > div:first-child > span .label-icon {
+  margin-right: 3px;
+}
 div.vertical-label {
   line-height: 1.2;
 }
@@ -978,6 +981,9 @@ div.vertical-label > span:first-child {
   width: 100%;
   display: inline-block;
   overflow: hidden;
+}
+div.vertical-label > span .label-icon {
+  margin-right: 3px;
 }
 span.required {
   color: #f44336;

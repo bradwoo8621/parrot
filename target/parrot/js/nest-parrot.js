@@ -1,4 +1,4 @@
-/** nest-parrot.V0.2.0 2016-02-25 */
+/** nest-parrot.V0.2.0 2016-02-26 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -7542,6 +7542,8 @@
    * @returns {XML}
    */
 		renderLabel: function () {
+			var labelIcon = this.getComponentOption('labelIcon');
+			var iconLabel = labelIcon ? React.createElement('span', { className: 'label-icon fa fa-fw fa-' + labelIcon }) : null;
 			var requiredPaint = this.getComponentOption("paintRequired");
 			var requireIconCSS = {
 				fa: true,
@@ -7565,7 +7567,10 @@
 			}
 			return React.createElement(
 				'span',
-				{ className: this.getLayout().getLabelCSS(), onClick: this.onLabelClicked, ref: 'label' },
+				{ className: this.getLayout().getLabelCSS(),
+					onClick: this.onLabelClicked,
+					ref: 'label' },
+				iconLabel,
 				this.getLayout().getLabel(),
 				tooltipIcon,
 				requiredLabel
@@ -7655,21 +7660,21 @@
    */
 		onModelValidateChanged: function (evt) {
 			// TODO maybe will introduce performance issue, cannot sure now.
-			// this.forceUpdate();
-			var div;
-			if (this.getModel().hasError(this.getDataId())) {
-				this.renderPopover();
-				div = this.refs.div;
-				if (div != null) {
-					$(ReactDOM.findDOMNode(div)).addClass('has-error');
-				}
-			} else {
-				this.destroyPopover();
-				div = this.refs.div;
-				if (div != null) {
-					$(ReactDOM.findDOMNode(div)).removeClass('has-error');
-				}
-			}
+			this.forceUpdate();
+			// var div;
+			// if (this.getModel().hasError(this.getDataId())) {
+			// 	this.renderPopover();
+			// 	div = this.refs.div;
+			// 	if (div != null) {
+			// 		$(ReactDOM.findDOMNode(div)).addClass('has-error');
+			// 	}
+			// } else {
+			// 	this.destroyPopover();
+			// 	div = this.refs.div;
+			// 	if (div != null) {
+			// 		$(ReactDOM.findDOMNode(div)).removeClass('has-error');
+			// 	}
+			// }
 		},
 		/**
    * on label clicked
@@ -10493,17 +10498,25 @@
 			} else if (!this.isViewMode() && option.view == 'view') {
 				return null;
 			}
-			var layout = {
+			var layout = $.extend({
 				label: option.text,
-				comp: {
-					type: $pt.ComponentConstants.Button,
-					icon: option.icon,
-					style: option.style,
-					click: option.click,
-					enabled: option.enabled,
-					visible: option.visible
-				}
-			};
+				comp: { type: $pt.ComponentConstants.Button }
+			}, {
+				comp: option
+			});
+			delete layout.comp.label;
+			//
+			// var layout = {
+			// 	label: option.text,
+			// 	comp: {
+			// 		type: $pt.ComponentConstants.Button,
+			// 		icon: option.icon,
+			// 		style: option.style,
+			// 		click: option.click,
+			// 		enabled: option.enabled,
+			// 		visible: option.visible
+			// 	}
+			// };
 			return React.createElement($pt.Components.NFormButton, { model: this.getModel(),
 				layout: $pt.createCellLayout('pseudo-button', layout),
 				key: buttonIndex });

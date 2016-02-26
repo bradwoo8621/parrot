@@ -113,17 +113,25 @@
 			} else if (!this.isViewMode() && option.view == 'view') {
 				return null;
 			}
-			var layout = {
+			var layout = $.extend({
 				label: option.text,
-				comp: {
-					type: $pt.ComponentConstants.Button,
-					icon: option.icon,
-					style: option.style,
-					click: option.click,
-					enabled: option.enabled,
-					visible: option.visible
-				}
-			};
+				comp: {type: $pt.ComponentConstants.Button}
+			}, {
+				comp: option
+			});
+			delete layout.comp.label;
+			//
+			// var layout = {
+			// 	label: option.text,
+			// 	comp: {
+			// 		type: $pt.ComponentConstants.Button,
+			// 		icon: option.icon,
+			// 		style: option.style,
+			// 		click: option.click,
+			// 		enabled: option.enabled,
+			// 		visible: option.visible
+			// 	}
+			// };
 			return <$pt.Components.NFormButton model={this.getModel()}
 											   layout={$pt.createCellLayout('pseudo-button', layout)}
 											   key={buttonIndex}/>;
