@@ -474,7 +474,12 @@
 			return section.getParentCard().getId() + '-' + section.getId();
 		},
 		isViewMode: function() {
-			return this.props.view;
+			var isViewMode = this.state ? this.state.isViewMode : null;
+			if (isViewMode == null) {
+				return this.props.view === true;
+			} else {
+				return isViewMode;
+			}
 		},
 		isFreeCard: function() {
 			return this.isViewMode() || this.getLayout().isFreeCard();

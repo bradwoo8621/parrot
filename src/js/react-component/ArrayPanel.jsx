@@ -143,14 +143,14 @@
 				});
 			});
 			var cellLayout = {
-				label: this.getPanelTitle(model),
+				label: this.getPanelTitle(model, itemIndex),
 				comp: {
 					type: $pt.ComponentConstants.Panel,
 					collapsible: this.getComponentOption('collapsible'),
 					expanded: this.getComponentOption('expanded'),
-					editLayout: this.getEditLayout(model),
+					editLayout: this.getEditLayout(model, itemIndex),
 					style: this.getComponentOption('style'),
-					checkInTitle: this.getCheckInTitle(model),
+					checkInTitle: this.getCheckInTitle(model, itemIndex),
 					expandedLabel: this.getComponentOption('expandedLabel'),
 					collapsedLabel: this.getComponentOption('collapsedLabel')
 				}
@@ -201,10 +201,10 @@
 		 * @param model {ModelInterface} item model
 		 * @returns {{}}
 		 */
-		getEditLayout: function (model) {
+		getEditLayout: function (model, itemIndex) {
 			var layout = this.getComponentOption('editLayout');
 			if (typeof layout === 'function') {
-				return layout.call(this, model);
+				return layout.call(this, model, itemIndex);
 			} else {
 				return layout;
 			}
@@ -214,10 +214,10 @@
 		 * @param model {ModelInterface} item model
 		 * @returns {{}}
 		 */
-		getCheckInTitle: function (model) {
+		getCheckInTitle: function (model, itemIndex) {
 			var checkInTitle = this.getComponentOption('checkInTitle');
 			if (typeof checkInTitle === 'function') {
-				return checkInTitle.call(this, model);
+				return checkInTitle.call(this, model, itemIndex);
 			} else {
 				return checkInTitle;
 			}
@@ -227,14 +227,14 @@
 		 * @param model {ModelInterface} item model
 		 * @returns {string}
 		 */
-		getPanelTitle: function (model) {
+		getPanelTitle: function (model, itemIndex) {
 			var title = this.getComponentOption('itemTitle');
 			if (title == null) {
 				return NArrayPanel.UNTITLED;
 			} else if (typeof title === 'string') {
 				return title;
 			} else {
-				var titleText = title.when.call(this, model);
+				var titleText = title.when.call(this, model, itemIndex);
 				return (titleText == null || titleText.isBlank()) ? NArrayPanel.UNTITLED : titleText;
 			}
 		}

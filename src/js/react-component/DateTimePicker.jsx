@@ -1004,6 +1004,17 @@
 			// or use un-strict mode to format
 			// cannot know the result of moment format
 			// move process of changing to blur event
+			var text = this.getTextInput().val();
+			if (text.length == 0 || text.isBlank())  {
+				this.setValueToModel(null);
+			} else {
+				var date = this.convertValueFromString(text, this.getDisplayFormat(), true);
+				if (date == null && text.length != 0) {
+					// TODO invalid date, do nothing now. donot know how to deal with it...
+				} else {
+					this.setValueToModel(date);
+				}
+			}
 		},
 		onModelChange: function (evt) {
 			this.forceUpdate();
@@ -1023,8 +1034,8 @@
 		 * @param format {string} optional, use value format if not passed
 		 * @returns {moment}
 		 */
-		convertValueFromString: function (value, format) {
-			var date = (value == null || value.isBlank()) ? null : moment(value, format ? format : this.getValueFormat(), this.getLocale());
+		convertValueFromString: function (value, format, useStrict) {
+			var date = (value == null || value.isBlank()) ? null : moment(value, format ? format : this.getValueFormat(), this.getLocale(), useStrict === true ? true : undefined);
 			return (date == null || !date.isValid()) ? null : date;
 		},
 		/**

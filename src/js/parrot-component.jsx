@@ -1121,10 +1121,23 @@
 		},
 		/**
 		 * component is view mode or not
+		 * first check "state.isViewMode"
+		 * second check "props.view"
+		 * last check the componen opion "view"
+		 * returns value of "state.isViewMode" has value.
+		 * otherwise returns true when one of "props.view" and component option "view" is true
 		 * @returns {boolean}
 		 */
 		isViewMode: function() {
-			return this.props.view === true;
+			var isViewMode = this.state ? this.state.isViewMode : null;
+			if (isViewMode == null) {
+				return this.props.view === true || this.getComponentOption('view');
+			} else {
+				return isViewMode;
+			}
+		},
+		setViewMode: function(isViewMode) {
+			this.setState({isViewMode: isViewMode});
 		},
 		/**
 		 * render in view mode. default render as a label.

@@ -102,11 +102,34 @@
 			if (comp != null) {
 				$(ReactDOM.findDOMNode(comp)).popover("destroy");
 			}
+			var tooltip = this.refs.tooltip;
+			if (tooltip != null) {
+				$(ReactDOM.findDOMNode(tooltip)).popover('destroy');
+			}
 		},
 		/**
 		 * render error popover
 		 */
 		renderPopover: function () {
+			var tooltip = this.getComponentOption('tooltip');
+			if (tooltip != null) {
+				if (typeof tooltip === 'string') {
+					tooltip = {
+						text: tooltip
+					};
+				}
+				var tooltipPopover = {
+					title: tooltip.title,
+					content: tooltip.text,
+					placement: tooltip.position ? tooltip.position: 'top',
+					trigger: 'hover',
+					container: 'body',
+					html: true,
+					animation: false
+				};
+				$(ReactDOM.findDOMNode(this.refs.tooltip)).popover(tooltipPopover);
+			}
+
 			if (this.getLayout().getComponentType().popover !== false && this.getModel().hasError(this.getDataId())) {
 				var messages = this.getModel().getError(this.getDataId());
 				var _this = this;
@@ -117,6 +140,7 @@
 					content: messages.map(function (msg) {
 						return "<span style='display:block'>" + msg.format([_this.getLayout().getLabel()]) + "</span>";
 					}),
+					container: 'body',
 					// false is very import, since when destroy popover,
 					// the really destroy will be invoked by some delay,
 					// and before really destory invoked,
@@ -167,20 +191,20 @@
 				required: true
 			};
 			requireIconCSS['fa-' + NFormCell.REQUIRED_ICON] = true;
-			var requiredLabel = requiredPaint && this.getModel().isRequired(this.getDataId()) ?
+			var requiredLabel = requiredPaint && !this.isViewMode() && this.getModel().isRequired(this.getDataId()) ?
 				(<span className={$pt.LayoutHelper.classSet(requireIconCSS)}/>) : null;
 			//var showColon = !this.getLayout().getLabel().endsWith('?')
 			//{showColon ? ':' : null}
 			var tooltip = this.getComponentOption('tooltip');
 			var tooltipIcon = null;
-			if (tooltip != null && !tooltip.isBlank()) {
-				var tooltipCSS = {
-					fa: true,
-					'fa-fw': true,
-					'n-form-cell-tooltip': true
-				};
+			var tooltipCSS = {
+				fa: true,
+				'fa-fw': true,
+				'n-form-cell-tooltip': true
+			};
+			if (tooltip != null) {
 				tooltipCSS['fa-' + NFormCell.TOOLTIP_ICON] = true;
-				tooltipIcon = <span className={$pt.LayoutHelper.classSet(tooltipCSS)} title={tooltip}/>;
+				tooltipIcon = <span className={$pt.LayoutHelper.classSet(tooltipCSS)} ref='tooltip'/>;
 			}
 			return (<span className={this.getLayout().getLabelCSS()}
 						onClick={this.onLabelClicked}

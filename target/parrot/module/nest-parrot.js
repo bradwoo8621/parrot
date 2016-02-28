@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.2.0 2016-02-26 */
+	/** nest-parrot.V0.2.0 2016-02-28 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -3360,10 +3360,23 @@
 		},
 		/**
    * component is view mode or not
+   * first check "state.isViewMode"
+   * second check "props.view"
+   * last check the componen opion "view"
+   * returns value of "state.isViewMode" has value.
+   * otherwise returns true when one of "props.view" and component option "view" is true
    * @returns {boolean}
    */
 		isViewMode: function () {
-			return this.props.view === true;
+			var isViewMode = this.state ? this.state.isViewMode : null;
+			if (isViewMode == null) {
+				return this.props.view === true || this.getComponentOption('view');
+			} else {
+				return isViewMode;
+			}
+		},
+		setViewMode: function (isViewMode) {
+			this.setState({ isViewMode: isViewMode });
 		},
 		/**
    * render in view mode. default render as a label.
@@ -4149,14 +4162,14 @@
 				});
 			});
 			var cellLayout = {
-				label: this.getPanelTitle(model),
+				label: this.getPanelTitle(model, itemIndex),
 				comp: {
 					type: $pt.ComponentConstants.Panel,
 					collapsible: this.getComponentOption('collapsible'),
 					expanded: this.getComponentOption('expanded'),
-					editLayout: this.getEditLayout(model),
+					editLayout: this.getEditLayout(model, itemIndex),
 					style: this.getComponentOption('style'),
-					checkInTitle: this.getCheckInTitle(model),
+					checkInTitle: this.getCheckInTitle(model, itemIndex),
 					expandedLabel: this.getComponentOption('expandedLabel'),
 					collapsedLabel: this.getComponentOption('collapsedLabel')
 				}
@@ -4213,10 +4226,10 @@
    * @param model {ModelInterface} item model
    * @returns {{}}
    */
-		getEditLayout: function (model) {
+		getEditLayout: function (model, itemIndex) {
 			var layout = this.getComponentOption('editLayout');
 			if (typeof layout === 'function') {
-				return layout.call(this, model);
+				return layout.call(this, model, itemIndex);
 			} else {
 				return layout;
 			}
@@ -4226,10 +4239,10 @@
    * @param model {ModelInterface} item model
    * @returns {{}}
    */
-		getCheckInTitle: function (model) {
+		getCheckInTitle: function (model, itemIndex) {
 			var checkInTitle = this.getComponentOption('checkInTitle');
 			if (typeof checkInTitle === 'function') {
-				return checkInTitle.call(this, model);
+				return checkInTitle.call(this, model, itemIndex);
 			} else {
 				return checkInTitle;
 			}
@@ -4239,14 +4252,14 @@
    * @param model {ModelInterface} item model
    * @returns {string}
    */
-		getPanelTitle: function (model) {
+		getPanelTitle: function (model, itemIndex) {
 			var title = this.getComponentOption('itemTitle');
 			if (title == null) {
 				return NArrayPanel.UNTITLED;
 			} else if (typeof title === 'string') {
 				return title;
 			} else {
-				var titleText = title.when.call(this, model);
+				var titleText = title.when.call(this, model, itemIndex);
 				return titleText == null || titleText.isBlank() ? NArrayPanel.UNTITLED : titleText;
 			}
 		}
@@ -6269,6 +6282,17 @@
 			// or use un-strict mode to format
 			// cannot know the result of moment format
 			// move process of changing to blur event
+			var text = this.getTextInput().val();
+			if (text.length == 0 || text.isBlank()) {
+				this.setValueToModel(null);
+			} else {
+				var date = this.convertValueFromString(text, this.getDisplayFormat(), true);
+				if (date == null && text.length != 0) {
+					// TODO invalid date, do nothing now. donot know how to deal with it...
+				} else {
+						this.setValueToModel(date);
+					}
+			}
 		},
 		onModelChange: function (evt) {
 			this.forceUpdate();
@@ -6288,8 +6312,8 @@
    * @param format {string} optional, use value format if not passed
    * @returns {moment}
    */
-		convertValueFromString: function (value, format) {
-			var date = value == null || value.isBlank() ? null : moment(value, format ? format : this.getValueFormat(), this.getLocale());
+		convertValueFromString: function (value, format, useStrict) {
+			var date = value == null || value.isBlank() ? null : moment(value, format ? format : this.getValueFormat(), this.getLocale(), useStrict === true ? true : undefined);
 			return date == null || !date.isValid() ? null : date;
 		},
 		/**
@@ -7294,7 +7318,12 @@
 			return section.getParentCard().getId() + '-' + section.getId();
 		},
 		isViewMode: function () {
-			return this.props.view;
+			var isViewMode = this.state ? this.state.isViewMode : null;
+			if (isViewMode == null) {
+				return this.props.view === true;
+			} else {
+				return isViewMode;
+			}
 		},
 		isFreeCard: function () {
 			return this.isViewMode() || this.getLayout().isFreeCard();
@@ -7515,11 +7544,34 @@
 			if (comp != null) {
 				$(ReactDOM.findDOMNode(comp)).popover("destroy");
 			}
+			var tooltip = this.refs.tooltip;
+			if (tooltip != null) {
+				$(ReactDOM.findDOMNode(tooltip)).popover('destroy');
+			}
 		},
 		/**
    * render error popover
    */
 		renderPopover: function () {
+			var tooltip = this.getComponentOption('tooltip');
+			if (tooltip != null) {
+				if (typeof tooltip === 'string') {
+					tooltip = {
+						text: tooltip
+					};
+				}
+				var tooltipPopover = {
+					title: tooltip.title,
+					content: tooltip.text,
+					placement: tooltip.position ? tooltip.position : 'top',
+					trigger: 'hover',
+					container: 'body',
+					html: true,
+					animation: false
+				};
+				$(ReactDOM.findDOMNode(this.refs.tooltip)).popover(tooltipPopover);
+			}
+
 			if (this.getLayout().getComponentType().popover !== false && this.getModel().hasError(this.getDataId())) {
 				var messages = this.getModel().getError(this.getDataId());
 				var _this = this;
@@ -7530,6 +7582,7 @@
 					content: messages.map(function (msg) {
 						return "<span style='display:block'>" + msg.format([_this.getLayout().getLabel()]) + "</span>";
 					}),
+					container: 'body',
 					// false is very import, since when destroy popover,
 					// the really destroy will be invoked by some delay,
 					// and before really destory invoked,
@@ -7582,19 +7635,19 @@
 				required: true
 			};
 			requireIconCSS['fa-' + NFormCell.REQUIRED_ICON] = true;
-			var requiredLabel = requiredPaint && this.getModel().isRequired(this.getDataId()) ? React.createElement('span', { className: $pt.LayoutHelper.classSet(requireIconCSS) }) : null;
+			var requiredLabel = requiredPaint && !this.isViewMode() && this.getModel().isRequired(this.getDataId()) ? React.createElement('span', { className: $pt.LayoutHelper.classSet(requireIconCSS) }) : null;
 			//var showColon = !this.getLayout().getLabel().endsWith('?')
 			//{showColon ? ':' : null}
 			var tooltip = this.getComponentOption('tooltip');
 			var tooltipIcon = null;
-			if (tooltip != null && !tooltip.isBlank()) {
-				var tooltipCSS = {
-					fa: true,
-					'fa-fw': true,
-					'n-form-cell-tooltip': true
-				};
+			var tooltipCSS = {
+				fa: true,
+				'fa-fw': true,
+				'n-form-cell-tooltip': true
+			};
+			if (tooltip != null) {
 				tooltipCSS['fa-' + NFormCell.TOOLTIP_ICON] = true;
-				tooltipIcon = React.createElement('span', { className: $pt.LayoutHelper.classSet(tooltipCSS), title: tooltip });
+				tooltipIcon = React.createElement('span', { className: $pt.LayoutHelper.classSet(tooltipCSS), ref: 'tooltip' });
 			}
 			return React.createElement(
 				'span',
@@ -8217,21 +8270,26 @@
 		render: function () {
 			var texts = this.getText();
 			if (!Array.isArray(texts)) {
-				var currency = this.getComponentOption('currency');
-				if (currency && texts != null && !(texts + '').isBlank()) {
-					var fraction = this.getComponentOption('fraction');
-					fraction = fraction ? fraction * 1 : 0;
-					texts = (texts + '').currencyFormat(fraction);
-				}
-				if (texts == null || (texts + '').isBlank()) {
-					texts = this.getComponentOption('replaceBlank') || this.getComponentOption('placeholder');
-				}
+				var convertor = this.getComponentOption('convertor');
+				if (convertor) {
+					texts = [convertor.call(this, texts)];
+				} else {
+					var currency = this.getComponentOption('currency');
+					if (currency && texts != null && !(texts + '').isBlank()) {
+						var fraction = this.getComponentOption('fraction');
+						fraction = fraction ? fraction * 1 : 0;
+						texts = (texts + '').currencyFormat(fraction);
+					}
+					if (texts == null || (texts + '').isBlank()) {
+						texts = this.getComponentOption('replaceBlank') || this.getComponentOption('placeholder');
+					}
 
-				var left = this.getComponentOption('left');
-				var right = this.getComponentOption('right');
-				texts = left ? left + texts : texts;
-				texts = right ? texts + right : texts;
-				texts = [texts];
+					var left = this.getComponentOption('left');
+					var right = this.getComponentOption('right');
+					texts = left ? left + texts : texts;
+					texts = right ? texts + right : texts;
+					texts = [texts];
+				}
 			}
 			var css = {
 				'n-disabled': !this.isEnabled()

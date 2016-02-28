@@ -59,21 +59,26 @@
 		render: function () {
 			var texts = this.getText();
 			if (!Array.isArray(texts)) {
-				var currency = this.getComponentOption('currency');
-				if (currency && texts != null && !(texts + '').isBlank()) {
-					var fraction = this.getComponentOption('fraction');
-					fraction = fraction ? fraction * 1 : 0;
-					texts = (texts + '').currencyFormat(fraction);
-				}
-				if (texts == null || (texts + '').isBlank()) {
-					texts = this.getComponentOption('replaceBlank') || this.getComponentOption('placeholder');
-				}
+				var convertor = this.getComponentOption('convertor');
+				if (convertor) {
+					texts = [convertor.call(this, texts)];
+				} else {
+					var currency = this.getComponentOption('currency');
+					if (currency && texts != null && !(texts + '').isBlank()) {
+						var fraction = this.getComponentOption('fraction');
+						fraction = fraction ? fraction * 1 : 0;
+						texts = (texts + '').currencyFormat(fraction);
+					}
+					if (texts == null || (texts + '').isBlank()) {
+						texts = this.getComponentOption('replaceBlank') || this.getComponentOption('placeholder');
+					}
 
-				var left = this.getComponentOption('left');
-				var right = this.getComponentOption('right');
-				texts = left ? (left + texts) : texts;
-				texts = right ? (texts + right) : texts;
-				texts = [texts];
+					var left = this.getComponentOption('left');
+					var right = this.getComponentOption('right');
+					texts = left ? (left + texts) : texts;
+					texts = right ? (texts + right) : texts;
+					texts = [texts];
+				}
 			}
 			var css = {
 				'n-disabled': !this.isEnabled()
