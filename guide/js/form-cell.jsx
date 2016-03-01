@@ -274,7 +274,8 @@
 				return {
 					id: 'form-cell-tooltip',
 					title: 'Tooltip',
-					desc: ['A simple tooltip can be declared.'],
+					desc: ['A simple tooltip can be declared.',
+						<span>Or a tooltip JSON like <code>{'tooltip: {text: \'\', position: \'\', title: \'\'}'}</code>, title and position are optional, see bootstrap document.</span>],
 					xml: {
 						width: 12,
 						xml: <NFormCell model={model} layout={$pt.createCellLayout('value', layoutTemplate)}/>
