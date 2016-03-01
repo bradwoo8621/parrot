@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.2.0 2016-02-28 */
+	/** nest-parrot.V0.2.0 2016-03-01 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -6301,7 +6301,20 @@
 			return this.convertValueFromString(this.getModel().get(this.getDataId()));
 		},
 		setValueToModel: function (value) {
-			this.getModel().set(this.getDataId(), this.convertValueToString(value));
+			var formattedValue = value;
+			if (value != null) {
+				if (typeof value === 'string') {
+					if (value.isBlank()) {
+						formattedValue = null;
+					} else {
+						formattedValue = moment(value, this.getPrimaryDisplayFormat()).format(this.getValueFormat());
+					}
+				} else {
+					formattedValue = value.format(this.getPrimaryDisplayFormat());
+					formattedValue = moment(formattedValue, this.getPrimaryDisplayFormat()).format(this.getValueFormat());
+				}
+			}
+			this.getModel().set(this.getDataId(), formattedValue);
 		},
 		setValueToTextInput: function (value) {
 			this.getTextInput().val(this.convertValueToString(value, this.getPrimaryDisplayFormat()));

@@ -46,6 +46,9 @@
                 console.log(data);
                 console.log(previewId);
                 console.log(index);
+            },
+            filebatchuploadsuccess: function() {
+                console.log(arguments);
             }
         }
     }));
