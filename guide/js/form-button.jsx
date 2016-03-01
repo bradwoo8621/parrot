@@ -133,6 +133,7 @@
 					id: 'button-label-dropdown',
 					title: 'Dropdown',
 					desc: ['Dropdown buttons.',
+						'Note if click of main button is not defined, show dropdown button as single button, otherwise as separated buttons',
 						<span>Dropdown item has <code>icon</code>, <code>text</code> and <code>click</code>.
 						Or declared as a divider via <code>divider: true</code>.<br/>
 						If no <code>click</code> defined in component, it is a single dropdown, otherwise is split dropdown.</span>],

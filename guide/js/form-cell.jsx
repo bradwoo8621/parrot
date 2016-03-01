@@ -283,6 +283,30 @@
 					index: 60
 				};
 			},
+			labelIcon: function() {
+				var layoutTemplate = {
+					label: 'Label Of Cell',
+					comp: {
+						labelIcon: 'ban'
+					}
+				};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'value',
+					template: layoutTemplate
+				});
+				return {
+					id: 'form-cell-labelIcon',
+					title: 'Label Icon',
+					desc: ['A simple icon can be declared.'],
+					xml: {
+						width: 12,
+						xml: <NFormCell model={model} layout={$pt.createCellLayout('value', layoutTemplate)}/>
+					},
+					code: [modelCode, layoutCode, compCode],
+					index: 65
+				};
+			},
 			width: function () {
 				var layoutTemplate = {
 					label: 'Label Of Cell',
