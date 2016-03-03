@@ -136,6 +136,17 @@
 				}
 			}
 
+			var listeners = this.getComponentOption('rowListener');
+			if (listeners) {
+				listeners = Array.isArray(listeners) ? listeners : [listeners];
+				listeners.forEach(function (listener) {
+					model.addListener(listener.id,
+						listener.time ? listener.time : 'post',
+						listener.type ? listener.type : 'change',
+						listener.listener);
+				});
+			}
+
 			var _this = this;
 			this.getDependencies('itemTitle').forEach(function (key) {
 				model.addListener(key, "post", "change", function () {

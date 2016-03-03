@@ -173,7 +173,7 @@
 				} else {
 					var canActive = this.getComponentOption('canActive');
 					if (canActive) {
-						canActive.call(this, newTabValue, newTabIndex, activeTabValue, activeTabIndex);
+						return canActive.call(this, newTabValue, newTabIndex, activeTabValue, activeTabIndex);
 					}
 				}
 			}.bind(this);
@@ -218,6 +218,16 @@
 						model.mergeError(itemError);
 					}
 				}
+			}
+			var listeners = this.getComponentOption('rowListener');
+			if (listeners) {
+				listeners = Array.isArray(listeners) ? listeners : [listeners];
+				listeners.forEach(function (listener) {
+					model.addListener(listener.id,
+						listener.time ? listener.time : 'post',
+						listener.type ? listener.type : 'change',
+						listener.listener);
+				});
 			}
 			return model;
 		},

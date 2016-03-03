@@ -1,4 +1,4 @@
-/** nest-parrot.V0.2.0 2016-03-01 */
+/** nest-parrot.V0.2.0 2016-03-03 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -4124,6 +4124,14 @@
 				}
 			}
 
+			var listeners = this.getComponentOption('rowListener');
+			if (listeners) {
+				listeners = Array.isArray(listeners) ? listeners : [listeners];
+				listeners.forEach(function (listener) {
+					model.addListener(listener.id, listener.time ? listener.time : 'post', listener.type ? listener.type : 'change', listener.listener);
+				});
+			}
+
 			var _this = this;
 			this.getDependencies('itemTitle').forEach(function (key) {
 				model.addListener(key, "post", "change", function () {
@@ -4413,7 +4421,7 @@
 				} else {
 					var canActive = this.getComponentOption('canActive');
 					if (canActive) {
-						canActive.call(this, newTabValue, newTabIndex, activeTabValue, activeTabIndex);
+						return canActive.call(this, newTabValue, newTabIndex, activeTabValue, activeTabIndex);
 					}
 				}
 			}).bind(this);
@@ -4460,6 +4468,13 @@
 						model.mergeError(itemError);
 					}
 				}
+			}
+			var listeners = this.getComponentOption('rowListener');
+			if (listeners) {
+				listeners = Array.isArray(listeners) ? listeners : [listeners];
+				listeners.forEach(function (listener) {
+					model.addListener(listener.id, listener.time ? listener.time : 'post', listener.type ? listener.type : 'change', listener.listener);
+				});
 			}
 			return model;
 		},
