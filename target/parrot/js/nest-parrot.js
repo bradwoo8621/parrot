@@ -1,4 +1,4 @@
-/** nest-parrot.V0.2.0 2016-03-03 */
+/** nest-parrot.V0.2.0 2016-03-07 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -1627,7 +1627,7 @@
    */
 		constructor: function (model, validator) {
 			this.__base = model;
-			this.__model = $pt.cloneJSON(model);
+			this.__model = $pt.mergeObject({ deep: true, sources: model });
 			this.__validator = validator;
 			this.__validateResults = {};
 			this.__changed = false;
@@ -1694,7 +1694,7 @@
    * apply current data to base model.
    */
 		applyCurrentToBase: function () {
-			this.__base = $.extend(true, {}, this.__model);
+			this.__base = $.mergObject({ deep: true, target: {}, sources: this.__model });
 			return this;
 		},
 		/**
@@ -1960,7 +1960,7 @@
    * reset model
    */
 		reset: function () {
-			this.__model = $pt.cloneJSON(this.__base);
+			this.__model = $pt.mergeObject({ deep: true, sources: this.__base }); //$pt.cloneJSON(this.__base);
 			this.__validateResults = {};
 			this.__changed = false;
 			return this;
@@ -2249,7 +2249,7 @@
 
 			// check if the cell definition is referenced by pre-definition
 			if (cell.base) {
-				cell = $.extend(true, {}, cell.base, cell);
+				cell = $pt.mergeObject({ deep: true, target: {}, sources: [cell.base, cell] });
 			}
 
 			this.__dataId = cell.dataId ? cell.dataId : this.__id;

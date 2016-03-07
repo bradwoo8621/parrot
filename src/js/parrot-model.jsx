@@ -651,7 +651,7 @@
 		 */
 		constructor: function (model, validator) {
 			this.__base = model;
-			this.__model = $pt.cloneJSON(model);
+			this.__model = $pt.mergeObject({deep: true, sources: model});
 			this.__validator = validator;
 			this.__validateResults = {};
 			this.__changed = false;
@@ -718,7 +718,7 @@
 		 * apply current data to base model.
 		 */
 		applyCurrentToBase: function() {
-			this.__base = $.extend(true, {}, this.__model);
+			this.__base = $.mergObject({deep: true, target: {}, sources: this.__model});
 			return this;
 		},
 		/**
@@ -984,7 +984,7 @@
 		 * reset model
 		 */
 		reset: function () {
-			this.__model = $pt.cloneJSON(this.__base);
+			this.__model = $pt.mergeObject({deep: true, sources: this.__base});//$pt.cloneJSON(this.__base);
 			this.__validateResults = {};
 			this.__changed = false;
 			return this;
