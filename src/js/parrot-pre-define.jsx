@@ -33,9 +33,9 @@
 	var messages = {};
 	$pt.messages = messages;
 	$pt.defineMessage = function (key, message) {
-		if (messages[key] != null) {
-			window.console.log('Message[' + key + '=' + messages[key] + '] was replaced by [' + message + ']');
-		}
+		// if (messages[key] != null) {
+		// 	window.console.debug('Message[' + key + '=' + messages[key] + '] was replaced by [' + message + ']');
+		// }
 		messages[key] = message;
 		return $pt;
 	};

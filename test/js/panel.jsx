@@ -56,6 +56,10 @@
             checkInTitle: {
                 data: 'check',
                 label: 'Check In title'
+            },
+            headerButtons: {
+                icon: 'ban',
+                text: 'test'
             }
         }
     }));
@@ -78,7 +82,14 @@
                 label: 'Check In title',
                 collapsible: 'reverse'
             },
-            style: 'danger'
+            style: 'danger',
+            headerButtons: [{
+                icon: 'ban',
+                text: 'test'
+            }, {
+                icon: 'pencil',
+                text: 'Yes'
+            }]
         }
     }));
     var checkInTitleCollapsible = $pt.createCellLayout('name', $.extend(true, {}, panelTemplate, {

@@ -53,6 +53,7 @@
 					try {
 						done(data, textStatus, jqXHR);
 					} catch (err) {
+						console.error(err);
 						console.error(data);
 						console.error(textStatus);
 						console.error(jqXHR);

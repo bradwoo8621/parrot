@@ -1,4 +1,4 @@
-/** nest-parrot.V0.2.0 2016-03-07 */
+/** nest-parrot.V0.2.0 2016-03-17 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -257,9 +257,9 @@
 	var messages = {};
 	$pt.messages = messages;
 	$pt.defineMessage = function (key, message) {
-		if (messages[key] != null) {
-			window.console.log('Message[' + key + '=' + messages[key] + '] was replaced by [' + message + ']');
-		}
+		// if (messages[key] != null) {
+		// 	window.console.debug('Message[' + key + '=' + messages[key] + '] was replaced by [' + message + ']');
+		// }
 		messages[key] = message;
 		return $pt;
 	};
@@ -437,6 +437,7 @@
 				try {
 					done(data, textStatus, jqXHR);
 				} catch (err) {
+					console.error(err);
 					console.error(data);
 					console.error(textStatus);
 					console.error(jqXHR);
@@ -7679,7 +7680,7 @@
 				return React.createElement('div', { className: this.getCSSClassName() + ' n-form-cell-invisible' });
 			} else {
 				var css = this.getCSSClassName();
-				if (this.getModel().hasError(this.getDataId())) {
+				if (this.getModel().hasError(this.getDataId()) && !this.isViewMode()) {
 					css += " has-error";
 				}
 				if (!this.isEnabled()) {
@@ -10177,6 +10178,37 @@
 				')'
 			);
 		},
+		renderHeadingButtons: function () {
+			var headButtons = this.getComponentOption('headerButtons');
+			if (headButtons) {
+				headButtons = Array.isArray(headButtons) ? headButtons : [headButtons];
+				var _this = this;
+				return React.createElement(
+					'div',
+					{ className: 'btn-toolbar pull-right', role: 'toolbar' },
+					headButtons.map(function (button, buttonIndex) {
+						if (_this.isViewMode() && button.view == 'edit') {
+							return null;
+						} else if (!_this.isViewMode() && button.view == 'view') {
+							return null;
+						}
+						var layout = {
+							label: button.text,
+							comp: button
+						};
+						// delete layout.comp.label;
+						console.log(layout);
+						return React.createElement($pt.Components.NFormButton, { model: _this.getModel(),
+							layout: $pt.createCellLayout('pseudo-button', layout),
+							key: buttonIndex });
+					}).filter(function (button) {
+						return button != null;
+					})
+				);
+			} else {
+				return null;
+			}
+		},
 		/**
    * render heading
    * @returns {XML}
@@ -10200,7 +10232,8 @@
 							label
 						),
 						this.renderCheckInTitle()
-					)
+					),
+					this.renderHeadingButtons()
 				);
 			} else if (this.hasCheckInTitle()) {
 				css['n-normal-title-check'] = this.hasCheckInTitle();
@@ -10216,13 +10249,15 @@
 							label
 						),
 						this.renderCheckInTitle()
-					)
+					),
+					this.renderHeadingButtons()
 				);
 			} else {
 				return React.createElement(
 					'div',
 					{ className: 'panel-heading', ref: 'head' },
-					label
+					label,
+					this.renderHeadingButtons()
 				);
 			}
 		},
@@ -11740,7 +11775,7 @@
 			} else {
 				var parentValue = this.getParentPropertyValue();
 				if (parentValue == null) {
-					return this.isAvailableWhenNoParentValue() ? this.convertDataOptions(this.getComponentOption("data")) : [];
+					return this.isAvailableWhenNoParentValue() ? this.convertDataOptions(this.getComponentOption('data')) : [];
 				} else {
 					var filter = this.getComponentOption("parentFilter");
 					if (typeof filter === 'object') {
@@ -11748,7 +11783,7 @@
 						return this.convertDataOptions(this.getComponentOption('data').filter($.extend({}, filter, { value: parentValue })));
 					} else {
 						// call local filter
-						var data = this.convertDataOptions(this.getComponentOption("data"));
+						var data = this.convertDataOptions(this.getComponentOption('data'));
 						if (typeof filter === "function") {
 							return filter.call(this, parentValue, data);
 						} else {
@@ -11776,13 +11811,7 @@
 		getTextInViewMode: function () {
 			var value = this.getValueFromModel();
 			if (value != null) {
-				var data = null;
-				if (this.hasParent()) {
-					data = this.getAvailableOptions(this.getParentPropertyValue());
-				} else {
-					data = this.convertDataOptions(this.getComponentOption('data'));
-				}
-				data.some(function (item) {
+				var data = this.getAvailableOptions().some(function (item) {
 					if (item.id == value) {
 						value = item.text;
 						return true;

@@ -1017,6 +1017,21 @@ div.n-form-cell.horizontal-label div.n-checkbox span.check-label {
 .n-form-cell.pull-down {
   padding-top: 20px;
 }
+div.n-panel .panel-heading .panel-title {
+  display: inline;
+}
+div.n-panel .panel-heading .btn-toolbar.pull-right {
+  display: inline;
+  margin-top: -1px;
+}
+div.n-panel .panel-heading .btn-toolbar.pull-right > .n-button {
+  float: right;
+  margin-left: 5px;
+}
+div.n-panel .panel-heading .btn-toolbar.pull-right > .n-button .btn {
+  line-height: 20px;
+  box-shadow: none;
+}
 div.n-panel-footer {
   padding-top: 2px;
   padding-bottom: 3px;

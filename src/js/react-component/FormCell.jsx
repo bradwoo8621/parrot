@@ -237,7 +237,7 @@
 				return (<div className={this.getCSSClassName() + ' n-form-cell-invisible'}/>);
 			} else {
 				var css = this.getCSSClassName();
-				if (this.getModel().hasError(this.getDataId())) {
+				if (this.getModel().hasError(this.getDataId()) && !this.isViewMode()) {
 					css += " has-error";
 				}
 				if (!this.isEnabled()) {

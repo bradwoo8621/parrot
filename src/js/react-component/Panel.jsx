@@ -124,10 +124,37 @@
 				})
 			};
 			return (<div>
-				(
-				<$pt.Components.NCheck model={this.getModel()} layout={$pt.createCellLayout('check', layout)} view={this.isViewMode()}/>
-				)
+				(<$pt.Components.NCheck model={this.getModel()} layout={$pt.createCellLayout('check', layout)} view={this.isViewMode()}/>)
 			</div>);
+		},
+		renderHeadingButtons: function() {
+			var headButtons = this.getComponentOption('headerButtons');
+			if (headButtons) {
+				headButtons = Array.isArray(headButtons) ? headButtons : [headButtons];
+				var _this = this;
+				return (<div className="btn-toolbar pull-right" role='toolbar'>
+					{headButtons.map(function(button, buttonIndex) {
+						if (_this.isViewMode() && button.view == 'edit') {
+							return null;
+						} else if (!_this.isViewMode() && button.view == 'view') {
+							return null;
+						}
+						var layout = {
+							label: button.text,
+							comp: button
+						};
+						// delete layout.comp.label;
+						console.log(layout);
+						return <$pt.Components.NFormButton model={_this.getModel()}
+														   layout={$pt.createCellLayout('pseudo-button', layout)}
+														   key={buttonIndex} />;
+					}).filter(function(button) {
+						return button != null;
+					})}
+				</div>);
+			} else {
+				return null;
+			}
 		},
 		/**
 		 * render heading
@@ -145,6 +172,7 @@
 						<a href='javascript:void(0);' onClick={this.onTitleClicked} ref='head'>{label}</a>
 						{this.renderCheckInTitle()}
 					</h4>
+					{this.renderHeadingButtons()}
 				</div>);
 			} else if (this.hasCheckInTitle()) {
 				css['n-normal-title-check'] = this.hasCheckInTitle();
@@ -153,9 +181,13 @@
 						<span ref='head'>{label}</span>
 						{this.renderCheckInTitle()}
 					</h4>
+					{this.renderHeadingButtons()}
 				</div>);
 			} else {
-				return <div className='panel-heading' ref='head'>{label}</div>;
+				return (<div className='panel-heading' ref='head'>
+					{label}
+					{this.renderHeadingButtons()}
+				</div>);
 			}
 		},
 		/**

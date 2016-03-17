@@ -404,7 +404,7 @@
 			} else {
 				var parentValue = this.getParentPropertyValue();
 				if (parentValue == null) {
-					return this.isAvailableWhenNoParentValue() ? this.convertDataOptions(this.getComponentOption("data")) : [];
+					return this.isAvailableWhenNoParentValue() ? this.convertDataOptions(this.getComponentOption('data')) : [];
 				} else {
 					var filter = this.getComponentOption("parentFilter");
 					if (typeof filter === 'object') {
@@ -412,7 +412,7 @@
 						return this.convertDataOptions(this.getComponentOption('data').filter($.extend({}, filter, {value: parentValue})));
 					} else {
 						// call local filter
-						var data = this.convertDataOptions(this.getComponentOption("data"));
+						var data = this.convertDataOptions(this.getComponentOption('data'));
 						if (typeof filter === "function") {
 							return filter.call(this, parentValue, data);
 						} else {
@@ -440,13 +440,7 @@
 		getTextInViewMode: function() {
 			var value = this.getValueFromModel();
 			if (value != null) {
-				var data = null;
-				if (this.hasParent()) {
-					data = this.getAvailableOptions(this.getParentPropertyValue());
-				} else {
-					data = this.convertDataOptions(this.getComponentOption('data'));
-				}
-				data.some(function(item) {
+				var data = this.getAvailableOptions().some(function(item) {
 					if (item.id == value) {
 						value = item.text;
 						return true;
