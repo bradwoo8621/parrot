@@ -107,6 +107,17 @@
 			});
 			return <$pt.Components.NFormButton layout={layout}/>;
 		},
+		renderDialogCloseButton: function() {
+			if (this.isDialogCloseShown()) {
+				return (<button className="close"
+						onClick={this.onCancelClicked}
+						aria-label="Close"
+						style={{marginTop: '-2px'}}>
+					<span aria-hidden="true">×</span>
+				</button>);
+			}
+			return null;
+		},
 		/**
 		 * render footer
 		 * @returns {XML}
@@ -165,12 +176,7 @@
 					<div className="modal-dialog">
 						<div className="modal-content" role="document">
 							<div className="modal-header">
-								<button className="close"
-										onClick={this.onCancelClicked}
-										aria-label="Close"
-										style={{marginTop: '-2px'}}>
-									<span aria-hidden="true">×</span>
-								</button>
+								{this.renderDialogCloseButton()}
 								<h4 className="modal-title">{this.state.title}</h4>
 							</div>
 							<div className="modal-body">
@@ -223,6 +229,9 @@
 				this.state.afterClose.call(this, 'cancel');
 			}
 		},
+		isDialogCloseShown: function() {
+			return this.state && this.state.buttons && this.state.buttons.disableDialogClose === true;
+		},
 		/**
 		 * show dialog
 		 *
@@ -267,6 +276,7 @@
 						disableButtons: options.disableButtons,
 						disableConfirm: options.disableConfirm,
 						disableClose: options.disableClose,
+						disableDialogClose: options.disableDialogClose,
 						close: options.close,
 						messages: options.messages
 					},

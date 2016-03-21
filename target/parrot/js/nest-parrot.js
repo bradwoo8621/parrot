@@ -1,4 +1,4 @@
-/** nest-parrot.V0.2.0 2016-03-17 */
+/** nest-parrot.V0.2.0 2016-03-18 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -4149,7 +4149,8 @@
 					style: this.getComponentOption('style'),
 					checkInTitle: this.getCheckInTitle(model, itemIndex),
 					expandedLabel: this.getComponentOption('expandedLabel'),
-					collapsedLabel: this.getComponentOption('collapsedLabel')
+					collapsedLabel: this.getComponentOption('collapsedLabel'),
+					headerButtons: this.getHeaderButtons(model, itemIndex)
 				}
 			};
 			return React.createElement(
@@ -4210,6 +4211,14 @@
 				return layout.call(this, model, itemIndex);
 			} else {
 				return layout;
+			}
+		},
+		getHeaderButtons: function (model, itemIndex) {
+			var buttons = this.getComponentOption('headerButtons');
+			if (typeof buttons === 'function') {
+				return buttons.call(this, model, itemIndex);
+			} else {
+				return buttons;
 			}
 		},
 		/**
@@ -8434,6 +8443,23 @@
 			});
 			return React.createElement($pt.Components.NFormButton, { layout: layout });
 		},
+		renderDialogCloseButton: function () {
+			if (this.isDialogCloseShown()) {
+				return React.createElement(
+					"button",
+					{ className: "close",
+						onClick: this.onCancelClicked,
+						"aria-label": "Close",
+						style: { marginTop: '-2px' } },
+					React.createElement(
+						"span",
+						{ "aria-hidden": "true" },
+						"×"
+					)
+				);
+			}
+			return null;
+		},
 		/**
    * render footer
    * @returns {XML}
@@ -8508,18 +8534,7 @@
 							React.createElement(
 								"div",
 								{ className: "modal-header" },
-								React.createElement(
-									"button",
-									{ className: "close",
-										onClick: this.onCancelClicked,
-										"aria-label": "Close",
-										style: { marginTop: '-2px' } },
-									React.createElement(
-										"span",
-										{ "aria-hidden": "true" },
-										"×"
-									)
-								),
+								this.renderDialogCloseButton(),
 								React.createElement(
 									"h4",
 									{ className: "modal-title" },
@@ -8579,6 +8594,9 @@
 				this.state.afterClose.call(this, 'cancel');
 			}
 		},
+		isDialogCloseShown: function () {
+			return this.state && this.state.buttons && this.state.buttons.disableDialogClose === true;
+		},
 		/**
    * show dialog
    *
@@ -8623,6 +8641,7 @@
 						disableButtons: options.disableButtons,
 						disableConfirm: options.disableConfirm,
 						disableClose: options.disableClose,
+						disableDialogClose: options.disableDialogClose,
 						close: options.close,
 						messages: options.messages
 					},
