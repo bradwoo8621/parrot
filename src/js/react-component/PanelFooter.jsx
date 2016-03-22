@@ -113,28 +113,24 @@
 			} else if (!this.isViewMode() && option.view == 'view') {
 				return null;
 			}
-			var layout = $.extend({
+			var layout = $.extend(true, {
 				label: option.text,
 				comp: {type: $pt.ComponentConstants.Button}
 			}, {
-				comp: option
+				comp: option,
+				pos: {width: '-1'}
 			});
 			delete layout.comp.label;
-			//
-			// var layout = {
-			// 	label: option.text,
-			// 	comp: {
-			// 		type: $pt.ComponentConstants.Button,
-			// 		icon: option.icon,
-			// 		style: option.style,
-			// 		click: option.click,
-			// 		enabled: option.enabled,
-			// 		visible: option.visible
-			// 	}
-			// };
-			return <$pt.Components.NFormButton model={this.getModel()}
-											   layout={$pt.createCellLayout('pseudo-button', layout)}
-											   key={buttonIndex}/>;
+			var model = this.getModel();
+			if (model) {
+				return <$pt.Components.NFormCell model={this.getModel()}
+												   layout={$pt.createCellLayout('pseudo-button', layout)}
+												   key={buttonIndex}/>;
+			} else {
+				return <$pt.Components.NFormButton model={this.getModel()}
+												   layout={$pt.createCellLayout('pseudo-button', layout)}
+												   key={buttonIndex}/>;
+			}
 		},
 		/**
 		 * render

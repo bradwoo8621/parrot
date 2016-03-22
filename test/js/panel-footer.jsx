@@ -30,7 +30,13 @@
             click: function () {
                 alert('Right One Clicked');
             },
-            style: 'info'
+            style: 'info',
+            visible: {
+                depends: 'abc',
+                when: function() {
+                    return this.getModel().get('abc') === 'abc';
+                }
+            }
         },
         {
             icon: 'pencil',
@@ -41,6 +47,7 @@
             style: 'info'
         }
     ];
+    window.model = $pt.createModel({});
 
     var panel = (<div>
         <div className='row'>
@@ -58,13 +65,13 @@
         <div className='row'>
             <div className='col-md-6 col-lg-6 col-sm-6'>
                 <span>Hide Reset/Cancel, Add Left</span>
-                <NPanelFooter save={save} validate={validate} left={left}/>
+                <NPanelFooter save={save} validate={validate} left={left} right={left}/>
             </div>
         </div>
         <div className='row'>
             <div className='col-md-9 col-lg-9 col-sm-9'>
                 <span>Hide Reset/Cancel, Add Left</span>
-                <NPanelFooter save={save} validate={validate} cancel={cancel} left={left} right={right}/>
+                <NPanelFooter save={save} validate={validate} cancel={cancel} left={left} right={right} model={model}/>
             </div>
         </div>
     </div>);
