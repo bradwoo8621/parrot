@@ -1,4 +1,4 @@
-/** nest-parrot.V0.2.0 2016-03-18 */
+/** nest-parrot.V0.2.0 2016-03-22 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -284,19 +284,19 @@
 		ArrayCheck: 'acheck',
 		Toggle: 'toggle',
 		Radio: "radio",
-		Table: { type: "table", label: false, popover: false },
-		Tree: { type: "tree", label: false, popover: false },
+		Table: { type: "table", label: false, popover: false, renderError: false },
+		Tree: { type: "tree", label: false, popover: false, renderError: false },
 		SelectTree: "seltree",
 		Date: "date",
 		Search: "search",
-		Button: { type: "button", label: false },
-		Tab: { type: 'tab', label: false },
-		ArrayTab: { type: 'atab', label: false },
-		Panel: { type: 'panel', label: false },
-		ArrayPanel: { type: 'apanel', label: false },
+		Button: { type: "button", label: false, renderError: false },
+		Tab: { type: 'tab', label: false, renderError: false },
+		ArrayTab: { type: 'atab', label: false, renderError: false },
+		Panel: { type: 'panel', label: false, renderError: false },
+		ArrayPanel: { type: 'apanel', label: false, renderError: false },
 		Label: { type: 'label', label: false },
-		Form: { type: 'form', label: false },
-		ButtonFooter: { type: 'buttonfooter', label: false },
+		Form: { type: 'form', label: false, renderError: false },
+		ButtonFooter: { type: 'buttonfooter', label: false, renderError: false },
 		File: "file",
 		Nothing: { type: "nothing", label: false },
 		// date format
@@ -7595,7 +7595,8 @@
 					// and before really destory invoked,
 					// the new popover is bind by componentDidUpdate method.
 					// and finally new popover will be destroyed.
-					animation: false
+					animation: false,
+					template: '<div class="popover form-cell-error" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>'
 				};
 
 				var comp = this.refs.comp;
@@ -7689,7 +7690,7 @@
 				return React.createElement('div', { className: this.getCSSClassName() + ' n-form-cell-invisible' });
 			} else {
 				var css = this.getCSSClassName();
-				if (this.getModel().hasError(this.getDataId()) && !this.isViewMode()) {
+				if (this.getModel().hasError(this.getDataId()) && !this.isViewMode() && this.getLayout().getComponentType().renderError !== false) {
 					css += " has-error";
 				}
 				if (!this.isEnabled()) {
@@ -12898,6 +12899,7 @@
 			},
 			ADD_BUTTON_ICON: "plus",
 			ADD_BUTTON_TEXT: "",
+			DOWNLOADABLE: false,
 			DOWNLOAD_BUTTON_ICON: "cloud-download",
 			DOWNLOAD_BUTTON_TEXT: "",
 			NO_DATA_DOWNLOAD_TITLE: 'Downloading...',
@@ -12984,7 +12986,7 @@
 
 					addable: false,
 					searchable: true,
-					downloadable: true,
+					// downloadable: false,
 
 					operationFixed: false,
 					editable: false,
@@ -13868,6 +13870,7 @@
 										layout = $.extend(true, {}, { comp: { data: column.codes } }, layout);
 									}
 								}
+								layout.label = column.title;
 								// pre-defined, use with data together
 								data = React.createElement($pt.Components.NFormCell, { model: inlineModel,
 									layout: $pt.createCellLayout(column.data, layout),
@@ -14476,7 +14479,12 @@
 			return this.getComponentOption('rowRemoveEnabled');
 		},
 		isDownloadable: function () {
-			return this.getComponentOption('downloadable');
+			var downloadable = this.getComponentOption('downloadable');
+			if (downloadable != null) {
+				return downloadable;
+			} else {
+				return NTable.DOWNLOADABLE;
+			}
 		},
 		/**
    * check the table is searchable or not
@@ -15004,6 +15012,20 @@
 				listeners.forEach(function (listener) {
 					model.addListener(listener.id, listener.time ? listener.time : 'post', listener.type ? listener.type : 'change', listener.listener);
 				});
+			}
+			if (this.getModel().hasError(this.getDataId())) {
+				var rowError = null;
+				var errors = this.getModel().getError(this.getDataId());
+				console.log('errors', errors);
+				for (var index = 0, count = errors.length; index < count; index++) {
+					if (typeof errors[index] !== "string") {
+						rowError = errors[index].getError(item);
+					}
+				}
+				if (rowError != null) {
+					console.log(rowError);
+					model.mergeError(rowError);
+				}
 			}
 			return model;
 		},

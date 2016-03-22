@@ -9,10 +9,19 @@
         id: '2',
         text: 'Female'
     }]);
+    var validator = $pt.createModelValidator({
+        items: {
+            table: {
+                name: {
+                    required: true
+                }
+            }
+        }
+    });
     var model = $pt.createModel({
         items: [
             {
-                name: 'Michael',
+                name: null,
                 code: 'CodeA',
                 gender: '1',
                 object: {
@@ -69,7 +78,8 @@
                 birth: '01/02/2015'
             }
         ]
-    });
+    }, validator);
+    model.validate();
     NDateTime.VALUE_FORMAT = 'MM/DD/YYYY';
     var layoutTemplate = {
         label: 'Table',

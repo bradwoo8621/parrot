@@ -146,7 +146,8 @@
 					// and before really destory invoked,
 					// the new popover is bind by componentDidUpdate method.
 					// and finally new popover will be destroyed.
-					animation: false
+					animation: false,
+					template: '<div class="popover form-cell-error" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>'
 				};
 
 				var comp = this.refs.comp;
@@ -237,7 +238,9 @@
 				return (<div className={this.getCSSClassName() + ' n-form-cell-invisible'}/>);
 			} else {
 				var css = this.getCSSClassName();
-				if (this.getModel().hasError(this.getDataId()) && !this.isViewMode()) {
+				if (this.getModel().hasError(this.getDataId())
+					&& !this.isViewMode()
+					&& this.getLayout().getComponentType().renderError !== false) {
 					css += " has-error";
 				}
 				if (!this.isEnabled()) {

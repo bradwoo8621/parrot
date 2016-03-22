@@ -22,6 +22,7 @@
 			},
 			ADD_BUTTON_ICON: "plus",
 			ADD_BUTTON_TEXT: "",
+			DOWNLOADABLE: false,
 			DOWNLOAD_BUTTON_ICON: "cloud-download",
 			DOWNLOAD_BUTTON_TEXT: "",
 			NO_DATA_DOWNLOAD_TITLE: 'Downloading...',
@@ -109,7 +110,7 @@
 
 					addable: false,
 					searchable: true,
-					downloadable: true,
+					// downloadable: false,
 
 					operationFixed: false,
 					editable: false,
@@ -955,6 +956,7 @@
 										layout = $.extend(true, {}, {comp: {data: column.codes}}, layout);
 									}
 								}
+								layout.label = column.title;
 								// pre-defined, use with data together
 								data = <$pt.Components.NFormCell model={inlineModel}
 								                                 layout={$pt.createCellLayout(column.data, layout)}
@@ -1501,7 +1503,12 @@
 			return this.getComponentOption('rowRemoveEnabled');
 		},
 		isDownloadable: function () {
-			return this.getComponentOption('downloadable');
+			var downloadable = this.getComponentOption('downloadable');
+			if (downloadable != null) {
+				return downloadable;
+			} else {
+				return NTable.DOWNLOADABLE;
+			}
 		},
 		/**
 		 * check the table is searchable or not
@@ -2035,6 +2042,20 @@
 						listener.type ? listener.type : 'change',
 						listener.listener);
 				});
+			}
+			if (this.getModel().hasError(this.getDataId())) {
+				var rowError = null;
+				var errors = this.getModel().getError(this.getDataId());
+				console.log('errors', errors);
+				for (var index = 0, count = errors.length; index < count; index++) {
+					if (typeof errors[index] !== "string") {
+						rowError = errors[index].getError(item);
+					}
+				}
+				if (rowError != null) {
+					console.log(rowError);
+					model.mergeError(rowError);
+				}
 			}
 			return model;
 		},

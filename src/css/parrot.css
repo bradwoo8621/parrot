@@ -1455,6 +1455,7 @@ div.n-select .form-control {
   display: flex;
   flex-direction: row;
   align-items: center;
+  border: 0;
 }
 div.n-select .form-control .text {
   order: 1;
@@ -3080,16 +3081,6 @@ div.has-error input[type=email].form-control,
 div.has-error input[type=tel].form-control {
   color: #f44336;
 }
-div.has-error div.popover {
-  max-width: 500px;
-  border-color: #f44336;
-}
-div.has-error div.popover div.arrow {
-  border-top-color: #cccccc;
-}
-div.has-error div.popover div.popover-content {
-  color: #f44336;
-}
 div.has-error div.n-label {
   color: #f44336;
 }
@@ -3197,4 +3188,26 @@ div.has-error hr.focus-line {
   transform: scaleX(1);
   -o-transform: scaleX(1);
   -webkit-transform: scaleX(1);
+}
+div.has-error div.popover {
+  max-width: 500px;
+  border-color: #f44336;
+  z-index: 8000;
+}
+div.has-error div.popover div.arrow {
+  border-top-color: #cccccc;
+}
+div.has-error div.popover div.popover-content {
+  color: #f44336;
+}
+div.popover.form-cell-error {
+  max-width: 500px;
+  border-color: #f44336;
+  z-index: 8000;
+}
+div.popover.form-cell-error div.arrow {
+  border-top-color: #cccccc;
+}
+div.popover.form-cell-error div.popover-content {
+  color: #f44336;
 }

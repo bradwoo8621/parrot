@@ -16,16 +16,6 @@ div.has-error {
 	input[type=tel].form-control {
 		color: @error-color;
 	}
-	div.popover {
-		max-width: 500px;
-		border-color: @error-color;
-		div.arrow {
-			border-top-color: @popover-arrow-color;
-		}
-		div.popover-content {
-			color: @error-color;
-		}
-	}
 	div.n-label {
 		color: @error-color;
 	}
@@ -147,5 +137,27 @@ div.has-error {
 		transform: scaleX(1);
 		-o-transform: scaleX(1);
 		-webkit-transform: scaleX(1);
+	}
+	div.popover {
+		max-width: 500px;
+		border-color: @error-color;
+		z-index: 8000;
+		div.arrow {
+			border-top-color: @popover-arrow-color;
+		}
+		div.popover-content {
+			color: @error-color;
+		}
+	}
+}
+div.popover.form-cell-error {
+	max-width: 500px;
+	border-color: @error-color;
+	z-index: 8000;
+	div.arrow {
+		border-top-color: @popover-arrow-color;
+	}
+	div.popover-content {
+		color: @error-color;
 	}
 }
