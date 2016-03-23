@@ -52,7 +52,7 @@
 		 */
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
+			this.removePostChangeListener(this.__forceUpdate);
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},

@@ -5,9 +5,22 @@
     var model = $pt.createModel({
         name: 'Name'
     });
+    var base = {
+        comp: {
+            format: 'currency',
+            convertor: function(value) {
+                return 'abcafdaseqr';
+            }
+        },
+        css: {comp:'currency'}
+    };
+    var label = $pt.createCellLayout('label', {
+        base: base
+    });
     var plainText = $pt.createCellLayout('name', {
         label: 'Plain Text',
-        pos: {row: 1, col: 1}
+        pos: {row: 1, col: 1},
+        base: base
     });
     var placeholder = $pt.createCellLayout('name', {
         label: 'Plain Text',

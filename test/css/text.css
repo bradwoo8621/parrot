@@ -5,3 +5,7 @@ hr.normal-line.custom-normal-line {
 hr.focus-line.custom-focus-line {
     border-top: solid 2px #ff2222;
 }
+
+div.currency.n-text input {
+    text-align: right;
+}

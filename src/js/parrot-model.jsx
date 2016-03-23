@@ -718,7 +718,7 @@
 		 * apply current data to base model.
 		 */
 		applyCurrentToBase: function() {
-			this.__base = $.mergObject({deep: true, target: {}, sources: this.__model});
+			this.__base = $pt.mergeObject({deep: true, target: {}, sources: this.__model});
 			return this;
 		},
 		/**

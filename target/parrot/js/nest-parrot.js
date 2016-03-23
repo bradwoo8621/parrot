@@ -1,4 +1,4 @@
-/** nest-parrot.V0.2.0 2016-03-22 */
+/** nest-parrot.V0.2.0 2016-03-23 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -1695,7 +1695,7 @@
    * apply current data to base model.
    */
 		applyCurrentToBase: function () {
-			this.__base = $.mergObject({ deep: true, target: {}, sources: this.__model });
+			this.__base = $pt.mergeObject({ deep: true, target: {}, sources: this.__model });
 			return this;
 		},
 		/**
@@ -8271,7 +8271,7 @@
    */
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
+			this.removePostChangeListener(this.__forceUpdate);
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
