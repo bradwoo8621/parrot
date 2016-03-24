@@ -72,7 +72,7 @@
 				}
 			});
 			model.addPostChangeListener('checked', this.onCodeItemCheckedChanged.bind(this, item));
-			return <$pt.Components.NCheck model={model} layout={layout} key={itemIndex}/>;
+			return <$pt.Components.NCheck model={model} layout={layout} key={itemIndex} view={this.isViewMode()}/>;
 		},
 		render: function() {
 			var enabled = this.isEnabled();

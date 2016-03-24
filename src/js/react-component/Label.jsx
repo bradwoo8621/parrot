@@ -60,8 +60,11 @@
 			var texts = this.getText();
 			if (!Array.isArray(texts)) {
 				var convertor = this.getComponentOption('convertor');
-				if (convertor) {
+				if (convertor && typeof convertor === 'function') {
 					texts = [convertor.call(this, texts)];
+				} else if (convertor && covertor.view) {
+					// for NText compatibility
+					texts = [convertor.view.call(this, texts)];
 				} else {
 					var currency = this.getComponentOption('currency');
 					if (currency && texts != null && !(texts + '').isBlank()) {

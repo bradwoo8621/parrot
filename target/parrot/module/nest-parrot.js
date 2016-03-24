@@ -3968,7 +3968,7 @@
 				}
 			});
 			model.addPostChangeListener('checked', this.onCodeItemCheckedChanged.bind(this, item));
-			return React.createElement($pt.Components.NCheck, { model: model, layout: layout, key: itemIndex });
+			return React.createElement($pt.Components.NCheck, { model: model, layout: layout, key: itemIndex, view: this.isViewMode() });
 		},
 		render: function () {
 			var enabled = this.isEnabled();
@@ -8331,8 +8331,11 @@
 			var texts = this.getText();
 			if (!Array.isArray(texts)) {
 				var convertor = this.getComponentOption('convertor');
-				if (convertor) {
+				if (convertor && typeof convertor === 'function') {
 					texts = [convertor.call(this, texts)];
+				} else if (convertor && covertor.view) {
+					// for NText compatibility
+					texts = [convertor.view.call(this, texts)];
 				} else {
 					var currency = this.getComponentOption('currency');
 					if (currency && texts != null && !(texts + '').isBlank()) {
