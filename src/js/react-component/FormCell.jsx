@@ -192,7 +192,11 @@
 				required: true
 			};
 			requireIconCSS['fa-' + NFormCell.REQUIRED_ICON] = true;
-			var requiredLabel = requiredPaint && !this.isViewMode() && this.getModel().isRequired(this.getDataId()) ?
+			if (typeof requiredPaint === 'function') {
+				requiredPaint = requiredPaint.call(this);
+			}
+			// console.log(this.getDataId(), this.getModel().isRequired(this.getDataId(), requiredPaint));
+			var requiredLabel = requiredPaint && !this.isViewMode() && this.getModel().isRequired(this.getDataId(), requiredPaint) ?
 				(<span className={$pt.LayoutHelper.classSet(requireIconCSS)}/>) : null;
 			//var showColon = !this.getLayout().getLabel().endsWith('?')
 			//{showColon ? ':' : null}

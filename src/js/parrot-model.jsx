@@ -618,14 +618,31 @@
 		/**
 		 * check property is required or not
 		 * @param id
+		 * @param phase can be array or plain text
 		 */
-		isRequired: function (id) {
-			// TODO more complex scenarios need to be supported
+		isRequired: function (id, phase) {
 			var config = this.getConfig(id);
-			if (config == null) {
+			if (config == null || config.required == null) {
+				// no required declared
+				return false;
+			} else if (config.required === true) {
+				// all phase required
+				return true;
+			} else if (phase == null) {
+				// no phase appointed
 				return false;
 			} else {
-				return config.required != null && config.required === true;
+				// phase appointed
+				var phases = Array.isArray(phase) ? phase : [phase];
+				var defines = Array.isArray(config.required) ? config.required: [config.required];
+				// console.log(phases, defines);
+				// return true when at least one definition which match the given phases and rule is true
+				return phases.some(function(phase) {
+					return defines.some(function(define) {
+						var definedPhase = Array.isArray(define._phase) ? define._phase : [define._phase];
+						return definedPhase.indexOf(phase) != -1 && define.rule === true;
+					});
+				});
 			}
 		}
 	});
@@ -1053,9 +1070,9 @@
 		 * @param id {string} property id
 		 * @returns {boolean}
 		 */
-		isRequired: function (id) {
+		isRequired: function (id, phase) {
 			var validator = this.getValidator();
-			return validator != null && validator.isRequired(id);
+			return validator != null && validator.isRequired(id, phase);
 		},
 		/**
 		 * get error of given id, or return all error when no parameter passed

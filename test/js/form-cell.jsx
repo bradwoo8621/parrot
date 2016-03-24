@@ -2,7 +2,19 @@
  * Created by brad.wu on 8/16/2015.
  */
 (function () {
-    var validator = $pt.createModelValidator({text1: {required: true}});
+    var validator = $pt.createModelValidator({
+        text1: {
+            required: true
+        },
+        text2: {
+            required: [
+                {
+                    _phase: ['one', 'two'],
+                    rule: true
+                }
+            ]
+        }
+    });
     var model = $pt.createModel({check: true}, validator);
     var plainText = $pt.createCellLayout('text', {
         label: 'Default Cell',
@@ -15,6 +27,14 @@
         label: 'Default Cell',
         comp: {
             tooltip: 'I\'m a tooltip'
+        },
+        pos: {row: 1, col: 1}
+    });
+    var requiredCell2 = $pt.createCellLayout('text2', {
+        label: 'Default Cell 2',
+        comp: {
+            tooltip: 'I\'m a tooltip',
+            paintRequired: 'one'
         },
         pos: {row: 1, col: 1}
     });
@@ -73,6 +93,7 @@
             <NFormCell model={model} layout={plainText}/>
             <NFormCell model={model} layout={longLabel}/>
             <NFormCell model={model} layout={requiredCell}/>
+            <NFormCell model={model} layout={requiredCell2}/>
         </div>
         <div className='row'>
             <NFormCell model={model} layout={horizontalPlainText}/>
