@@ -1,4 +1,4 @@
-/** nest-parrot.V0.2.0 2016-03-24 */
+/** nest-parrot.V0.2.0 2016-03-25 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -8302,7 +8302,7 @@
 				var convertor = this.getComponentOption('convertor');
 				if (convertor && typeof convertor === 'function') {
 					texts = [convertor.call(this, texts)];
-				} else if (convertor && covertor.view) {
+				} else if (convertor && convertor.view) {
 					// for NText compatibility
 					texts = [convertor.view.call(this, texts)];
 				} else {
