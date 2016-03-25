@@ -118,7 +118,7 @@
 				comp: {type: $pt.ComponentConstants.Button}
 			}, {
 				comp: option,
-				pos: {width: '-1'}
+				pos: {width: 999}
 			});
 			delete layout.comp.label;
 			var model = this.getModel();

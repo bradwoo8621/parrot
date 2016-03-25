@@ -105,3 +105,21 @@ model.addPostChangeListener(/name/, regexpListener);
 model.set('name', 'def');
 model.removePostChangeListener(/name/, regexpListener);
 model.set('name', 'xyz');
+
+
+model = $pt.createModel({
+    start: '2016/02/01 00:00:00.000',
+    end: '2016/01/01 00:00:00.000'
+}, $pt.createModelValidator({
+    start: {
+        before: {
+            _phase: 'one',
+            rule: {
+                rule: 'end',
+                label: 'End'
+            }
+        }
+    }
+}));
+model.validateByPhase('one');
+console.log(model.getError());

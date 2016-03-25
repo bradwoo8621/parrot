@@ -1830,7 +1830,7 @@
 				var downloadListener = this.getEventMonitor('download');
 				if (downloadListener) {
 					this.notifyEvent({
-						type: 'pageChange',
+						type: 'download',
 						criteria: criteria,
 						target: this
 					});

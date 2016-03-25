@@ -1544,6 +1544,9 @@
 					} else if (ruleBody._phase != phase) {
 						runRule = false;
 					}
+				} else if (ruleBody._phase) {
+					// no phase given, but there is phase on rule
+					realRuleBody = ruleBody.rule;
 				}
 				// a simple json
 				if (ruleBody._when) {
@@ -1558,6 +1561,7 @@
 					if (typeof realRuleBody === 'function') {
 						ret = realRuleBody.call(this, model, value, phase);
 					} else {
+						// console.log(model, value, realRuleBody);
 						ret = this.getRule(ruleKey).call(this, model, value, realRuleBody);
 					}
 				}
@@ -10699,7 +10703,7 @@
 				comp: { type: $pt.ComponentConstants.Button }
 			}, {
 				comp: option,
-				pos: { width: '-1' }
+				pos: { width: 999 }
 			});
 			delete layout.comp.label;
 			var model = this.getModel();
@@ -14855,7 +14859,7 @@
 				var downloadListener = this.getEventMonitor('download');
 				if (downloadListener) {
 					this.notifyEvent({
-						type: 'pageChange',
+						type: 'download',
 						criteria: criteria,
 						target: this
 					});
