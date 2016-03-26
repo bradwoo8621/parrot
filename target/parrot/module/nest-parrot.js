@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.2.0 2016-03-25 */
+	/** nest-parrot.V0.2.0 2016-03-26 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -511,7 +511,7 @@
   * @param settings {*} optional jquery ajax settings
   * @returns {jqXHR}
   */
-	$pt.doPost = function (url, data, settings) {
+	$pt.internalDoPost = $pt.doPost = function (url, data, settings) {
 		return submit($.extend({
 			method: "POST",
 			dataType: "json",
@@ -11241,7 +11241,7 @@
 				if (NSearchText.SEARCH_PROXY) {
 					postData = NSearchText.SEARCH_PROXY.call(this, postData);
 				}
-				$pt.doPost(_this.getSearchUrl(), postData, {
+				$pt.internalDoPost(_this.getSearchUrl(), postData, {
 					quiet: true
 				}).done(function (data) {
 					if (typeof data === 'string') {
@@ -11343,7 +11343,7 @@
 									currentModel = NSearchText.ADVANCED_SEARCH_PROXY.call(this, currentModel);
 								}
 
-								$pt.doPost(_this.getAdvancedSearchUrl(), currentModel, {
+								$pt.internalDoPost(_this.getAdvancedSearchUrl(), currentModel, {
 									done: (function (data) {
 										if (typeof data === 'string') {
 											data = JSON.parse(data);
@@ -14865,7 +14865,7 @@
 					});
 				} else {
 					var _this = this;
-					$pt.doPost(url, criteria).done(function (data) {
+					$pt.internalDoPost(url, criteria).done(function (data) {
 						if (typeof data === 'string') {
 							data = JSON.parse(data);
 						}
@@ -15148,7 +15148,7 @@
 						target: this
 					});
 				} else {
-					$pt.doPost(url, criteria).done(function (data) {
+					$pt.internalDoPost(url, criteria).done(function (data) {
 						if (typeof data === 'string') {
 							data = JSON.parse(data);
 						}

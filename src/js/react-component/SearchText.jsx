@@ -239,7 +239,7 @@
 				if (NSearchText.SEARCH_PROXY) {
 					postData = NSearchText.SEARCH_PROXY.call(this, postData);
 				}
-				$pt.doPost(_this.getSearchUrl(), postData, {
+				$pt.internalDoPost(_this.getSearchUrl(), postData, {
 					quiet: true
 				}).done(function (data) {
 					if (typeof data === 'string') {
@@ -341,7 +341,7 @@
 									currentModel = NSearchText.ADVANCED_SEARCH_PROXY.call(this, currentModel);
 								}
 
-								$pt.doPost(_this.getAdvancedSearchUrl(), currentModel, {
+								$pt.internalDoPost(_this.getAdvancedSearchUrl(), currentModel, {
 									done: function (data) {
 										if (typeof data === 'string') {
 											data = JSON.parse(data);

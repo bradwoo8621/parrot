@@ -1836,7 +1836,7 @@
 					});
 				} else {
 					var _this = this;
-					$pt.doPost(url, criteria).done(function (data) {
+					$pt.internalDoPost(url, criteria).done(function (data) {
 						if (typeof data === 'string') {
 							data = JSON.parse(data);
 						}
@@ -2123,7 +2123,7 @@
 						target: this
 					});
 				} else {
-					$pt.doPost(url, criteria).done(function (data) {
+					$pt.internalDoPost(url, criteria).done(function (data) {
 						if (typeof data === 'string') {
 							data = JSON.parse(data);
 						}

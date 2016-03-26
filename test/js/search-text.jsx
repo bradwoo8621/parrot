@@ -57,6 +57,9 @@
         url: "/test",
         response: function (settings) {
             var request = settings.data;
+            if (typeof request === 'string') {
+                request = JSON.parse(request);
+            }
             var code = request.code;
             this.responseText = {
                 code: code,
@@ -69,6 +72,9 @@
         response: function (settings) {
             var items = [];
             var request = settings.data;
+            if (typeof request === 'string') {
+                request = JSON.parse(request);
+            }
             if (request.pageIndex) {
                 for (var index = 0; index < 10; index++) {
                     var suffix = (request.countPerPage * (request.pageIndex - 1) + index + 1);

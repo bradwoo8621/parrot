@@ -96,7 +96,7 @@
 	 * @param settings {*} optional jquery ajax settings
 	 * @returns {jqXHR}
 	 */
-	$pt.doPost = function (url, data, settings) {
+	$pt.internalDoPost = $pt.doPost = function (url, data, settings) {
 		return submit($.extend({
 			method: "POST",
 			dataType: "json",
