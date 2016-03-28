@@ -1,4 +1,4 @@
-/** nest-parrot.V0.2.0 2016-03-26 */
+/** nest-parrot.V0.2.0 2016-03-28 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -1518,7 +1518,7 @@
 					realRuleBody = ruleBody.rule;
 				}
 				// a simple json
-				if (ruleBody._when) {
+				if (runRule && ruleBody._when) {
 					realRuleBody = ruleBody.rule;
 					var when = ruleBody._when.call(this, model);
 					if (!when) {
@@ -2456,6 +2456,33 @@
 				}
 			} else {
 				return !this.__cell.evt ? {} : this.__cell.evt;
+			}
+		},
+		/**
+   * get validate phase(s).
+   * always returns an array of string
+   */
+		getValidationPhase: function () {
+			if (this.__cell && this.__cell.validate) {
+				return this.transformValidationPhase(this.__cell.validate);
+			} else {
+				return [];
+			}
+		},
+		transformValidationPhase: function (phase) {
+			if (typeof phase === 'string') {
+				return [phase];
+			} else if (Array.isArray(phase)) {
+				return phase;
+			} else if (typeof phase === 'function') {
+				var phases = phase.call(this, this.getModel(), this.getDataId());
+				return phases == null ? [] : Array.isArray(phases) ? phases : [phases];
+			} else if (phase.phase) {
+				// it must be a json object
+				return this.transformValidationPhase(phase.phase);
+			} else {
+				console.error('Failed to parse validation phase definition of [' + this.getDataId() + ']', phase);
+				throw 'Failed to parse validation phase definition';
 			}
 		}
 	});
@@ -3556,6 +3583,13 @@
 			return this.getComponentRuleValue("visible", true);
 		},
 		/**
+   * is required
+   * @returns {boolean}
+   */
+		isRequiredSignNeeded: function () {
+			return this.getComponentRuleValue('required', false);
+		},
+		/**
    * get dependencies
    * @returns {Array|string}
    */
@@ -3582,6 +3616,12 @@
 		},
 		removeEnableDependencyMonitor: function () {
 			this.removeDependencyMonitor(this.getDependencies("enabled"));
+		},
+		addRequiredDependencyMonitor: function () {
+			this.addDependencyMonitor(this.getDependencies('required'));
+		},
+		removeRequiredDependencyMonitor: function () {
+			this.removeDependencyMonitor(this.getDependencies('required'));
 		},
 		/**
    * force update, call react API
@@ -7515,7 +7555,7 @@
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
-					paintRequired: true
+					// paintRequired: true
 				},
 				direction: 'vertical'
 			};
@@ -7530,6 +7570,7 @@
 			this.removePostValidateListener(this.onModelValidateChanged);
 			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
+			this.removeRequiredDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		/**
@@ -7543,6 +7584,7 @@
 			this.addPostValidateListener(this.onModelValidateChanged);
 			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
+			this.addRequiredDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -7554,6 +7596,7 @@
 			this.addPostValidateListener(this.onModelValidateChanged);
 			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
+			this.addRequiredDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -7565,6 +7608,7 @@
 			this.removePostValidateListener(this.onModelValidateChanged);
 			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
+			this.removeRequiredDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		destroyPopover: function () {
@@ -7650,6 +7694,28 @@
 				$pt.LayoutHelper.getComponentRenderer(type).call(this, this.getFormModel(), this.getLayout(), direction, this.isViewMode())
 			);
 		},
+		isRequiredSignPaint: function () {
+			if (this.isViewMode()) {
+				return false;
+			}
+			// calculate the 'paintRequired' attribute
+			var requiredPaint = this.getComponentOption("paintRequired");
+			if (requiredPaint == null) {
+				// not given, calculate 'required' rules
+				return this.isRequiredSignNeeded();
+			} else if (typeof requiredPaint === 'boolean') {
+				// boolean type, return directly
+				return requiredPaint;
+			} else if (typeof requiredPaint === 'function') {
+				requiredPaint = requiredPaint.call(this);
+				if (typeof requiredPaint === 'boolean') {
+					// boolean type, return directly
+					return requiredPaint;
+				}
+			}
+			// calculate from model validator
+			return this.getModel().isRequired(this.getDataId(), requiredPaint);
+		},
 		/**
    * render label
    * @returns {XML}
@@ -7657,20 +7723,13 @@
 		renderLabel: function () {
 			var labelIcon = this.getComponentOption('labelIcon');
 			var iconLabel = labelIcon ? React.createElement('span', { className: 'label-icon fa fa-fw fa-' + labelIcon }) : null;
-			var requiredPaint = this.getComponentOption("paintRequired");
 			var requireIconCSS = {
 				fa: true,
 				'fa-fw': true,
 				required: true
 			};
 			requireIconCSS['fa-' + NFormCell.REQUIRED_ICON] = true;
-			if (typeof requiredPaint === 'function') {
-				requiredPaint = requiredPaint.call(this);
-			}
-			// console.log(this.getDataId(), this.getModel().isRequired(this.getDataId(), requiredPaint));
-			var requiredLabel = requiredPaint && !this.isViewMode() && this.getModel().isRequired(this.getDataId(), requiredPaint) ? React.createElement('span', { className: $pt.LayoutHelper.classSet(requireIconCSS) }) : null;
-			//var showColon = !this.getLayout().getLabel().endsWith('?')
-			//{showColon ? ':' : null}
+			var requiredLabel = this.isRequiredSignPaint() ? React.createElement('span', { className: $pt.LayoutHelper.classSet(requireIconCSS) }) : null;
 			var tooltip = this.getComponentOption('tooltip');
 			var tooltipIcon = null;
 			var tooltipCSS = {
@@ -7769,7 +7828,17 @@
    * @param evt
    */
 		onModelChanged: function (evt) {
-			this.getModel().validate(evt.id);
+			var phases = this.getLayout().getValidationPhase();
+			if (phases) {
+				// only validate the given phases
+				var validateByPhase = (function (phase) {
+					this.getModel().validateByPhase(phase, evt.id);
+				}).bind(this);
+				phases.forEach(validateByPhase);
+			} else {
+				// no phase defined, validate all
+				this.getModel().validate(evt.id);
+			}
 		},
 		/**
    * on model validate change

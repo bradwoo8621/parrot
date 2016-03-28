@@ -36,7 +36,8 @@
             tooltip: 'I\'m a tooltip',
             paintRequired: 'one'
         },
-        pos: {row: 1, col: 1}
+        pos: {row: 1, col: 1},
+        validate: 'three'
     });
     var horizontalPlainText = $pt.createCellLayout('text', {
         label: 'Horizontal Direction',

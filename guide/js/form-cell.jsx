@@ -174,7 +174,17 @@
 					id: 'form-cell-required',
 					title: 'Required',
 					desc: [<span>Form Cell will paint required sign only if there is <code>required: true</code> declared in validator</span>,
-						'But sometimes, even validator rule is declared, the required sign also do not needed.'],
+						'But sometimes, even validator rule is declared, the required sign also do or do not needed.',
+						<span>
+							Use <code>paintRequired</code> to declare which phase of validation rule needs to be applied in cell.<br/>
+							<code>paintRequired</code> can be boolean/string/string array/function(no argument, returns boolean/string/string array).<br/>
+							if it is boolean (or returns boolean from function), paint or not according to boolean value.<br/>
+							if it is string or string array, use them as phase key to scan the validate rule in model validator.
+						</span>,
+						<span>
+							When want to paint required sign not depends on model validator, defines <code>required</code> in component definition
+							just like <code>enabled</code>. It normally cooperates with <code>_when</code> in model validator.
+						</span>],
 					xml: [<NFormCell model={model} layout={$pt.createCellLayout('value3', layoutTemplate)}/>,
 						<NFormCell model={model} layout={$pt.createCellLayout('value4', layoutTemplate2)}/>],
 					code: [modelCode, layoutCode, layoutCode2, compCode, compCode2],

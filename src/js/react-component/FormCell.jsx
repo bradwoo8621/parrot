@@ -45,7 +45,7 @@
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
-					paintRequired: true
+					// paintRequired: true
 				},
 				direction: 'vertical'
 			};
@@ -60,6 +60,7 @@
 			this.removePostValidateListener(this.onModelValidateChanged);
 			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
+			this.removeRequiredDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		/**
@@ -73,6 +74,7 @@
 			this.addPostValidateListener(this.onModelValidateChanged);
 			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
+			this.addRequiredDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -84,6 +86,7 @@
 			this.addPostValidateListener(this.onModelValidateChanged);
 			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
+			this.addRequiredDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -95,6 +98,7 @@
 			this.removePostValidateListener(this.onModelValidateChanged);
 			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
+			this.removeRequiredDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		destroyPopover: function () {
@@ -178,6 +182,28 @@
 				{$pt.LayoutHelper.getComponentRenderer(type).call(this, this.getFormModel(), this.getLayout(), direction, this.isViewMode())}
 			</div>);
 		},
+		isRequiredSignPaint: function() {
+			if (this.isViewMode()) {
+				return false;
+			}
+			// calculate the 'paintRequired' attribute
+			var requiredPaint = this.getComponentOption("paintRequired");
+			if (requiredPaint == null) {
+				// not given, calculate 'required' rules
+				return this.isRequiredSignNeeded();
+			} else if (typeof requiredPaint === 'boolean') {
+				// boolean type, return directly
+				return requiredPaint;
+			} else if (typeof requiredPaint === 'function') {
+				requiredPaint = requiredPaint.call(this);
+				if (typeof requiredPaint === 'boolean') {
+					// boolean type, return directly
+					return requiredPaint;
+				}
+			}
+			// calculate from model validator
+			return this.getModel().isRequired(this.getDataId(), requiredPaint);
+		},
 		/**
 		 * render label
 		 * @returns {XML}
@@ -185,21 +211,13 @@
 		renderLabel: function () {
 			var labelIcon = this.getComponentOption('labelIcon');
 			var iconLabel = labelIcon ? <span className={'label-icon fa fa-fw fa-' + labelIcon} /> : null;
-			var requiredPaint = this.getComponentOption("paintRequired");
 			var requireIconCSS = {
 				fa: true,
 				'fa-fw': true,
 				required: true
 			};
 			requireIconCSS['fa-' + NFormCell.REQUIRED_ICON] = true;
-			if (typeof requiredPaint === 'function') {
-				requiredPaint = requiredPaint.call(this);
-			}
-			// console.log(this.getDataId(), this.getModel().isRequired(this.getDataId(), requiredPaint));
-			var requiredLabel = requiredPaint && !this.isViewMode() && this.getModel().isRequired(this.getDataId(), requiredPaint) ?
-				(<span className={$pt.LayoutHelper.classSet(requireIconCSS)}/>) : null;
-			//var showColon = !this.getLayout().getLabel().endsWith('?')
-			//{showColon ? ':' : null}
+			var requiredLabel = this.isRequiredSignPaint() ? (<span className={$pt.LayoutHelper.classSet(requireIconCSS)}/>) : null;
 			var tooltip = this.getComponentOption('tooltip');
 			var tooltipIcon = null;
 			var tooltipCSS = {
@@ -286,7 +304,17 @@
 		 * @param evt
 		 */
 		onModelChanged: function (evt) {
-			this.getModel().validate(evt.id);
+			var phases = this.getLayout().getValidationPhase();
+			if (phases) {
+				// only validate the given phases
+				var validateByPhase = function(phase) {
+					this.getModel().validateByPhase(phase, evt.id);
+				}.bind(this);
+				phases.forEach(validateByPhase);
+			} else {
+				// no phase defined, validate all
+				this.getModel().validate(evt.id);
+			}
 		},
 		/**
 		 * on model validate change

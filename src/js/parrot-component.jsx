@@ -227,6 +227,33 @@
 			} else {
 				return !this.__cell.evt ? {} : this.__cell.evt;
 			}
+		},
+		/**
+		 * get validate phase(s).
+		 * always returns an array of string
+		 */
+		getValidationPhase: function() {
+			if (this.__cell && this.__cell.validate) {
+				return this.transformValidationPhase(this.__cell.validate);
+			} else {
+				return [];
+			}
+		},
+		transformValidationPhase: function(phase) {
+			if (typeof phase === 'string') {
+				return [phase];
+			} else if (Array.isArray(phase)) {
+				return phase;
+			} else if (typeof phase === 'function') {
+				var phases = phase.call(this, this.getModel(), this.getDataId());
+				return phases == null ? [] : (Array.isArray(phases) ? phases : [phases]);
+			} else if (phase.phase) {
+				// it must be a json object
+				return this.transformValidationPhase(phase.phase);
+			} else {
+				console.error('Failed to parse validation phase definition of [' + this.getDataId() + ']', phase);
+				throw 'Failed to parse validation phase definition';
+			}
 		}
 	});
 
@@ -1327,6 +1354,13 @@
 			return this.getComponentRuleValue("visible", true);
 		},
 		/**
+		 * is required
+		 * @returns {boolean}
+		 */
+		isRequiredSignNeeded: function() {
+			return this.getComponentRuleValue('required', false);
+		},
+		/**
 		 * get dependencies
 		 * @returns {Array|string}
 		 */
@@ -1353,6 +1387,12 @@
 		},
 		removeEnableDependencyMonitor: function () {
 			this.removeDependencyMonitor(this.getDependencies("enabled"));
+		},
+		addRequiredDependencyMonitor: function() {
+			this.addDependencyMonitor(this.getDependencies('required'));
+		},
+		removeRequiredDependencyMonitor: function() {
+			this.removeDependencyMonitor(this.getDependencies('required'));
 		},
 		/**
 		 * force update, call react API

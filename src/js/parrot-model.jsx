@@ -541,7 +541,7 @@
 					realRuleBody = ruleBody.rule;
 				}
 				// a simple json
-				if (ruleBody._when) {
+				if (runRule && ruleBody._when) {
 					realRuleBody = ruleBody.rule;
 					var when = ruleBody._when.call(this, model);
 					if (!when) {
@@ -1038,8 +1038,7 @@
 				if (ret !== true) {
 					this.__validateResults[id] = ret;
 				} else {
-					delete this.__validateResults[id]
-					;
+					delete this.__validateResults[id];
 				}
 				this.fireEvent({
 					model: this,
