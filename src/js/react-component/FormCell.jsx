@@ -160,7 +160,11 @@
 
 				var comp = this.refs.comp;
 				if (comp != null) {
-					$(ReactDOM.findDOMNode(comp)).popover(popover);
+					var dom = $(ReactDOM.findDOMNode(comp))
+					dom.popover(popover);
+					if (dom.has($(':focus')).length != 0) {
+						dom.popover('show');
+					}
 				}
 			}
 		},
