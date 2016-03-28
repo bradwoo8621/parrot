@@ -2459,24 +2459,21 @@
 			}
 		},
 		/**
-   * get validate phase(s).
-   * always returns an array of string
+   * get validate phase
    */
 		getValidationPhase: function () {
 			if (this.__cell && this.__cell.validate) {
 				return this.transformValidationPhase(this.__cell.validate);
 			} else {
-				return [];
+				return null;
 			}
 		},
 		transformValidationPhase: function (phase) {
 			if (typeof phase === 'string') {
 				return [phase];
-			} else if (Array.isArray(phase)) {
-				return phase;
 			} else if (typeof phase === 'function') {
 				var phases = phase.call(this, this.getModel(), this.getDataId());
-				return phases == null ? [] : Array.isArray(phases) ? phases : [phases];
+				return phases == null ? null : Array.isArray(phases) ? phases : [phases];
 			} else if (phase.phase) {
 				// it must be a json object
 				return this.transformValidationPhase(phase.phase);
@@ -3622,6 +3619,25 @@
 		},
 		removeRequiredDependencyMonitor: function () {
 			this.removeDependencyMonitor(this.getDependencies('required'));
+		},
+		addValidateDependencyMonitor: function () {
+			this.addDependencyMonitor(this.getDependencies('validation'), this.validate);
+		},
+		removeValidateDependencyMonitor: function () {
+			this.removeDependencyMonitor(this.getDependencies('validation'), this.validate);
+		},
+		/**
+   * validate current cell by given phase
+   */
+		validate: function () {
+			var phase = this.getLayout().getValidationPhase();
+			if (phase) {
+				// only validate the given phase
+				this.getModel().validateByPhase(phase, this.getDataId());
+			} else {
+				// no phase defined, validate all
+				this.getModel().validate(this.getDataId());
+			}
 		},
 		/**
    * force update, call react API
@@ -7571,6 +7587,7 @@
 			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.removeRequiredDependencyMonitor();
+			this.removeValidateDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		/**
@@ -7585,6 +7602,7 @@
 			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.addRequiredDependencyMonitor();
+			this.addValidateDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -7597,6 +7615,7 @@
 			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.addRequiredDependencyMonitor();
+			this.addValidateDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -7609,6 +7628,7 @@
 			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.removeRequiredDependencyMonitor();
+			this.removeValidateDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		destroyPopover: function () {
@@ -7702,7 +7722,8 @@
 			var requiredPaint = this.getComponentOption("paintRequired");
 			if (requiredPaint == null) {
 				// not given, calculate 'required' rules
-				return this.isRequiredSignNeeded();
+				requiredPaint = this.getModel().isRequired(this.getDataId());
+				return requiredPaint ? true : this.isRequiredSignNeeded();
 			} else if (typeof requiredPaint === 'boolean') {
 				// boolean type, return directly
 				return requiredPaint;
@@ -7828,17 +7849,7 @@
    * @param evt
    */
 		onModelChanged: function (evt) {
-			var phases = this.getLayout().getValidationPhase();
-			if (phases) {
-				// only validate the given phases
-				var validateByPhase = (function (phase) {
-					this.getModel().validateByPhase(phase, evt.id);
-				}).bind(this);
-				phases.forEach(validateByPhase);
-			} else {
-				// no phase defined, validate all
-				this.getModel().validate(evt.id);
-			}
+			this.validate();
 		},
 		/**
    * on model validate change

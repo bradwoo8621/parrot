@@ -989,14 +989,14 @@ span.required {
   color: #f44336;
   font-size: 0.95em;
 }
-div.n-form-cell {
-  padding-top: 2px;
-  padding-bottom: 3px;
-}
-div.n-form-cell .n-form-cell-tooltip {
+span.n-form-cell-tooltip {
   color: #90A4AE;
   font-size: 0.95em;
   margin-left: 3px;
+}
+div.n-form-cell {
+  padding-top: 2px;
+  padding-bottom: 3px;
 }
 div.n-form-cell.n-form-cell-invisible {
   display: none;
@@ -3072,7 +3072,9 @@ div.n-array-check.vertical div.n-checkbox {
   max-height: 300px;
 }
 div.has-error > span,
-div.has-error.horizontal-label > div.row > div:first-child > span {
+div.has-error > span > span.n-form-cell-tooltip,
+div.has-error.horizontal-label > div.row > div:first-child > span,
+div.has-error.horizontal-label > div.row > div:first-child > span > span.n-form-cell-tooltip {
   color: #f44336;
 }
 div.has-error textarea,

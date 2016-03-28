@@ -34,10 +34,19 @@
         label: 'Default Cell 2',
         comp: {
             tooltip: 'I\'m a tooltip',
-            paintRequired: 'one'
+            // paintRequired: 'one',
+            required: {
+                depends: 'text1',
+                when: function() {
+                    return this.getModel().get('text1') == 'abc';
+                }
+            },
+            validation: {
+                depends: 'text1'
+            }
         },
         pos: {row: 1, col: 1},
-        validate: 'three'
+        validate: 'one'
     });
     var horizontalPlainText = $pt.createCellLayout('text', {
         label: 'Horizontal Direction',

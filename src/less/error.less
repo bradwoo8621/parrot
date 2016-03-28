@@ -1,6 +1,8 @@
 div.has-error {
 	> span,
-	&.horizontal-label > div.row > div:first-child > span {
+	> span > span.n-form-cell-tooltip,
+	&.horizontal-label > div.row > div:first-child > span,
+	&.horizontal-label > div.row > div:first-child > span > span.n-form-cell-tooltip {
 		color: @error-color;
 	}
 	textarea,

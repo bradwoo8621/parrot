@@ -61,6 +61,7 @@
 			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.removeRequiredDependencyMonitor();
+			this.removeValidateDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		/**
@@ -75,6 +76,7 @@
 			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.addRequiredDependencyMonitor();
+			this.addValidateDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -87,6 +89,7 @@
 			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.addRequiredDependencyMonitor();
+			this.addValidateDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -99,6 +102,7 @@
 			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.removeRequiredDependencyMonitor();
+			this.removeValidateDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		destroyPopover: function () {
@@ -190,7 +194,8 @@
 			var requiredPaint = this.getComponentOption("paintRequired");
 			if (requiredPaint == null) {
 				// not given, calculate 'required' rules
-				return this.isRequiredSignNeeded();
+				requiredPaint = this.getModel().isRequired(this.getDataId());
+				return requiredPaint ? true : this.isRequiredSignNeeded();
 			} else if (typeof requiredPaint === 'boolean') {
 				// boolean type, return directly
 				return requiredPaint;
@@ -304,17 +309,7 @@
 		 * @param evt
 		 */
 		onModelChanged: function (evt) {
-			var phases = this.getLayout().getValidationPhase();
-			if (phases) {
-				// only validate the given phases
-				var validateByPhase = function(phase) {
-					this.getModel().validateByPhase(phase, evt.id);
-				}.bind(this);
-				phases.forEach(validateByPhase);
-			} else {
-				// no phase defined, validate all
-				this.getModel().validate(evt.id);
-			}
+			this.validate();
 		},
 		/**
 		 * on model validate change
