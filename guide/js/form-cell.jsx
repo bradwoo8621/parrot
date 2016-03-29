@@ -269,6 +269,20 @@
 					index: 50
 				};
 			},
+			validation: function() {
+				return {
+					id: 'form-cell-validation',
+					title: 'Validation',
+					desc: <span>
+						Define the validation phase in form cell via <code>{'{validate: \'phase\'}'}</code>, value of <code>validate</code> can be string, function.
+						Phase string should be returned by function.<br/>
+						<code>{'{validate: {phase: \'phase\'}}'}</code> means the same and recommended, for further extension of <code>validate</code> attribute.<br/>
+						In some cases, validation can be invoked by other value changed. Use <code>{'{comp: {validation: {depends: \'otherPropId\'}}'}</code> to monitor.
+						same as <code>enabled</code> and <code>when</code> is not needed.
+					</span>,
+					index: 45
+				};
+			},
 			tooltip: function () {
 				var layoutTemplate = {
 					label: 'Label Of Cell',

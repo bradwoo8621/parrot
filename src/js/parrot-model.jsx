@@ -420,7 +420,7 @@
 		 * @param config {{}} validate rules config
 		 * @returns {TableValidationResult|boolean}
 		 */
-		table: function (model, value, config) {
+		table: function (model, value, config, phase) {
 			if (value == null || value.length == 0) {
 				// no data
 				return true;
@@ -431,7 +431,11 @@
 			for (var index = 0, count = value.length; index < count; index++) {
 				var item = value[index];
 				var itemModel = $pt.createModel(item, validator);
-				itemModel.validate();
+				if (phase) {
+					itemModel.validateByPhase(phase);
+				} else {
+					itemModel.validate();
+				}
 				var error = itemModel.getError();
 				if (Object.keys(error).length !== 0) {
 					results.push(item, error);

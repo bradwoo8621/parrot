@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.2.0 2016-03-28 */
+	/** nest-parrot.V0.2.0 2016-03-29 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -320,14 +320,14 @@
 		SelectTree: "seltree",
 		Date: "date",
 		Search: "search",
-		Button: { type: "button", label: false, renderError: false },
-		Tab: { type: 'tab', label: false, renderError: false },
-		ArrayTab: { type: 'atab', label: false, renderError: false },
-		Panel: { type: 'panel', label: false, renderError: false },
-		ArrayPanel: { type: 'apanel', label: false, renderError: false },
+		Button: { type: "button", label: false, popover: false, renderError: false },
+		Tab: { type: 'tab', label: false, popover: false, renderError: false },
+		ArrayTab: { type: 'atab', label: false, popover: false, renderError: false },
+		Panel: { type: 'panel', label: false, popover: false, renderError: false },
+		ArrayPanel: { type: 'apanel', label: false, popover: false, renderError: false },
 		Label: { type: 'label', label: false },
-		Form: { type: 'form', label: false, renderError: false },
-		ButtonFooter: { type: 'buttonfooter', label: false, renderError: false },
+		Form: { type: 'form', label: false, popover: false, renderError: false },
+		ButtonFooter: { type: 'buttonfooter', label: false, popover: false, renderError: false },
 		File: "file",
 		Nothing: { type: "nothing", label: false },
 		// date format
@@ -1428,7 +1428,7 @@
    * @param config {{}} validate rules config
    * @returns {TableValidationResult|boolean}
    */
-		table: function (model, value, config) {
+		table: function (model, value, config, phase) {
 			if (value == null || value.length == 0) {
 				// no data
 				return true;
@@ -1439,7 +1439,11 @@
 			for (var index = 0, count = value.length; index < count; index++) {
 				var item = value[index];
 				var itemModel = $pt.createModel(item, validator);
-				itemModel.validate();
+				if (phase) {
+					itemModel.validateByPhase(phase);
+				} else {
+					itemModel.validate();
+				}
 				var error = itemModel.getError();
 				if (Object.keys(error).length !== 0) {
 					results.push(item, error);
@@ -2500,11 +2504,8 @@
 			}
 		},
 		transformValidationPhase: function (phase) {
-			if (typeof phase === 'string') {
-				return [phase];
-			} else if (typeof phase === 'function') {
-				var phases = phase.call(this, this.getModel(), this.getDataId());
-				return phases == null ? null : Array.isArray(phases) ? phases : [phases];
+			if (phase == null || typeof phase === 'string' || typeof phase === 'function') {
+				return phase;
 			} else if (phase.phase) {
 				// it must be a json object
 				return this.transformValidationPhase(phase.phase);
@@ -3662,6 +3663,9 @@
    */
 		validate: function () {
 			var phase = this.getLayout().getValidationPhase();
+			if (typeof phase === 'function') {
+				phase = phase.call(this, this.getModel(), this.getDataId());
+			}
 			if (phase) {
 				// only validate the given phase
 				this.getModel().validateByPhase(phase, this.getDataId());

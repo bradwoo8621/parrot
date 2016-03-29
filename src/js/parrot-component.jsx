@@ -239,11 +239,8 @@
 			}
 		},
 		transformValidationPhase: function(phase) {
-			if (typeof phase === 'string') {
-				return [phase];
-			} else if (typeof phase === 'function') {
-				var phases = phase.call(this, this.getModel(), this.getDataId());
-				return phases == null ? null : (Array.isArray(phases) ? phases : [phases]);
+			if (phase == null || typeof phase === 'string' || typeof phase === 'function') {
+				return phase;
 			} else if (phase.phase) {
 				// it must be a json object
 				return this.transformValidationPhase(phase.phase);
@@ -1402,6 +1399,9 @@
 		 */
 		validate: function() {
 			var phase = this.getLayout().getValidationPhase();
+			if (typeof phase === 'function') {
+				phase = phase.call(this, this.getModel(), this.getDataId());
+			}
 			if (phase) {
 				// only validate the given phase
 				this.getModel().validateByPhase(phase, this.getDataId());
