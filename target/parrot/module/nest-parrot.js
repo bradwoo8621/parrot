@@ -1566,7 +1566,7 @@
 						ret = realRuleBody.call(this, model, value, phase);
 					} else {
 						// console.log(model, value, realRuleBody);
-						ret = this.getRule(ruleKey).call(this, model, value, realRuleBody);
+						ret = this.getRule(ruleKey).call(this, model, value, realRuleBody, phase);
 					}
 				}
 			}
