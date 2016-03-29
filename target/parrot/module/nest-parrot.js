@@ -2061,7 +2061,7 @@
 			} else {
 				this.__validateResults = validator.validateByPhase(this, phase);
 				var _this = this;
-				Object.keys(this.getCurrentModel()).forEach(function (id) {
+				Object.keys(this.__validateResults ? this.__validateResults : {}).forEach(function (id) {
 					_this.fireEvent({
 						model: this,
 						id: id,
