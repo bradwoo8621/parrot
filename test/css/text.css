@@ -9,3 +9,18 @@ hr.focus-line.custom-focus-line {
 div.currency.n-text input {
     text-align: right;
 }
+
+.has-error .form-control.search-code + span {
+    color: #f44336;
+}
+.form-control.search-code + span {
+    font-size: inherit;
+    font-weight: bold;
+    left: -22%;
+}
+.form-control.search-code + span:before {
+    content: ' - ';
+}
+.form-control.search-label {
+    padding-left: 5px;
+}

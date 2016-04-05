@@ -41,7 +41,11 @@
 
 			// check if the cell definition is referenced by pre-definition
 			if (cell.base) {
-				cell = $pt.mergeObject({deep: true, target: {}, sources: [cell.base, cell]});
+				if (Array.isArray(cell.base)) {
+					cell = $pt.mergeObject({deep: true, target: {}, sources: cell.base.concat(cell)});
+				} else {
+					cell = $pt.mergeObject({deep: true, target: {}, sources: [cell.base, cell]});
+				}
 			}
 
 			this.__dataId = cell.dataId ? cell.dataId : this.__id;
