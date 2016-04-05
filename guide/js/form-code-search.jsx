@@ -217,7 +217,8 @@
 					desc: <span>Available constants. Constants must be change before construct component.'<br/>
 					<code>NSearchText.SEARCH_PROXY</code> and <code>NSearchText.ADVANCED_SEARCH_PROXY</code>
 					are functions which proxy the remote request data. Before send to remote,
-					set these proxy functions to change the format of post data JSON.
+					set these proxy functions to change the format of post data JSON.<br/>
+					<code>NSearchText.ADVANCED_SEARCH_PROXY_CALLBACK</code> is function which proxy the remote response.
 					</span>,
 					index: 30,
 					code: $demo.convertJSON({

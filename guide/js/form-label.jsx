@@ -52,6 +52,22 @@
 					index: 20
 				};
 			},
+			convertor: function() {
+				var layoutTemplate = {comp: {convertor: function(value) {return 'Who are you?';}}};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'amount',
+					template: layoutTemplate
+				});
+				return {
+					id: 'label-convertor',
+					title: 'Convertor',
+					desc: 'A convertor can be defined in component option, can return value is displayed.',
+					xml: <NLabel model={model} layout={$pt.createCellLayout('amount', layoutTemplate)}/>,
+					code: [modelCode, layoutCode, compCode],
+					index: 25
+				};
+			},
 			left: function () {
 				var layoutTemplate = {comp: {left: '#: '}};
 				var layoutCode = $demo.convertCellLayoutCreatorToString({

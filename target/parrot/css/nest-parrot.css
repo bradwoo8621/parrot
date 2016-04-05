@@ -965,6 +965,9 @@ div.horizontal-label > div.row > div:first-child > span {
   display: inline-block;
   overflow: hidden;
 }
+div.horizontal-label > div.row > div:first-child > span .label-icon {
+  margin-right: 3px;
+}
 div.vertical-label {
   line-height: 1.2;
 }
@@ -979,18 +982,21 @@ div.vertical-label > span:first-child {
   display: inline-block;
   overflow: hidden;
 }
+div.vertical-label > span .label-icon {
+  margin-right: 3px;
+}
 span.required {
   color: #f44336;
   font-size: 0.95em;
 }
-div.n-form-cell {
-  padding-top: 2px;
-  padding-bottom: 3px;
-}
-div.n-form-cell .n-form-cell-tooltip {
+span.n-form-cell-tooltip {
   color: #90A4AE;
   font-size: 0.95em;
   margin-left: 3px;
+}
+div.n-form-cell {
+  padding-top: 2px;
+  padding-bottom: 3px;
 }
 div.n-form-cell.n-form-cell-invisible {
   display: none;
@@ -1011,6 +1017,21 @@ div.n-form-cell.horizontal-label div.n-checkbox span.check-label {
 .n-form-cell.pull-down {
   padding-top: 20px;
 }
+div.n-panel .panel-heading .panel-title {
+  display: inline;
+}
+div.n-panel .panel-heading .btn-toolbar.pull-right {
+  display: inline;
+  margin-top: -1px;
+}
+div.n-panel .panel-heading .btn-toolbar.pull-right > .n-button {
+  float: right;
+  margin-left: 5px;
+}
+div.n-panel .panel-heading .btn-toolbar.pull-right > .n-button .btn {
+  line-height: 20px;
+  box-shadow: none;
+}
 div.n-panel-footer {
   padding-top: 2px;
   padding-bottom: 3px;
@@ -1026,18 +1047,25 @@ div.n-panel-footer div.btn-toolbar {
 div.n-panel-footer div.btn-toolbar.n-panel-footer-left {
   display: inline-block;
 }
-div.n-panel-footer div.btn-toolbar.n-panel-footer-left > div.n-button {
+div.n-panel-footer div.btn-toolbar.n-panel-footer-left > div.n-button,
+div.n-panel-footer div.btn-toolbar.n-panel-footer-left > div.n-form-cell {
   float: left;
+}
+div.n-panel-footer div.btn-toolbar.n-panel-footer-left > div.n-button:not(:first-child),
+div.n-panel-footer div.btn-toolbar.n-panel-footer-left > div.n-form-cell:not(:first-child) {
+  margin-left: 5px;
 }
 div.n-panel-footer div.btn-toolbar.n-panel-footer-right {
   float: right;
   display: inline-block;
   margin-bottom: 0;
 }
-div.n-panel-footer div.btn-toolbar.n-panel-footer-right > div.n-button {
+div.n-panel-footer div.btn-toolbar.n-panel-footer-right > div.n-button,
+div.n-panel-footer div.btn-toolbar.n-panel-footer-right > div.n-form-cell {
   float: right;
 }
-div.n-panel-footer div.btn-toolbar > div.n-button {
+div.n-panel-footer div.btn-toolbar.n-panel-footer-right > div.n-button:not(:last-child),
+div.n-panel-footer div.btn-toolbar.n-panel-footer-right > div.n-form-cell:not(:last-child) {
   margin-left: 5px;
 }
 div.n-array-tab > div.n-array-tab-content {
@@ -1434,6 +1462,7 @@ div.n-select .form-control {
   display: flex;
   flex-direction: row;
   align-items: center;
+  border: 0;
 }
 div.n-select .form-control .text {
   order: 1;
@@ -2283,6 +2312,14 @@ div.n-button a.btn.dropdown-toggle.effect:focus:before {
   animation: none;
   -o-animation: none;
 }
+div.n-button a.btn:first-child.dropdown-toggle {
+  padding-right: 40px;
+}
+div.n-button a.btn:first-child.dropdown-toggle > span.caret {
+  position: absolute;
+  top: 45%;
+  right: 10%;
+}
 @keyframes buttonRippleOn {
   0% {
     opacity: 0;
@@ -3035,7 +3072,9 @@ div.n-array-check.vertical div.n-checkbox {
   max-height: 300px;
 }
 div.has-error > span,
-div.has-error.horizontal-label > div.row > div:first-child > span {
+div.has-error > span > span.n-form-cell-tooltip,
+div.has-error.horizontal-label > div.row > div:first-child > span,
+div.has-error.horizontal-label > div.row > div:first-child > span > span.n-form-cell-tooltip {
   color: #f44336;
 }
 div.has-error textarea,
@@ -3049,16 +3088,6 @@ div.has-error input[type=text].form-control,
 div.has-error input[type=password].form-control,
 div.has-error input[type=email].form-control,
 div.has-error input[type=tel].form-control {
-  color: #f44336;
-}
-div.has-error div.popover {
-  max-width: 500px;
-  border-color: #f44336;
-}
-div.has-error div.popover div.arrow {
-  border-top-color: #cccccc;
-}
-div.has-error div.popover div.popover-content {
   color: #f44336;
 }
 div.has-error div.n-label {
@@ -3168,4 +3197,26 @@ div.has-error hr.focus-line {
   transform: scaleX(1);
   -o-transform: scaleX(1);
   -webkit-transform: scaleX(1);
+}
+div.has-error div.popover {
+  max-width: 500px;
+  border-color: #f44336;
+  z-index: 8000;
+}
+div.has-error div.popover div.arrow {
+  border-top-color: #cccccc;
+}
+div.has-error div.popover div.popover-content {
+  color: #f44336;
+}
+div.popover.form-cell-error {
+  max-width: 500px;
+  border-color: #f44336;
+  z-index: 8000;
+}
+div.popover.form-cell-error div.arrow {
+  border-top-color: #cccccc;
+}
+div.popover.form-cell-error div.popover-content {
+  color: #f44336;
 }

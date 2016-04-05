@@ -314,6 +314,35 @@
 					children: $demo.convertToExampleList(check)
 				}
 			},
+			headButtons: function() {
+				var layoutTemplate = {
+					label: 'Panel Title',
+					comp: {
+						editLayout: {
+							name: {
+								label: 'Name'
+							}
+						},
+						headerButtons: {icon: 'pencil'}
+					}
+				};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'panel',
+					template: layoutTemplate
+				});
+				return {
+					id: 'form-panel-header-buttons',
+					title: 'Header Buttons',
+					desc: ['Panel with header buttons.', 'Button also can be an array.'],
+					xml: [{
+						width: 12,
+						xml: <NPanel model={model} layout={$pt.createCellLayout('panel', layoutTemplate)}/>
+					}],
+					code: [modelCode, layoutCode, compCode],
+					index: 60
+				};
+			},
 			css: function () {
 				return $demo.convertCSSJSONToExample({
 					id: 'form-panel-css',

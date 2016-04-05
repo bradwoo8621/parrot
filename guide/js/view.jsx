@@ -11,6 +11,7 @@
 					Now form components support displaying in view mode by simply pass a property <code>view</code>,
 					eg. <code>{"<NForm model={model} layout={layout} view={true} />"}</code>,
 					then all form components are switched to view mode.<br/>
+					If want to set a specific componen to be view mode, set <code>{"{comp: {view: true}}"}</code>
 					<br/>
 					See the rules of switching:<br/>
 					1. NText, NTextArea, NSelect, NDateTime, NSearchText: change to NLabel,<br/>

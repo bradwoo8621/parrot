@@ -140,6 +140,11 @@
 								pattern: '#getValidator() : ModelValidator',
 								desc: 'Get model validator.'
 							}, {
+								id: 'data-setValidator',
+								title: '#setValidator',
+								pattern: '#setValidator(validator: ModelValidator, clearValidateResults: boolean)',
+								desc: 'Set model validator. The second parameter is optional, pass true to clear existed validation results.'
+							}, {
 								id: 'data-hasError',
 								title: '#hasError',
 								pattern: '#hasError(id: string) : boolean',

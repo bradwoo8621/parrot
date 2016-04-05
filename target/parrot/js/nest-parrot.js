@@ -1,4 +1,4 @@
-/** nest-parrot.V0.2.0 2016-02-18 */
+/** nest-parrot.V0.2.0 2016-04-05 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -257,9 +257,9 @@
 	var messages = {};
 	$pt.messages = messages;
 	$pt.defineMessage = function (key, message) {
-		if (messages[key] != null) {
-			window.console.log('Message[' + key + '=' + messages[key] + '] was replaced by [' + message + ']');
-		}
+		// if (messages[key] != null) {
+		// 	window.console.debug('Message[' + key + '=' + messages[key] + '] was replaced by [' + message + ']');
+		// }
 		messages[key] = message;
 		return $pt;
 	};
@@ -284,19 +284,19 @@
 		ArrayCheck: 'acheck',
 		Toggle: 'toggle',
 		Radio: "radio",
-		Table: { type: "table", label: false, popover: false },
-		Tree: { type: "tree", label: false, popover: false },
+		Table: { type: "table", label: false, popover: false, renderError: false },
+		Tree: { type: "tree", label: false, popover: false, renderError: false },
 		SelectTree: "seltree",
 		Date: "date",
 		Search: "search",
-		Button: { type: "button", label: false },
-		Tab: { type: 'tab', label: false },
-		ArrayTab: { type: 'atab', label: false },
-		Panel: { type: 'panel', label: false },
-		ArrayPanel: { type: 'apanel', label: false },
+		Button: { type: "button", label: false, popover: false, renderError: false },
+		Tab: { type: 'tab', label: false, popover: false, renderError: false },
+		ArrayTab: { type: 'atab', label: false, popover: false, renderError: false },
+		Panel: { type: 'panel', label: false, popover: false, renderError: false },
+		ArrayPanel: { type: 'apanel', label: false, popover: false, renderError: false },
 		Label: { type: 'label', label: false },
-		Form: { type: 'form', label: false },
-		ButtonFooter: { type: 'buttonfooter', label: false },
+		Form: { type: 'form', label: false, popover: false, renderError: false },
+		ButtonFooter: { type: 'buttonfooter', label: false, popover: false, renderError: false },
 		File: "file",
 		Nothing: { type: "nothing", label: false },
 		// date format
@@ -426,10 +426,23 @@
 		if (quiet === true) {} else {
 			$pt.Components.NOnRequestModal.getOnRequestModal().show();
 		}
+		var hideOnRequest = function () {
+			if (quiet === true) {} else {
+				$pt.Components.NOnRequestModal.getOnRequestModal().hide();
+			}
+		};
 
 		return $.ajax(url, options).done(function (data, textStatus, jqXHR) {
 			if (done !== undefined && done !== null) {
-				done(data, textStatus, jqXHR);
+				try {
+					done(data, textStatus, jqXHR);
+				} catch (err) {
+					console.error(err);
+					console.error(data);
+					console.error(textStatus);
+					console.error(jqXHR);
+					$pt.Components.NExceptionModal.getExceptionModal().show('Javascript Error', err);
+				}
 			}
 		}).fail(function (jqXHR, textStatus, errorThrown) {
 			if (fail !== undefined && fail !== null) {
@@ -440,7 +453,14 @@
 					callback = fail["" + jqXHR.status];
 				}
 				if (callback != null) {
-					callback(jqXHR, textStatus, errorThrown);
+					try {
+						callback(jqXHR, textStatus, errorThrown);
+					} catch (err) {
+						console.error(data);
+						console.error(textStatus);
+						console.error(jqXHR);
+						$pt.Components.NExceptionModal.getExceptionModal().show('Javascript Error', err);
+					}
 				} else {
 					$pt.Components.NExceptionModal.getExceptionModal().show("" + jqXHR.status, jqXHR.responseText);
 				}
@@ -449,9 +469,7 @@
 			}
 		}).always(function () {
 			// hide
-			if (quiet === true) {} else {
-				$pt.Components.NOnRequestModal.getOnRequestModal().hide();
-			}
+			hideOnRequest();
 		});
 	};
 
@@ -462,7 +480,7 @@
   * @param settings {*} optional jquery ajax settings
   * @returns {jqXHR}
   */
-	$pt.doPost = function (url, data, settings) {
+	$pt.internalDoPost = $pt.doPost = function (url, data, settings) {
 		return submit($.extend({
 			method: "POST",
 			dataType: "json",
@@ -566,7 +584,7 @@
 				return {};
 			}
 		}
-		return deparam(paramsString);
+		return $.deparam(paramsString);
 	};
 	/**
   * mock ajax
@@ -1379,7 +1397,7 @@
    * @param config {{}} validate rules config
    * @returns {TableValidationResult|boolean}
    */
-		table: function (model, value, config) {
+		table: function (model, value, config, phase) {
 			if (value == null || value.length == 0) {
 				// no data
 				return true;
@@ -1390,7 +1408,11 @@
 			for (var index = 0, count = value.length; index < count; index++) {
 				var item = value[index];
 				var itemModel = $pt.createModel(item, validator);
-				itemModel.validate();
+				if (phase) {
+					itemModel.validateByPhase(phase);
+				} else {
+					itemModel.validate();
+				}
 				var error = itemModel.getError();
 				if (Object.keys(error).length !== 0) {
 					results.push(item, error);
@@ -1495,9 +1517,12 @@
 					} else if (ruleBody._phase != phase) {
 						runRule = false;
 					}
+				} else if (ruleBody._phase) {
+					// no phase given, but there is phase on rule
+					realRuleBody = ruleBody.rule;
 				}
 				// a simple json
-				if (ruleBody._when) {
+				if (runRule && ruleBody._when) {
 					realRuleBody = ruleBody.rule;
 					var when = ruleBody._when.call(this, model);
 					if (!when) {
@@ -1509,7 +1534,8 @@
 					if (typeof realRuleBody === 'function') {
 						ret = realRuleBody.call(this, model, value, phase);
 					} else {
-						ret = this.getRule(ruleKey).call(this, model, value, realRuleBody);
+						// console.log(model, value, realRuleBody);
+						ret = this.getRule(ruleKey).call(this, model, value, realRuleBody, phase);
 					}
 				}
 			}
@@ -1577,14 +1603,31 @@
 		/**
    * check property is required or not
    * @param id
+   * @param phase can be array or plain text
    */
-		isRequired: function (id) {
-			// TODO more complex scenarios need to be supported
+		isRequired: function (id, phase) {
 			var config = this.getConfig(id);
-			if (config == null) {
+			if (config == null || config.required == null) {
+				// no required declared
+				return false;
+			} else if (config.required === true) {
+				// all phase required
+				return true;
+			} else if (phase == null) {
+				// no phase appointed
 				return false;
 			} else {
-				return config.required != null && config.required === true;
+				// phase appointed
+				var phases = Array.isArray(phase) ? phase : [phase];
+				var defines = Array.isArray(config.required) ? config.required : [config.required];
+				// console.log(phases, defines);
+				// return true when at least one definition which match the given phases and rule is true
+				return phases.some(function (phase) {
+					return defines.some(function (define) {
+						var definedPhase = Array.isArray(define._phase) ? define._phase : [define._phase];
+						return definedPhase.indexOf(phase) != -1 && define.rule === true;
+					});
+				});
 			}
 		}
 	});
@@ -1610,7 +1653,7 @@
    */
 		constructor: function (model, validator) {
 			this.__base = model;
-			this.__model = $pt.cloneJSON(model);
+			this.__model = $pt.mergeObject({ deep: true, sources: model });
 			this.__validator = validator;
 			this.__validateResults = {};
 			this.__changed = false;
@@ -1677,7 +1720,7 @@
    * apply current data to base model.
    */
 		applyCurrentToBase: function () {
-			this.__base = $.extend(true, {}, this.__model);
+			this.__base = $pt.mergeObject({ deep: true, target: {}, sources: this.__model });
 			return this;
 		},
 		/**
@@ -1686,6 +1729,13 @@
    */
 		getValidator: function () {
 			return this.__validator;
+		},
+		setValidator: function (validator, clearError) {
+			this.__validator = validator;
+			if (clearError) {
+				this.__validateResults = {};
+			}
+			return this;
 		},
 		/**
    * get value by given id
@@ -1936,7 +1986,7 @@
    * reset model
    */
 		reset: function () {
-			this.__model = $pt.cloneJSON(this.__base);
+			this.__model = $pt.mergeObject({ deep: true, sources: this.__base }); //$pt.cloneJSON(this.__base);
 			this.__validateResults = {};
 			this.__changed = false;
 			return this;
@@ -1980,7 +2030,7 @@
 			} else {
 				this.__validateResults = validator.validateByPhase(this, phase);
 				var _this = this;
-				Object.keys(this.getCurrentModel()).forEach(function (id) {
+				Object.keys(this.__validateResults ? this.__validateResults : {}).forEach(function (id) {
 					_this.fireEvent({
 						model: this,
 						id: id,
@@ -2004,9 +2054,9 @@
    * @param id {string} property id
    * @returns {boolean}
    */
-		isRequired: function (id) {
+		isRequired: function (id, phase) {
 			var validator = this.getValidator();
-			return validator != null && validator.isRequired(id);
+			return validator != null && validator.isRequired(id, phase);
 		},
 		/**
    * get error of given id, or return all error when no parameter passed
@@ -2225,7 +2275,11 @@
 
 			// check if the cell definition is referenced by pre-definition
 			if (cell.base) {
-				cell = $.extend({}, cell.base, cell);
+				if (Array.isArray(cell.base)) {
+					cell = $pt.mergeObject({ deep: true, target: {}, sources: cell.base.concat(cell) });
+				} else {
+					cell = $pt.mergeObject({ deep: true, target: {}, sources: [cell.base, cell] });
+				}
 			}
 
 			this.__dataId = cell.dataId ? cell.dataId : this.__id;
@@ -2410,6 +2464,27 @@
 				}
 			} else {
 				return !this.__cell.evt ? {} : this.__cell.evt;
+			}
+		},
+		/**
+   * get validate phase
+   */
+		getValidationPhase: function () {
+			if (this.__cell && this.__cell.validate) {
+				return this.transformValidationPhase(this.__cell.validate);
+			} else {
+				return null;
+			}
+		},
+		transformValidationPhase: function (phase) {
+			if (phase == null || typeof phase === 'string' || typeof phase === 'function') {
+				return phase;
+			} else if (phase.phase) {
+				// it must be a json object
+				return this.transformValidationPhase(phase.phase);
+			} else {
+				console.error('Failed to parse validation phase definition of [' + this.getDataId() + ']', phase);
+				throw 'Failed to parse validation phase definition';
 			}
 		}
 	});
@@ -3305,10 +3380,23 @@
 		},
 		/**
    * component is view mode or not
+   * first check "state.isViewMode"
+   * second check "props.view"
+   * last check the componen opion "view"
+   * returns value of "state.isViewMode" has value.
+   * otherwise returns true when one of "props.view" and component option "view" is true
    * @returns {boolean}
    */
 		isViewMode: function () {
-			return this.props.view === true;
+			var isViewMode = this.state ? this.state.isViewMode : null;
+			if (isViewMode == null) {
+				return this.props.view === true || this.getComponentOption('view');
+			} else {
+				return isViewMode;
+			}
+		},
+		setViewMode: function (isViewMode) {
+			this.setState({ isViewMode: isViewMode });
 		},
 		/**
    * render in view mode. default render as a label.
@@ -3497,6 +3585,13 @@
 			return this.getComponentRuleValue("visible", true);
 		},
 		/**
+   * is required
+   * @returns {boolean}
+   */
+		isRequiredSignNeeded: function () {
+			return this.getComponentRuleValue('required', false);
+		},
+		/**
    * get dependencies
    * @returns {Array|string}
    */
@@ -3523,6 +3618,34 @@
 		},
 		removeEnableDependencyMonitor: function () {
 			this.removeDependencyMonitor(this.getDependencies("enabled"));
+		},
+		addRequiredDependencyMonitor: function () {
+			this.addDependencyMonitor(this.getDependencies('required'));
+		},
+		removeRequiredDependencyMonitor: function () {
+			this.removeDependencyMonitor(this.getDependencies('required'));
+		},
+		addValidateDependencyMonitor: function () {
+			this.addDependencyMonitor(this.getDependencies('validation'), this.validate);
+		},
+		removeValidateDependencyMonitor: function () {
+			this.removeDependencyMonitor(this.getDependencies('validation'), this.validate);
+		},
+		/**
+   * validate current cell by given phase
+   */
+		validate: function () {
+			var phase = this.getLayout().getValidationPhase();
+			if (typeof phase === 'function') {
+				phase = phase.call(this, this.getModel(), this.getDataId());
+			}
+			if (phase) {
+				// only validate the given phase
+				this.getModel().validateByPhase(phase, this.getDataId());
+			} else {
+				// no phase defined, validate all
+				this.getModel().validate(this.getDataId());
+			}
 		},
 		/**
    * force update, call react API
@@ -3882,7 +4005,7 @@
 				}
 			});
 			model.addPostChangeListener('checked', this.onCodeItemCheckedChanged.bind(this, item));
-			return React.createElement($pt.Components.NCheck, { model: model, layout: layout, key: itemIndex });
+			return React.createElement($pt.Components.NCheck, { model: model, layout: layout, key: itemIndex, view: this.isViewMode() });
 		},
 		render: function () {
 			var enabled = this.isEnabled();
@@ -4087,6 +4210,14 @@
 				}
 			}
 
+			var listeners = this.getComponentOption('rowListener');
+			if (listeners) {
+				listeners = Array.isArray(listeners) ? listeners : [listeners];
+				listeners.forEach(function (listener) {
+					model.addListener(listener.id, listener.time ? listener.time : 'post', listener.type ? listener.type : 'change', listener.listener);
+				});
+			}
+
 			var _this = this;
 			this.getDependencies('itemTitle').forEach(function (key) {
 				model.addListener(key, "post", "change", function () {
@@ -4094,16 +4225,17 @@
 				});
 			});
 			var cellLayout = {
-				label: this.getPanelTitle(model),
+				label: this.getPanelTitle(model, itemIndex),
 				comp: {
 					type: $pt.ComponentConstants.Panel,
 					collapsible: this.getComponentOption('collapsible'),
 					expanded: this.getComponentOption('expanded'),
-					editLayout: this.getEditLayout(model),
+					editLayout: this.getEditLayout(model, itemIndex),
 					style: this.getComponentOption('style'),
-					checkInTitle: this.getCheckInTitle(model),
+					checkInTitle: this.getCheckInTitle(model, itemIndex),
 					expandedLabel: this.getComponentOption('expandedLabel'),
-					collapsedLabel: this.getComponentOption('collapsedLabel')
+					collapsedLabel: this.getComponentOption('collapsedLabel'),
+					headerButtons: this.getHeaderButtons(model, itemIndex)
 				}
 			};
 			return React.createElement(
@@ -4158,12 +4290,20 @@
    * @param model {ModelInterface} item model
    * @returns {{}}
    */
-		getEditLayout: function (model) {
+		getEditLayout: function (model, itemIndex) {
 			var layout = this.getComponentOption('editLayout');
 			if (typeof layout === 'function') {
-				return layout.call(this, model);
+				return layout.call(this, model, itemIndex);
 			} else {
 				return layout;
+			}
+		},
+		getHeaderButtons: function (model, itemIndex) {
+			var buttons = this.getComponentOption('headerButtons');
+			if (typeof buttons === 'function') {
+				return buttons.call(this, model, itemIndex);
+			} else {
+				return buttons;
 			}
 		},
 		/**
@@ -4171,10 +4311,10 @@
    * @param model {ModelInterface} item model
    * @returns {{}}
    */
-		getCheckInTitle: function (model) {
+		getCheckInTitle: function (model, itemIndex) {
 			var checkInTitle = this.getComponentOption('checkInTitle');
 			if (typeof checkInTitle === 'function') {
-				return checkInTitle.call(this, model);
+				return checkInTitle.call(this, model, itemIndex);
 			} else {
 				return checkInTitle;
 			}
@@ -4184,14 +4324,14 @@
    * @param model {ModelInterface} item model
    * @returns {string}
    */
-		getPanelTitle: function (model) {
+		getPanelTitle: function (model, itemIndex) {
 			var title = this.getComponentOption('itemTitle');
 			if (title == null) {
 				return NArrayPanel.UNTITLED;
 			} else if (typeof title === 'string') {
 				return title;
 			} else {
-				var titleText = title.when.call(this, model);
+				var titleText = title.when.call(this, model, itemIndex);
 				return titleText == null || titleText.isBlank() ? NArrayPanel.UNTITLED : titleText;
 			}
 		}
@@ -4376,7 +4516,7 @@
 				} else {
 					var canActive = this.getComponentOption('canActive');
 					if (canActive) {
-						canActive.call(this, newTabValue, newTabIndex, activeTabValue, activeTabIndex);
+						return canActive.call(this, newTabValue, newTabIndex, activeTabValue, activeTabIndex);
 					}
 				}
 			}).bind(this);
@@ -4423,6 +4563,13 @@
 						model.mergeError(itemError);
 					}
 				}
+			}
+			var listeners = this.getComponentOption('rowListener');
+			if (listeners) {
+				listeners = Array.isArray(listeners) ? listeners : [listeners];
+				listeners.forEach(function (listener) {
+					model.addListener(listener.id, listener.time ? listener.time : 'post', listener.type ? listener.type : 'change', listener.listener);
+				});
 			}
 			return model;
 		},
@@ -4711,7 +4858,7 @@
 					'fa-fw': true
 				};
 				css['fa-' + icon] = true;
-				return React.createElement('span', { className: $pt.LayoutHelper.classSet(css) });
+				return React.createElement('span', { className: $pt.LayoutHelper.classSet(css), key: 'icon' });
 			}
 		},
 		/**
@@ -4734,6 +4881,7 @@
 						'aria-haspopup': 'true',
 						'aria-expanded': 'false',
 						key: 'a' },
+					!this.getComponentOption('click') ? this.getButtonContext() : null,
 					React.createElement('span', { className: 'caret' })
 				);
 				var emptyFunction = function () {};
@@ -4769,6 +4917,33 @@
 				return null;
 			}
 		},
+		getButtonContext: function () {
+			var label = this.getLabel();
+			var icon = this.renderButtonIcon();
+			var buttonContext = null;
+			if (this.getLabelPosition() === 'left') {
+				// label in left
+				if (label && icon) {
+					label = React.createElement(
+						'span',
+						{ key: 'lbl' },
+						label + ' '
+					);
+				}
+				buttonContext = [label, icon];
+			} else {
+				// default label in right
+				if (label && icon) {
+					label = React.createElement(
+						'span',
+						{ key: 'lbl' },
+						' ' + label
+					);
+				}
+				buttonContext = [icon, label];
+			}
+			return buttonContext;
+		},
 		render: function () {
 			if (!this.isVisible()) {
 				return null;
@@ -4781,59 +4956,31 @@
 				disabled: !this.isEnabled()
 			};
 			css['btn-' + this.getStyle()] = true;
-			var label = this.getLabel();
-			var icon = this.renderButtonIcon();
-			if (this.getLabelPosition() === 'left') {
-				if (label && icon) {
-					label = label + ' ';
-				}
-				// label in left
-				return React.createElement(
-					'div',
-					{ className: $pt.LayoutHelper.classSet(compCSS) },
-					React.createElement(
-						'div',
-						{ className: 'btn-group' },
-						React.createElement(
-							'a',
-							{ href: 'javascript:void(0);',
-								className: $pt.LayoutHelper.classSet(css),
-								onClick: this.onClicked,
-								disabled: !this.isEnabled(),
-								title: this.getComponentOption('tooltip'),
-								ref: 'a' },
-							label,
-							icon
-						),
-						this.renderMoreButtons(css)
-					)
-				);
-			} else {
-				if (label && icon) {
-					label = ' ' + label;
-				}
-				// default label in right
-				return React.createElement(
-					'div',
-					{ className: $pt.LayoutHelper.classSet(compCSS) },
-					React.createElement(
-						'div',
-						{ className: 'btn-group' },
-						React.createElement(
-							'a',
-							{ href: 'javascript:void(0);',
-								className: $pt.LayoutHelper.classSet(css),
-								onClick: this.onClicked,
-								disabled: !this.isEnabled(),
-								title: this.getComponentOption('tooltip'),
-								ref: 'a' },
-							icon,
-							label
-						),
-						this.renderMoreButtons(css)
-					)
+			var defaultClick = this.getComponentOption("click");
+			var more = this.getComponentOption('more');
+			var defaultButton = null;
+			if (defaultClick || !more) {
+				defaultButton = React.createElement(
+					'a',
+					{ href: 'javascript:void(0);',
+						className: $pt.LayoutHelper.classSet(css),
+						onClick: this.onClicked,
+						disabled: !this.isEnabled(),
+						title: this.getComponentOption('tooltip'),
+						ref: 'a' },
+					this.getButtonContext()
 				);
 			}
+			return React.createElement(
+				'div',
+				{ className: $pt.LayoutHelper.classSet(compCSS) },
+				React.createElement(
+					'div',
+					{ className: 'btn-group' },
+					defaultButton,
+					this.renderMoreButtons(css)
+				)
+			);
 		},
 		onClicked: function (evt) {
 			if (this.isEnabled()) {
@@ -6214,6 +6361,17 @@
 			// or use un-strict mode to format
 			// cannot know the result of moment format
 			// move process of changing to blur event
+			var text = this.getTextInput().val();
+			if (text.length == 0 || text.isBlank()) {
+				this.setValueToModel(null);
+			} else {
+				var date = this.convertValueFromString(text, this.getDisplayFormat(), true);
+				if (date == null && text.length != 0) {
+					// TODO invalid date, do nothing now. donot know how to deal with it...
+				} else {
+						this.setValueToModel(date);
+					}
+			}
 		},
 		onModelChange: function (evt) {
 			this.forceUpdate();
@@ -6222,7 +6380,20 @@
 			return this.convertValueFromString(this.getModel().get(this.getDataId()));
 		},
 		setValueToModel: function (value) {
-			this.getModel().set(this.getDataId(), this.convertValueToString(value));
+			var formattedValue = value;
+			if (value != null) {
+				if (typeof value === 'string') {
+					if (value.isBlank()) {
+						formattedValue = null;
+					} else {
+						formattedValue = moment(value, this.getPrimaryDisplayFormat()).format(this.getValueFormat());
+					}
+				} else {
+					formattedValue = value.format(this.getPrimaryDisplayFormat());
+					formattedValue = moment(formattedValue, this.getPrimaryDisplayFormat()).format(this.getValueFormat());
+				}
+			}
+			this.getModel().set(this.getDataId(), formattedValue);
 		},
 		setValueToTextInput: function (value) {
 			this.getTextInput().val(this.convertValueToString(value, this.getPrimaryDisplayFormat()));
@@ -6233,8 +6404,8 @@
    * @param format {string} optional, use value format if not passed
    * @returns {moment}
    */
-		convertValueFromString: function (value, format) {
-			var date = value == null || value.isBlank() ? null : moment(value, format ? format : this.getValueFormat(), this.getLocale());
+		convertValueFromString: function (value, format, useStrict) {
+			var date = value == null || value.isBlank() ? null : moment(value, format ? format : this.getValueFormat(), this.getLocale(), useStrict === true ? true : undefined);
 			return date == null || !date.isValid() ? null : date;
 		},
 		/**
@@ -7239,7 +7410,12 @@
 			return section.getParentCard().getId() + '-' + section.getId();
 		},
 		isViewMode: function () {
-			return this.props.view;
+			var isViewMode = this.state ? this.state.isViewMode : null;
+			if (isViewMode == null) {
+				return this.props.view === true;
+			} else {
+				return isViewMode;
+			}
 		},
 		isFreeCard: function () {
 			return this.isViewMode() || this.getLayout().isFreeCard();
@@ -7403,7 +7579,7 @@
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
-					paintRequired: true
+					// paintRequired: true
 				},
 				direction: 'vertical'
 			};
@@ -7418,6 +7594,8 @@
 			this.removePostValidateListener(this.onModelValidateChanged);
 			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
+			this.removeRequiredDependencyMonitor();
+			this.removeValidateDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		/**
@@ -7431,6 +7609,8 @@
 			this.addPostValidateListener(this.onModelValidateChanged);
 			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
+			this.addRequiredDependencyMonitor();
+			this.addValidateDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -7442,6 +7622,8 @@
 			this.addPostValidateListener(this.onModelValidateChanged);
 			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
+			this.addRequiredDependencyMonitor();
+			this.addValidateDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -7453,6 +7635,8 @@
 			this.removePostValidateListener(this.onModelValidateChanged);
 			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
+			this.removeRequiredDependencyMonitor();
+			this.removeValidateDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		destroyPopover: function () {
@@ -7460,11 +7644,34 @@
 			if (comp != null) {
 				$(ReactDOM.findDOMNode(comp)).popover("destroy");
 			}
+			var tooltip = this.refs.tooltip;
+			if (tooltip != null) {
+				$(ReactDOM.findDOMNode(tooltip)).popover('destroy');
+			}
 		},
 		/**
    * render error popover
    */
 		renderPopover: function () {
+			var tooltip = this.getComponentOption('tooltip');
+			if (tooltip != null) {
+				if (typeof tooltip === 'string') {
+					tooltip = {
+						text: tooltip
+					};
+				}
+				var tooltipPopover = {
+					title: tooltip.title,
+					content: tooltip.text,
+					placement: tooltip.position ? tooltip.position : 'top',
+					trigger: 'hover',
+					container: 'body',
+					html: true,
+					animation: false
+				};
+				$(ReactDOM.findDOMNode(this.refs.tooltip)).popover(tooltipPopover);
+			}
+
 			if (this.getLayout().getComponentType().popover !== false && this.getModel().hasError(this.getDataId())) {
 				var messages = this.getModel().getError(this.getDataId());
 				var _this = this;
@@ -7475,17 +7682,23 @@
 					content: messages.map(function (msg) {
 						return "<span style='display:block'>" + msg.format([_this.getLayout().getLabel()]) + "</span>";
 					}),
+					container: 'body',
 					// false is very import, since when destroy popover,
 					// the really destroy will be invoked by some delay,
 					// and before really destory invoked,
 					// the new popover is bind by componentDidUpdate method.
 					// and finally new popover will be destroyed.
-					animation: false
+					animation: false,
+					template: '<div class="popover form-cell-error" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>'
 				};
 
 				var comp = this.refs.comp;
 				if (comp != null) {
-					$(ReactDOM.findDOMNode(comp)).popover(popover);
+					var dom = $(ReactDOM.findDOMNode(comp));
+					dom.popover(popover);
+					if (dom.has($(':focus')).length != 0) {
+						dom.popover('show');
+					}
 				}
 			}
 		},
@@ -7513,35 +7726,60 @@
 				$pt.LayoutHelper.getComponentRenderer(type).call(this, this.getFormModel(), this.getLayout(), direction, this.isViewMode())
 			);
 		},
+		isRequiredSignPaint: function () {
+			if (this.isViewMode()) {
+				return false;
+			}
+			// calculate the 'paintRequired' attribute
+			var requiredPaint = this.getComponentOption("paintRequired");
+			if (requiredPaint == null) {
+				// not given, calculate 'required' rules
+				requiredPaint = this.getModel().isRequired(this.getDataId());
+				return requiredPaint ? true : this.isRequiredSignNeeded();
+			} else if (typeof requiredPaint === 'boolean') {
+				// boolean type, return directly
+				return requiredPaint;
+			} else if (typeof requiredPaint === 'function') {
+				requiredPaint = requiredPaint.call(this);
+				if (typeof requiredPaint === 'boolean') {
+					// boolean type, return directly
+					return requiredPaint;
+				}
+			}
+			// calculate from model validator
+			return this.getModel().isRequired(this.getDataId(), requiredPaint);
+		},
 		/**
    * render label
    * @returns {XML}
    */
 		renderLabel: function () {
-			var requiredPaint = this.getComponentOption("paintRequired");
+			var labelIcon = this.getComponentOption('labelIcon');
+			var iconLabel = labelIcon ? React.createElement('span', { className: 'label-icon fa fa-fw fa-' + labelIcon }) : null;
 			var requireIconCSS = {
 				fa: true,
 				'fa-fw': true,
 				required: true
 			};
 			requireIconCSS['fa-' + NFormCell.REQUIRED_ICON] = true;
-			var requiredLabel = requiredPaint && this.getModel().isRequired(this.getDataId()) ? React.createElement('span', { className: $pt.LayoutHelper.classSet(requireIconCSS) }) : null;
-			//var showColon = !this.getLayout().getLabel().endsWith('?')
-			//{showColon ? ':' : null}
+			var requiredLabel = this.isRequiredSignPaint() ? React.createElement('span', { className: $pt.LayoutHelper.classSet(requireIconCSS) }) : null;
 			var tooltip = this.getComponentOption('tooltip');
 			var tooltipIcon = null;
-			if (tooltip != null && !tooltip.isBlank()) {
-				var tooltipCSS = {
-					fa: true,
-					'fa-fw': true,
-					'n-form-cell-tooltip': true
-				};
+			var tooltipCSS = {
+				fa: true,
+				'fa-fw': true,
+				'n-form-cell-tooltip': true
+			};
+			if (tooltip != null) {
 				tooltipCSS['fa-' + NFormCell.TOOLTIP_ICON] = true;
-				tooltipIcon = React.createElement('span', { className: $pt.LayoutHelper.classSet(tooltipCSS), title: tooltip });
+				tooltipIcon = React.createElement('span', { className: $pt.LayoutHelper.classSet(tooltipCSS), ref: 'tooltip' });
 			}
 			return React.createElement(
 				'span',
-				{ className: this.getLayout().getLabelCSS(), onClick: this.onLabelClicked, ref: 'label' },
+				{ className: this.getLayout().getLabelCSS(),
+					onClick: this.onLabelClicked,
+					ref: 'label' },
+				iconLabel,
 				this.getLayout().getLabel(),
 				tooltipIcon,
 				requiredLabel
@@ -7569,7 +7807,7 @@
 				return React.createElement('div', { className: this.getCSSClassName() + ' n-form-cell-invisible' });
 			} else {
 				var css = this.getCSSClassName();
-				if (this.getModel().hasError(this.getDataId())) {
+				if (this.getModel().hasError(this.getDataId()) && !this.isViewMode() && this.getLayout().getComponentType().renderError !== false) {
 					css += " has-error";
 				}
 				if (!this.isEnabled()) {
@@ -7623,7 +7861,7 @@
    * @param evt
    */
 		onModelChanged: function (evt) {
-			this.getModel().validate(evt.id);
+			this.validate();
 		},
 		/**
    * on model validate change
@@ -7631,21 +7869,21 @@
    */
 		onModelValidateChanged: function (evt) {
 			// TODO maybe will introduce performance issue, cannot sure now.
-			// this.forceUpdate();
-			var div;
-			if (this.getModel().hasError(this.getDataId())) {
-				this.renderPopover();
-				div = this.refs.div;
-				if (div != null) {
-					$(ReactDOM.findDOMNode(div)).addClass('has-error');
-				}
-			} else {
-				this.destroyPopover();
-				div = this.refs.div;
-				if (div != null) {
-					$(ReactDOM.findDOMNode(div)).removeClass('has-error');
-				}
-			}
+			this.forceUpdate();
+			// var div;
+			// if (this.getModel().hasError(this.getDataId())) {
+			// 	this.renderPopover();
+			// 	div = this.refs.div;
+			// 	if (div != null) {
+			// 		$(ReactDOM.findDOMNode(div)).addClass('has-error');
+			// 	}
+			// } else {
+			// 	this.destroyPopover();
+			// 	div = this.refs.div;
+			// 	if (div != null) {
+			// 		$(ReactDOM.findDOMNode(div)).removeClass('has-error');
+			// 	}
+			// }
 		},
 		/**
    * on label clicked
@@ -8150,28 +8388,36 @@
    */
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
+			this.removePostChangeListener(this.__forceUpdate);
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		render: function () {
 			var texts = this.getText();
 			if (!Array.isArray(texts)) {
-				var currency = this.getComponentOption('currency');
-				if (currency && texts != null && !(texts + '').isBlank()) {
-					var fraction = this.getComponentOption('fraction');
-					fraction = fraction ? fraction * 1 : 0;
-					texts = (texts + '').currencyFormat(fraction);
-				}
-				if (texts == null || (texts + '').isBlank()) {
-					texts = this.getComponentOption('replaceBlank') || this.getComponentOption('placeholder');
-				}
+				var convertor = this.getComponentOption('convertor');
+				if (convertor && typeof convertor === 'function') {
+					texts = [convertor.call(this, texts)];
+				} else if (convertor && convertor.view) {
+					// for NText compatibility
+					texts = [convertor.view.call(this, texts)];
+				} else {
+					var currency = this.getComponentOption('currency');
+					if (currency && texts != null && !(texts + '').isBlank()) {
+						var fraction = this.getComponentOption('fraction');
+						fraction = fraction ? fraction * 1 : 0;
+						texts = (texts + '').currencyFormat(fraction);
+					}
+					if (texts == null || (texts + '').isBlank()) {
+						texts = this.getComponentOption('replaceBlank') || this.getComponentOption('placeholder');
+					}
 
-				var left = this.getComponentOption('left');
-				var right = this.getComponentOption('right');
-				texts = left ? left + texts : texts;
-				texts = right ? texts + right : texts;
-				texts = [texts];
+					var left = this.getComponentOption('left');
+					var right = this.getComponentOption('right');
+					texts = left ? left + texts : texts;
+					texts = right ? texts + right : texts;
+					texts = [texts];
+				}
 			}
 			var css = {
 				'n-disabled': !this.isEnabled()
@@ -8318,6 +8564,23 @@
 			});
 			return React.createElement($pt.Components.NFormButton, { layout: layout });
 		},
+		renderDialogCloseButton: function () {
+			if (this.isDialogCloseShown()) {
+				return React.createElement(
+					"button",
+					{ className: "close",
+						onClick: this.onCancelClicked,
+						"aria-label": "Close",
+						style: { marginTop: '-2px' } },
+					React.createElement(
+						"span",
+						{ "aria-hidden": "true" },
+						"×"
+					)
+				);
+			}
+			return null;
+		},
 		/**
    * render footer
    * @returns {XML}
@@ -8392,18 +8655,7 @@
 							React.createElement(
 								"div",
 								{ className: "modal-header" },
-								React.createElement(
-									"button",
-									{ className: "close",
-										onClick: this.onCancelClicked,
-										"aria-label": "Close",
-										style: { marginTop: '-2px' } },
-									React.createElement(
-										"span",
-										{ "aria-hidden": "true" },
-										"×"
-									)
-								),
+								this.renderDialogCloseButton(),
 								React.createElement(
 									"h4",
 									{ className: "modal-title" },
@@ -8463,6 +8715,9 @@
 				this.state.afterClose.call(this, 'cancel');
 			}
 		},
+		isDialogCloseShown: function () {
+			return this.state && this.state.buttons && this.state.buttons.disableDialogClose === true;
+		},
 		/**
    * show dialog
    *
@@ -8507,6 +8762,7 @@
 						disableButtons: options.disableButtons,
 						disableConfirm: options.disableConfirm,
 						disableClose: options.disableClose,
+						disableDialogClose: options.disableDialogClose,
 						close: options.close,
 						messages: options.messages
 					},
@@ -10062,6 +10318,37 @@
 				')'
 			);
 		},
+		renderHeadingButtons: function () {
+			var headButtons = this.getComponentOption('headerButtons');
+			if (headButtons) {
+				headButtons = Array.isArray(headButtons) ? headButtons : [headButtons];
+				var _this = this;
+				return React.createElement(
+					'div',
+					{ className: 'btn-toolbar pull-right', role: 'toolbar' },
+					headButtons.map(function (button, buttonIndex) {
+						if (_this.isViewMode() && button.view == 'edit') {
+							return null;
+						} else if (!_this.isViewMode() && button.view == 'view') {
+							return null;
+						}
+						var layout = {
+							label: button.text,
+							comp: button
+						};
+						// delete layout.comp.label;
+						console.log(layout);
+						return React.createElement($pt.Components.NFormButton, { model: _this.getModel(),
+							layout: $pt.createCellLayout('pseudo-button', layout),
+							key: buttonIndex });
+					}).filter(function (button) {
+						return button != null;
+					})
+				);
+			} else {
+				return null;
+			}
+		},
 		/**
    * render heading
    * @returns {XML}
@@ -10085,7 +10372,8 @@
 							label
 						),
 						this.renderCheckInTitle()
-					)
+					),
+					this.renderHeadingButtons()
 				);
 			} else if (this.hasCheckInTitle()) {
 				css['n-normal-title-check'] = this.hasCheckInTitle();
@@ -10101,13 +10389,15 @@
 							label
 						),
 						this.renderCheckInTitle()
-					)
+					),
+					this.renderHeadingButtons()
 				);
 			} else {
 				return React.createElement(
 					'div',
 					{ className: 'panel-heading', ref: 'head' },
-					label
+					label,
+					this.renderHeadingButtons()
 				);
 			}
 		},
@@ -10469,20 +10759,24 @@
 			} else if (!this.isViewMode() && option.view == 'view') {
 				return null;
 			}
-			var layout = {
+			var layout = $.extend(true, {
 				label: option.text,
-				comp: {
-					type: $pt.ComponentConstants.Button,
-					icon: option.icon,
-					style: option.style,
-					click: option.click,
-					enabled: option.enabled,
-					visible: option.visible
-				}
-			};
-			return React.createElement($pt.Components.NFormButton, { model: this.getModel(),
-				layout: $pt.createCellLayout('pseudo-button', layout),
-				key: buttonIndex });
+				comp: { type: $pt.ComponentConstants.Button }
+			}, {
+				comp: option,
+				pos: { width: 999 }
+			});
+			delete layout.comp.label;
+			var model = this.getModel();
+			if (model) {
+				return React.createElement($pt.Components.NFormCell, { model: this.getModel(),
+					layout: $pt.createCellLayout('pseudo-button', layout),
+					key: buttonIndex });
+			} else {
+				return React.createElement($pt.Components.NFormButton, { model: this.getModel(),
+					layout: $pt.createCellLayout('pseudo-button', layout),
+					key: buttonIndex });
+			}
 		},
 		/**
    * render
@@ -10778,7 +11072,8 @@
 			NOT_FOUND: 'Not Found',
 			SEARCH_PROXY: null,
 			SEARCH_PROXY_CALLBACK: null,
-			ADVANCED_SEARCH_PROXY: null
+			ADVANCED_SEARCH_PROXY: null,
+			ADVANCED_SEARCH_PROXY_CALLBACK: null
 		},
 		propTypes: {
 			// model
@@ -11007,7 +11302,7 @@
 				if (NSearchText.SEARCH_PROXY) {
 					postData = NSearchText.SEARCH_PROXY.call(this, postData);
 				}
-				$pt.doPost(_this.getSearchUrl(), postData, {
+				$pt.internalDoPost(_this.getSearchUrl(), postData, {
 					quiet: true
 				}).done(function (data) {
 					if (typeof data === 'string') {
@@ -11109,10 +11404,13 @@
 									currentModel = NSearchText.ADVANCED_SEARCH_PROXY.call(this, currentModel);
 								}
 
-								$pt.doPost(_this.getAdvancedSearchUrl(), currentModel, {
+								$pt.internalDoPost(_this.getAdvancedSearchUrl(), currentModel, {
 									done: (function (data) {
 										if (typeof data === 'string') {
 											data = JSON.parse(data);
+										}
+										if (NSearchText.ADVANCED_SEARCH_PROXY_CALLBACK) {
+											data = NSearchText.ADVANCED_SEARCH_PROXY_CALLBACK.call(this, data, this.getDataId());
 										}
 										model.mergeCurrentModel(data);
 										model.set('criteria' + $pt.PROPERTY_SEPARATOR + 'url', this.getAdvancedSearchUrl());
@@ -11613,7 +11911,7 @@
 			} else {
 				var parentValue = this.getParentPropertyValue();
 				if (parentValue == null) {
-					return this.isAvailableWhenNoParentValue() ? this.convertDataOptions(this.getComponentOption("data")) : [];
+					return this.isAvailableWhenNoParentValue() ? this.convertDataOptions(this.getComponentOption('data')) : [];
 				} else {
 					var filter = this.getComponentOption("parentFilter");
 					if (typeof filter === 'object') {
@@ -11621,7 +11919,7 @@
 						return this.convertDataOptions(this.getComponentOption('data').filter($.extend({}, filter, { value: parentValue })));
 					} else {
 						// call local filter
-						var data = this.convertDataOptions(this.getComponentOption("data"));
+						var data = this.convertDataOptions(this.getComponentOption('data'));
 						if (typeof filter === "function") {
 							return filter.call(this, parentValue, data);
 						} else {
@@ -11649,13 +11947,7 @@
 		getTextInViewMode: function () {
 			var value = this.getValueFromModel();
 			if (value != null) {
-				var data = null;
-				if (this.hasParent()) {
-					data = this.getAvailableOptions(this.getParentPropertyValue());
-				} else {
-					data = this.convertDataOptions(this.getComponentOption('data'));
-				}
-				data.some(function (item) {
+				var data = this.getAvailableOptions().some(function (item) {
 					if (item.id == value) {
 						value = item.text;
 						return true;
@@ -12723,6 +13015,7 @@
 			},
 			ADD_BUTTON_ICON: "plus",
 			ADD_BUTTON_TEXT: "",
+			DOWNLOADABLE: false,
 			DOWNLOAD_BUTTON_ICON: "cloud-download",
 			DOWNLOAD_BUTTON_TEXT: "",
 			NO_DATA_DOWNLOAD_TITLE: 'Downloading...',
@@ -12743,6 +13036,7 @@
 			BOOLEAN_TRUE_DISPLAY_TEXT: 'Y',
 			BOOLEAN_FALSE_DISPLAY_TEXT: 'N',
 			PAGE_JUMPING_PROXY: null,
+			PAGE_JUMPING_PROXY_CALLBACK: null,
 			registerInlineEditor: function (type, definition) {
 				if (NTable.__inlineEditors[type] != null) {
 					window.console.warn("Inline editor[" + type + "] is repalced.");
@@ -12808,7 +13102,7 @@
 
 					addable: false,
 					searchable: true,
-					downloadable: true,
+					// downloadable: false,
 
 					operationFixed: false,
 					editable: false,
@@ -13465,7 +13759,7 @@
 		},
 		renderPopover: function (moreOperations, rowModel, eventTarget) {
 			var styles = { display: 'block' };
-			var target = $(eventTarget.closest('a'));
+			var target = $(eventTarget).closest('a');
 			var offset = target.offset();
 			styles.top = offset.top + target.outerHeight() - 5;
 			styles.left = offset.left;
@@ -13489,7 +13783,7 @@
 
 			// reset position
 			var styles = {};
-			var target = $(eventTarget.closest('a'));
+			var target = $(eventTarget).closest('a');
 			var offset = target.offset();
 			var popover = this.state.popoverDiv.children('.popover');
 			var popWidth = popover.outerWidth();
@@ -13692,6 +13986,7 @@
 										layout = $.extend(true, {}, { comp: { data: column.codes } }, layout);
 									}
 								}
+								layout.label = column.title;
 								// pre-defined, use with data together
 								data = React.createElement($pt.Components.NFormCell, { model: inlineModel,
 									layout: $pt.createCellLayout(column.data, layout),
@@ -14300,7 +14595,12 @@
 			return this.getComponentOption('rowRemoveEnabled');
 		},
 		isDownloadable: function () {
-			return this.getComponentOption('downloadable');
+			var downloadable = this.getComponentOption('downloadable');
+			if (downloadable != null) {
+				return downloadable;
+			} else {
+				return NTable.DOWNLOADABLE;
+			}
 		},
 		/**
    * check the table is searchable or not
@@ -14620,13 +14920,13 @@
 				var downloadListener = this.getEventMonitor('download');
 				if (downloadListener) {
 					this.notifyEvent({
-						type: 'pageChange',
+						type: 'download',
 						criteria: criteria,
 						target: this
 					});
 				} else {
 					var _this = this;
-					$pt.doPost(url, criteria).done(function (data) {
+					$pt.internalDoPost(url, criteria).done(function (data) {
 						if (typeof data === 'string') {
 							data = JSON.parse(data);
 						}
@@ -14829,6 +15129,20 @@
 					model.addListener(listener.id, listener.time ? listener.time : 'post', listener.type ? listener.type : 'change', listener.listener);
 				});
 			}
+			if (this.getModel().hasError(this.getDataId())) {
+				var rowError = null;
+				var errors = this.getModel().getError(this.getDataId());
+				console.log('errors', errors);
+				for (var index = 0, count = errors.length; index < count; index++) {
+					if (typeof errors[index] !== "string") {
+						rowError = errors[index].getError(item);
+					}
+				}
+				if (rowError != null) {
+					console.log(rowError);
+					model.mergeError(rowError);
+				}
+			}
 			return model;
 		},
 		/**
@@ -14895,9 +15209,12 @@
 						target: this
 					});
 				} else {
-					$pt.doPost(url, criteria).done(function (data) {
+					$pt.internalDoPost(url, criteria).done(function (data) {
 						if (typeof data === 'string') {
 							data = JSON.parse(data);
+						}
+						if (NTable.PAGE_JUMPING_PROXY_CALLBACK) {
+							data = NTable.PAGE_JUMPING_PROXY_CALLBACK.call(_this, data, _this.getDataId());
 						}
 						model.mergeCurrentModel(data);
 						// refresh

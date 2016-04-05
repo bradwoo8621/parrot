@@ -1341,11 +1341,12 @@
 					id: 'table-download',
 					title: 'Download',
 					desc: <span>Table content default can be downloaded by download button in panel header.<br/>
-						Set <code>downloadable</code> as false to disable this feature.<br/>
+						Set <code>downloadable</code> as true to enable this feature.<br/>
 						If table is delared as pageable, download button will send a standard request
 						(same as pagination request except pageIndex is -1) to server side to get all data and trigger excel exporting.<br/>
 						And an event <code>download</code> is predefined to handle the download event,
-						if download is defined in component options, then the standard behavior is ignored.
+						if download is defined in component options, then the standard behavior is ignored.<br/>
+						Use <code>NTable.DOWNLOADABLE</code> to change the default behavior.
 					</span>,
 					xml: {
 						width: 12,
@@ -1415,7 +1416,8 @@
 					title: 'Constants',
 					desc: <span>Available constants. Constants must be change before construct component.<br/>
 						<code>NTable.PAGE_JUMPING_PROXY</code> is a function which proxy the page jumping,
-						before send criteria to remote, set this proxy function to change the format of criteria JSON.
+						before send criteria to remote, set this proxy function to change the format of criteria JSON.<br/>
+						<code>NTable.PAGE_JUMPING_PROXY_CALLBACK</code> is a function which proxy the page jumping return data callback.
 					</span>,
 					index: 900,
 					code: $demo.convertJSON({
