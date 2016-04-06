@@ -319,7 +319,9 @@
 					id: 'tree-style-check-appoint',
 					title: 'Appointed Check',
 					desc: <span>Check box can be set for single node by define <code>check</code> as a function.<br/>
-					Do not use <code>hierarchyCheck</code> in this case.</span>,
+					Do not use <code>hierarchyCheck</code> in this case.<br/>
+					<code>valueCanCheck</code> can be used to declare enabled of check box.
+					</span>,
 					xml: <NTree model={model} layout={$pt.createCellLayout('nodes', layoutTemplate)}/>,
 					code: [codesCode, modelCode, layoutCode, compCode],
 					index: 40

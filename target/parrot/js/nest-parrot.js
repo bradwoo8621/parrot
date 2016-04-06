@@ -1,4 +1,4 @@
-/** nest-parrot.V0.2.0 2016-04-05 */
+/** nest-parrot.V0.3.0 2016-04-06 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -16151,6 +16151,7 @@
         componentWillUpdate: function (nextProps) {
             // remove post change listener to handle model change
             this.removePostChangeListener(this.__forceUpdate);
+            this.removeEnableDependencyMonitor();
             this.unregisterFromComponentCentral();
         },
         /**
@@ -16161,6 +16162,7 @@
         componentDidUpdate: function (prevProps, prevState) {
             // add post change listener to handle model change
             this.addPostChangeListener(this.__forceUpdate);
+            this.addEnableDependencyMonitor();
             this.registerToComponentCentral();
         },
         componentWillMount: function () {
@@ -16193,6 +16195,7 @@
         componentDidMount: function () {
             // add post change listener to handle model change
             this.addPostChangeListener(this.__forceUpdate);
+            this.addEnableDependencyMonitor();
             this.registerToComponentCentral();
         },
         /**
@@ -16201,6 +16204,7 @@
         componentWillUnmount: function () {
             // remove post change listener to handle model change
             this.removePostChangeListener(this.__forceUpdate);
+            this.removeEnableDependencyMonitor();
             this.unregisterFromComponentCentral();
         },
         renderCheck: function (node, nodeId) {
@@ -16212,11 +16216,16 @@
             modelValue = modelValue ? modelValue : {};
             var model = $pt.createModel({ selected: this.isNodeChecked(nodeId) });
             model.useBaseAsCurrent();
-            var layout = $pt.createCellLayout('selected', {
+            var layoutJSON = {
                 comp: {
                     type: $pt.ComponentConstants.Check
                 }
-            });
+            };
+            var valueCanChange = this.isNodeCheckCanChange(node);
+            if (valueCanChange != null) {
+                layoutJSON.comp.enabled = valueCanChange;
+            }
+            var layout = $pt.createCellLayout('selected', layoutJSON);
             model.addPostChangeListener('selected', this.onNodeCheckChanged.bind(this, node, nodeId));
             return React.createElement($pt.Components.NCheck, { model: model, layout: layout, view: this.isViewMode() });
         },
@@ -16750,6 +16759,16 @@
                 return check;
             } else {
                 return false;
+            }
+        },
+        isNodeCheckCanChange: function (node) {
+            var change = this.getComponentOption('valueCanCheck');
+            if (typeof change === 'function') {
+                return change.call(this, node);
+            } else if (change != null) {
+                return change;
+            } else {
+                return true;
             }
         },
         /**
