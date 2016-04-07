@@ -2899,15 +2899,22 @@ div.n-file .file-input div.btn.btn-file {
 .n-tree li.active > ul.nav {
   display: block;
 }
-.n-tree li > a,
-.n-tree li > a:hover,
-.n-tree li > a:visited,
-.n-tree li > a:active,
-.n-tree li > a:focus {
+.n-tree li > div.node-content > a,
+.n-tree li > div.node-content > a:hover,
+.n-tree li > div.node-content > a:visited,
+.n-tree li > div.node-content > a:active,
+.n-tree li > div.node-content > a:focus {
   color: #666666;
   padding: 0;
   background-color: transparent;
   min-height: 30px;
+  display: inline-block;
+  text-decoration: none;
+}
+.n-tree li > div.node-content > a.node-button {
+  display: none;
+}
+.n-tree li > div.node-content:hover > a.node-button {
   display: inline-block;
 }
 .n-tree li > ul.nav li {

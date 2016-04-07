@@ -1,4 +1,4 @@
-/** nest-parrot.V0.3.0 2016-04-06 */
+/** nest-parrot.V0.3.0 2016-04-07 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -441,7 +441,9 @@
 					console.error(data);
 					console.error(textStatus);
 					console.error(jqXHR);
-					$pt.Components.NExceptionModal.getExceptionModal().show('Javascript Error', err);
+					var message = 'Unknown error occurred, see console for more information.';
+					message = err ? err.stack ? err.stack : err.toString ? err.toString() : message : message;
+					$pt.Components.NExceptionModal.getExceptionModal().show('Javascript Error', message);
 				}
 			}
 		}).fail(function (jqXHR, textStatus, errorThrown) {
@@ -16174,20 +16176,8 @@
             if (expandLevel === 'all') {
                 expandLevel = 9999;
             }
-            var _this = this;
-            var expand = function (parentId, node, level) {
-                if (level < expandLevel) {
-                    var nodeId = _this.getNodeId(parentId, node);
-                    _this.state.activeNodes[nodeId] = node;
-                    if (node.children) {
-                        node.children.forEach(function (child) {
-                            expand(nodeId, child, level + 1);
-                        });
-                    }
-                }
-            };
             this.state.root.children = this.getTopLevelNodes();
-            expand(null, this.state.root, 0);
+            this.expandTo(expandLevel);
         },
         /**
          * did mount
@@ -16258,23 +16248,58 @@
                 React.createElement($pt.Components.NIcon, folderIconAttrs)
             );
 
+            var _this = this;
+            var buttons = this.getComponentOption('nodeOperations');
+            buttons = buttons ? Array.isArray(buttons) ? buttons : [buttons] : [];
+            buttons = buttons.map(function (button, buttonIndex) {
+                var visible = true;
+                if (typeof button.visible === 'boolean') {
+                    visible = button.visible;
+                } else if (typeof button.visible === 'function') {
+                    visible = button.visible.call(_this, node);
+                }
+                if (!visible) {
+                    return null;
+                }
+                var icon = {
+                    icon: button.icon,
+                    fixWidth: true
+                };
+                return React.createElement(
+                    'a',
+                    { href: 'javascript:void(0);',
+                        onClick: _this.onNodeOperationClicked.bind(_this, node, button.click),
+                        className: 'node-button',
+                        key: buttonIndex,
+                        title: button.text },
+                    React.createElement($pt.Components.NIcon, icon)
+                );
+            }).filter(function (button) {
+                return button != null;
+            });
+
             var active = this.isActive(nodeId) ? 'active' : null;
             return React.createElement(
                 'li',
                 { className: active, key: nodeId },
-                opIcon,
-                folderIcon,
-                this.renderCheck(node, nodeId),
                 React.createElement(
-                    'a',
-                    {
-                        href: 'javascript:void(0);',
-                        onClick: this.onNodeClicked.bind(this, node, nodeId) },
+                    'div',
+                    { className: 'node-content' },
+                    opIcon,
+                    folderIcon,
+                    this.renderCheck(node, nodeId),
                     React.createElement(
-                        'span',
-                        { className: 'node-text' },
-                        this.getNodeText(node)
-                    )
+                        'a',
+                        {
+                            href: 'javascript:void(0);',
+                            onClick: this.onNodeClicked.bind(this, node, nodeId) },
+                        React.createElement(
+                            'span',
+                            { className: 'node-text' },
+                            this.getNodeText(node)
+                        )
+                    ),
+                    buttons
                 ),
                 this.renderNodes(node, nodeId)
             );
@@ -16347,6 +16372,11 @@
             var nodeClick = this.getComponentOption('nodeClick');
             if (nodeClick) {
                 nodeClick.call(this, node);
+            }
+        },
+        onNodeOperationClicked: function (node, click) {
+            if (click) {
+                click.call(this, node);
             }
         },
         onNodeCheckChanged: function (node, nodeId, evt, toChildOnly) {
@@ -16487,6 +16517,34 @@
             };
             checkNodeOnChildren(this.state.root, this.getNodeId(null, this.state.root));
             // window.console.log(modelValue);
+        },
+        expandTo: function (expandLevel) {
+            var activeNodes = $.extend({}, this.state.activeNodes);
+            var _this = this;
+            var expand = function (parentId, node, level) {
+                if (level < expandLevel) {
+                    var nodeId = _this.getNodeId(parentId, node);
+                    activeNodes[nodeId] = node;
+                    if (node.children) {
+                        node.children.forEach(function (child) {
+                            expand(nodeId, child, level + 1);
+                        });
+                    }
+                }
+            };
+            expand(null, this.state.root, 0);
+
+            var previousActiveNodes = null;
+            this.setState(function (previousState, currentProps) {
+                previousActiveNodes = previousState.activeNodes;
+                return { activeNodes: activeNodes };
+            }, function () {
+                _this.notifyEvent({
+                    type: 'expand',
+                    before: previousActiveNodes,
+                    after: activeNodes
+                });
+            });
         },
         expandAll: function () {
             var activeNodes = $.extend({}, this.state.activeNodes);

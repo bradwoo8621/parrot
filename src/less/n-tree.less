@@ -23,16 +23,28 @@
 	li.active > ul.nav {
 		display: block;
 	}
-	li > a,
-	li > a:hover,
-	li > a:visited,
-	li > a:active,
-	li > a:focus {
+	li > div.node-content > a,
+	li > div.node-content > a:hover,
+	li > div.node-content > a:visited,
+	li > div.node-content > a:active,
+	li > div.node-content > a:focus {
 		color: @font-color;
 		padding: 0;
 		background-color: transparent;
 		min-height: 30px;
 		display: inline-block;
+		text-decoration: none;
+	}
+
+	li > div.node-content {
+		> a.node-button {
+			display: none;
+		}
+		&:hover {
+			> a.node-button {
+				display: inline-block;
+			}
+		}
 	}
 
 	li > ul.nav li {

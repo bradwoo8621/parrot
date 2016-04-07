@@ -57,7 +57,9 @@
 						console.error(data);
 						console.error(textStatus);
 						console.error(jqXHR);
-						$pt.Components.NExceptionModal.getExceptionModal().show('Javascript Error', err);
+						var message = 'Unknown error occurred, see console for more information.';
+						message = err ? (err.stack ? err.stack : (err.toString ? err.toString() : message)) : message;
+						$pt.Components.NExceptionModal.getExceptionModal().show('Javascript Error', message);
 					}
 				}
 			}).fail(function (jqXHR, textStatus, errorThrown) {

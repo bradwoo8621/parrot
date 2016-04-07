@@ -116,20 +116,8 @@
             if (expandLevel === 'all') {
                 expandLevel = 9999;
             }
-            var _this = this;
-            var expand = function(parentId, node, level) {
-                if (level < expandLevel) {
-                    var nodeId = _this.getNodeId(parentId, node);
-                    _this.state.activeNodes[nodeId] = node;
-                    if (node.children) {
-                        node.children.forEach(function(child) {
-                            expand(nodeId, child, level + 1);
-                        });
-                    }
-                }
-            };
             this.state.root.children = this.getTopLevelNodes();
-            expand(null, this.state.root, 0);
+            this.expandTo(expandLevel);
         },
     	/**
     	 * did mount
@@ -196,17 +184,48 @@
                 <$pt.Components.NIcon {...folderIconAttrs}/>
             </a>);
 
+            var _this = this;
+            var buttons = this.getComponentOption('nodeOperations');
+            buttons = buttons ? (Array.isArray(buttons) ? buttons : [buttons]) : [];
+            buttons = buttons.map(function(button, buttonIndex) {
+                var visible = true;
+                if (typeof button.visible === 'boolean') {
+                    visible = button.visible;
+                } else if (typeof button.visible === 'function') {
+                    visible = button.visible.call(_this, node);
+                }
+                if (!visible) {
+                    return null;
+                }
+                var icon = {
+                    icon: button.icon,
+                    fixWidth: true,
+                };
+                return (<a href='javascript:void(0);'
+                            onClick={_this.onNodeOperationClicked.bind(_this, node, button.click)}
+                            className='node-button'
+                            key={buttonIndex}
+                            title={button.text}>
+                    <$pt.Components.NIcon {...icon}/>
+                </a>)
+            }).filter(function(button) {
+                return button != null;
+            });
+
             var active = this.isActive(nodeId) ? 'active' : null;
             return (
                 <li className={active} key={nodeId}>
-                    {opIcon}
-                    {folderIcon}
-                    {this.renderCheck(node, nodeId)}
-                    <a
-                        href='javascript:void(0);'
-                        onClick={this.onNodeClicked.bind(this, node, nodeId)}>
-                        <span className='node-text'>{this.getNodeText(node)}</span>
-                    </a>
+                    <div className='node-content'>
+                        {opIcon}
+                        {folderIcon}
+                        {this.renderCheck(node, nodeId)}
+                        <a
+                            href='javascript:void(0);'
+                            onClick={this.onNodeClicked.bind(this, node, nodeId)}>
+                            <span className='node-text'>{this.getNodeText(node)}</span>
+                        </a>
+                        {buttons}
+                    </div>
                     {this.renderNodes(node, nodeId)}
                 </li>
             );
@@ -274,6 +293,11 @@
             var nodeClick = this.getComponentOption('nodeClick');
             if (nodeClick) {
                 nodeClick.call(this, node);
+            }
+        },
+        onNodeOperationClicked: function(node, click) {
+            if (click) {
+                click.call(this, node);
             }
         },
         onNodeCheckChanged: function(node, nodeId, evt, toChildOnly) {
@@ -414,6 +438,34 @@
             };
             checkNodeOnChildren(this.state.root, this.getNodeId(null, this.state.root));
             // window.console.log(modelValue);
+        },
+        expandTo: function(expandLevel) {
+            var activeNodes = $.extend({}, this.state.activeNodes);
+            var _this = this;
+            var expand = function(parentId, node, level) {
+                if (level < expandLevel) {
+                    var nodeId = _this.getNodeId(parentId, node);
+                    activeNodes[nodeId] = node;
+                    if (node.children) {
+                        node.children.forEach(function(child) {
+                            expand(nodeId, child, level + 1);
+                        });
+                    }
+                }
+            };
+            expand(null, this.state.root, 0);
+
+            var previousActiveNodes = null;
+            this.setState(function(previousState, currentProps) {
+                previousActiveNodes = previousState.activeNodes;
+                return {activeNodes: activeNodes};
+            }, function() {
+                _this.notifyEvent({
+                    type: 'expand',
+                    before: previousActiveNodes,
+                    after: activeNodes
+                });
+            });
         },
         expandAll: function() {
             var activeNodes = $.extend({}, this.state.activeNodes);
