@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.3.0 2016-04-07 */
+	/** nest-parrot.V0.3.0 2016-04-08 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -4544,7 +4544,7 @@
    */
 		render: function () {
 			var tabs = this.getTabs();
-			var canActiveProxy = (function (newTabValue, newTabIndex, activeTabValue, activeTabIndex) {
+			var canActiveProxy = function (newTabValue, newTabIndex, activeTabValue, activeTabIndex) {
 				if (this.isAddable() && newTabIndex == tabs.length - 1) {
 					var onAdd = this.getComponentOption('onAdd');
 					onAdd.call(this, this.getModel(), this.getValueFromModel());
@@ -4555,7 +4555,7 @@
 						return canActive.call(this, newTabValue, newTabIndex, activeTabValue, activeTabIndex);
 					}
 				}
-			}).bind(this);
+			}.bind(this);
 			return React.createElement(
 				'div',
 				{ className: this.getComponentCSS('n-array-tab') },
@@ -9252,14 +9252,14 @@
 		hide: function () {
 			var model = this.state.model;
 			if (this.state.buttons && typeof this.state.buttons.cancel === 'function') {
-				this.state.buttons.cancel.call(this, model, (function () {
+				this.state.buttons.cancel.call(this, model, function () {
 					this.setState({
 						visible: false,
 						model: null,
 						layout: null,
 						buttons: null
 					});
-				}).bind(this));
+				}.bind(this));
 			} else {
 				this.setState({
 					visible: false,
@@ -10649,14 +10649,14 @@
 			if (expanded) {
 				if (this.canExpanded()) {
 					// panel can be expanded
-					$(ReactDOM.findDOMNode(this.refs.body)).slideDown(300, (function () {
+					$(ReactDOM.findDOMNode(this.refs.body)).slideDown(300, function () {
 						this.setState({ expanded: true });
-					}).bind(this));
+					}.bind(this));
 				}
 			} else {
-				$(ReactDOM.findDOMNode(this.refs.body)).slideUp(300, (function () {
+				$(ReactDOM.findDOMNode(this.refs.body)).slideUp(300, function () {
 					this.setState({ expanded: false });
-				}).bind(this));
+				}.bind(this));
 			}
 		},
 		/**
@@ -11441,7 +11441,7 @@
 								}
 
 								$pt.internalDoPost(_this.getAdvancedSearchUrl(), currentModel, {
-									done: (function (data) {
+									done: function (data) {
 										if (typeof data === 'string') {
 											data = JSON.parse(data);
 										}
@@ -11452,7 +11452,7 @@
 										model.set('criteria' + $pt.PROPERTY_SEPARATOR + 'url', this.getAdvancedSearchUrl());
 										window.console.debug(model.getCurrentModel());
 										this.state.searchDialog.forceUpdate();
-									}).bind(_this)
+									}.bind(_this)
 								});
 							}
 						},
