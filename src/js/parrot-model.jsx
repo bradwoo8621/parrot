@@ -744,6 +744,7 @@
 		 */
 		applyCurrentToBase: function() {
 			this.__base = $pt.mergeObject({deep: true, target: {}, sources: this.__model});
+			this.__changed = false;
 			return this;
 		},
 		/**

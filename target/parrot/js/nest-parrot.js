@@ -1,4 +1,4 @@
-/** nest-parrot.V0.3.0 2016-04-08 */
+/** nest-parrot.V0.3.0 2016-04-09 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -1726,6 +1726,7 @@
    */
 		applyCurrentToBase: function () {
 			this.__base = $pt.mergeObject({ deep: true, target: {}, sources: this.__model });
+			this.__changed = false;
 			return this;
 		},
 		/**
@@ -3395,7 +3396,7 @@
 		isViewMode: function () {
 			var isViewMode = this.state ? this.state.isViewMode : null;
 			if (isViewMode == null) {
-				return this.props.view === true || this.getComponentOption('view');
+				return this.props.view === true || this.getComponentOption('view') === true;
 			} else {
 				return isViewMode;
 			}

@@ -1156,7 +1156,7 @@
 		isViewMode: function() {
 			var isViewMode = this.state ? this.state.isViewMode : null;
 			if (isViewMode == null) {
-				return this.props.view === true || this.getComponentOption('view');
+				return this.props.view === true || this.getComponentOption('view') === true;
 			} else {
 				return isViewMode;
 			}
