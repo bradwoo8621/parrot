@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.3.0 2016-04-09 */
+	/** nest-parrot.V0.3.0 2016-04-11 */
 (function (window) {
 	var patches = {
 		console: function () {
