@@ -326,6 +326,11 @@
 				if (typeof existMessage === 'object') {
 					throwMessageTypeConflictException(prefix ? prefix + '.' + key : key, message, existMessage);
 				} else {
+					if (existMessage) {
+						console.error('Message [%1] exists in target.'.format([prefix ? prefix + '.' + key : key]));
+						console.log('source message: ', source);
+						console.log('target message: ', target);
+					}
 					target[key] = message;
 				}
 			}
