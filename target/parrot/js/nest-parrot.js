@@ -1,4 +1,4 @@
-/** nest-parrot.V0.3.0 2016-04-11 */
+/** nest-parrot.V0.3.0 2016-04-12 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -279,9 +279,9 @@
 		Object.keys(source).forEach(function (key) {
 			var message = source[key];
 			var existMessage = target[key];
-			if (typeof message === 'object') {
+			if (typeof message === 'object' && !Array.isArray(message)) {
 				if (existMessage) {
-					if (typeof existMessage === 'object') {
+					if (typeof existMessage === 'object' && !Array.isArray(existMessage)) {
 						internalInstallMessages(message, existMessage, prefix ? prefix + '.' + key : key);
 					} else {
 						throwMessageTypeConflictException(prefix ? prefix + '.' + key : key, message, existMessage);
@@ -292,7 +292,7 @@
 					internalInstallMessages(message, target[key], prefix ? prefix + '.' + key : key);
 				}
 			} else {
-				if (typeof existMessage === 'object') {
+				if (typeof existMessage === 'object' && !Array.isArray(existMessage)) {
 					throwMessageTypeConflictException(prefix ? prefix + '.' + key : key, message, existMessage);
 				} else {
 					if (existMessage) {
@@ -331,9 +331,9 @@
 		Object.keys(source).forEach(function (key) {
 			var message = source[key];
 			var existMessage = target[key];
-			if (typeof message === 'object') {
+			if (typeof message === 'object' && !Array.isArray(message)) {
 				if (existMessage) {
-					if (typeof existMessage === 'object') {
+					if (typeof existMessage === 'object' && !Array.isArray(existMessage)) {
 						internalUninstallMessages(message, existMessage, prefix ? prefix + '.' + key : key);
 						if (Object.keys(existMessage).length == 0) {
 							// all content removed, delete from target
@@ -344,7 +344,7 @@
 					}
 				}
 			} else {
-				if (typeof existMessage === 'object') {
+				if (typeof existMessage === 'object' && !Array.isArray(existMessage)) {
 					throwMessageTypeConflictException(prefix ? prefix + '.' + key : key, message, existMessage);
 				} else {
 					delete target[key];
