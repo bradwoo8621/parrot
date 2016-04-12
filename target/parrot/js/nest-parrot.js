@@ -14019,12 +14019,10 @@
 		/**
    * render row select cell
    * @param column
-   * @param data
+   * @param model
    * @returns {XML}
    */
-		renderRowSelectCell: function (column, data) {
-			var model = $pt.createModel(data);
-			model.useBaseAsCurrent();
+		renderRowSelectCell: function (column, model) {
 			var _this = this;
 			model.addListener(column.rowSelectable, 'post', 'change', function (evt) {
 				_this.forceUpdate();
@@ -14086,7 +14084,7 @@
 							// index column
 							data = rowIndex;
 						} else if (column.rowSelectable) {
-							data = _this.renderRowSelectCell(column, row);
+							data = _this.renderRowSelectCell(column, inlineModel);
 						} else if (column.inline) {
 							// inline editor or something, can be pre-defined or just declare as be constructed as a form layout
 							if (typeof column.inline === 'string') {
