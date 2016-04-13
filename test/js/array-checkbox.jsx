@@ -2,6 +2,18 @@
  * Created by brad.wu on 8/16/2015.
  */
 (function () {
+    $.mockjax({
+        url: '/app/codetable',
+        responseTime: 2000,
+        response: function () {
+            this.responseText = [
+                {id: '1', text: 'Remote Item 1'},
+                {id: '2', text: 'Remote Item 2'},
+                {id: '3', text: 'Remote Item 3'}
+            ];
+        }
+    });
+
     var codes = $pt.createCodeTable([
         {id: '1', text: 'One'},
         {id: '2', text: 'Two'},
@@ -45,6 +57,11 @@
         },
         pos: {row: 1, col: 1}
     });
+    var remote = $pt.createCellLayout('values', {
+        comp: {
+            data: $pt.createCodeTable({url: '/app/codetable'})
+        }
+    });
 
     var panel = (<div className='row'>
         <div className='col-md-3 col-lg-3 col-sm-3'>
@@ -72,6 +89,10 @@
             <NArrayCheck model={model} layout={disabled}/>
             <span>Disabled, label in left</span>
             <NArrayCheck model={model} layout={disabledLabelInLeft}/>
+        </div>
+        <div className='col-md-3 col-lg-3 col-sm-3'>
+            <span>Remote</span>
+            <NArrayCheck model={model} layout={remote}/>
         </div>
     </div>);
     ReactDOM.render(panel, document.getElementById('main'));

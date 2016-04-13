@@ -62,6 +62,27 @@
 			this._renderer = renderer;
 			this._sorter = sorter;
 		},
+		isInitialized: function() {
+			return this._initialized === true;
+		},
+		isRemote: function() {
+			return this._local === false;
+		},
+		isRemoteButNotInitialized: function() {
+			return this.isRemote() && !this.isInitialized();
+		},
+		initializeRemote: function() {
+			if (this.isRemoteButNotInitialized()) {
+				// return a promise to load remote codes
+				return this.__loadRemoteCodes(true);
+			} else {
+				// already initialized, or is local
+				// return an immediately resolved promise
+				return $.Deferred(function(deferred) {
+					deferred.resolve();
+				}).promise();
+			}
+		},
 		/**
 		 * get renderer of code table
 		 */
@@ -117,20 +138,20 @@
 		 * load remote code table, quiet and synchronized
 		 * @private
 		 */
-		__loadRemoteCodes: function () {
+		__loadRemoteCodes: function (async) {
 			var _this = this;
-			$pt.doPost(this._url, this._postData, {
+			return $pt.doPost(this._url, this._postData, {
 				quiet: true,
-				async: false,
-				done: function (data) {
-					// init code table element array after get data from remote
-					_this.__initCodesArray(data, _this._renderer, _this._sorter);
-					_this._initialized = true;
-				},
-				fail: function (jqXHR, textStatus, errorThrown) {
-					// error to console, quiet backend
-					window.console.error('Status:' + textStatus + ', error:' + errorThrown);
-				}
+				async: async != null ? async : false
+			}).done(function (data) {
+				// init code table element array after get data from remote
+				_this.__initCodesArray(data, _this._renderer, _this._sorter);
+			}).fail(function(jqXHR, textStatus, errorThrown) {
+				// error to console, quiet backend
+				_this.__initCodesArray(null, _this._renderer, _this._sorter);
+				window.console.error('Status:' + textStatus + ', error:' + errorThrown);
+			}).always(function() {
+				_this._initialized = true;
 			});
 		},
 		/**

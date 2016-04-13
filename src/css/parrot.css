@@ -3078,6 +3078,13 @@ div.n-array-check.vertical div.n-checkbox {
   overflow: auto;
   max-height: 300px;
 }
+div.n-codetable-wrapper {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+div.n-codetable-wrapper span.n-ctol-label {
+  margin-left: 3px;
+}
 div.has-error > span,
 div.has-error > span > span.n-form-cell-tooltip,
 div.has-error.horizontal-label > div.row > div:first-child > span,

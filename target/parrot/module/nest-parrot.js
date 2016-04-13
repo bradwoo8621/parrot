@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.3.0 2016-04-12 */
+	/** nest-parrot.V0.3.0 2016-04-13 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -847,6 +847,27 @@
 			this._renderer = renderer;
 			this._sorter = sorter;
 		},
+		isInitialized: function () {
+			return this._initialized === true;
+		},
+		isRemote: function () {
+			return this._local === false;
+		},
+		isRemoteButNotInitialized: function () {
+			return this.isRemote() && !this.isInitialized();
+		},
+		initializeRemote: function () {
+			if (this.isRemoteButNotInitialized()) {
+				// return a promise to load remote codes
+				return this.__loadRemoteCodes(true);
+			} else {
+				// already initialized, or is local
+				// return an immediately resolved promise
+				return $.Deferred(function (deferred) {
+					deferred.resolve();
+				}).promise();
+			}
+		},
 		/**
    * get renderer of code table
    */
@@ -902,20 +923,20 @@
    * load remote code table, quiet and synchronized
    * @private
    */
-		__loadRemoteCodes: function () {
+		__loadRemoteCodes: function (async) {
 			var _this = this;
-			$pt.doPost(this._url, this._postData, {
+			return $pt.doPost(this._url, this._postData, {
 				quiet: true,
-				async: false,
-				done: function (data) {
-					// init code table element array after get data from remote
-					_this.__initCodesArray(data, _this._renderer, _this._sorter);
-					_this._initialized = true;
-				},
-				fail: function (jqXHR, textStatus, errorThrown) {
-					// error to console, quiet backend
-					window.console.error('Status:' + textStatus + ', error:' + errorThrown);
-				}
+				async: async != null ? async : false
+			}).done(function (data) {
+				// init code table element array after get data from remote
+				_this.__initCodesArray(data, _this._renderer, _this._sorter);
+			}).fail(function (jqXHR, textStatus, errorThrown) {
+				// error to console, quiet backend
+				_this.__initCodesArray(null, _this._renderer, _this._sorter);
+				window.console.error('Status:' + textStatus + ', error:' + errorThrown);
+			}).always(function () {
+				_this._initialized = true;
 			});
 		},
 		/**
@@ -4162,6 +4183,27 @@
 				vertical: this.getComponentOption('direction') === 'vertical'
 			};
 			css[this.getComponentCSS('n-array-check')] = true;
+			// var codetable = this.getCodeTable();
+			// if (!codetable.isRemoteInitialized()) {
+			// 	return (<div className={$pt.LayoutHelper.classSet(css)}>
+			// 		{codetable.list().map(this.renderItem.bind(this, enabled))}
+			// 	</div>);
+			// } else {
+			// 	return (<div className={$pt.LayoutHelper.classSet(css)}>
+			// 		<$pt.Components.NCTOL />
+			// 	</div>);
+			// }
+			return React.createElement($pt.Components.NCodeTableWrapper, { codetable: this.getCodeTable(),
+				className: $pt.LayoutHelper.classSet(css),
+				renderer: this.getRealRenderer });
+		},
+		getRealRenderer: function () {
+			var enabled = this.isEnabled();
+			var css = {
+				'n-disabled': !enabled,
+				vertical: this.getComponentOption('direction') === 'vertical'
+			};
+			css[this.getComponentCSS('n-array-check')] = true;
 			return React.createElement(
 				'div',
 				{ className: $pt.LayoutHelper.classSet(css) },
@@ -5401,6 +5443,63 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Check, function (model, layout, direction, viewMode) {
 		return React.createElement($pt.Components.NCheck, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
 	});
+})(window, jQuery, React, ReactDOM, $pt);
+
+(function (window, $, React, ReactDOM, $pt) {
+	var NCodeTableWrapper = React.createClass($pt.defineCellComponent({
+		displayName: 'CodeTableWrapper',
+		statics: {
+			ON_LOADING_ICON: 'fa fa-fw fa-spinner fa-spin',
+			ON_LOADING: 'On Loading...'
+		},
+		propTypes: {},
+		getDefaultProps: function () {
+			return {};
+		},
+		getInitialState: function () {
+			return {};
+		},
+		/**
+   * did mount
+   */
+		componentDidMount: function () {
+			var codetable = this.getCodeTable();
+			if (this.state.paintWrapper) {
+				codetable.initializeRemote().done(function () {
+					this.setState({
+						paintWrapper: false
+					});
+				}.bind(this));
+			}
+		},
+		render: function () {
+			var className = this.props.className ? this.props.className + ' n-codetable-wrapper' : 'n-codetable-wrapper';
+			var codetable = this.getCodeTable();
+			if (codetable.isRemoteButNotInitialized()) {
+				this.state.paintWrapper = true;
+				return React.createElement(
+					'div',
+					{ className: className },
+					React.createElement('span', { className: 'n-ctol-icon ' + NCodeTableWrapper.ON_LOADING_ICON }),
+					React.createElement(
+						'span',
+						{ className: 'n-ctol-label' },
+						NCodeTableWrapper.ON_LOADING
+					)
+				);
+			} else {
+				this.state.paintWrapper = false;
+				return this.getWrappedRenderer().call(this);
+			}
+		},
+		getCodeTable: function () {
+			return this.props.codetable;
+		},
+		getWrappedRenderer: function () {
+			return this.props.renderer;
+		}
+	}));
+	$pt.Components.NCodeTableWrapper = NCodeTableWrapper;
 })(window, jQuery, React, ReactDOM, $pt);
 
 /**

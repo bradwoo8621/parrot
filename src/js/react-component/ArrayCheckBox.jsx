@@ -81,6 +81,27 @@
 				vertical: this.getComponentOption('direction') === 'vertical'
 			};
 			css[this.getComponentCSS('n-array-check')] = true;
+			// var codetable = this.getCodeTable();
+			// if (!codetable.isRemoteInitialized()) {
+			// 	return (<div className={$pt.LayoutHelper.classSet(css)}>
+			// 		{codetable.list().map(this.renderItem.bind(this, enabled))}
+			// 	</div>);
+			// } else {
+			// 	return (<div className={$pt.LayoutHelper.classSet(css)}>
+			// 		<$pt.Components.NCTOL />
+			// 	</div>);
+			// }
+			return (<$pt.Components.NCodeTableWrapper codetable={this.getCodeTable()}
+								className={$pt.LayoutHelper.classSet(css)}
+								renderer={this.getRealRenderer} />);
+		},
+		getRealRenderer: function() {
+			var enabled = this.isEnabled();
+			var css = {
+				'n-disabled': !enabled,
+				vertical: this.getComponentOption('direction') === 'vertical'
+			};
+			css[this.getComponentCSS('n-array-check')] = true;
 			return (<div className={$pt.LayoutHelper.classSet(css)}>
 				{this.getCodeTable().list().map(this.renderItem.bind(this, enabled))}
 			</div>);
