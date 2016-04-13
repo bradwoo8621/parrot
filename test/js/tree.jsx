@@ -2,7 +2,7 @@
  * Created by brad.wu on 8/16/2015.
  */
 (function () {
-	var nodes = $pt.createCodeTable([
+	var data = [
 		{
 			id: 1,
 			text: 'Languages',
@@ -36,7 +36,15 @@
 			text: 'Others',
 			folder: true
 		}
-	]);
+	];
+	var nodes = $pt.createCodeTable(data);
+	$.mockjax({
+        url: '/app/codetable',
+        responseTime: 5000,
+        response: function () {
+            this.responseText = data;
+        }
+    });
 	console.log(nodes.listWithHierarchyKeys({separtor: NTree.NODE_SEPARATOR, rootId: NTree.ROOT_ID}));
 	console.log(nodes.listAllChildren());
 	var model = $pt.createModel({nodes: null});
@@ -56,7 +64,22 @@
 		},
 		pos: {row: 1, col: 1}
 	});
-
+	var remote = $pt.createCellLayout('nodes', {
+		label: 'Plain Text',
+		comp: {
+			type: $pt.ComponentConstants.Tree,
+			data: $pt.createCodeTable({url: '/app/codetable'}),
+			root: false,
+			check: true,
+			valueAsArray: true,
+			hierarchyCheck: true,
+			// multiple: false,
+			expandLevel: 1,
+			inactiveSlibing: true,
+			border: true
+		},
+		pos: {row: 1, col: 1}
+	});
 	var button = $pt.createCellLayout('button', {
 		label: 'Click',
 		comp: {
@@ -73,6 +96,10 @@
 		<div className='col-md-3 col-lg-3 col-sm-3'>
 			<span>View Mode</span>
 			<NTree model={model} layout={tree} view={true}/>
+		</div>
+		<div className='col-md-3 col-lg-3 col-sm-3'>
+			<span>Remote</span>
+			<NTree model={model} layout={remote}/>
 		</div>
 		<div className='col-md-3 col-lg-3 col-sm-3'>
 			<NFormButton model={model} layout={button} />

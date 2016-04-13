@@ -116,8 +116,10 @@
             if (expandLevel === 'all') {
                 expandLevel = 9999;
             }
-            this.state.root.children = this.getTopLevelNodes();
-            this.expandTo(expandLevel);
+            if (this.state.root.children) {
+                // this.state.root.children = this.getTopLevelNodes();
+                this.expandTo(expandLevel);
+            }
         },
     	/**
     	 * did mount
@@ -248,6 +250,10 @@
             </ul>);
         },
         renderTopLevel: function() {
+            return (<$pt.Components.NCodeTableWrapper codetable={this.getCodeTable()}
+                                renderer={this.getRealTopLevelRenderer} />);
+        },
+        getRealTopLevelRenderer: function() {
             var root = this.state.root;
             root.children = this.getTopLevelNodes();
             return this.isRootPaint() ? this.renderRoot() : this.renderNodes(root, this.getNodeId(null, root));
@@ -497,26 +503,27 @@
         },
         collapseAll: function() {
             var _this = this;
-            var root = this.state.root;
-            var nodeIds = null;
-            if (this.isRootPaint()) {
-                // this.collapseNode(root, this.getNodeId(null, root));
-                nodeIds = [this.getNodeId(null, root)];
-            } else {
-                var rootNodeId = this.getNodeId(null, root);
-                if (root.children) {
-                    // root.children.forEach(function(node) {
-                    //     this.collapseNode(node, this.getNodeId(rootNodeId, node));
-                    // }.bind(this));
-                    nodeIds = root.children.map(function(node) {
-                        return _this.getNodeId(rootNodeId, node);
-                    });
-                }
-            }
-            var regexp = new RegExp(nodeIds.map(function(nodeId) {
-                return '(' + nodeId + ')';
-            }).join(NTree.NODE_SEPARATOR));
-            var activeNodes = $.extend({}, this.state.activeNodes);
+            // var root = this.state.root;
+            // var nodeIds = null;
+            // if (this.isRootPaint()) {
+            //     // this.collapseNode(root, this.getNodeId(null, root));
+            //     nodeIds = [this.getNodeId(null, root)];
+            // } else {
+            //     var rootNodeId = this.getNodeId(null, root);
+            //     if (root.children) {
+            //         // root.children.forEach(function(node) {
+            //         //     this.collapseNode(node, this.getNodeId(rootNodeId, node));
+            //         // }.bind(this));
+            //         nodeIds = root.children.map(function(node) {
+            //             return _this.getNodeId(rootNodeId, node);
+            //         });
+            //     }
+            // }
+            // var regexp = new RegExp(nodeIds.map(function(nodeId) {
+            //     return '(' + nodeId + ')';
+            // }).join(NTree.NODE_SEPARATOR));
+            // var activeNodes = $.extend({}, this.state.activeNodes);
+            var activeNodes = {};
             Object.keys(activeNodes).forEach(function(key) {
                 if (key.match(regexp)) {
                     delete activeNodes[key];
@@ -614,13 +621,13 @@
          * @returns {{}[]}
          */
         getTopLevelNodes: function() {
-            return this.getAvailableNodes().list();
+            return this.getCodeTable().list();
         },
         /**
          * get avaiable top level nodes
          * @returns {CodeTable}
          */
-        getAvailableNodes: function() {
+        getCodeTable: function() {
             return this.getComponentOption('data');
         },
         getNodeIcon: function(node, nodeId) {
