@@ -74,7 +74,15 @@
 		initializeRemote: function() {
 			if (this.isRemoteButNotInitialized()) {
 				// return a promise to load remote codes
-				return this.__loadRemoteCodes(true);
+				// since there might be more than one components using the same codetable
+				// log the first loading promise and returns to all others
+				if (!this._loading) {
+					this._loading = this.__loadRemoteCodes(true).always(function() {
+						delete this._loadding;
+						this._allLoaded = true;
+					}.bind(this));
+				}
+				return this._loading;
 			} else {
 				// already initialized, or is local
 				// return an immediately resolved promise
@@ -82,6 +90,11 @@
 					deferred.resolve();
 				}).promise();
 			}
+		},
+		setAsRemoteInitialized: function() {
+			this._codes = this._codes ? this._codes : [];
+			this._map = this._map ? this._map : {};
+			this._initialized = true;
 		},
 		/**
 		 * get renderer of code table
@@ -207,33 +220,77 @@
 				return this.__getCodes().filter(func);
 			} else {
 				var value = func.value;
-				if (!this._local && (!this._loadedKeys || this._loadedKeys.indexOf(value) == -1)) {
-					// no local data, and loaded keys don't contain current value
-					// reset post data
-					if (this._postData) {
-						this._postData = $.extend({}, this._postData, {value: func.value});
-					} else {
-						this._postData = {value: func.value};
-					}
-					// store current local data
-					var existedCodes = this._codes != null ? this._codes : [];
-					var existedMap = this._map != null ? this._map : {};
-					// get data from server
-					this.__loadRemoteCodes();
-					// init loaded keys
-					if (!this._loadedKeys) {
-						this._loadedKeys = [];
-					}
-					// log the loaded keys
-					this._loadedKeys.push(value);
-					// merge server data and local data
-					this._codes.push.apply(this._codes, existedCodes);
-					this._map = $.extend(existedMap, this._map);
-				}
+				this.__loadRemoteCodeSegment(value);
 				// filter
 				return this.__getCodes().filter(function (code) {
 					return code[func.name] == value;
 				});
+			}
+		},
+		isSegmentLoaded: function(parentValue) {
+			return !this.__needLoadFromRemote(parentValue);
+		},
+		loadRemoteCodeSegment: function(parentValue) {
+			if (this.__needLoadFromRemote(parentValue)) {
+				// no local data, and loaded keys don't contain current value
+				// reset post data
+				this.__rebuildPostData(parentValue);
+				// store current local data
+				var existedData = this.__holdExistedCodes();
+				// get data from server
+				return this.__loadRemoteCodes(true).done(function() {
+					this.__setParentValueAsLoaded(parentValue);
+				}.bind(this)).always(function() {
+					this.__mergeAll(existedData);
+				}.bind(this));
+			} else {
+				// local or already loaded
+				// return an immediately resolved promise
+				return $.Deferred(function(deferred) {
+					deferred.resolve();
+				}).promise();
+			}
+		},
+		__needLoadFromRemote: function(parentValue) {
+			return !this._local && !this._allLoaded && (!this._loadedKeys || this._loadedKeys.indexOf(parentValue) == -1);
+		},
+		__rebuildPostData: function(parentValue) {
+			if (this._postData) {
+				this._postData = $.extend({}, this._postData, {value: parentValue});
+			} else {
+				this._postData = {value: parentValue};
+			}
+		},
+		__holdExistedCodes: function() {
+			return {
+				codes: this._codes != null ? this._codes : [],
+				map: this._map != null ? this._map : {}
+			};
+		},
+		__mergeAll: function(existedData) {
+			// merge server data and local data
+			this._codes.push.apply(this._codes, existedData.codes);
+			this._map = $.extend(existedData.map, this._map);
+		},
+		__setParentValueAsLoaded: function(parentValue) {
+			// init loaded keys
+			if (!this._loadedKeys) {
+				this._loadedKeys = [];
+			}
+			// log the loaded keys
+			this._loadedKeys.push(parentValue);
+		},
+		__loadRemoteCodeSegment: function(parentValue) {
+			if (this.__needLoadFromRemote(parentValue)) {
+				// no local data, and loaded keys don't contain current value
+				// reset post data
+				this.__rebuildPostData(parentValue);
+				// store current local data
+				var existedData = this.__holdExistedCodes();
+				// get data from server
+				this.__loadRemoteCodes();
+				this.__setParentValueAsLoaded(parentValue);
+				this.__mergeAll(existedData);
 			}
 		},
 		/**

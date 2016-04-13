@@ -70,11 +70,20 @@
 		componentDidMount: function () {
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 			if (this.hasParent()) {
 				// add post change listener into parent model
 				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+				if (this.isOnLoadingWhenHasParent()) {
+					this.getCodeTable().loadRemoteCodeSegment(this.getParentPropertyValue()).done(function() {
+						this.setState({onloading: false});
+					}.bind(this));
+				}
+			} else if (this.isOnLoadingWhenNoParent()) {
+				this.getCodeTable().initializeRemote().done(function() {
+					this.setState({onloading: false});
+				}.bind(this));
 			}
-			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
@@ -99,7 +108,11 @@
 		renderText: function() {
 			var value = this.getValueFromModel();
 			var itemText = null;
-			if (value != null) {
+			if (this.hasParent() && this.isOnLoadingWhenHasParent() && value != null) {
+				this.state.onloading = true;
+			} else if (this.isOnLoadingWhenNoParent()) {
+				this.state.onloading = true;
+			} else if (value != null) {
 				var item = this.getAvailableOptions().find(function(item) {
 					return item.id == value;
 				});
@@ -108,9 +121,9 @@
 				}
 			}
 			if (itemText == null) {
-				itemText = NSelect.PLACEHOLDER;
+				itemText = this.state.onloading ? $pt.Components.NCodeTableWrapper.ON_LOADING : NSelect.PLACEHOLDER;
 			}
-			return (<div className='input-group form-control' onClick={this.onComponentClicked} ref='comp'>
+			return (<div className='input-group form-control' onClick={this.onComponentClicked}>
 				<span className='text'>{itemText}</span>
 				{this.renderClear()}
 				<span className='fa fa-fw fa-sort-down drop' />
@@ -121,15 +134,12 @@
 		 * @returns {XML}
 		 */
 		render: function () {
-			if (this.isViewMode()) {
-				return this.renderInViewMode();
-			}
 			var css = {
 				'n-disabled': !this.isEnabled(),
 				'n-view-mode': this.isViewMode()
 			};
 			css[this.getComponentCSS('n-select')] = true;
-			return (<div className={$pt.LayoutHelper.classSet(css)} tabIndex='0' aria-readonly='true'>
+			return (<div className={$pt.LayoutHelper.classSet(css)} tabIndex='0' aria-readonly='true' ref='comp'>
 				{this.renderText()}
 				{this.renderNormalLine()}
 				{this.renderFocusLine()}
@@ -293,13 +303,64 @@
 				delete this.state.popoverDiv;
 			}
 		},
+		isOnLoadingWhenHasParent: function() {
+			var codetable = this.getCodeTable();
+			var parentValue = this.getParentPropertyValue();
+			if (parentValue == null) {
+				// no parent value
+				if (this.isAvailableWhenNoParentValue()) {
+					// still need options
+					// check code table is remote and not initialized
+					// is on loading
+					return codetable.isRemoteButNotInitialized();
+				} else {
+					// otherwise not need load options
+					codetable.setAsRemoteInitialized();
+					return false;
+				}
+			} else {
+				// has parent value
+				// check code table segment is loaded or not
+				return !codetable.isSegmentLoaded(parentValue);
+			}
+		},
+		isOnLoadingWhenNoParent: function() {
+			// var value = this.getValueFromModel();
+			var codetable = this.getCodeTable();
+			// remote and not initialized
+			// is on loading
+			return codetable.isRemoteButNotInitialized();
+		},
 		onComponentClicked: function() {
 			if (!this.isEnabled() || this.isViewMode()) {
 				// do nothing
 				return;
 			}
 			if (!this.state.popoverDiv || !this.state.popoverDiv.is(':visible')) {
-				this.showPopover();
+				var codetable = this.getCodeTable();
+				if (this.hasParent() && this.isOnLoadingWhenHasParent()) {
+					this.setState({
+						onloading: true
+					}, function() {
+						codetable.loadRemoteCodeSegment(this.getParentPropertyValue()).done(function() {
+							this.showPopover();
+						}.bind(this)).always(function() {
+							this.setState({onloading: false});
+						}.bind(this));
+					}.bind(this));
+				} else if (this.isOnLoadingWhenNoParent()) {
+					this.setState({
+						onloading: true
+					}, function() {
+						codetable.initializeRemote().done(function() {
+							this.showPopover();
+						}.bind(this)).always(function() {
+							this.setState({onloading: false});
+						}.bind(this));
+					}.bind(this));
+				} else {
+					this.showPopover();
+				}
 			}
 		},
 		onDocumentMouseDown: function(evt) {
@@ -347,14 +408,15 @@
 		 * @param evt
 		 */
 		onParentModelChanged: function (evt) {
-			var options = this.getAvailableOptions();
-			var currentValue = this.getValueFromModel();
-			var index = options.findIndex(function(item) {
-				return item.id == currentValue;
-			});
-			if (index == -1) {
-				this.setValueToModel(null);
-			}
+			// var options = this.getAvailableOptions();
+			// var currentValue = this.getValueFromModel();
+			// var index = options.findIndex(function(item) {
+			// 	return item.id == currentValue;
+			// });
+			// if (index == -1) {
+			this.setValueToModel(null);
+			// }
+			// this.forceUpdate();
 		},
 		/**
 		 * get parent model
@@ -393,6 +455,9 @@
 		convertDataOptions: function (options) {
 			return Array.isArray(options) ? options : options.list();
 		},
+		getCodeTable: function() {
+			return this.getComponentOption('data');
+		},
 		/**
 		 * get available options.
 		 * if no parent assigned, return all data options
@@ -400,19 +465,19 @@
 		 */
 		getAvailableOptions: function () {
 			if (!this.hasParent()) {
-				return this.convertDataOptions(this.getComponentOption('data'));
+				return this.convertDataOptions(this.getCodeTable());
 			} else {
 				var parentValue = this.getParentPropertyValue();
 				if (parentValue == null) {
-					return this.isAvailableWhenNoParentValue() ? this.convertDataOptions(this.getComponentOption('data')) : [];
+					return this.isAvailableWhenNoParentValue() ? this.convertDataOptions(this.getCodeTable()) : [];
 				} else {
 					var filter = this.getComponentOption("parentFilter");
 					if (typeof filter === 'object') {
 						// call code table filter
-						return this.convertDataOptions(this.getComponentOption('data').filter($.extend({}, filter, {value: parentValue})));
+						return this.convertDataOptions(this.getCodeTable().filter($.extend({}, filter, {value: parentValue})));
 					} else {
 						// call local filter
-						var data = this.convertDataOptions(this.getComponentOption('data'));
+						var data = this.convertDataOptions(this.getCodeTable());
 						if (typeof filter === "function") {
 							return filter.call(this, parentValue, data);
 						} else {

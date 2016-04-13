@@ -1,4 +1,4 @@
-/** nest-parrot.V0.3.0 2016-04-13 */
+/** nest-parrot.V0.3.0 2016-04-14 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -828,7 +828,15 @@
 		initializeRemote: function () {
 			if (this.isRemoteButNotInitialized()) {
 				// return a promise to load remote codes
-				return this.__loadRemoteCodes(true);
+				// since there might be more than one components using the same codetable
+				// log the first loading promise and returns to all others
+				if (!this._loading) {
+					this._loading = this.__loadRemoteCodes(true).always(function () {
+						delete this._loadding;
+						this._allLoaded = true;
+					}.bind(this));
+				}
+				return this._loading;
 			} else {
 				// already initialized, or is local
 				// return an immediately resolved promise
@@ -836,6 +844,11 @@
 					deferred.resolve();
 				}).promise();
 			}
+		},
+		setAsRemoteInitialized: function () {
+			this._codes = this._codes ? this._codes : [];
+			this._map = this._map ? this._map : {};
+			this._initialized = true;
 		},
 		/**
    * get renderer of code table
@@ -961,33 +974,77 @@
 				return this.__getCodes().filter(func);
 			} else {
 				var value = func.value;
-				if (!this._local && (!this._loadedKeys || this._loadedKeys.indexOf(value) == -1)) {
-					// no local data, and loaded keys don't contain current value
-					// reset post data
-					if (this._postData) {
-						this._postData = $.extend({}, this._postData, { value: func.value });
-					} else {
-						this._postData = { value: func.value };
-					}
-					// store current local data
-					var existedCodes = this._codes != null ? this._codes : [];
-					var existedMap = this._map != null ? this._map : {};
-					// get data from server
-					this.__loadRemoteCodes();
-					// init loaded keys
-					if (!this._loadedKeys) {
-						this._loadedKeys = [];
-					}
-					// log the loaded keys
-					this._loadedKeys.push(value);
-					// merge server data and local data
-					this._codes.push.apply(this._codes, existedCodes);
-					this._map = $.extend(existedMap, this._map);
-				}
+				this.__loadRemoteCodeSegment(value);
 				// filter
 				return this.__getCodes().filter(function (code) {
 					return code[func.name] == value;
 				});
+			}
+		},
+		isSegmentLoaded: function (parentValue) {
+			return !this.__needLoadFromRemote(parentValue);
+		},
+		loadRemoteCodeSegment: function (parentValue) {
+			if (this.__needLoadFromRemote(parentValue)) {
+				// no local data, and loaded keys don't contain current value
+				// reset post data
+				this.__rebuildPostData(parentValue);
+				// store current local data
+				var existedData = this.__holdExistedCodes();
+				// get data from server
+				return this.__loadRemoteCodes(true).done(function () {
+					this.__setParentValueAsLoaded(parentValue);
+				}.bind(this)).always(function () {
+					this.__mergeAll(existedData);
+				}.bind(this));
+			} else {
+				// local or already loaded
+				// return an immediately resolved promise
+				return $.Deferred(function (deferred) {
+					deferred.resolve();
+				}).promise();
+			}
+		},
+		__needLoadFromRemote: function (parentValue) {
+			return !this._local && !this._allLoaded && (!this._loadedKeys || this._loadedKeys.indexOf(parentValue) == -1);
+		},
+		__rebuildPostData: function (parentValue) {
+			if (this._postData) {
+				this._postData = $.extend({}, this._postData, { value: parentValue });
+			} else {
+				this._postData = { value: parentValue };
+			}
+		},
+		__holdExistedCodes: function () {
+			return {
+				codes: this._codes != null ? this._codes : [],
+				map: this._map != null ? this._map : {}
+			};
+		},
+		__mergeAll: function (existedData) {
+			// merge server data and local data
+			this._codes.push.apply(this._codes, existedData.codes);
+			this._map = $.extend(existedData.map, this._map);
+		},
+		__setParentValueAsLoaded: function (parentValue) {
+			// init loaded keys
+			if (!this._loadedKeys) {
+				this._loadedKeys = [];
+			}
+			// log the loaded keys
+			this._loadedKeys.push(parentValue);
+		},
+		__loadRemoteCodeSegment: function (parentValue) {
+			if (this.__needLoadFromRemote(parentValue)) {
+				// no local data, and loaded keys don't contain current value
+				// reset post data
+				this.__rebuildPostData(parentValue);
+				// store current local data
+				var existedData = this.__holdExistedCodes();
+				// get data from server
+				this.__loadRemoteCodes();
+				this.__setParentValueAsLoaded(parentValue);
+				this.__mergeAll(existedData);
 			}
 		},
 		/**
@@ -4152,16 +4209,6 @@
 				vertical: this.getComponentOption('direction') === 'vertical'
 			};
 			css[this.getComponentCSS('n-array-check')] = true;
-			// var codetable = this.getCodeTable();
-			// if (!codetable.isRemoteInitialized()) {
-			// 	return (<div className={$pt.LayoutHelper.classSet(css)}>
-			// 		{codetable.list().map(this.renderItem.bind(this, enabled))}
-			// 	</div>);
-			// } else {
-			// 	return (<div className={$pt.LayoutHelper.classSet(css)}>
-			// 		<$pt.Components.NCTOL />
-			// 	</div>);
-			// }
 			return React.createElement($pt.Components.NCodeTableWrapper, { codetable: this.getCodeTable(),
 				className: $pt.LayoutHelper.classSet(css),
 				renderer: this.getRealRenderer });
@@ -5434,18 +5481,50 @@
 		componentDidMount: function () {
 			var codetable = this.getCodeTable();
 			if (this.state.paintWrapper) {
-				codetable.initializeRemote().done(function () {
-					this.setState({
-						paintWrapper: false
-					});
-				}.bind(this));
+				if (this.hasParent()) {
+					var parentValue = this.getParentValue();
+					if (parentValue == null) {
+						if (this.loadWhenNoParentValue()) {
+							// load all when no parent value
+							codetable.initializeRemote().done(this.repaint);
+						} else {
+							codetable.setAsRemoteInitialized();
+							this.repaint();
+						}
+					} else {
+						// only load segments according to parent value
+						codetable.loadRemoteCodeSegment(parentValue).done(this.repaint);
+					}
+				} else {
+					// no parent, load all
+					codetable.initializeRemote().done(this.repaint);
+				}
 			}
 		},
-		render: function () {
-			var className = this.props.className ? this.props.className + ' n-codetable-wrapper' : 'n-codetable-wrapper';
+		repaint: function () {
+			this.setState({
+				paintWrapper: false
+			});
+		},
+		needWrapper: function () {
 			var codetable = this.getCodeTable();
-			if (!Array.isArray(codetable) && codetable.isRemoteButNotInitialized()) {
+			var need = true;
+			if (Array.isArray(codetable)) {
+				// is an array, not code table instance
+				need = false;
+			} else if (this.hasParent() && this.getParentValue() == null && !this.loadWhenNoParentValue()) {
+				// has parent, no parent value, no options when no parent value
+				need = false;
+			} else if (!codetable.isRemoteButNotInitialized()) {
+				// initialized remote data
+				need = false;
+			}
+			return need;
+		},
+		render: function () {
+			if (this.needWrapper()) {
 				this.state.paintWrapper = true;
+				var className = this.props.className ? this.props.className + ' n-codetable-wrapper form-control' : 'n-codetable-wrapper form-control';
 				return React.createElement(
 					'div',
 					{ className: className },
@@ -5466,6 +5545,15 @@
 		},
 		getWrappedRenderer: function () {
 			return this.props.renderer;
+		},
+		hasParent: function () {
+			return this.props.hasParent;
+		},
+		loadWhenNoParentValue: function () {
+			return this.props.hasParent ? this.props.loadWhenNoParentValue : true;
+		},
+		getParentValue: function () {
+			return this.props.parentValue;
 		}
 	}));
 	$pt.Components.NCodeTableWrapper = NCodeTableWrapper;
@@ -11777,11 +11865,20 @@
 		componentDidMount: function () {
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 			if (this.hasParent()) {
 				// add post change listener into parent model
 				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+				if (this.isOnLoadingWhenHasParent()) {
+					this.getCodeTable().loadRemoteCodeSegment(this.getParentPropertyValue()).done(function () {
+						this.setState({ onloading: false });
+					}.bind(this));
+				}
+			} else if (this.isOnLoadingWhenNoParent()) {
+				this.getCodeTable().initializeRemote().done(function () {
+					this.setState({ onloading: false });
+				}.bind(this));
 			}
-			this.registerToComponentCentral();
 		},
 		/**
    * will unmount
@@ -11806,7 +11903,11 @@
 		renderText: function () {
 			var value = this.getValueFromModel();
 			var itemText = null;
-			if (value != null) {
+			if (this.hasParent() && this.isOnLoadingWhenHasParent() && value != null) {
+				this.state.onloading = true;
+			} else if (this.isOnLoadingWhenNoParent()) {
+				this.state.onloading = true;
+			} else if (value != null) {
 				var item = this.getAvailableOptions().find(function (item) {
 					return item.id == value;
 				});
@@ -11815,11 +11916,11 @@
 				}
 			}
 			if (itemText == null) {
-				itemText = NSelect.PLACEHOLDER;
+				itemText = this.state.onloading ? $pt.Components.NCodeTableWrapper.ON_LOADING : NSelect.PLACEHOLDER;
 			}
 			return React.createElement(
 				'div',
-				{ className: 'input-group form-control', onClick: this.onComponentClicked, ref: 'comp' },
+				{ className: 'input-group form-control', onClick: this.onComponentClicked },
 				React.createElement(
 					'span',
 					{ className: 'text' },
@@ -11834,9 +11935,6 @@
    * @returns {XML}
    */
 		render: function () {
-			if (this.isViewMode()) {
-				return this.renderInViewMode();
-			}
 			var css = {
 				'n-disabled': !this.isEnabled(),
 				'n-view-mode': this.isViewMode()
@@ -11844,7 +11942,7 @@
 			css[this.getComponentCSS('n-select')] = true;
 			return React.createElement(
 				'div',
-				{ className: $pt.LayoutHelper.classSet(css), tabIndex: '0', 'aria-readonly': 'true' },
+				{ className: $pt.LayoutHelper.classSet(css), tabIndex: '0', 'aria-readonly': 'true', ref: 'comp' },
 				this.renderText(),
 				this.renderNormalLine(),
 				this.renderFocusLine()
@@ -12026,13 +12124,64 @@
 				delete this.state.popoverDiv;
 			}
 		},
+		isOnLoadingWhenHasParent: function () {
+			var codetable = this.getCodeTable();
+			var parentValue = this.getParentPropertyValue();
+			if (parentValue == null) {
+				// no parent value
+				if (this.isAvailableWhenNoParentValue()) {
+					// still need options
+					// check code table is remote and not initialized
+					// is on loading
+					return codetable.isRemoteButNotInitialized();
+				} else {
+					// otherwise not need load options
+					codetable.setAsRemoteInitialized();
+					return false;
+				}
+			} else {
+				// has parent value
+				// check code table segment is loaded or not
+				return !codetable.isSegmentLoaded(parentValue);
+			}
+		},
+		isOnLoadingWhenNoParent: function () {
+			// var value = this.getValueFromModel();
+			var codetable = this.getCodeTable();
+			// remote and not initialized
+			// is on loading
+			return codetable.isRemoteButNotInitialized();
+		},
 		onComponentClicked: function () {
 			if (!this.isEnabled() || this.isViewMode()) {
 				// do nothing
 				return;
 			}
 			if (!this.state.popoverDiv || !this.state.popoverDiv.is(':visible')) {
-				this.showPopover();
+				var codetable = this.getCodeTable();
+				if (this.hasParent() && this.isOnLoadingWhenHasParent()) {
+					this.setState({
+						onloading: true
+					}, function () {
+						codetable.loadRemoteCodeSegment(this.getParentPropertyValue()).done(function () {
+							this.showPopover();
+						}.bind(this)).always(function () {
+							this.setState({ onloading: false });
+						}.bind(this));
+					}.bind(this));
+				} else if (this.isOnLoadingWhenNoParent()) {
+					this.setState({
+						onloading: true
+					}, function () {
+						codetable.initializeRemote().done(function () {
+							this.showPopover();
+						}.bind(this)).always(function () {
+							this.setState({ onloading: false });
+						}.bind(this));
+					}.bind(this));
+				} else {
+					this.showPopover();
+				}
 			}
 		},
 		onDocumentMouseDown: function (evt) {
@@ -12081,14 +12230,15 @@
    * @param evt
    */
 		onParentModelChanged: function (evt) {
-			var options = this.getAvailableOptions();
-			var currentValue = this.getValueFromModel();
-			var index = options.findIndex(function (item) {
-				return item.id == currentValue;
-			});
-			if (index == -1) {
-				this.setValueToModel(null);
-			}
+			// var options = this.getAvailableOptions();
+			// var currentValue = this.getValueFromModel();
+			// var index = options.findIndex(function(item) {
+			// 	return item.id == currentValue;
+			// });
+			// if (index == -1) {
+			this.setValueToModel(null);
+			// }
+			// this.forceUpdate();
 		},
 		/**
    * get parent model
@@ -12127,6 +12277,9 @@
 		convertDataOptions: function (options) {
 			return Array.isArray(options) ? options : options.list();
 		},
+		getCodeTable: function () {
+			return this.getComponentOption('data');
+		},
 		/**
    * get available options.
    * if no parent assigned, return all data options
@@ -12134,19 +12287,19 @@
    */
 		getAvailableOptions: function () {
 			if (!this.hasParent()) {
-				return this.convertDataOptions(this.getComponentOption('data'));
+				return this.convertDataOptions(this.getCodeTable());
 			} else {
 				var parentValue = this.getParentPropertyValue();
 				if (parentValue == null) {
-					return this.isAvailableWhenNoParentValue() ? this.convertDataOptions(this.getComponentOption('data')) : [];
+					return this.isAvailableWhenNoParentValue() ? this.convertDataOptions(this.getCodeTable()) : [];
 				} else {
 					var filter = this.getComponentOption("parentFilter");
 					if (typeof filter === 'object') {
 						// call code table filter
-						return this.convertDataOptions(this.getComponentOption('data').filter($.extend({}, filter, { value: parentValue })));
+						return this.convertDataOptions(this.getCodeTable().filter($.extend({}, filter, { value: parentValue })));
 					} else {
 						// call local filter
-						var data = this.convertDataOptions(this.getComponentOption('data'));
+						var data = this.convertDataOptions(this.getCodeTable());
 						if (typeof filter === "function") {
 							return filter.call(this, parentValue, data);
 						} else {
@@ -15801,15 +15954,29 @@
 					this.getComponent().val(formattedValue);
 				}
 			}
-			this.setValueToModel(value);
+			if (!this.textEquals(value, this.getValueFromModel())) {
+				this.setValueToModel(value);
+			}
+		},
+		hasText: function (value) {
+			return value != null && !value.isEmpty();
+		},
+		textEquals: function (v1, v2) {
+			var hasText1 = this.hasText(v1);
+			var hasText2 = this.hasText(v2);
+			return hasText1 ? v1 == v2 : !hasText2;
 		},
 		/**
    * on component change
    * @param evt
    */
 		onComponentChanged: function (evt) {
-			// window.console.debug('Text component changed[modelValue=' + this.getValueFromModel() + ', compValue=' + evt.target.value + '].');
-			this.setValueToModel(evt.target.value);
+			// console.debug('Text component changed[modelValue=' + this.getValueFromModel() + ', compValue=' + evt.target.value + '].');
+			var newValue = evt.target.value;
+			var oldValue = this.getValueFromModel();
+			if (!this.textEquals(newValue, oldValue)) {
+				this.setValueToModel(evt.target.value);
+			}
 		},
 		/**
    * on model change

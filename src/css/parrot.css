@@ -3081,6 +3081,19 @@ div.n-array-check.vertical div.n-checkbox {
 div.n-codetable-wrapper {
   white-space: nowrap;
   text-overflow: ellipsis;
+  padding: 0;
+  box-shadow: none;
+  -webkit-box-shadow: none;
+  -o-box-shadow: none;
+  outline: none;
+  margin-top: 3px;
+}
+div.n-codetable-wrapper.form-control:focus {
+  outline: none;
+  box-shadow: none;
+  -webkit-box-shadow: none;
+  -o-box-shadow: none;
+  border: 0;
 }
 div.n-codetable-wrapper span.n-ctol-label {
   margin-left: 3px;

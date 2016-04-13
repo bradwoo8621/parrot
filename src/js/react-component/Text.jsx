@@ -258,15 +258,29 @@
 					this.getComponent().val(formattedValue);
 				}
 			}
-			this.setValueToModel(value);
+			if (!this.textEquals(value, this.getValueFromModel())) {
+				this.setValueToModel(value);
+			}
+		},
+		hasText: function(value) {
+			return value != null && !value.isEmpty();
+		},
+		textEquals: function(v1, v2) {
+			var hasText1 = this.hasText(v1);
+			var hasText2 = this.hasText(v2);
+			return hasText1 ? (v1 == v2) : !hasText2;
 		},
 		/**
 		 * on component change
 		 * @param evt
 		 */
 		onComponentChanged: function (evt) {
-			// window.console.debug('Text component changed[modelValue=' + this.getValueFromModel() + ', compValue=' + evt.target.value + '].');
-			this.setValueToModel(evt.target.value);
+			// console.debug('Text component changed[modelValue=' + this.getValueFromModel() + ', compValue=' + evt.target.value + '].');
+			var newValue = evt.target.value;
+			var oldValue = this.getValueFromModel();
+			if (!this.textEquals(newValue, oldValue)) {
+				this.setValueToModel(evt.target.value);
+			}
 		},
 		/**
 		 * on model change
