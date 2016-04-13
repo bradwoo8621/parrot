@@ -5444,7 +5444,7 @@
 		render: function () {
 			var className = this.props.className ? this.props.className + ' n-codetable-wrapper' : 'n-codetable-wrapper';
 			var codetable = this.getCodeTable();
-			if (codetable.isRemoteButNotInitialized()) {
+			if (!Array.isArray(codetable) && codetable.isRemoteButNotInitialized()) {
 				this.state.paintWrapper = true;
 				return React.createElement(
 					'div',
@@ -11211,14 +11211,25 @@
 				'n-disabled': !this.isEnabled(),
 				'n-view-mode': this.isViewMode()
 			};
-			// <input type="hidden" style={{display: "none"}}
-			// 	   onChange={this.onComponentChanged} value={this.getValueFromModel()}
-			// 	   ref='txt'/>
+			return React.createElement($pt.Components.NCodeTableWrapper, { codetable: this.getCodeTable(),
+				className: $pt.LayoutHelper.classSet(css),
+				renderer: this.getRealRenderer });
+		},
+		getRealRenderer: function () {
+			var css = {
+				'n-radio': true,
+				vertical: this.getComponentOption('direction') === 'vertical',
+				'n-disabled': !this.isEnabled(),
+				'n-view-mode': this.isViewMode()
+			};
 			return React.createElement(
 				'div',
 				{ className: this.getComponentCSS($pt.LayoutHelper.classSet(css)) },
-				this.getComponentOption("data").map(this.renderRadio)
+				this.getCodeTable().map(this.renderRadio)
 			);
+		},
+		getCodeTable: function () {
+			return this.getComponentOption("data");
 		},
 		/**
    * inner span clicked, force focus to outer span

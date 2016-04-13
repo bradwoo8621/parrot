@@ -137,12 +137,23 @@
 				'n-disabled': !this.isEnabled(),
 				'n-view-mode': this.isViewMode()
 			};
-			// <input type="hidden" style={{display: "none"}}
-			// 	   onChange={this.onComponentChanged} value={this.getValueFromModel()}
-			// 	   ref='txt'/>
+			return (<$pt.Components.NCodeTableWrapper codetable={this.getCodeTable()}
+								className={$pt.LayoutHelper.classSet(css)}
+								renderer={this.getRealRenderer} />);
+		},
+		getRealRenderer: function() {
+			var css = {
+				'n-radio': true,
+				vertical: this.getComponentOption('direction') === 'vertical',
+				'n-disabled': !this.isEnabled(),
+				'n-view-mode': this.isViewMode()
+			};
 			return (<div className={this.getComponentCSS($pt.LayoutHelper.classSet(css))}>
-				{this.getComponentOption("data").map(this.renderRadio)}
+				{this.getCodeTable().map(this.renderRadio)}
 			</div>);
+		},
+		getCodeTable: function() {
+			return this.getComponentOption("data");
 		},
 		/**
 		 * inner span clicked, force focus to outer span
