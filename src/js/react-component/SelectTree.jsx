@@ -9,6 +9,7 @@
 	var NSelectTree = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelectTree',
 		statics: {
+			PLACEHOLDER: "Please Select...",
 		},
 		propTypes: {
 			// model
@@ -79,6 +80,9 @@
 				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
 			}
 			this.registerToComponentCentral();
+			this.getCodeTable().initializeRemote().done(function() {
+				this.setState({onloading: false});
+			}.bind(this));
 		},
 		/**
 		 * will unmount
@@ -196,10 +200,19 @@
 			}
 		},
 		renderText: function() {
+			var renderContent = function() {
+				if (this.isOnLoading()) {
+					this.state.onloading = true;
+					return <span className='text'>{$pt.Components.NCodeTableWrapper.ON_LOADING}</span>
+				} else {
+					this.state.onloading = false;
+					return (<ul className='selection'>
+						{this.renderSelection()}
+					</ul>);
+				}
+			}.bind(this);
 			return (<div className='input-group form-control' onClick={this.onComponentClicked} ref='comp'>
-				<ul className='selection'>
-					{this.renderSelection()}
-				</ul>
+				{this.renderContent()}
 				<span className='fa fa-fw fa-sort-down pull-right' />
 			</div>);
 		},
@@ -328,6 +341,13 @@
 				delete this.state.popoverDiv;
 			}
 		},
+		isOnLoading: function() {
+			// var value = this.getValueFromModel();
+			var codetable = this.getCodeTable();
+			// remote and not initialized
+			// is on loading
+			return codetable.isRemoteButNotInitialized();
+		},
 		onComponentClicked: function() {
 			if (!this.isEnabled() || this.isViewMode()) {
 				// do nothing
@@ -450,7 +470,7 @@
 		 * get tree model
 		 * @returns {CodeTable}
 		 */
-		getTreeModel: function() {
+		getCodeTable: function() {
 			return this.getComponentOption('data');
 		},
 		/**
@@ -459,7 +479,8 @@
 		 */
 		getAvailableTreeModel: function() {
 			var filter = this.getComponentOption('parentFilter');
-			var tree = this.getTreeModel();
+			var tree = this.getCodeTable();
+			// fetch data from remote is not supported now
 			if (filter) {
 				return filter.call(this, tree, this.getParentPropertyValue());
 			} else {

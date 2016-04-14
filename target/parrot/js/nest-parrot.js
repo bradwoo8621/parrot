@@ -12126,6 +12126,9 @@
 		},
 		isOnLoadingWhenHasParent: function () {
 			var codetable = this.getCodeTable();
+			if (!codetable.isRemote()) {
+				return false;
+			}
 			var parentValue = this.getParentPropertyValue();
 			if (parentValue == null) {
 				// no parent value
@@ -12354,7 +12357,9 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NSelectTree = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelectTree',
-		statics: {},
+		statics: {
+			PLACEHOLDER: "Please Select..."
+		},
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
@@ -12424,6 +12429,9 @@
 				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
 			}
 			this.registerToComponentCentral();
+			this.getCodeTable().initializeRemote().done(function () {
+				this.setState({ onloading: false });
+			}.bind(this));
 		},
 		/**
    * will unmount
@@ -12543,14 +12551,27 @@
 			}
 		},
 		renderText: function () {
+			var renderContent = function () {
+				if (this.isOnLoading()) {
+					this.state.onloading = true;
+					return React.createElement(
+						"span",
+						{ className: "text" },
+						$pt.Components.NCodeTableWrapper.ON_LOADING
+					);
+				} else {
+					this.state.onloading = false;
+					return React.createElement(
+						"ul",
+						{ className: "selection" },
+						this.renderSelection()
+					);
+				}
+			}.bind(this);
 			return React.createElement(
 				"div",
 				{ className: "input-group form-control", onClick: this.onComponentClicked, ref: "comp" },
-				React.createElement(
-					"ul",
-					{ className: "selection" },
-					this.renderSelection()
-				),
+				this.renderContent(),
 				React.createElement("span", { className: "fa fa-fw fa-sort-down pull-right" })
 			);
 		},
@@ -12681,6 +12702,13 @@
 				delete this.state.popoverDiv;
 			}
 		},
+		isOnLoading: function () {
+			// var value = this.getValueFromModel();
+			var codetable = this.getCodeTable();
+			// remote and not initialized
+			// is on loading
+			return codetable.isRemoteButNotInitialized();
+		},
 		onComponentClicked: function () {
 			if (!this.isEnabled() || this.isViewMode()) {
 				// do nothing
@@ -12804,7 +12832,7 @@
    * get tree model
    * @returns {CodeTable}
    */
-		getTreeModel: function () {
+		getCodeTable: function () {
 			return this.getComponentOption('data');
 		},
 		/**
@@ -12813,7 +12841,8 @@
    */
 		getAvailableTreeModel: function () {
 			var filter = this.getComponentOption('parentFilter');
-			var tree = this.getTreeModel();
+			var tree = this.getCodeTable();
+			// fetch data from remote is not supported now
 			if (filter) {
 				return filter.call(this, tree, this.getParentPropertyValue());
 			} else {
@@ -15956,6 +15985,10 @@
 			}
 			if (!this.textEquals(value, this.getValueFromModel())) {
 				this.setValueToModel(value);
+			}
+			var monitor = this.getEventMonitor('blur');
+			if (monitor) {
+				monitor.call(this, evt);
 			}
 		},
 		hasText: function (value) {

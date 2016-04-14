@@ -2,6 +2,33 @@
  * Created by brad.wu on 8/16/2015.
  */
 (function () {
+	$.mockjax({
+        url: '/app/codetable',
+        responseTime: 2000,
+        response: function () {
+            this.responseText = [
+				{
+					id: 1,
+					text: 'Languages',
+					children: [
+						{id: 2, text:'Java'},
+						{id: 3, text:'C#'}
+					]
+				}, {
+					id: 4,
+					text: 'Costing',
+					children: [
+						{id: 5, text: '1,000'},
+						{id: 6, text: '2,000'}
+					]
+				}, {
+					id: 7,
+					text: 'Others',
+					folder: true
+				}
+			];
+        }
+    });
 	var tree = $pt.createCodeTable([
 		{
 			id: 1,

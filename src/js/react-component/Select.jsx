@@ -305,6 +305,9 @@
 		},
 		isOnLoadingWhenHasParent: function() {
 			var codetable = this.getCodeTable();
+			if (!codetable.isRemote()) {
+				return false;
+			}
 			var parentValue = this.getParentPropertyValue();
 			if (parentValue == null) {
 				// no parent value

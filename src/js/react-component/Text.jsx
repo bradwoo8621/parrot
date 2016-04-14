@@ -261,6 +261,10 @@
 			if (!this.textEquals(value, this.getValueFromModel())) {
 				this.setValueToModel(value);
 			}
+			var monitor = this.getEventMonitor('blur');
+			if (monitor) {
+				monitor.call(this, evt);
+			}
 		},
 		hasText: function(value) {
 			return value != null && !value.isEmpty();
