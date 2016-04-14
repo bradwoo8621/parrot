@@ -12571,7 +12571,7 @@
 			return React.createElement(
 				"div",
 				{ className: "input-group form-control", onClick: this.onComponentClicked, ref: "comp" },
-				this.renderContent(),
+				renderContent(),
 				React.createElement("span", { className: "fa fa-fw fa-sort-down pull-right" })
 			);
 		},

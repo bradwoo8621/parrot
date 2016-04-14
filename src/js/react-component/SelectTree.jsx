@@ -212,7 +212,7 @@
 				}
 			}.bind(this);
 			return (<div className='input-group form-control' onClick={this.onComponentClicked} ref='comp'>
-				{this.renderContent()}
+				{renderContent()}
 				<span className='fa fa-fw fa-sort-down pull-right' />
 			</div>);
 		},
