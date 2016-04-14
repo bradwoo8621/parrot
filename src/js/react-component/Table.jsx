@@ -554,7 +554,7 @@
 						}
 						rowIndex++;
 					});
-					_this.forceUpdate();
+					_this.forceUpdate(_this.onCheckAllChanged.bind(_this, selected));
 				}
 			});
 			return <$pt.Components.NCheck model={model} layout={layout}/>;
@@ -1680,6 +1680,12 @@
 			} else {
 				$(ReactDOM.findDOMNode(this.refs['table-panel-body'])).slideUp(300);
 				$(ReactDOM.findDOMNode(this.refs['add-button'])).hide();
+			}
+		},
+		onCheckAllChanged: function(selected) {
+			var monitor = this.getEventMonitor('checkAll');
+			if (monitor) {
+				monitor.call(this, selected);
 			}
 		},
 		/**

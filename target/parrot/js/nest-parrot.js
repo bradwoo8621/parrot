@@ -13990,7 +13990,7 @@
 						}
 						rowIndex++;
 					});
-					_this.forceUpdate();
+					_this.forceUpdate(_this.onCheckAllChanged.bind(_this, selected));
 				}
 			});
 			return React.createElement($pt.Components.NCheck, { model: model, layout: layout });
@@ -15202,6 +15202,12 @@
 				$(ReactDOM.findDOMNode(this.refs['add-button'])).hide();
 			}
 		},
+		onCheckAllChanged: function (selected) {
+			var monitor = this.getEventMonitor('checkAll');
+			if (monitor) {
+				monitor.call(this, selected);
+			}
+		},
 		/**
    * on add button clicked
    */
@@ -16011,7 +16017,7 @@
 			}
 		},
 		hasText: function (value) {
-			return value != null && !value.isEmpty();
+			return value != null && !(value + '').isEmpty();
 		},
 		textEquals: function (v1, v2) {
 			var hasText1 = this.hasText(v1);

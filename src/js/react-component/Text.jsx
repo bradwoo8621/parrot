@@ -267,7 +267,7 @@
 			}
 		},
 		hasText: function(value) {
-			return value != null && !value.isEmpty();
+			return value != null && !(value + '').isEmpty();
 		},
 		textEquals: function(v1, v2) {
 			var hasText1 = this.hasText(v1);
