@@ -12460,9 +12460,11 @@
 				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
 			}
 			this.registerToComponentCentral();
-			this.getCodeTable().initializeRemote().done(function () {
-				this.setState({ onloading: false });
-			}.bind(this));
+			if (this.isOnLoading()) {
+				this.getCodeTable().initializeRemote().done(function () {
+					this.setState({ onloading: false });
+				}.bind(this));
+			}
 		},
 		/**
    * will unmount
@@ -12487,7 +12489,7 @@
 		renderSelectionItem: function (codeItem, nodeId) {
 			return React.createElement(
 				"li",
-				null,
+				{ key: nodeId },
 				React.createElement("span", { className: "fa fa-fw fa-remove", onClick: this.onSelectionItemRemove.bind(this, nodeId) }),
 				codeItem.text
 			);
@@ -12592,11 +12594,20 @@
 					);
 				} else {
 					this.state.onloading = false;
-					return React.createElement(
-						"ul",
-						{ className: "selection" },
-						this.renderSelection()
-					);
+					var value = this.getValueFromModel();
+					if (value == null || Array.isArray(value) && value.length == 0 || typeof value === 'object' && Object.keys(value).length == 0) {
+						return React.createElement(
+							"span",
+							{ className: "text" },
+							NSelectTree.PLACEHOLDER
+						);
+					} else {
+						return React.createElement(
+							"ul",
+							{ className: "selection" },
+							this.renderSelection()
+						);
+					}
 				}
 			}.bind(this);
 			return React.createElement(
@@ -12745,7 +12756,15 @@
 				// do nothing
 				return;
 			}
-			this.showPopover();
+
+			if (this.isOnLoading()) {
+				this.getCodeTable().initializeRemote().done(function () {
+					this.setState({ onloading: false });
+					this.showPopover();
+				}.bind(this));
+			} else {
+				this.showPopover();
+			}
 		},
 		onDocumentMouseDown: function (evt) {
 			var target = $(evt.target);

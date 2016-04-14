@@ -80,9 +80,11 @@
 				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
 			}
 			this.registerToComponentCentral();
-			this.getCodeTable().initializeRemote().done(function() {
-				this.setState({onloading: false});
-			}.bind(this));
+			if (this.isOnLoading()) {
+				this.getCodeTable().initializeRemote().done(function() {
+					this.setState({onloading: false});
+				}.bind(this));
+			}
 		},
 		/**
 		 * will unmount
@@ -105,7 +107,7 @@
 			return <$pt.Components.NTree model={model} layout={layout}/>;
 		},
 		renderSelectionItem: function(codeItem, nodeId) {
-			return (<li>
+			return (<li key={nodeId}>
 				<span className='fa fa-fw fa-remove' onClick={this.onSelectionItemRemove.bind(this, nodeId)}></span>
 				{codeItem.text}
 			</li>);
@@ -206,9 +208,15 @@
 					return <span className='text'>{$pt.Components.NCodeTableWrapper.ON_LOADING}</span>
 				} else {
 					this.state.onloading = false;
-					return (<ul className='selection'>
-						{this.renderSelection()}
-					</ul>);
+					var value = this.getValueFromModel();
+					if (value == null || (Array.isArray(value) && value.length == 0)
+				 		|| (typeof value === 'object' && Object.keys(value).length == 0)) {
+						return <span className='text'>{NSelectTree.PLACEHOLDER}</span>
+					} else {
+						return (<ul className='selection'>
+							{this.renderSelection()}
+						</ul>);
+					}
 				}
 			}.bind(this);
 			return (<div className='input-group form-control' onClick={this.onComponentClicked} ref='comp'>
@@ -353,7 +361,15 @@
 				// do nothing
 				return;
 			}
-			this.showPopover();
+
+			if (this.isOnLoading()) {
+				this.getCodeTable().initializeRemote().done(function() {
+					this.setState({onloading: false});
+					this.showPopover();
+				}.bind(this));
+			} else {
+				this.showPopover();
+			}
 		},
 		onDocumentMouseDown: function(evt) {
 			var target = $(evt.target);

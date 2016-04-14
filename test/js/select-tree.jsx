@@ -79,6 +79,13 @@
 		},
 		pos: {row: 1, col: 1}
 	});
+	var remote = $pt.createCellLayout('value', {
+		comp: {
+			type: $pt.ComponentConstants.SelectTree,
+			data: $pt.createCodeTable({url: '/app/codetable'})
+		},
+		pos: {row: 1, col: 1}
+	});
 
 	var dialog = NModalForm.createFormModal("Test");
 	dialog.show({
@@ -123,6 +130,10 @@
 			<span>View Mode</span>
 			<NSelectTree model={model} layout={selectTree} view={true}/>
 			<NSelectTree model={model} layout={disabledSelectTree} view={true}/>
+		</div>
+		<div className='col-md-3 col-lg-3 col-sm-3'>
+			<span>Remote</span>
+			<NSelectTree model={model} layout={remote} />
 		</div>
 		<div style={{height: "1000px"}}/>
 	</div>);
