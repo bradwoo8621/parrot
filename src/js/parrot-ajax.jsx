@@ -11,6 +11,12 @@
 			GET: "application/json; charset=UTF-8",
 			DELETE: "application/json; charset=UTF-8",
 			PUT: "application/json; charset=UTF-8"
+		},
+		Stringify: {
+			POST: true,
+			GET: false,
+			DELETE: false,
+			PUT: true
 		}
 	};
 
@@ -102,6 +108,9 @@
 	 * @returns {jqXHR}
 	 */
 	$pt.internalDoPost = $pt.doPost = function (url, data, settings) {
+		if (settings.stringify || $pt.AjaxConstants.Stringify.POST) {
+			data = (typeof data === 'string') ? data : JSON.stringify(data);
+		}
 		return submit($.extend({
 			method: "POST",
 			dataType: "json",
@@ -109,7 +118,7 @@
 		}, settings, {
 			url: url,
 			// always send string to server side
-			data: ((typeof data === 'string') ? data : JSON.stringify(data))
+			data: data
 		}));
 	};
 	/**
@@ -120,13 +129,16 @@
 	 * @returns {jqXHR}
 	 */
 	$pt.doPut = function (url, data, settings) {
+		if (settings.stringify || $pt.AjaxConstants.Stringify.POST) {
+			data = (typeof data === 'string') ? data : JSON.stringify(data);
+		}
 		return submit($.extend({
 			method: "PUT",
 			dataType: "json",
 			contentType: $pt.AjaxConstants.ContentType.PUT
 		}, settings, {
 			url: url,
-			data: ((typeof data === 'string') ? data : JSON.stringify(data))
+			data: data
 		}));
 	};
 	/**
