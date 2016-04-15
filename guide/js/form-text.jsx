@@ -207,12 +207,35 @@
 					template: layoutTemplate
 				});
 				return {
-					id: 'text-event',
-					title: 'Event',
+					id: 'text-event-keyup',
+					title: 'KeyUp',
 					desc: 'Capture the key up event.',
 					xml: <NText model={model} layout={$pt.createCellLayout('value', layoutTemplate)}/>,
 					code: [modelCode, layoutCode, compCode],
 					index: 10
+				};
+			},
+			blur: function () {
+				var layoutTemplate = {
+					evt: {
+						blur: function (evt) {
+							alert('Blur invoked.');
+							console.log(evt);
+						}
+					}
+				};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'value',
+					template: layoutTemplate
+				});
+				return {
+					id: 'text-event-blur',
+					title: 'Blur',
+					desc: 'Capture the blur event.',
+					xml: <NText model={model} layout={$pt.createCellLayout('value', layoutTemplate)}/>,
+					code: [modelCode, layoutCode, compCode],
+					index: 20
 				};
 			}
 		};
@@ -340,11 +363,11 @@
 					children: $demo.convertToExampleList(format)
 				};
 			},
-			event: function () {
+			event: function() {
 				return {
 					id: 'text-event',
 					title: 'Event',
-					desc: 'Event capture.',
+					desc: 'Event capture',
 					index: 60,
 					children: $demo.convertToExampleList(event)
 				};

@@ -1272,6 +1272,33 @@
 				};
 			}
 		};
+		var event = {
+			checkAll: function() {
+				var layoutTemplate = {
+					comp: {
+						rowSelectable: 'check'
+					},
+					evt: {
+						checkAll: function(selected) {
+							alert('Check All invoked.');
+							console.log('Check All Selected', selected);
+						}
+					}
+				};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'value',
+					template: layoutTemplate
+				});
+				return {
+					id: 'table-event-checkall',
+					title: 'CheckAll',
+					desc: 'Capture the check all event.',
+					code: [layoutCode],
+					index: 10
+				};
+			}
+		};
 
 		var all = {
 			defaultOptions: function () {
@@ -1381,6 +1408,15 @@
 					desc: 'Data in table can be pageable.',
 					index: 80,
 					children: $demo.convertToExampleList(page)
+				};
+			},
+			event: function () {
+				return {
+					id: 'table-event',
+					title: 'Event',
+					desc: 'Event capture',
+					index: 90,
+					children: $demo.convertToExampleList(event)
 				};
 			},
 			constants: function () {
