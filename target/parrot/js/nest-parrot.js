@@ -595,6 +595,17 @@
 		});
 	};
 
+	var needStringify = function (predefine, specific) {
+		if (specific === true) {
+			return true;
+		} else if (specific === false) {
+			return false;
+		} else if (predefine === true) {
+			return true;
+		} else {
+			return false;
+		}
+	};
 	/**
   * http post
   * @param url {string}
@@ -603,7 +614,7 @@
   * @returns {jqXHR}
   */
 	$pt.internalDoPost = $pt.doPost = function (url, data, settings) {
-		if (settings.stringify === true || $pt.AjaxConstants.Stringify.POST) {
+		if (needStringify($pt.AjaxConstants.Stringify.POST, settings.stringify)) {
 			data = typeof data === 'string' ? data : JSON.stringify(data);
 		}
 		return submit($.extend({
@@ -624,7 +635,7 @@
   * @returns {jqXHR}
   */
 	$pt.doPut = function (url, data, settings) {
-		if (settings.stringify === true || $pt.AjaxConstants.Stringify.PUT) {
+		if (needStringify($pt.AjaxConstants.Stringify.PUT, settings.stringify)) {
 			data = typeof data === 'string' ? data : JSON.stringify(data);
 		}
 		return submit($.extend({
@@ -644,7 +655,7 @@
   * @returns {jqXHR}
   */
 	$pt.doGet = function (url, data, settings) {
-		if (settings.stringify === true || $pt.AjaxConstants.Stringify.GET) {
+		if (needStringify($pt.AjaxConstants.Stringify.GET, settings.stringify)) {
 			data = typeof data === 'string' ? data : JSON.stringify(data);
 		}
 		return submit($.extend({
@@ -664,7 +675,7 @@
   * @returns {jqXHR}
   */
 	$pt.doDelete = function (url, data, settings) {
-		if (settings.stringify === true || $pt.AjaxConstants.Stringify.DELETE) {
+		if (needStringify($pt.AjaxConstants.Stringify.DELETE, settings.stringify)) {
 			data = typeof data === 'string' ? data : JSON.stringify(data);
 		}
 		return submit($.extend({
