@@ -121,7 +121,7 @@
 				}
 			}
 			if (itemText == null) {
-				itemText = this.state.onloading ? $pt.Components.NCodeTableWrapper.ON_LOADING : NSelect.PLACEHOLDER;
+				itemText = this.state.onloading ? $pt.Components.NCodeTableWrapper.ON_LOADING : this.getPlaceholder();
 			}
 			return (<div className='input-group form-control' onClick={this.onComponentClicked}>
 				<span className='text'>{itemText}</span>
@@ -457,6 +457,9 @@
 		 */
 		convertDataOptions: function (options) {
 			return Array.isArray(options) ? options : options.list();
+		},
+		getPlaceholder: function() {
+			return this.getComponentOption('placeholder', NSelect.PLACEHOLDER);
 		},
 		getCodeTable: function() {
 			return this.getComponentOption('data');

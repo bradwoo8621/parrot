@@ -1,4 +1,4 @@
-/** nest-parrot.V0.3.1 2016-04-15 */
+/** nest-parrot.V0.3.1 2016-04-16 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -11939,7 +11939,7 @@
 				}
 			}
 			if (itemText == null) {
-				itemText = this.state.onloading ? $pt.Components.NCodeTableWrapper.ON_LOADING : NSelect.PLACEHOLDER;
+				itemText = this.state.onloading ? $pt.Components.NCodeTableWrapper.ON_LOADING : this.getPlaceholder();
 			}
 			return React.createElement(
 				'div',
@@ -12302,6 +12302,9 @@
    */
 		convertDataOptions: function (options) {
 			return Array.isArray(options) ? options : options.list();
+		},
+		getPlaceholder: function () {
+			return this.getComponentOption('placeholder', NSelect.PLACEHOLDER);
 		},
 		getCodeTable: function () {
 			return this.getComponentOption('data');
