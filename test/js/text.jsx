@@ -221,7 +221,7 @@
         }
     });
 
-    model.set('numeric', -0.65);
+    model.set('numeric', 0.65);
     var panel = (<div className='row'>
         <div className='col-md-3 col-lg-3 col-sm-3'>
             <span>Plain Text</span>
@@ -231,7 +231,7 @@
             <span>Password</span>
             <NText model={model} layout={password}/>
             <span>Numeric</span>
-            <NText model={model} layout={numberText}/>
+            <NText model={model} layout={numberText} />
             <NFormButton model={model} layout={button}/>
             <span>Custom CSS</span>
             <NText model={model} layout={css}/>

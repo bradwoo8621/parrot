@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.3.1 2016-04-16 */
+	/** nest-parrot.V0.3.1 2016-04-17 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -12180,7 +12180,7 @@
 		},
 		isOnLoadingWhenHasParent: function () {
 			var codetable = this.getCodeTable();
-			if (!codetable.isRemote()) {
+			if (codetable == null || Array.isArray(codetable) || !codetable.isRemote()) {
 				return false;
 			}
 			var parentValue = this.getParentPropertyValue();
@@ -12207,7 +12207,7 @@
 			var codetable = this.getCodeTable();
 			// remote and not initialized
 			// is on loading
-			return codetable.isRemoteButNotInitialized();
+			return codetable != null && !Array.isArray(codetable) && codetable.isRemoteButNotInitialized();
 		},
 		onComponentClicked: function () {
 			if (!this.isEnabled() || this.isViewMode()) {
@@ -16171,7 +16171,7 @@
 		getValueFromModel: function () {
 			var value = this.getModel().get(this.getDataId());
 			var convertor = this.getTextConvertor();
-			if (convertor) {
+			if (convertor && convertor.view) {
 				return convertor.view.call(this, value);
 			} else {
 				return value;
@@ -16179,11 +16179,14 @@
 		},
 		setValueToModel: function (value) {
 			var convertor = this.getTextConvertor();
-			if (convertor) {
+			if (convertor && convertor.model) {
 				this.getModel().set(this.getDataId(), convertor.model.call(this, value));
 			} else {
 				this.getModel().set(this.getDataId(), value);
 			}
+		},
+		getTextInViewMode: function () {
+			return this.getModel().get(this.getDataId());
 		}
 	}));
 	$pt.Components.NText = NText;

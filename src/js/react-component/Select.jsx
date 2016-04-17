@@ -305,7 +305,7 @@
 		},
 		isOnLoadingWhenHasParent: function() {
 			var codetable = this.getCodeTable();
-			if (!codetable.isRemote()) {
+			if (codetable == null || Array.isArray(codetable) || !codetable.isRemote()) {
 				return false;
 			}
 			var parentValue = this.getParentPropertyValue();
@@ -332,7 +332,7 @@
 			var codetable = this.getCodeTable();
 			// remote and not initialized
 			// is on loading
-			return codetable.isRemoteButNotInitialized();
+			return codetable != null && !Array.isArray(codetable) && codetable.isRemoteButNotInitialized();
 		},
 		onComponentClicked: function() {
 			if (!this.isEnabled() || this.isViewMode()) {

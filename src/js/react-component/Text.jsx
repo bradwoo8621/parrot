@@ -364,7 +364,7 @@
 		getValueFromModel: function() {
 			var value = this.getModel().get(this.getDataId());
 			var convertor = this.getTextConvertor();
-			if (convertor) {
+			if (convertor && convertor.view) {
 				return convertor.view.call(this, value);
 			} else {
 				return value;
@@ -372,11 +372,14 @@
 		},
 		setValueToModel: function (value) {
 			var convertor = this.getTextConvertor();
-			if (convertor) {
+			if (convertor && convertor.model) {
 				this.getModel().set(this.getDataId(), convertor.model.call(this, value));
 			} else {
 				this.getModel().set(this.getDataId(), value);
 			}
+		},
+		getTextInViewMode: function() {
+			return this.getModel().get(this.getDataId());
 		}
 	}));
 	$pt.Components.NText = NText;
