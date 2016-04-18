@@ -1,4 +1,4 @@
-/** nest-parrot.V0.3.1 2016-04-17 */
+/** nest-parrot.V0.3.2 2016-04-18 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -5100,11 +5100,11 @@
 		renderMoreButtons: function (css) {
 			var more = this.getComponentOption('more');
 			if (more) {
+				// onClick={this.onClicked}
 				var dropdown = React.createElement(
 					'a',
 					{ href: 'javascript:void(0);',
 						className: $pt.LayoutHelper.classSet(css) + ' dropdown-toggle',
-						onClick: this.onClicked,
 						disabled: !this.isEnabled(),
 						'data-toggle': 'dropdown',
 						'aria-haspopup': 'true',

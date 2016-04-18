@@ -103,9 +103,9 @@
 		renderMoreButtons: function(css) {
 			var more = this.getComponentOption('more');
 			if (more) {
+				// onClick={this.onClicked}
 				var dropdown = (<a href='javascript:void(0);'
 					className={$pt.LayoutHelper.classSet(css) + ' dropdown-toggle'}
-					onClick={this.onClicked}
 					disabled={!this.isEnabled()}
 					data-toggle="dropdown"
 					aria-haspopup="true"
