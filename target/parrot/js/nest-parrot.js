@@ -1,4 +1,4 @@
-/** nest-parrot.V0.3.2 2016-04-18 */
+/** nest-parrot.V0.3.2 2016-04-19 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -872,6 +872,7 @@
 			this._codes = this._codes ? this._codes : [];
 			this._map = this._map ? this._map : {};
 			this._initialized = true;
+			return this;
 		},
 		/**
    * get renderer of code table
@@ -923,6 +924,7 @@
 				};
 				sort(this._codes);
 			}
+			return this;
 		},
 		/**
    * load remote code table, quiet and synchronized
@@ -1037,6 +1039,7 @@
 			} else {
 				this._postData = { value: parentValue };
 			}
+			return this;
 		},
 		__holdExistedCodes: function () {
 			return {
@@ -1048,6 +1051,7 @@
 			// merge server data and local data
 			this._codes.push.apply(this._codes, existedData.codes);
 			this._map = $.extend(existedData.map, this._map);
+			return this;
 		},
 		__setParentValueAsLoaded: function (parentValue) {
 			// init loaded keys
@@ -1056,6 +1060,7 @@
 			}
 			// log the loaded keys
 			this._loadedKeys.push(parentValue);
+			return this;
 		},
 		__loadRemoteCodeSegment: function (parentValue) {
 			if (this.__needLoadFromRemote(parentValue)) {
@@ -1069,6 +1074,7 @@
 				this.__setParentValueAsLoaded(parentValue);
 				this.__mergeAll(existedData);
 			}
+			return this;
 		},
 		/**
    * get element by given code
@@ -1158,6 +1164,7 @@
 		name: function (name) {
 			if (name) {
 				this.__name = name;
+				return this;
 			} else {
 				return this.__name;
 			}
@@ -1185,6 +1192,14 @@
   */
 	$pt.createCodeTable = function (items, renderer, sorter) {
 		return new CodeTable(items, renderer, sorter);
+	};
+	/**
+  * extend code table
+  * @param  {JSON} extendCodeTable extend class definition
+  * @return {jsface.Class} extend code table class
+  */
+	$pt.extendCodeTable = function (extendCodeTable) {
+		return jsface.Class(CodeTable, extendCodeTable);
 	};
 })(window, jQuery, jsface);
 
