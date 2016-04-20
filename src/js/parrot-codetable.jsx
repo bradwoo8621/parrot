@@ -49,7 +49,7 @@
 		 * @param sorter {CodeTableSorter} optional
 		 */
 		constructor: function (data, renderer, sorter) {
-			if (Array.isArray(data)) {
+			if (data == null || Array.isArray(data)) {
 				// construct with array, local data
 				this._local = true;
 				this._initArray = data;

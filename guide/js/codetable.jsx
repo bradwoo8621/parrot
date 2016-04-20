@@ -19,7 +19,8 @@
 				<code>sorter</code>: object which has sort function, pass items array to this function.<br/>
 				<code>children</code> of code table item is default recognized,
 				<code>renderer</code> and <code>sorter</code> are applied to children automatically.
-				See <code>listAllChildren</code> and <code>#listWithHierarchyKeys</code>.</span>,
+				See <code>listAllChildren</code> and <code>#listWithHierarchyKeys</code>.
+				And <code>$pt.extendCodeTable</code> can be used to create code table sub class, follow the <code>jsface</code> standard.</span>,
 				children: [
 					{
 						id: 'codetable-filter',

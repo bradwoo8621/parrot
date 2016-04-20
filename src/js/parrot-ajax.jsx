@@ -119,6 +119,7 @@
 	 * @returns {jqXHR}
 	 */
 	$pt.internalDoPost = $pt.doPost = function (url, data, settings) {
+		settings = settings ? settings : {};
 		if (needStringify($pt.AjaxConstants.Stringify.POST, settings.stringify)) {
 			data = (typeof data === 'string') ? data : JSON.stringify(data);
 		}
@@ -140,6 +141,7 @@
 	 * @returns {jqXHR}
 	 */
 	$pt.doPut = function (url, data, settings) {
+		settings = settings ? settings : {};
 		if (needStringify($pt.AjaxConstants.Stringify.PUT, settings.stringify)) {
 			data = (typeof data === 'string') ? data : JSON.stringify(data);
 		}
@@ -160,6 +162,7 @@
 	 * @returns {jqXHR}
 	 */
 	$pt.doGet = function (url, data, settings) {
+		settings = settings ? settings : {};
 		if (needStringify($pt.AjaxConstants.Stringify.GET, settings.stringify)) {
 			data = (typeof data === 'string') ? data : JSON.stringify(data);
 		}
@@ -180,6 +183,7 @@
 	 * @returns {jqXHR}
 	 */
 	$pt.doDelete = function (url, data, settings) {
+		settings = settings ? settings : {};
 		if (needStringify($pt.AjaxConstants.Stringify.DELETE, settings.stringify)) {
 			data = (typeof data === 'string') ? data : JSON.stringify(data);
 		}

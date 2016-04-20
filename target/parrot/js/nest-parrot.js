@@ -1,4 +1,4 @@
-/** nest-parrot.V0.3.2 2016-04-19 */
+/** nest-parrot.V0.3.2 2016-04-20 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -614,6 +614,7 @@
   * @returns {jqXHR}
   */
 	$pt.internalDoPost = $pt.doPost = function (url, data, settings) {
+		settings = settings ? settings : {};
 		if (needStringify($pt.AjaxConstants.Stringify.POST, settings.stringify)) {
 			data = typeof data === 'string' ? data : JSON.stringify(data);
 		}
@@ -635,6 +636,7 @@
   * @returns {jqXHR}
   */
 	$pt.doPut = function (url, data, settings) {
+		settings = settings ? settings : {};
 		if (needStringify($pt.AjaxConstants.Stringify.PUT, settings.stringify)) {
 			data = typeof data === 'string' ? data : JSON.stringify(data);
 		}
@@ -655,6 +657,7 @@
   * @returns {jqXHR}
   */
 	$pt.doGet = function (url, data, settings) {
+		settings = settings ? settings : {};
 		if (needStringify($pt.AjaxConstants.Stringify.GET, settings.stringify)) {
 			data = typeof data === 'string' ? data : JSON.stringify(data);
 		}
@@ -675,6 +678,7 @@
   * @returns {jqXHR}
   */
 	$pt.doDelete = function (url, data, settings) {
+		settings = settings ? settings : {};
 		if (needStringify($pt.AjaxConstants.Stringify.DELETE, settings.stringify)) {
 			data = typeof data === 'string' ? data : JSON.stringify(data);
 		}
@@ -826,7 +830,7 @@
    * @param sorter {CodeTableSorter} optional
    */
 		constructor: function (data, renderer, sorter) {
-			if (Array.isArray(data)) {
+			if (data == null || Array.isArray(data)) {
 				// construct with array, local data
 				this._local = true;
 				this._initArray = data;
