@@ -277,7 +277,7 @@
 			return this.state.tabs;
 		},
 		clearTabs: function(callback) {
-			this.setState({tabs: null}, callback.call(this));
+			this.setState({tabs: null}, callback.bind(this));
 		},
 		/**
 		 * return [] when is null

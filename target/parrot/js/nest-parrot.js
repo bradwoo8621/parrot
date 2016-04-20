@@ -4867,7 +4867,7 @@
 			return this.state.tabs;
 		},
 		clearTabs: function (callback) {
-			this.setState({ tabs: null }, callback.call(this));
+			this.setState({ tabs: null }, callback.bind(this));
 		},
 		/**
    * return [] when is null
@@ -16138,7 +16138,7 @@
 				if (typeof value === 'number') {
 					value = value + '';
 				}
-				if (!(value + '').isBlank()) {
+				if (!value.isBlank()) {
 					var format = this.getTextFormat();
 					if (format) {
 						var formatValue = value;
