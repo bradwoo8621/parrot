@@ -16169,7 +16169,7 @@
 				if (typeof value === 'number') {
 					value = value + '';
 				}
-				if (!value.isBlank()) {
+				if (!(value + '').isBlank()) {
 					var format = this.getTextFormat();
 					if (format) {
 						var formatValue = value;
