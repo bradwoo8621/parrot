@@ -3652,8 +3652,10 @@
 				label = this.getValueFromModel();
 			}
 			var labelLayout = $pt.createCellLayout(this.getId(), $.extend(true, {}, {
-				comp: this.getComponentOption()
-				// css, pos, dataId, evt are all not necessary, since label will not use.
+				comp: this.getComponentOption(),
+				// view css
+				css: this.getAdditionalCSS('view')
+				// pos, dataId, evt are all not necessary, since label will not use.
 			}, {
 				label: label,
 				dataId: this.getDataId(),
@@ -16154,7 +16156,7 @@
 			return value;
 		},
 		getTextConvertor: function () {
-			return this.getComponentOption('convertor');
+			return this.getComponentOption('transformer') || this.getComponentOption('convertor');
 		},
 		getValueFromModel: function () {
 			var value = this.getModel().get(this.getDataId());

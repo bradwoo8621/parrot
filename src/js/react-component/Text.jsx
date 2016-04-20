@@ -359,7 +359,7 @@
 			return value;
 		},
 		getTextConvertor: function() {
-			return this.getComponentOption('convertor');
+			return this.getComponentOption('transformer') || this.getComponentOption('convertor');
 		},
 		getValueFromModel: function() {
 			var value = this.getModel().get(this.getDataId());

@@ -1181,8 +1181,10 @@
 				label = this.getValueFromModel();
 			}
 			var labelLayout = $pt.createCellLayout(this.getId(), $.extend(true, {}, {
-				comp: this.getComponentOption()
-				// css, pos, dataId, evt are all not necessary, since label will not use.
+				comp: this.getComponentOption(),
+				// view css
+				css: this.getAdditionalCSS('view')
+				// pos, dataId, evt are all not necessary, since label will not use.
 			}, {
 				label: label,
 				dataId: this.getDataId(),
