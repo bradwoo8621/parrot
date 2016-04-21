@@ -280,7 +280,10 @@
 					Define <code>convertor</code> to convert between value in model and display text in input.<br/>
 					<code>convertor</code> is a JSON object with two properties: <code>model</code> and <code>view</code>.
 					Both of properties need to be defined as a function, component calls function to convert value.<br/>
-					<code>NText.PERCENTAGE</code> is pre-defined to convert percentage value.
+					<code>NText.PERCENTAGE</code> is pre-defined to convert percentage value.<br/>
+					Since <code>NLabel</code> also has <code>convertor</code> attribute,
+					and if <code>NText</code> needs to be renderred under view mode,
+					use <code>transformer</code> instead of <code>convertor</code>. 
 					</span>,
 					xml: <NText model={model} layout={$pt.createCellLayout('value', layoutTemplate)}/>,
 					code: [modelCode, layoutCode, compCode],
