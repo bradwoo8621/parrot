@@ -52,7 +52,7 @@
 		throw exp;
 	};
 	var internalInstallMessages = function(source, target, prefix) {
-		console.log('prefix', prefix);
+		// console.log('prefix', prefix);
 		Object.keys(source).forEach(function(key) {
 			var message = source[key];
 			var existMessage = target[key];

@@ -1,4 +1,4 @@
-/** nest-parrot.V0.3.2 2016-04-20 */
+/** nest-parrot.V0.3.3 2016-04-22 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -275,7 +275,7 @@
 		throw exp;
 	};
 	var internalInstallMessages = function (source, target, prefix) {
-		console.log('prefix', prefix);
+		// console.log('prefix', prefix);
 		Object.keys(source).forEach(function (key) {
 			var message = source[key];
 			var existMessage = target[key];
