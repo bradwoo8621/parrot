@@ -11625,12 +11625,12 @@
 						} else {
 							label += ' - ' + text;
 						}
-						// $(ReactDOM.findDOMNode(this.refs.viewLabel)).text(label);
-						this.setState({ viewLabel: label });
+						$(ReactDOM.findDOMNode(this.refs.viewLabel)).text(label);
+						// this.setState({viewLabel: label})
 					}
 			} else {
-				$(ReactDOM.findDOMNode(this.refs.label)).val(text);
-			}
+					$(ReactDOM.findDOMNode(this.refs.label)).val(text);
+				}
 			// if label property id defined, and value changed, set to model
 			var labelPropertyId = this.getComponentOption('labelPropId');
 			if (labelPropertyId) {
@@ -11840,9 +11840,9 @@
 		getTextInViewMode: function () {
 			var value = this.getValueFromModel();
 			if (value != null) {
-				if (this.state.viewLabel) {
-					return this.state.viewLabel;
-				}
+				// if (this.state.viewLabel) {
+				// 	return this.state.viewLabel;
+				// }
 			}
 			return value;
 		}
