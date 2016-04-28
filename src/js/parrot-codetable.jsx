@@ -257,10 +257,12 @@
 			return !this._local && !this._allLoaded && (!this._loadedKeys || this._loadedKeys.indexOf(parentValue) == -1);
 		},
 		__rebuildPostData: function(parentValue) {
+			var values = {};
+			values[this.parentValueKey()] = parentValue;
 			if (this._postData) {
-				this._postData = $.extend({}, this._postData, {value: parentValue});
+				this._postData = $.extend({}, this._postData, values);
 			} else {
-				this._postData = {value: parentValue};
+				this._postData = values;
 			}
 			return this;
 		},
@@ -390,6 +392,14 @@
 				return this;
 			} else {
 				return this.__name;
+			}
+		},
+		parentValueKey: function(key) {
+			if (key) {
+				this.__parentValueKey = key;
+				return this;
+			} else {
+				return this.__parentValueKey ? this.__parentValueKey : $pt.ComponentConstants.CODETABLE_PARENT_VALUE_KEY;
 			}
 		}
 	});

@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.3.3 2016-04-22 */
+	/** nest-parrot.V0.3.3 2016-04-28 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -442,6 +442,7 @@
 		Nothing: { type: "nothing", label: false },
 		// date format
 		Default_Date_Format: "YYYY/MM/DD HH:mm:ss.SSS", // see momentjs
+		CODETABLE_PARENT_VALUE_KEY: 'value',
 		// exception codes
 		Err_Unsupported_Component: "PT-00001",
 		Err_Unuspported_Column_Sort: "PT-00002",
@@ -1069,10 +1070,12 @@
 			return !this._local && !this._allLoaded && (!this._loadedKeys || this._loadedKeys.indexOf(parentValue) == -1);
 		},
 		__rebuildPostData: function (parentValue) {
+			var values = {};
+			values[this.parentValueKey()] = parentValue;
 			if (this._postData) {
-				this._postData = $.extend({}, this._postData, { value: parentValue });
+				this._postData = $.extend({}, this._postData, values);
 			} else {
-				this._postData = { value: parentValue };
+				this._postData = values;
 			}
 			return this;
 		},
@@ -1202,6 +1205,14 @@
 				return this;
 			} else {
 				return this.__name;
+			}
+		},
+		parentValueKey: function (key) {
+			if (key) {
+				this.__parentValueKey = key;
+				return this;
+			} else {
+				return this.__parentValueKey ? this.__parentValueKey : $pt.ComponentConstants.CODETABLE_PARENT_VALUE_KEY;
 			}
 		}
 	});
