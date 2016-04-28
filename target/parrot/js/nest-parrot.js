@@ -11617,16 +11617,17 @@
 			if (this.isViewMode()) {
 				var value = this.getValueFromModel();
 				if (value == null) {
-					$(ReactDOM.findDOMNode(this.refs.viewLabel)).text('');
+					// $(ReactDOM.findDOMNode(this.refs.viewLabel)).text('');
 				} else {
-					var label = value;
-					if (text == null) {
-						label += ' - ' + NSearchText.NOT_FOUND;
-					} else {
-						label += ' - ' + text;
+						var label = value;
+						if (text == null) {
+							label += ' - ' + NSearchText.NOT_FOUND;
+						} else {
+							label += ' - ' + text;
+						}
+						// $(ReactDOM.findDOMNode(this.refs.viewLabel)).text(label);
+						this.setState({ viewLabel: label });
 					}
-					$(ReactDOM.findDOMNode(this.refs.viewLabel)).text(label);
-				}
 			} else {
 				$(ReactDOM.findDOMNode(this.refs.label)).val(text);
 			}
@@ -11838,7 +11839,11 @@
 		},
 		getTextInViewMode: function () {
 			var value = this.getValueFromModel();
-			if (value != null) {}
+			if (value != null) {
+				if (this.state.viewLabel) {
+					return this.state.viewLabel;
+				}
+			}
 			return value;
 		}
 	}));
