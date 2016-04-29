@@ -108,6 +108,30 @@
 						Actually, any object with sort function can be used as CodeTableSorter, even a plain JSON object.</span>
 					}
 				]
+			},
+			{
+				id: 'constants',
+				title: 'Constants',
+				desc: <span>Change the constants of code table.</span>,
+				children: [
+					{
+						id: 'valueKey',
+						title: 'Value Key',
+						pattern: '$pt.ComponentConstants.CODETABLE_PARENT_VALUE_KEY = \'value\';',
+						desc: <span>
+							The default key in remote code table posted JSON is <code>value</code>, it can be changed.
+						</span>
+					}, {
+						id: 'receiveProxy',
+						title: 'Data Receive Proxy',
+						pattern: '$pt.ComponentConstants.CODETABLE_RECEIVER_PROXY = null;',
+						desc: <span>
+							The default proxy of remote code table options receiver is <code>null</code>.<br/>
+							Proxy can be defined as a function which has one parameter <code>data : JSON[]</code>,
+							and returns <code>JSON[]</code> which fit the code table format.
+						</span>
+					}
+				]
 			}
 		];
 		return items;
