@@ -159,8 +159,12 @@
 				quiet: true,
 				async: async != null ? async : false
 			}).done(function (data) {
+				var receiveData = data;
+				if ($pt.ComponentConstants.CODETABLE_RECEIVER_PROXY) {
+					receiveData = $pt.ComponentConstants.CODETABLE_RECEIVER_PROXY.call(this, receiveData);
+				}
 				// init code table element array after get data from remote
-				_this.__initCodesArray(data, _this._renderer, _this._sorter);
+				_this.__initCodesArray(receiveData, _this._renderer, _this._sorter);
 			}).fail(function(jqXHR, textStatus, errorThrown) {
 				// error to console, quiet backend
 				_this.__initCodesArray(null, _this._renderer, _this._sorter);

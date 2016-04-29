@@ -443,6 +443,7 @@
 		// date format
 		Default_Date_Format: "YYYY/MM/DD HH:mm:ss.SSS", // see momentjs
 		CODETABLE_PARENT_VALUE_KEY: 'value',
+		CODETABLE_RECEIVER_PROXY: null,
 		// exception codes
 		Err_Unsupported_Component: "PT-00001",
 		Err_Unuspported_Column_Sort: "PT-00002",
@@ -972,8 +973,12 @@
 				quiet: true,
 				async: async != null ? async : false
 			}).done(function (data) {
+				var receiveData = data;
+				if ($pt.ComponentConstants.CODETABLE_RECEIVER_PROXY) {
+					receiveData = $pt.ComponentConstants.CODETABLE_RECEIVER_PROXY.call(this, receiveData);
+				}
 				// init code table element array after get data from remote
-				_this.__initCodesArray(data, _this._renderer, _this._sorter);
+				_this.__initCodesArray(receiveData, _this._renderer, _this._sorter);
 			}).fail(function (jqXHR, textStatus, errorThrown) {
 				// error to console, quiet backend
 				_this.__initCodesArray(null, _this._renderer, _this._sorter);
