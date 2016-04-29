@@ -11,7 +11,7 @@
 			{name: 'JQuery Storage API (Not Used Now)', url: 'https://github.com/julien-maurel/jQuery-Storage-API'},
 			{name: 'Bootstrap', url: 'http://getbootstrap.com/'},
 			{name: 'Bootwatch', url: 'https://bootswatch.com/'},
-			{name: 'Bootstrap DatetimePicker (Optional)', url: 'https://eonasdan.github.io/bootstrap-datetimepicker/'},
+			{name: 'Bootstrap DatetimePicker (Not Used Now)', url: 'https://eonasdan.github.io/bootstrap-datetimepicker/'},
 			{name: 'Bootstrap FileInput', url: 'https://github.com/kartik-v/bootstrap-fileinput'},
 			{name: 'ES5-Shim (IE8)', url: 'https://github.com/es-shims/es5-shim'},
 			{name: 'Font Awesome', url: 'http://fortawesome.github.io/Font-Awesome/'},
@@ -23,7 +23,7 @@
 			{name: 'ReactJS', url: 'http://facebook.github.io/react/'},
 			{name: 'React-Bootstrap (Not Used Now)', url: 'http://react-bootstrap.github.io/'},
 			{name: 'Respond (IE8)', url: 'https://github.com/scottjehl/Respond'},
-			{name: 'Select2 (Optional)', url: 'https://select2.github.io/'}
+			{name: 'Select2 (Not Used Now)', url: 'https://select2.github.io/'}
 		];
 		var renderParty = function (party) {
 			return (<div className='col-sm-12 col-md-12 col-lg-12'>

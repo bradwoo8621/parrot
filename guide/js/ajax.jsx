@@ -47,6 +47,14 @@
 				pattern: '$pt.mock()',
 				desc: <span>Sames as <code>$.mockjax</code>, accepts any paramters which accepted by Mockjax.<br/>
 				Include Mockjax first if call this API, or do nothing.</span>
+			}, {
+				id: 'constants',
+				title: 'Constants',
+				pattern: '$pt.AjaxConstants',
+				desc: <span>
+					<code>$pt.AjaxConstants.ContentType</code> to setup the default content types.<br/>
+					<code>$pt.AjaxConstants.Stringify</code> to setup the default stringify behaviours.
+				</span>
 			}
 		];
 		return items;

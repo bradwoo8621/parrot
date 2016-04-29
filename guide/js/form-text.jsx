@@ -207,12 +207,35 @@
 					template: layoutTemplate
 				});
 				return {
-					id: 'text-event',
-					title: 'Event',
+					id: 'text-event-keyup',
+					title: 'KeyUp',
 					desc: 'Capture the key up event.',
 					xml: <NText model={model} layout={$pt.createCellLayout('value', layoutTemplate)}/>,
 					code: [modelCode, layoutCode, compCode],
 					index: 10
+				};
+			},
+			blur: function () {
+				var layoutTemplate = {
+					evt: {
+						blur: function (evt) {
+							alert('Blur invoked.');
+							console.log(evt);
+						}
+					}
+				};
+				var layoutCode = $demo.convertCellLayoutCreatorToString({
+					variable: 'layout',
+					cellKey: 'value',
+					template: layoutTemplate
+				});
+				return {
+					id: 'text-event-blur',
+					title: 'Blur',
+					desc: 'Capture the blur event.',
+					xml: <NText model={model} layout={$pt.createCellLayout('value', layoutTemplate)}/>,
+					code: [modelCode, layoutCode, compCode],
+					index: 20
 				};
 			}
 		};
@@ -257,7 +280,10 @@
 					Define <code>convertor</code> to convert between value in model and display text in input.<br/>
 					<code>convertor</code> is a JSON object with two properties: <code>model</code> and <code>view</code>.
 					Both of properties need to be defined as a function, component calls function to convert value.<br/>
-					<code>NText.PERCENTAGE</code> is pre-defined to convert percentage value.
+					<code>NText.PERCENTAGE</code> is pre-defined to convert percentage value.<br/>
+					Since <code>NLabel</code> also has <code>convertor</code> attribute,
+					and if <code>NText</code> needs to be renderred under view mode,
+					use <code>transformer</code> instead of <code>convertor</code>. 
 					</span>,
 					xml: <NText model={model} layout={$pt.createCellLayout('value', layoutTemplate)}/>,
 					code: [modelCode, layoutCode, compCode],
@@ -340,11 +366,11 @@
 					children: $demo.convertToExampleList(format)
 				};
 			},
-			event: function () {
+			event: function() {
 				return {
 					id: 'text-event',
 					title: 'Event',
-					desc: 'Event capture.',
+					desc: 'Event capture',
 					index: 60,
 					children: $demo.convertToExampleList(event)
 				};

@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.2.0 2016-04-05 */
+	/** nest-parrot.V0.3.3 2016-04-29 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -298,6 +298,116 @@
 		var message = messages[key];
 		return message == null ? null : message;
 	};
+	$pt.__messagesDomain = {};
+	var throwMessageTypeConflictException = function (key, source, target) {
+		var exp = $pt.createComponentException($pt.ComponentConstants.Err_Incorrect_Messages_Format, 'Message [%1] has conflict type in source and target.'.format([key]));
+		exp.source = source;
+		exp.target = target;
+		throw exp;
+	};
+	var internalInstallMessages = function (source, target, prefix) {
+		// console.log('prefix', prefix);
+		Object.keys(source).forEach(function (key) {
+			var message = source[key];
+			var existMessage = target[key];
+			if (typeof message === 'object' && !Array.isArray(message)) {
+				if (existMessage) {
+					if (typeof existMessage === 'object' && !Array.isArray(existMessage)) {
+						internalInstallMessages(message, existMessage, prefix ? prefix + '.' + key : key);
+					} else {
+						throwMessageTypeConflictException(prefix ? prefix + '.' + key : key, message, existMessage);
+					}
+				} else {
+					// not exists in target, create a JSON to handle
+					target[key] = {};
+					internalInstallMessages(message, target[key], prefix ? prefix + '.' + key : key);
+				}
+			} else {
+				if (typeof existMessage === 'object' && !Array.isArray(existMessage)) {
+					throwMessageTypeConflictException(prefix ? prefix + '.' + key : key, message, existMessage);
+				} else {
+					if (existMessage) {
+						console.error('Message [%1] exists in target.'.format([prefix ? prefix + '.' + key : key]));
+						console.log('source message: ', source);
+						console.log('target message: ', target);
+					}
+					target[key] = message;
+				}
+			}
+		});
+	};
+	$pt.installMessages = function (domain, messagesJSON, messageTarget) {
+		if (typeof messagesJSON !== 'object') {
+			throw $pt.createComponentException($pt.ComponentConstants.Err_Incorrect_Messages_Format, 'Messages must be an JSON object.');
+		}
+		if (domain == null || typeof domain !== 'string' || domain.isBlank()) {
+			throw $pt.createComponentException($pt.ComponentConstants.Err_Incorrect_Messages_Format, 'Domain of messages must be a string.');
+		}
+		console.log('Start to install messages on domain [' + domain + '].');
+		var target = messageTarget ? messageTarget : $pt.messages;
+		internalInstallMessages(messagesJSON, target);
+		if (!$pt.__messagesDomain[domain]) {
+			$pt.__messagesDomain[domain] = {
+				domain: domain,
+				messages: []
+			};
+		}
+		$pt.__messagesDomain[domain].messages.push({
+			target: target,
+			json: messagesJSON
+		});
+		console.log('End of install messages on domain [' + domain + '].');
+	};
+	var internalUninstallMessages = function (source, target, prefix) {
+		Object.keys(source).forEach(function (key) {
+			var message = source[key];
+			var existMessage = target[key];
+			if (typeof message === 'object' && !Array.isArray(message)) {
+				if (existMessage) {
+					if (typeof existMessage === 'object' && !Array.isArray(existMessage)) {
+						internalUninstallMessages(message, existMessage, prefix ? prefix + '.' + key : key);
+						if (Object.keys(existMessage).length == 0) {
+							// all content removed, delete from target
+							delete target[key];
+						}
+					} else {
+						throwMessageTypeConflictException(prefix ? prefix + '.' + key : key, message, existMessage);
+					}
+				}
+			} else {
+				if (typeof existMessage === 'object' && !Array.isArray(existMessage)) {
+					throwMessageTypeConflictException(prefix ? prefix + '.' + key : key, message, existMessage);
+				} else {
+					delete target[key];
+				}
+			}
+		});
+	};
+	$pt.uninstallMessages = function (domain, messageTarget) {
+		if (domain == null || typeof domain !== 'string' || domain.isBlank()) {
+			throw $pt.createComponentException($pt.ComponentConstants.Err_Incorrect_Messages_Format, 'Domain of messages must be a string.');
+		}
+		console.log('Start to uninstall messages on domain [' + domain + '].');
+		var target = messageTarget ? messageTarget : $pt.messages;
+		var domainMessages = $pt.__messagesDomain[domain];
+		if (domainMessages) {
+			domainMessages.messages = domainMessages.messages.map(function (log) {
+				if (log.target === target) {
+					internalUninstallMessages(log.json, target);
+					return null;
+				} else {
+					return log;
+				}
+			}).filter(function (log) {
+				return log != null;
+			});
+			if (domainMessages.messages.length == 0) {
+				// all messages uninstalled, remove domain
+				delete $pt.__messagesDomain[domain];
+			}
+		}
+		console.log('End of uninstall messages on domain [' + domain + '].');
+	};
 	// components
 	$pt.Components = {};
 	$pt.exposeComponents = function (context) {
@@ -332,11 +442,14 @@
 		Nothing: { type: "nothing", label: false },
 		// date format
 		Default_Date_Format: "YYYY/MM/DD HH:mm:ss.SSS", // see momentjs
+		CODETABLE_PARENT_VALUE_KEY: 'value',
+		CODETABLE_RECEIVER_PROXY: null,
 		// exception codes
 		Err_Unsupported_Component: "PT-00001",
 		Err_Unuspported_Column_Sort: "PT-00002",
 		Err_Search_Text_Trigger_Digits_Not_Defined: "PT-00003",
 		Err_Tab_Index_Out_Of_Bound: "PT-00004",
+		Err_Incorrect_Messages_Format: 'PT-00005',
 		// http status
 		Http_Status: {
 			"0": "Browser Error",
@@ -429,6 +542,12 @@
 			GET: "application/json; charset=UTF-8",
 			DELETE: "application/json; charset=UTF-8",
 			PUT: "application/json; charset=UTF-8"
+		},
+		Stringify: {
+			POST: true,
+			GET: false,
+			DELETE: false,
+			PUT: true
 		}
 	};
 
@@ -472,7 +591,9 @@
 					console.error(data);
 					console.error(textStatus);
 					console.error(jqXHR);
-					$pt.Components.NExceptionModal.getExceptionModal().show('Javascript Error', err);
+					var message = 'Unknown error occurred, see console for more information.';
+					message = err ? err.stack ? err.stack : err.toString ? err.toString() : message : message;
+					$pt.Components.NExceptionModal.getExceptionModal().show('Javascript Error', message);
 				}
 			}
 		}).fail(function (jqXHR, textStatus, errorThrown) {
@@ -487,10 +608,13 @@
 					try {
 						callback(jqXHR, textStatus, errorThrown);
 					} catch (err) {
+						console.error(err);
 						console.error(data);
 						console.error(textStatus);
 						console.error(jqXHR);
-						$pt.Components.NExceptionModal.getExceptionModal().show('Javascript Error', err);
+						var message = 'Unknown error occurred, see console for more information.';
+						message = err ? err.stack ? err.stack : err.toString ? err.toString() : message : message;
+						$pt.Components.NExceptionModal.getExceptionModal().show('Javascript Error', message);
 					}
 				} else {
 					$pt.Components.NExceptionModal.getExceptionModal().show("" + jqXHR.status, jqXHR.responseText);
@@ -504,6 +628,17 @@
 		});
 	};
 
+	var needStringify = function (predefine, specific) {
+		if (specific === true) {
+			return true;
+		} else if (specific === false) {
+			return false;
+		} else if (predefine === true) {
+			return true;
+		} else {
+			return false;
+		}
+	};
 	/**
   * http post
   * @param url {string}
@@ -512,6 +647,10 @@
   * @returns {jqXHR}
   */
 	$pt.internalDoPost = $pt.doPost = function (url, data, settings) {
+		settings = settings ? settings : {};
+		if (needStringify($pt.AjaxConstants.Stringify.POST, settings.stringify)) {
+			data = typeof data === 'string' ? data : JSON.stringify(data);
+		}
 		return submit($.extend({
 			method: "POST",
 			dataType: "json",
@@ -519,7 +658,7 @@
 		}, settings, {
 			url: url,
 			// always send string to server side
-			data: typeof data === 'string' ? data : JSON.stringify(data)
+			data: data
 		}));
 	};
 	/**
@@ -530,13 +669,17 @@
   * @returns {jqXHR}
   */
 	$pt.doPut = function (url, data, settings) {
+		settings = settings ? settings : {};
+		if (needStringify($pt.AjaxConstants.Stringify.PUT, settings.stringify)) {
+			data = typeof data === 'string' ? data : JSON.stringify(data);
+		}
 		return submit($.extend({
 			method: "PUT",
 			dataType: "json",
 			contentType: $pt.AjaxConstants.ContentType.PUT
 		}, settings, {
 			url: url,
-			data: typeof data === 'string' ? data : JSON.stringify(data)
+			data: data
 		}));
 	};
 	/**
@@ -547,7 +690,8 @@
   * @returns {jqXHR}
   */
 	$pt.doGet = function (url, data, settings) {
-		if (settings.stringify) {
+		settings = settings ? settings : {};
+		if (needStringify($pt.AjaxConstants.Stringify.GET, settings.stringify)) {
 			data = typeof data === 'string' ? data : JSON.stringify(data);
 		}
 		return submit($.extend({
@@ -567,7 +711,8 @@
   * @returns {jqXHR}
   */
 	$pt.doDelete = function (url, data, settings) {
-		if (settings.stringify) {
+		settings = settings ? settings : {};
+		if (needStringify($pt.AjaxConstants.Stringify.DELETE, settings.stringify)) {
 			data = typeof data === 'string' ? data : JSON.stringify(data);
 		}
 		return submit($.extend({
@@ -718,7 +863,7 @@
    * @param sorter {CodeTableSorter} optional
    */
 		constructor: function (data, renderer, sorter) {
-			if (Array.isArray(data)) {
+			if (data == null || Array.isArray(data)) {
 				// construct with array, local data
 				this._local = true;
 				this._initArray = data;
@@ -730,6 +875,41 @@
 			}
 			this._renderer = renderer;
 			this._sorter = sorter;
+		},
+		isInitialized: function () {
+			return this._initialized === true;
+		},
+		isRemote: function () {
+			return this._local === false;
+		},
+		isRemoteButNotInitialized: function () {
+			return this.isRemote() && !this.isInitialized();
+		},
+		initializeRemote: function () {
+			if (this.isRemoteButNotInitialized()) {
+				// return a promise to load remote codes
+				// since there might be more than one components using the same codetable
+				// log the first loading promise and returns to all others
+				if (!this._loading) {
+					this._loading = this.__loadRemoteCodes(true).always(function () {
+						delete this._loadding;
+						this._allLoaded = true;
+					}.bind(this));
+				}
+				return this._loading;
+			} else {
+				// already initialized, or is local
+				// return an immediately resolved promise
+				return $.Deferred(function (deferred) {
+					deferred.resolve();
+				}).promise();
+			}
+		},
+		setAsRemoteInitialized: function () {
+			this._codes = this._codes ? this._codes : [];
+			this._map = this._map ? this._map : {};
+			this._initialized = true;
+			return this;
 		},
 		/**
    * get renderer of code table
@@ -781,25 +961,30 @@
 				};
 				sort(this._codes);
 			}
+			return this;
 		},
 		/**
    * load remote code table, quiet and synchronized
    * @private
    */
-		__loadRemoteCodes: function () {
+		__loadRemoteCodes: function (async) {
 			var _this = this;
-			$pt.doPost(this._url, this._postData, {
+			return $pt.doPost(this._url, this._postData, {
 				quiet: true,
-				async: false,
-				done: function (data) {
-					// init code table element array after get data from remote
-					_this.__initCodesArray(data, _this._renderer, _this._sorter);
-					_this._initialized = true;
-				},
-				fail: function (jqXHR, textStatus, errorThrown) {
-					// error to console, quiet backend
-					window.console.error('Status:' + textStatus + ', error:' + errorThrown);
+				async: async != null ? async : false
+			}).done(function (data) {
+				var receiveData = data;
+				if ($pt.ComponentConstants.CODETABLE_RECEIVER_PROXY) {
+					receiveData = $pt.ComponentConstants.CODETABLE_RECEIVER_PROXY.call(this, receiveData);
 				}
+				// init code table element array after get data from remote
+				_this.__initCodesArray(receiveData, _this._renderer, _this._sorter);
+			}).fail(function (jqXHR, textStatus, errorThrown) {
+				// error to console, quiet backend
+				_this.__initCodesArray(null, _this._renderer, _this._sorter);
+				window.console.error('Status:' + textStatus + ', error:' + errorThrown);
+			}).always(function () {
+				_this._initialized = true;
 			});
 		},
 		/**
@@ -855,34 +1040,84 @@
 				return this.__getCodes().filter(func);
 			} else {
 				var value = func.value;
-				if (!this._local && (!this._loadedKeys || this._loadedKeys.indexOf(value) == -1)) {
-					// no local data, and loaded keys don't contain current value
-					// reset post data
-					if (this._postData) {
-						this._postData = $.extend({}, this._postData, { value: func.value });
-					} else {
-						this._postData = { value: func.value };
-					}
-					// store current local data
-					var existedCodes = this._codes != null ? this._codes : [];
-					var existedMap = this._map != null ? this._map : {};
-					// get data from server
-					this.__loadRemoteCodes();
-					// init loaded keys
-					if (!this._loadedKeys) {
-						this._loadedKeys = [];
-					}
-					// log the loaded keys
-					this._loadedKeys.push(value);
-					// merge server data and local data
-					this._codes.push.apply(this._codes, existedCodes);
-					this._map = $.extend(existedMap, this._map);
-				}
+				this.__loadRemoteCodeSegment(value);
 				// filter
 				return this.__getCodes().filter(function (code) {
 					return code[func.name] == value;
 				});
 			}
+		},
+		isSegmentLoaded: function (parentValue) {
+			return !this.__needLoadFromRemote(parentValue);
+		},
+		loadRemoteCodeSegment: function (parentValue) {
+			if (this.__needLoadFromRemote(parentValue)) {
+				// no local data, and loaded keys don't contain current value
+				// reset post data
+				this.__rebuildPostData(parentValue);
+				// store current local data
+				var existedData = this.__holdExistedCodes();
+				// get data from server
+				return this.__loadRemoteCodes(true).done(function () {
+					this.__setParentValueAsLoaded(parentValue);
+				}.bind(this)).always(function () {
+					this.__mergeAll(existedData);
+				}.bind(this));
+			} else {
+				// local or already loaded
+				// return an immediately resolved promise
+				return $.Deferred(function (deferred) {
+					deferred.resolve();
+				}).promise();
+			}
+		},
+		__needLoadFromRemote: function (parentValue) {
+			return !this._local && !this._allLoaded && (!this._loadedKeys || this._loadedKeys.indexOf(parentValue) == -1);
+		},
+		__rebuildPostData: function (parentValue) {
+			var values = {};
+			values[this.parentValueKey()] = parentValue;
+			if (this._postData) {
+				this._postData = $.extend({}, this._postData, values);
+			} else {
+				this._postData = values;
+			}
+			return this;
+		},
+		__holdExistedCodes: function () {
+			return {
+				codes: this._codes != null ? this._codes : [],
+				map: this._map != null ? this._map : {}
+			};
+		},
+		__mergeAll: function (existedData) {
+			// merge server data and local data
+			this._codes.push.apply(this._codes, existedData.codes);
+			this._map = $.extend(existedData.map, this._map);
+			return this;
+		},
+		__setParentValueAsLoaded: function (parentValue) {
+			// init loaded keys
+			if (!this._loadedKeys) {
+				this._loadedKeys = [];
+			}
+			// log the loaded keys
+			this._loadedKeys.push(parentValue);
+			return this;
+		},
+		__loadRemoteCodeSegment: function (parentValue) {
+			if (this.__needLoadFromRemote(parentValue)) {
+				// no local data, and loaded keys don't contain current value
+				// reset post data
+				this.__rebuildPostData(parentValue);
+				// store current local data
+				var existedData = this.__holdExistedCodes();
+				// get data from server
+				this.__loadRemoteCodes();
+				this.__setParentValueAsLoaded(parentValue);
+				this.__mergeAll(existedData);
+			}
+			return this;
 		},
 		/**
    * get element by given code
@@ -972,8 +1207,17 @@
 		name: function (name) {
 			if (name) {
 				this.__name = name;
+				return this;
 			} else {
 				return this.__name;
+			}
+		},
+		parentValueKey: function (key) {
+			if (key) {
+				this.__parentValueKey = key;
+				return this;
+			} else {
+				return this.__parentValueKey ? this.__parentValueKey : $pt.ComponentConstants.CODETABLE_PARENT_VALUE_KEY;
 			}
 		}
 	});
@@ -999,6 +1243,14 @@
   */
 	$pt.createCodeTable = function (items, renderer, sorter) {
 		return new CodeTable(items, renderer, sorter);
+	};
+	/**
+  * extend code table
+  * @param  {JSON} extendCodeTable extend class definition
+  * @return {jsface.Class} extend code table class
+  */
+	$pt.extendCodeTable = function (extendCodeTable) {
+		return jsface.Class(CodeTable, extendCodeTable);
 	};
 })(window, jQuery, jsface);
 
@@ -1219,7 +1471,7 @@
 				// close the required check
 				return true;
 			}
-			if (value == null || value.toString().isEmpty()) {
+			if (value == null || (value + '').toString().isEmpty()) {
 				return $pt.getMessage('validate.required');
 			} else {
 				return true;
@@ -1752,6 +2004,7 @@
    */
 		applyCurrentToBase: function () {
 			this.__base = $pt.mergeObject({ deep: true, target: {}, sources: this.__model });
+			this.__changed = false;
 			return this;
 		},
 		/**
@@ -3421,7 +3674,7 @@
 		isViewMode: function () {
 			var isViewMode = this.state ? this.state.isViewMode : null;
 			if (isViewMode == null) {
-				return this.props.view === true || this.getComponentOption('view');
+				return this.props.view === true || this.getComponentOption('view') === true;
 			} else {
 				return isViewMode;
 			}
@@ -3446,8 +3699,10 @@
 				label = this.getValueFromModel();
 			}
 			var labelLayout = $pt.createCellLayout(this.getId(), $.extend(true, {}, {
-				comp: this.getComponentOption()
-				// css, pos, dataId, evt are all not necessary, since label will not use.
+				comp: this.getComponentOption(),
+				// view css
+				css: this.getAdditionalCSS('view')
+				// pos, dataId, evt are all not necessary, since label will not use.
 			}, {
 				label: label,
 				dataId: this.getDataId(),
@@ -4045,6 +4300,17 @@
 				vertical: this.getComponentOption('direction') === 'vertical'
 			};
 			css[this.getComponentCSS('n-array-check')] = true;
+			return React.createElement($pt.Components.NCodeTableWrapper, { codetable: this.getCodeTable(),
+				className: $pt.LayoutHelper.classSet(css),
+				renderer: this.getRealRenderer });
+		},
+		getRealRenderer: function () {
+			var enabled = this.isEnabled();
+			var css = {
+				'n-disabled': !enabled,
+				vertical: this.getComponentOption('direction') === 'vertical'
+			};
+			css[this.getComponentCSS('n-array-check')] = true;
 			return React.createElement(
 				'div',
 				{ className: $pt.LayoutHelper.classSet(css) },
@@ -4539,7 +4805,7 @@
    */
 		render: function () {
 			var tabs = this.getTabs();
-			var canActiveProxy = (function (newTabValue, newTabIndex, activeTabValue, activeTabIndex) {
+			var canActiveProxy = function (newTabValue, newTabIndex, activeTabValue, activeTabIndex) {
 				if (this.isAddable() && newTabIndex == tabs.length - 1) {
 					var onAdd = this.getComponentOption('onAdd');
 					onAdd.call(this, this.getModel(), this.getValueFromModel());
@@ -4550,7 +4816,7 @@
 						return canActive.call(this, newTabValue, newTabIndex, activeTabValue, activeTabIndex);
 					}
 				}
-			}).bind(this);
+			}.bind(this);
 			return React.createElement(
 				'div',
 				{ className: this.getComponentCSS('n-array-tab') },
@@ -4650,7 +4916,7 @@
 			return this.state.tabs;
 		},
 		clearTabs: function (callback) {
-			this.setState({ tabs: null }, callback.call(this));
+			this.setState({ tabs: null }, callback.bind(this));
 		},
 		/**
    * return [] when is null
@@ -4902,11 +5168,11 @@
 		renderMoreButtons: function (css) {
 			var more = this.getComponentOption('more');
 			if (more) {
+				// onClick={this.onClicked}
 				var dropdown = React.createElement(
 					'a',
 					{ href: 'javascript:void(0);',
 						className: $pt.LayoutHelper.classSet(css) + ' dropdown-toggle',
-						onClick: this.onClicked,
 						disabled: !this.isEnabled(),
 						'data-toggle': 'dropdown',
 						'aria-haspopup': 'true',
@@ -5284,6 +5550,104 @@
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Check, function (model, layout, direction, viewMode) {
 		return React.createElement($pt.Components.NCheck, $pt.LayoutHelper.transformParameters(model, layout, direction, viewMode));
 	});
+})(window, jQuery, React, ReactDOM, $pt);
+
+(function (window, $, React, ReactDOM, $pt) {
+	var NCodeTableWrapper = React.createClass($pt.defineCellComponent({
+		displayName: 'CodeTableWrapper',
+		statics: {
+			ON_LOADING_ICON: 'fa fa-fw fa-spinner fa-spin',
+			ON_LOADING: 'On Loading...'
+		},
+		propTypes: {},
+		getDefaultProps: function () {
+			return {};
+		},
+		getInitialState: function () {
+			return {};
+		},
+		/**
+   * did mount
+   */
+		componentDidMount: function () {
+			var codetable = this.getCodeTable();
+			if (this.state.paintWrapper) {
+				if (this.hasParent()) {
+					var parentValue = this.getParentValue();
+					if (parentValue == null) {
+						if (this.loadWhenNoParentValue()) {
+							// load all when no parent value
+							codetable.initializeRemote().done(this.repaint);
+						} else {
+							codetable.setAsRemoteInitialized();
+							this.repaint();
+						}
+					} else {
+						// only load segments according to parent value
+						codetable.loadRemoteCodeSegment(parentValue).done(this.repaint);
+					}
+				} else {
+					// no parent, load all
+					codetable.initializeRemote().done(this.repaint);
+				}
+			}
+		},
+		repaint: function () {
+			this.setState({
+				paintWrapper: false
+			});
+		},
+		needWrapper: function () {
+			var codetable = this.getCodeTable();
+			var need = true;
+			if (Array.isArray(codetable)) {
+				// is an array, not code table instance
+				need = false;
+			} else if (this.hasParent() && this.getParentValue() == null && !this.loadWhenNoParentValue()) {
+				// has parent, no parent value, no options when no parent value
+				need = false;
+			} else if (!codetable.isRemoteButNotInitialized()) {
+				// initialized remote data
+				need = false;
+			}
+			return need;
+		},
+		render: function () {
+			if (this.needWrapper()) {
+				this.state.paintWrapper = true;
+				var className = this.props.className ? this.props.className + ' n-codetable-wrapper form-control' : 'n-codetable-wrapper form-control';
+				return React.createElement(
+					'div',
+					{ className: className },
+					React.createElement('span', { className: 'n-ctol-icon ' + NCodeTableWrapper.ON_LOADING_ICON }),
+					React.createElement(
+						'span',
+						{ className: 'n-ctol-label' },
+						NCodeTableWrapper.ON_LOADING
+					)
+				);
+			} else {
+				this.state.paintWrapper = false;
+				return this.getWrappedRenderer().call(this);
+			}
+		},
+		getCodeTable: function () {
+			return this.props.codetable;
+		},
+		getWrappedRenderer: function () {
+			return this.props.renderer;
+		},
+		hasParent: function () {
+			return this.props.hasParent;
+		},
+		loadWhenNoParentValue: function () {
+			return this.props.hasParent ? this.props.loadWhenNoParentValue : true;
+		},
+		getParentValue: function () {
+			return this.props.parentValue;
+		}
+	}));
+	$pt.Components.NCodeTableWrapper = NCodeTableWrapper;
 })(window, jQuery, React, ReactDOM, $pt);
 
 /**
@@ -9247,14 +9611,14 @@
 		hide: function () {
 			var model = this.state.model;
 			if (this.state.buttons && typeof this.state.buttons.cancel === 'function') {
-				this.state.buttons.cancel.call(this, model, (function () {
+				this.state.buttons.cancel.call(this, model, function () {
 					this.setState({
 						visible: false,
 						model: null,
 						layout: null,
 						buttons: null
 					});
-				}).bind(this));
+				}.bind(this));
 			} else {
 				this.setState({
 					visible: false,
@@ -10644,14 +11008,14 @@
 			if (expanded) {
 				if (this.canExpanded()) {
 					// panel can be expanded
-					$(ReactDOM.findDOMNode(this.refs.body)).slideDown(300, (function () {
+					$(ReactDOM.findDOMNode(this.refs.body)).slideDown(300, function () {
 						this.setState({ expanded: true });
-					}).bind(this));
+					}.bind(this));
 				}
 			} else {
-				$(ReactDOM.findDOMNode(this.refs.body)).slideUp(300, (function () {
+				$(ReactDOM.findDOMNode(this.refs.body)).slideUp(300, function () {
 					this.setState({ expanded: false });
-				}).bind(this));
+				}.bind(this));
 			}
 		},
 		/**
@@ -11026,14 +11390,25 @@
 				'n-disabled': !this.isEnabled(),
 				'n-view-mode': this.isViewMode()
 			};
-			// <input type="hidden" style={{display: "none"}}
-			// 	   onChange={this.onComponentChanged} value={this.getValueFromModel()}
-			// 	   ref='txt'/>
+			return React.createElement($pt.Components.NCodeTableWrapper, { codetable: this.getCodeTable(),
+				className: $pt.LayoutHelper.classSet(css),
+				renderer: this.getRealRenderer });
+		},
+		getRealRenderer: function () {
+			var css = {
+				'n-radio': true,
+				vertical: this.getComponentOption('direction') === 'vertical',
+				'n-disabled': !this.isEnabled(),
+				'n-view-mode': this.isViewMode()
+			};
 			return React.createElement(
 				'div',
 				{ className: this.getComponentCSS($pt.LayoutHelper.classSet(css)) },
-				this.getComponentOption("data").map(this.renderRadio)
+				this.getCodeTable().map(this.renderRadio)
 			);
+		},
+		getCodeTable: function () {
+			return this.getComponentOption("data");
 		},
 		/**
    * inner span clicked, force focus to outer span
@@ -11278,19 +11653,20 @@
 			if (this.isViewMode()) {
 				var value = this.getValueFromModel();
 				if (value == null) {
-					$(ReactDOM.findDOMNode(this.refs.viewLabel)).text('');
+					// $(ReactDOM.findDOMNode(this.refs.viewLabel)).text('');
 				} else {
-					var label = value;
-					if (text == null) {
-						label += ' - ' + NSearchText.NOT_FOUND;
-					} else {
-						label += ' - ' + text;
+						var label = value;
+						if (text == null) {
+							label += ' - ' + NSearchText.NOT_FOUND;
+						} else {
+							label += ' - ' + text;
+						}
+						$(ReactDOM.findDOMNode(this.refs.viewLabel)).text(label);
+						// this.setState({viewLabel: label})
 					}
-					$(ReactDOM.findDOMNode(this.refs.viewLabel)).text(label);
-				}
 			} else {
-				$(ReactDOM.findDOMNode(this.refs.label)).val(text);
-			}
+					$(ReactDOM.findDOMNode(this.refs.label)).val(text);
+				}
 			// if label property id defined, and value changed, set to model
 			var labelPropertyId = this.getComponentOption('labelPropId');
 			if (labelPropertyId) {
@@ -11436,7 +11812,7 @@
 								}
 
 								$pt.internalDoPost(_this.getAdvancedSearchUrl(), currentModel, {
-									done: (function (data) {
+									done: function (data) {
 										if (typeof data === 'string') {
 											data = JSON.parse(data);
 										}
@@ -11447,7 +11823,7 @@
 										model.set('criteria' + $pt.PROPERTY_SEPARATOR + 'url', this.getAdvancedSearchUrl());
 										window.console.debug(model.getCurrentModel());
 										this.state.searchDialog.forceUpdate();
-									}).bind(_this)
+									}.bind(_this)
 								});
 							}
 						},
@@ -11499,7 +11875,11 @@
 		},
 		getTextInViewMode: function () {
 			var value = this.getValueFromModel();
-			if (value != null) {}
+			if (value != null) {
+				// if (this.state.viewLabel) {
+				// 	return this.state.viewLabel;
+				// }
+			}
 			return value;
 		}
 	}));
@@ -11581,11 +11961,20 @@
 		componentDidMount: function () {
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
+			this.registerToComponentCentral();
 			if (this.hasParent()) {
 				// add post change listener into parent model
 				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+				if (this.isOnLoadingWhenHasParent()) {
+					this.getCodeTable().loadRemoteCodeSegment(this.getParentPropertyValue()).done(function () {
+						this.setState({ onloading: false });
+					}.bind(this));
+				}
+			} else if (this.isOnLoadingWhenNoParent()) {
+				this.getCodeTable().initializeRemote().done(function () {
+					this.setState({ onloading: false });
+				}.bind(this));
 			}
-			this.registerToComponentCentral();
 		},
 		/**
    * will unmount
@@ -11610,7 +11999,11 @@
 		renderText: function () {
 			var value = this.getValueFromModel();
 			var itemText = null;
-			if (value != null) {
+			if (this.hasParent() && this.isOnLoadingWhenHasParent() && value != null) {
+				this.state.onloading = true;
+			} else if (this.isOnLoadingWhenNoParent()) {
+				this.state.onloading = true;
+			} else if (value != null) {
 				var item = this.getAvailableOptions().find(function (item) {
 					return item.id == value;
 				});
@@ -11619,11 +12012,11 @@
 				}
 			}
 			if (itemText == null) {
-				itemText = NSelect.PLACEHOLDER;
+				itemText = this.state.onloading ? $pt.Components.NCodeTableWrapper.ON_LOADING : this.getPlaceholder();
 			}
 			return React.createElement(
 				'div',
-				{ className: 'input-group form-control', onClick: this.onComponentClicked, ref: 'comp' },
+				{ className: 'input-group form-control', onClick: this.onComponentClicked },
 				React.createElement(
 					'span',
 					{ className: 'text' },
@@ -11638,9 +12031,6 @@
    * @returns {XML}
    */
 		render: function () {
-			if (this.isViewMode()) {
-				return this.renderInViewMode();
-			}
 			var css = {
 				'n-disabled': !this.isEnabled(),
 				'n-view-mode': this.isViewMode()
@@ -11648,7 +12038,7 @@
 			css[this.getComponentCSS('n-select')] = true;
 			return React.createElement(
 				'div',
-				{ className: $pt.LayoutHelper.classSet(css), tabIndex: '0', 'aria-readonly': 'true' },
+				{ className: $pt.LayoutHelper.classSet(css), tabIndex: '0', 'aria-readonly': 'true', ref: 'comp' },
 				this.renderText(),
 				this.renderNormalLine(),
 				this.renderFocusLine()
@@ -11830,13 +12220,67 @@
 				delete this.state.popoverDiv;
 			}
 		},
+		isOnLoadingWhenHasParent: function () {
+			var codetable = this.getCodeTable();
+			if (codetable == null || Array.isArray(codetable) || !codetable.isRemote()) {
+				return false;
+			}
+			var parentValue = this.getParentPropertyValue();
+			if (parentValue == null) {
+				// no parent value
+				if (this.isAvailableWhenNoParentValue()) {
+					// still need options
+					// check code table is remote and not initialized
+					// is on loading
+					return codetable.isRemoteButNotInitialized();
+				} else {
+					// otherwise not need load options
+					codetable.setAsRemoteInitialized();
+					return false;
+				}
+			} else {
+				// has parent value
+				// check code table segment is loaded or not
+				return !codetable.isSegmentLoaded(parentValue);
+			}
+		},
+		isOnLoadingWhenNoParent: function () {
+			// var value = this.getValueFromModel();
+			var codetable = this.getCodeTable();
+			// remote and not initialized
+			// is on loading
+			return codetable != null && !Array.isArray(codetable) && codetable.isRemoteButNotInitialized();
+		},
 		onComponentClicked: function () {
 			if (!this.isEnabled() || this.isViewMode()) {
 				// do nothing
 				return;
 			}
 			if (!this.state.popoverDiv || !this.state.popoverDiv.is(':visible')) {
-				this.showPopover();
+				var codetable = this.getCodeTable();
+				if (this.hasParent() && this.isOnLoadingWhenHasParent()) {
+					this.setState({
+						onloading: true
+					}, function () {
+						codetable.loadRemoteCodeSegment(this.getParentPropertyValue()).done(function () {
+							this.showPopover();
+						}.bind(this)).always(function () {
+							this.setState({ onloading: false });
+						}.bind(this));
+					}.bind(this));
+				} else if (this.isOnLoadingWhenNoParent()) {
+					this.setState({
+						onloading: true
+					}, function () {
+						codetable.initializeRemote().done(function () {
+							this.showPopover();
+						}.bind(this)).always(function () {
+							this.setState({ onloading: false });
+						}.bind(this));
+					}.bind(this));
+				} else {
+					this.showPopover();
+				}
 			}
 		},
 		onDocumentMouseDown: function (evt) {
@@ -11885,14 +12329,15 @@
    * @param evt
    */
 		onParentModelChanged: function (evt) {
-			var options = this.getAvailableOptions();
-			var currentValue = this.getValueFromModel();
-			var index = options.findIndex(function (item) {
-				return item.id == currentValue;
-			});
-			if (index == -1) {
-				this.setValueToModel(null);
-			}
+			// var options = this.getAvailableOptions();
+			// var currentValue = this.getValueFromModel();
+			// var index = options.findIndex(function(item) {
+			// 	return item.id == currentValue;
+			// });
+			// if (index == -1) {
+			this.setValueToModel(null);
+			// }
+			// this.forceUpdate();
 		},
 		/**
    * get parent model
@@ -11931,6 +12376,12 @@
 		convertDataOptions: function (options) {
 			return Array.isArray(options) ? options : options.list();
 		},
+		getPlaceholder: function () {
+			return this.getComponentOption('placeholder', NSelect.PLACEHOLDER);
+		},
+		getCodeTable: function () {
+			return this.getComponentOption('data');
+		},
 		/**
    * get available options.
    * if no parent assigned, return all data options
@@ -11938,19 +12389,19 @@
    */
 		getAvailableOptions: function () {
 			if (!this.hasParent()) {
-				return this.convertDataOptions(this.getComponentOption('data'));
+				return this.convertDataOptions(this.getCodeTable());
 			} else {
 				var parentValue = this.getParentPropertyValue();
 				if (parentValue == null) {
-					return this.isAvailableWhenNoParentValue() ? this.convertDataOptions(this.getComponentOption('data')) : [];
+					return this.isAvailableWhenNoParentValue() ? this.convertDataOptions(this.getCodeTable()) : [];
 				} else {
 					var filter = this.getComponentOption("parentFilter");
 					if (typeof filter === 'object') {
 						// call code table filter
-						return this.convertDataOptions(this.getComponentOption('data').filter($.extend({}, filter, { value: parentValue })));
+						return this.convertDataOptions(this.getCodeTable().filter($.extend({}, filter, { value: parentValue })));
 					} else {
 						// call local filter
-						var data = this.convertDataOptions(this.getComponentOption('data'));
+						var data = this.convertDataOptions(this.getCodeTable());
 						if (typeof filter === "function") {
 							return filter.call(this, parentValue, data);
 						} else {
@@ -12005,7 +12456,9 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NSelectTree = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelectTree',
-		statics: {},
+		statics: {
+			PLACEHOLDER: "Please Select..."
+		},
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
@@ -12075,6 +12528,11 @@
 				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
 			}
 			this.registerToComponentCentral();
+			if (this.isOnLoading()) {
+				this.getCodeTable().initializeRemote().done(function () {
+					this.setState({ onloading: false });
+				}.bind(this));
+			}
 		},
 		/**
    * will unmount
@@ -12099,7 +12557,7 @@
 		renderSelectionItem: function (codeItem, nodeId) {
 			return React.createElement(
 				"li",
-				null,
+				{ key: nodeId },
 				React.createElement("span", { className: "fa fa-fw fa-remove", onClick: this.onSelectionItemRemove.bind(this, nodeId) }),
 				codeItem.text
 			);
@@ -12194,14 +12652,36 @@
 			}
 		},
 		renderText: function () {
+			var renderContent = function () {
+				if (this.isOnLoading()) {
+					this.state.onloading = true;
+					return React.createElement(
+						"span",
+						{ className: "text" },
+						$pt.Components.NCodeTableWrapper.ON_LOADING
+					);
+				} else {
+					this.state.onloading = false;
+					var value = this.getValueFromModel();
+					if (value == null || Array.isArray(value) && value.length == 0 || typeof value === 'object' && Object.keys(value).length == 0) {
+						return React.createElement(
+							"span",
+							{ className: "text" },
+							NSelectTree.PLACEHOLDER
+						);
+					} else {
+						return React.createElement(
+							"ul",
+							{ className: "selection" },
+							this.renderSelection()
+						);
+					}
+				}
+			}.bind(this);
 			return React.createElement(
 				"div",
 				{ className: "input-group form-control", onClick: this.onComponentClicked, ref: "comp" },
-				React.createElement(
-					"ul",
-					{ className: "selection" },
-					this.renderSelection()
-				),
+				renderContent(),
 				React.createElement("span", { className: "fa fa-fw fa-sort-down pull-right" })
 			);
 		},
@@ -12332,12 +12812,27 @@
 				delete this.state.popoverDiv;
 			}
 		},
+		isOnLoading: function () {
+			// var value = this.getValueFromModel();
+			var codetable = this.getCodeTable();
+			// remote and not initialized
+			// is on loading
+			return codetable.isRemoteButNotInitialized();
+		},
 		onComponentClicked: function () {
 			if (!this.isEnabled() || this.isViewMode()) {
 				// do nothing
 				return;
 			}
-			this.showPopover();
+
+			if (this.isOnLoading()) {
+				this.getCodeTable().initializeRemote().done(function () {
+					this.setState({ onloading: false });
+					this.showPopover();
+				}.bind(this));
+			} else {
+				this.showPopover();
+			}
 		},
 		onDocumentMouseDown: function (evt) {
 			var target = $(evt.target);
@@ -12455,7 +12950,7 @@
    * get tree model
    * @returns {CodeTable}
    */
-		getTreeModel: function () {
+		getCodeTable: function () {
 			return this.getComponentOption('data');
 		},
 		/**
@@ -12464,7 +12959,8 @@
    */
 		getAvailableTreeModel: function () {
 			var filter = this.getComponentOption('parentFilter');
-			var tree = this.getTreeModel();
+			var tree = this.getCodeTable();
+			// fetch data from remote is not supported now
 			if (filter) {
 				return filter.call(this, tree, this.getParentPropertyValue());
 			} else {
@@ -13593,7 +14089,7 @@
 						}
 						rowIndex++;
 					});
-					_this.forceUpdate();
+					_this.forceUpdate(_this.onCheckAllChanged.bind(_this, selected));
 				}
 			});
 			return React.createElement($pt.Components.NCheck, { model: model, layout: layout });
@@ -13933,12 +14429,10 @@
 		/**
    * render row select cell
    * @param column
-   * @param data
+   * @param model
    * @returns {XML}
    */
-		renderRowSelectCell: function (column, data) {
-			var model = $pt.createModel(data);
-			model.useBaseAsCurrent();
+		renderRowSelectCell: function (column, model) {
 			var _this = this;
 			model.addListener(column.rowSelectable, 'post', 'change', function (evt) {
 				_this.forceUpdate();
@@ -14000,7 +14494,7 @@
 							// index column
 							data = rowIndex;
 						} else if (column.rowSelectable) {
-							data = _this.renderRowSelectCell(column, row);
+							data = _this.renderRowSelectCell(column, inlineModel);
 						} else if (column.inline) {
 							// inline editor or something, can be pre-defined or just declare as be constructed as a form layout
 							if (typeof column.inline === 'string') {
@@ -14807,6 +15301,12 @@
 				$(ReactDOM.findDOMNode(this.refs['add-button'])).hide();
 			}
 		},
+		onCheckAllChanged: function (selected) {
+			var monitor = this.getEventMonitor('checkAll');
+			if (monitor) {
+				monitor.call(this, selected);
+			}
+		},
 		/**
    * on add button clicked
    */
@@ -15405,10 +15905,10 @@
 			},
 			PERCENTAGE: {
 				model: function (value) {
-					return isNaN(value) ? value : (value + '').movePointLeft(2);
+					return isNaN(value) || (value + '').isBlank() ? value : (value + '').movePointLeft(2);
 				},
 				view: function (value) {
-					return isNaN(value) ? value : (value + '').movePointRight(2);
+					return isNaN(value) || (value + '').isBlank() ? value : (value + '').movePointRight(2);
 				}
 			}
 		},
@@ -15607,15 +16107,33 @@
 					this.getComponent().val(formattedValue);
 				}
 			}
-			this.setValueToModel(value);
+			if (!this.textEquals(value, this.getValueFromModel())) {
+				this.setValueToModel(value);
+			}
+			var monitor = this.getEventMonitor('blur');
+			if (monitor) {
+				monitor.call(this, evt);
+			}
+		},
+		hasText: function (value) {
+			return value != null && !(value + '').isEmpty();
+		},
+		textEquals: function (v1, v2) {
+			var hasText1 = this.hasText(v1);
+			var hasText2 = this.hasText(v2);
+			return hasText1 ? v1 == v2 : !hasText2;
 		},
 		/**
    * on component change
    * @param evt
    */
 		onComponentChanged: function (evt) {
-			// window.console.debug('Text component changed[modelValue=' + this.getValueFromModel() + ', compValue=' + evt.target.value + '].');
-			this.setValueToModel(evt.target.value);
+			// console.debug('Text component changed[modelValue=' + this.getValueFromModel() + ', compValue=' + evt.target.value + '].');
+			var newValue = evt.target.value;
+			var oldValue = this.getValueFromModel();
+			if (!this.textEquals(newValue, oldValue)) {
+				this.setValueToModel(evt.target.value);
+			}
 		},
 		/**
    * on model change
@@ -15690,12 +16208,12 @@
 			return value;
 		},
 		getTextConvertor: function () {
-			return this.getComponentOption('convertor');
+			return this.getComponentOption('transformer') || this.getComponentOption('convertor');
 		},
 		getValueFromModel: function () {
 			var value = this.getModel().get(this.getDataId());
 			var convertor = this.getTextConvertor();
-			if (convertor) {
+			if (convertor && convertor.view) {
 				return convertor.view.call(this, value);
 			} else {
 				return value;
@@ -15703,11 +16221,14 @@
 		},
 		setValueToModel: function (value) {
 			var convertor = this.getTextConvertor();
-			if (convertor) {
+			if (convertor && convertor.model) {
 				this.getModel().set(this.getDataId(), convertor.model.call(this, value));
 			} else {
 				this.getModel().set(this.getDataId(), value);
 			}
+		},
+		getTextInViewMode: function () {
+			return this.getModel().get(this.getDataId());
 		}
 	}));
 	$pt.Components.NText = NText;
@@ -16182,6 +16703,7 @@
         componentWillUpdate: function (nextProps) {
             // remove post change listener to handle model change
             this.removePostChangeListener(this.__forceUpdate);
+            this.removeEnableDependencyMonitor();
             this.unregisterFromComponentCentral();
         },
         /**
@@ -16192,6 +16714,7 @@
         componentDidUpdate: function (prevProps, prevState) {
             // add post change listener to handle model change
             this.addPostChangeListener(this.__forceUpdate);
+            this.addEnableDependencyMonitor();
             this.registerToComponentCentral();
         },
         componentWillMount: function () {
@@ -16203,20 +16726,10 @@
             if (expandLevel === 'all') {
                 expandLevel = 9999;
             }
-            var _this = this;
-            var expand = function (parentId, node, level) {
-                if (level < expandLevel) {
-                    var nodeId = _this.getNodeId(parentId, node);
-                    _this.state.activeNodes[nodeId] = node;
-                    if (node.children) {
-                        node.children.forEach(function (child) {
-                            expand(nodeId, child, level + 1);
-                        });
-                    }
-                }
-            };
-            this.state.root.children = this.getTopLevelNodes();
-            expand(null, this.state.root, 0);
+            if (this.state.root.children) {
+                // this.state.root.children = this.getTopLevelNodes();
+                this.expandTo(expandLevel);
+            }
         },
         /**
          * did mount
@@ -16224,6 +16737,7 @@
         componentDidMount: function () {
             // add post change listener to handle model change
             this.addPostChangeListener(this.__forceUpdate);
+            this.addEnableDependencyMonitor();
             this.registerToComponentCentral();
         },
         /**
@@ -16232,6 +16746,7 @@
         componentWillUnmount: function () {
             // remove post change listener to handle model change
             this.removePostChangeListener(this.__forceUpdate);
+            this.removeEnableDependencyMonitor();
             this.unregisterFromComponentCentral();
         },
         renderCheck: function (node, nodeId) {
@@ -16243,11 +16758,16 @@
             modelValue = modelValue ? modelValue : {};
             var model = $pt.createModel({ selected: this.isNodeChecked(nodeId) });
             model.useBaseAsCurrent();
-            var layout = $pt.createCellLayout('selected', {
+            var layoutJSON = {
                 comp: {
                     type: $pt.ComponentConstants.Check
                 }
-            });
+            };
+            var valueCanChange = this.isNodeCheckCanChange(node);
+            if (valueCanChange != null) {
+                layoutJSON.comp.enabled = valueCanChange;
+            }
+            var layout = $pt.createCellLayout('selected', layoutJSON);
             model.addPostChangeListener('selected', this.onNodeCheckChanged.bind(this, node, nodeId));
             return React.createElement($pt.Components.NCheck, { model: model, layout: layout, view: this.isViewMode() });
         },
@@ -16280,23 +16800,58 @@
                 React.createElement($pt.Components.NIcon, folderIconAttrs)
             );
 
+            var _this = this;
+            var buttons = this.getComponentOption('nodeOperations');
+            buttons = buttons ? Array.isArray(buttons) ? buttons : [buttons] : [];
+            buttons = buttons.map(function (button, buttonIndex) {
+                var visible = true;
+                if (typeof button.visible === 'boolean') {
+                    visible = button.visible;
+                } else if (typeof button.visible === 'function') {
+                    visible = button.visible.call(_this, node);
+                }
+                if (!visible) {
+                    return null;
+                }
+                var icon = {
+                    icon: button.icon,
+                    fixWidth: true
+                };
+                return React.createElement(
+                    'a',
+                    { href: 'javascript:void(0);',
+                        onClick: _this.onNodeOperationClicked.bind(_this, node, button.click),
+                        className: 'node-button',
+                        key: buttonIndex,
+                        title: button.text },
+                    React.createElement($pt.Components.NIcon, icon)
+                );
+            }).filter(function (button) {
+                return button != null;
+            });
+
             var active = this.isActive(nodeId) ? 'active' : null;
             return React.createElement(
                 'li',
                 { className: active, key: nodeId },
-                opIcon,
-                folderIcon,
-                this.renderCheck(node, nodeId),
                 React.createElement(
-                    'a',
-                    {
-                        href: 'javascript:void(0);',
-                        onClick: this.onNodeClicked.bind(this, node, nodeId) },
+                    'div',
+                    { className: 'node-content' },
+                    opIcon,
+                    folderIcon,
+                    this.renderCheck(node, nodeId),
                     React.createElement(
-                        'span',
-                        { className: 'node-text' },
-                        this.getNodeText(node)
-                    )
+                        'a',
+                        {
+                            href: 'javascript:void(0);',
+                            onClick: this.onNodeClicked.bind(this, node, nodeId) },
+                        React.createElement(
+                            'span',
+                            { className: 'node-text' },
+                            this.getNodeText(node)
+                        )
+                    ),
+                    buttons
                 ),
                 this.renderNodes(node, nodeId)
             );
@@ -16321,6 +16876,10 @@
             );
         },
         renderTopLevel: function () {
+            return React.createElement($pt.Components.NCodeTableWrapper, { codetable: this.getCodeTable(),
+                renderer: this.getRealTopLevelRenderer });
+        },
+        getRealTopLevelRenderer: function () {
             var root = this.state.root;
             root.children = this.getTopLevelNodes();
             return this.isRootPaint() ? this.renderRoot() : this.renderNodes(root, this.getNodeId(null, root));
@@ -16369,6 +16928,11 @@
             var nodeClick = this.getComponentOption('nodeClick');
             if (nodeClick) {
                 nodeClick.call(this, node);
+            }
+        },
+        onNodeOperationClicked: function (node, click) {
+            if (click) {
+                click.call(this, node);
             }
         },
         onNodeCheckChanged: function (node, nodeId, evt, toChildOnly) {
@@ -16510,6 +17074,34 @@
             checkNodeOnChildren(this.state.root, this.getNodeId(null, this.state.root));
             // window.console.log(modelValue);
         },
+        expandTo: function (expandLevel) {
+            var activeNodes = $.extend({}, this.state.activeNodes);
+            var _this = this;
+            var expand = function (parentId, node, level) {
+                if (level < expandLevel) {
+                    var nodeId = _this.getNodeId(parentId, node);
+                    activeNodes[nodeId] = node;
+                    if (node.children) {
+                        node.children.forEach(function (child) {
+                            expand(nodeId, child, level + 1);
+                        });
+                    }
+                }
+            };
+            expand(null, this.state.root, 0);
+
+            var previousActiveNodes = null;
+            this.setState(function (previousState, currentProps) {
+                previousActiveNodes = previousState.activeNodes;
+                return { activeNodes: activeNodes };
+            }, function () {
+                _this.notifyEvent({
+                    type: 'expand',
+                    before: previousActiveNodes,
+                    after: activeNodes
+                });
+            });
+        },
         expandAll: function () {
             var activeNodes = $.extend({}, this.state.activeNodes);
             var root = this.state.root;
@@ -16540,26 +17132,27 @@
         },
         collapseAll: function () {
             var _this = this;
-            var root = this.state.root;
-            var nodeIds = null;
-            if (this.isRootPaint()) {
-                // this.collapseNode(root, this.getNodeId(null, root));
-                nodeIds = [this.getNodeId(null, root)];
-            } else {
-                var rootNodeId = this.getNodeId(null, root);
-                if (root.children) {
-                    // root.children.forEach(function(node) {
-                    //     this.collapseNode(node, this.getNodeId(rootNodeId, node));
-                    // }.bind(this));
-                    nodeIds = root.children.map(function (node) {
-                        return _this.getNodeId(rootNodeId, node);
-                    });
-                }
-            }
-            var regexp = new RegExp(nodeIds.map(function (nodeId) {
-                return '(' + nodeId + ')';
-            }).join(NTree.NODE_SEPARATOR));
-            var activeNodes = $.extend({}, this.state.activeNodes);
+            // var root = this.state.root;
+            // var nodeIds = null;
+            // if (this.isRootPaint()) {
+            //     // this.collapseNode(root, this.getNodeId(null, root));
+            //     nodeIds = [this.getNodeId(null, root)];
+            // } else {
+            //     var rootNodeId = this.getNodeId(null, root);
+            //     if (root.children) {
+            //         // root.children.forEach(function(node) {
+            //         //     this.collapseNode(node, this.getNodeId(rootNodeId, node));
+            //         // }.bind(this));
+            //         nodeIds = root.children.map(function(node) {
+            //             return _this.getNodeId(rootNodeId, node);
+            //         });
+            //     }
+            // }
+            // var regexp = new RegExp(nodeIds.map(function(nodeId) {
+            //     return '(' + nodeId + ')';
+            // }).join(NTree.NODE_SEPARATOR));
+            // var activeNodes = $.extend({}, this.state.activeNodes);
+            var activeNodes = {};
             Object.keys(activeNodes).forEach(function (key) {
                 if (key.match(regexp)) {
                     delete activeNodes[key];
@@ -16657,13 +17250,13 @@
          * @returns {{}[]}
          */
         getTopLevelNodes: function () {
-            return this.getAvailableNodes().list();
+            return this.getCodeTable().list();
         },
         /**
          * get avaiable top level nodes
          * @returns {CodeTable}
          */
-        getAvailableNodes: function () {
+        getCodeTable: function () {
             return this.getComponentOption('data');
         },
         getNodeIcon: function (node, nodeId) {
@@ -16781,6 +17374,16 @@
                 return check;
             } else {
                 return false;
+            }
+        },
+        isNodeCheckCanChange: function (node) {
+            var change = this.getComponentOption('valueCanCheck');
+            if (typeof change === 'function') {
+                return change.call(this, node);
+            } else if (change != null) {
+                return change;
+            } else {
+                return true;
             }
         },
         /**

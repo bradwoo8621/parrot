@@ -136,14 +136,15 @@
 				return {
 					id: 'select-properties',
 					title: 'Properties',
-					desc: ['Available properties.', 'Refers to Select2'],
+					desc: ['Available properties.'],
 					index: 30,
 					code: $demo.convertJSON({
 						variable: 'layout',
 						json: {
 							comp: {
 								allowClear: null,
-								minimumResultsForSearch: null
+								minimumResultsForSearch: null,
+								placeholder: 'Hello World'
 							}
 						}
 					})
