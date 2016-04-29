@@ -62,10 +62,10 @@
 			},
 			PERCENTAGE: {
 				model: function(value) {
-					return isNaN(value) ? value : ((value + '').movePointLeft(2));
+					return (isNaN(value) || (value + '').isBlank()) ? value : ((value + '').movePointLeft(2));
 				},
 				view: function(value) {
-					return isNaN(value) ? value : ((value + '').movePointRight(2));
+					return (isNaN(value) || (value + '').isBlank()) ? value : ((value + '').movePointRight(2));
 				}
 			}
 		},

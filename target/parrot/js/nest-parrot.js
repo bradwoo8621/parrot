@@ -1,4 +1,4 @@
-/** nest-parrot.V0.3.3 2016-04-28 */
+/** nest-parrot.V0.3.3 2016-04-29 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -15869,10 +15869,10 @@
 			},
 			PERCENTAGE: {
 				model: function (value) {
-					return isNaN(value) ? value : (value + '').movePointLeft(2);
+					return isNaN(value) || (value + '').isBlank() ? value : (value + '').movePointLeft(2);
 				},
 				view: function (value) {
-					return isNaN(value) ? value : (value + '').movePointRight(2);
+					return isNaN(value) || (value + '').isBlank() ? value : (value + '').movePointRight(2);
 				}
 			}
 		},
