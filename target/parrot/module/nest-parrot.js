@@ -1466,7 +1466,7 @@
 				// close the required check
 				return true;
 			}
-			if (value == null || value.toString().isEmpty()) {
+			if (value == null || (value + '').toString().isEmpty()) {
 				return $pt.getMessage('validate.required');
 			} else {
 				return true;
