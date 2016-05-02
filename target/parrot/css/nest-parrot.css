@@ -2911,6 +2911,86 @@ div.n-file .file-input div.btn.btn-file {
   display: inline-block;
   text-decoration: none;
 }
+.n-tree li > div.node-content > a.node-text-link-1,
+.n-tree li > div.node-content > a:hover.node-text-link-1,
+.n-tree li > div.node-content > a:visited.node-text-link-1,
+.n-tree li > div.node-content > a:active.node-text-link-1,
+.n-tree li > div.node-content > a:focus.node-text-link-1 {
+  padding-right: 22px;
+  margin-right: -22px;
+}
+.n-tree li > div.node-content > a.node-text-link-2,
+.n-tree li > div.node-content > a:hover.node-text-link-2,
+.n-tree li > div.node-content > a:visited.node-text-link-2,
+.n-tree li > div.node-content > a:active.node-text-link-2,
+.n-tree li > div.node-content > a:focus.node-text-link-2 {
+  padding-right: 39px;
+  margin-right: -39px;
+}
+.n-tree li > div.node-content > a.node-text-link-3,
+.n-tree li > div.node-content > a:hover.node-text-link-3,
+.n-tree li > div.node-content > a:visited.node-text-link-3,
+.n-tree li > div.node-content > a:active.node-text-link-3,
+.n-tree li > div.node-content > a:focus.node-text-link-3 {
+  padding-right: 56px;
+  margin-right: -56px;
+}
+.n-tree li > div.node-content > a.node-text-link-4,
+.n-tree li > div.node-content > a:hover.node-text-link-4,
+.n-tree li > div.node-content > a:visited.node-text-link-4,
+.n-tree li > div.node-content > a:active.node-text-link-4,
+.n-tree li > div.node-content > a:focus.node-text-link-4 {
+  padding-right: 73px;
+  margin-right: -73px;
+}
+.n-tree li > div.node-content > a.node-text-link-5,
+.n-tree li > div.node-content > a:hover.node-text-link-5,
+.n-tree li > div.node-content > a:visited.node-text-link-5,
+.n-tree li > div.node-content > a:active.node-text-link-5,
+.n-tree li > div.node-content > a:focus.node-text-link-5 {
+  padding-right: 90px;
+  margin-right: -90px;
+}
+.n-tree li > div.node-content > a.node-text-link-6,
+.n-tree li > div.node-content > a:hover.node-text-link-6,
+.n-tree li > div.node-content > a:visited.node-text-link-6,
+.n-tree li > div.node-content > a:active.node-text-link-6,
+.n-tree li > div.node-content > a:focus.node-text-link-6 {
+  padding-right: 107px;
+  margin-right: -107px;
+}
+.n-tree li > div.node-content > a.node-text-link-7,
+.n-tree li > div.node-content > a:hover.node-text-link-7,
+.n-tree li > div.node-content > a:visited.node-text-link-7,
+.n-tree li > div.node-content > a:active.node-text-link-7,
+.n-tree li > div.node-content > a:focus.node-text-link-7 {
+  padding-right: 124px;
+  margin-right: -124px;
+}
+.n-tree li > div.node-content > a.node-text-link-8,
+.n-tree li > div.node-content > a:hover.node-text-link-8,
+.n-tree li > div.node-content > a:visited.node-text-link-8,
+.n-tree li > div.node-content > a:active.node-text-link-8,
+.n-tree li > div.node-content > a:focus.node-text-link-8 {
+  padding-right: 141px;
+  margin-right: -141px;
+}
+.n-tree li > div.node-content > a.node-text-link-9,
+.n-tree li > div.node-content > a:hover.node-text-link-9,
+.n-tree li > div.node-content > a:visited.node-text-link-9,
+.n-tree li > div.node-content > a:active.node-text-link-9,
+.n-tree li > div.node-content > a:focus.node-text-link-9 {
+  padding-right: 158px;
+  margin-right: -158px;
+}
+.n-tree li > div.node-content > a.node-text-link-10,
+.n-tree li > div.node-content > a:hover.node-text-link-10,
+.n-tree li > div.node-content > a:visited.node-text-link-10,
+.n-tree li > div.node-content > a:active.node-text-link-10,
+.n-tree li > div.node-content > a:focus.node-text-link-10 {
+  padding-right: 175px;
+  margin-right: -175px;
+}
 .n-tree li > div.node-content > a.node-button {
   display: none;
 }

@@ -34,6 +34,14 @@
 		min-height: 30px;
 		display: inline-block;
 		text-decoration: none;
+		.generate-node-text-link(@n, @i: 1) when (@i =< @n) {
+			&.node-text-link-@{i} {
+				padding-right: (17 * @i) + 5px;
+				margin-right: 0 - ((17 * @i) + 5px);
+			}
+			.generate-node-text-link(@n, (@i + 1));
+		}
+		.generate-node-text-link(10);
 	}
 
 	li > div.node-content {

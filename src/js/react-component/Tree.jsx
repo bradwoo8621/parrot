@@ -221,7 +221,7 @@
                         {opIcon}
                         {folderIcon}
                         {this.renderCheck(node, nodeId)}
-                        <a
+                        <a className={'node-text-link-' + buttons.length}
                             href='javascript:void(0);'
                             onClick={this.onNodeClicked.bind(this, node, nodeId)}>
                             <span className='node-text'>{this.getNodeText(node)}</span>

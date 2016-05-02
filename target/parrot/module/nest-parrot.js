@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.3.3 2016-04-29 */
+	/** nest-parrot.V0.4.0 2016-05-02 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -16842,7 +16842,7 @@
                     this.renderCheck(node, nodeId),
                     React.createElement(
                         'a',
-                        {
+                        { className: 'node-text-link-' + buttons.length,
                             href: 'javascript:void(0);',
                             onClick: this.onNodeClicked.bind(this, node, nodeId) },
                         React.createElement(
