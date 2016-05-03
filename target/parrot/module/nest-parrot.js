@@ -872,6 +872,7 @@
 				this._local = false;
 				this._url = data.url;
 				this._postData = data.data;
+				this._remoteProxy = data.proxy;
 			}
 			this._renderer = renderer;
 			this._sorter = sorter;
@@ -969,10 +970,16 @@
    */
 		__loadRemoteCodes: function (async) {
 			var _this = this;
-			return $pt.doPost(this._url, this._postData, {
+			var remoteVisit = this._remoteProxy ? this._remoteProxy.call(this, {
+				url: this._url,
+				data: this._postData,
 				quiet: true,
 				async: async != null ? async : false
-			}).done(function (data) {
+			}) : $pt.doPost(this._url, this._postData, {
+				quiet: true,
+				async: async != null ? async : false
+			});
+			return remoteVisit.done(function (data) {
 				var receiveData = data;
 				if ($pt.ComponentConstants.CODETABLE_RECEIVER_PROXY) {
 					receiveData = $pt.ComponentConstants.CODETABLE_RECEIVER_PROXY.call(this, receiveData);
