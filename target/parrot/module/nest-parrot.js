@@ -444,6 +444,7 @@
 		Default_Date_Format: "YYYY/MM/DD HH:mm:ss.SSS", // see momentjs
 		CODETABLE_PARENT_VALUE_KEY: 'value',
 		CODETABLE_RECEIVER_PROXY: null,
+		CODETABLE_REMOTE_PROXY: null,
 		// exception codes
 		Err_Unsupported_Component: "PT-00001",
 		Err_Unuspported_Column_Sort: "PT-00002",
@@ -970,7 +971,8 @@
    */
 		__loadRemoteCodes: function (async) {
 			var _this = this;
-			var remoteVisit = this._remoteProxy ? this._remoteProxy.call(this, {
+			var remoteProxy = this.__getRemoteProxy();
+			var remoteVisit = remoteProxy ? remoteProxy.call(this, {
 				url: this._url,
 				data: this._postData,
 				quiet: true,
@@ -993,6 +995,9 @@
 			}).always(function () {
 				_this._initialized = true;
 			});
+		},
+		__getRemoteProxy: function () {
+			return this._remoteProxy || $pt.ComponentConstants.CODETABLE_REMOTE_PROXY;
 		},
 		/**
    * get code table element array

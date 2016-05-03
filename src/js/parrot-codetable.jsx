@@ -156,7 +156,8 @@
 		 */
 		__loadRemoteCodes: function (async) {
 			var _this = this;
-			var remoteVisit = this._remoteProxy ? this._remoteProxy.call(this, {
+			var remoteProxy = this.__getRemoteProxy();
+			var remoteVisit = remoteProxy ? remoteProxy.call(this, {
 				url: this._url,
 				data: this._postData,
 				quiet: true,
@@ -179,6 +180,9 @@
 			}).always(function() {
 				_this._initialized = true;
 			});
+		},
+		__getRemoteProxy: function() {
+			return this._remoteProxy || $pt.ComponentConstants.CODETABLE_REMOTE_PROXY;
 		},
 		/**
 		 * get code table element array
