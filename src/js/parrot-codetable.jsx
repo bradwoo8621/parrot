@@ -229,8 +229,9 @@
 				this.__loadRemoteCodeSegment(value);
 				// filter
 				return this.__getCodes().filter(function (code) {
+					this.__setParentValueAsLoaded(code[func.name]);
 					return code[func.name] == value;
-				});
+				}.bind(this));
 			}
 		},
 		isSegmentLoaded: function(parentValue) {
@@ -258,7 +259,8 @@
 			}
 		},
 		__needLoadFromRemote: function(parentValue) {
-			return !this._local && !this._allLoaded && (!this._loadedKeys || this._loadedKeys.indexOf(parentValue) == -1);
+			return !this._local && !this._allLoaded
+				&& (!this._loadedKeys || this._loadedKeys[parentValue + ''] !== true);
 		},
 		__rebuildPostData: function(parentValue) {
 			var values = {};
@@ -285,10 +287,12 @@
 		__setParentValueAsLoaded: function(parentValue) {
 			// init loaded keys
 			if (!this._loadedKeys) {
-				this._loadedKeys = [];
+				// this._loadedKeys = [];
+				this._loadedKeys = {};
 			}
 			// log the loaded keys
-			this._loadedKeys.push(parentValue);
+			// this._loadedKeys.push(parentValue);
+			this._loadedKeys[parentValue + ''] = true;
 			return this;
 		},
 		__loadRemoteCodeSegment: function(parentValue) {

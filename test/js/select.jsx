@@ -36,7 +36,14 @@
                         {id: '2', text: 'Option B', parent: '1'},
                         {id: '3', text: 'Option C', parent: '1'},
                         {id: '4', text: 'Option D', parent: '1'},
-                        {id: '5', text: 'Option E', parent: '1'}
+                        {id: '5', text: 'Option E', parent: '1'},
+                        // if other parent value received, code table automatically store
+                        {id: '6', text: 'Option F', parent: '2'},
+                        {id: '7', text: 'Option G', parent: '2'},
+                        {id: '8', text: 'Option H', parent: '2'},
+                        {id: '9', text: 'Option I', parent: '2'},
+                        {id: '10', text: 'Option J', parent: '2'},
+                        {id: '11', text: 'Option K', parent: '2'}
                     ];
                 } else if (data.value == '2') {
                     this.responseText = [
@@ -45,7 +52,13 @@
                         {id: '8', text: 'Option H', parent: '2'},
                         {id: '9', text: 'Option I', parent: '2'},
                         {id: '10', text: 'Option J', parent: '2'},
-                        {id: '11', text: 'Option K', parent: '2'}
+                        {id: '11', text: 'Option K', parent: '2'},
+
+                        {id: '1', text: 'Option A', parent: '1'},
+                        {id: '2', text: 'Option B', parent: '1'},
+                        {id: '3', text: 'Option C', parent: '1'},
+                        {id: '4', text: 'Option D', parent: '1'},
+                        {id: '5', text: 'Option E', parent: '1'}
                     ]
                 } else {
                     // throw 'error';
