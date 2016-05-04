@@ -80,7 +80,7 @@
 				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
 			}
 			this.registerToComponentCentral();
-			if (this.isOnLoading()) {
+			if (this.state.onloading) {
 				this.getCodeTable().initializeRemote().done(function() {
 					this.setState({onloading: false});
 				}.bind(this));

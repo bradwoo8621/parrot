@@ -71,18 +71,31 @@
 			this.addPostChangeListener(this.onModelChanged);
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
-			if (this.hasParent()) {
-				// add post change listener into parent model
-				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
-				if (this.isOnLoadingWhenHasParent()) {
-					this.getCodeTable().loadRemoteCodeSegment(this.getParentPropertyValue()).done(function() {
+			if (this.state.onloading) {
+				if (this.hasParent()) {
+					// add post change listener into parent model
+					this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+					var parentValue = this.getParentPropertyValue();
+					if (parentValue == null) {
+						// no parent value
+						if (this.isAvailableWhenNoParentValue()) {
+							this.getCodeTable().initializeRemote().done(function() {
+								this.setState({onloading: false});
+							}.bind(this));
+						} else {
+							this.getCodeTable().setAsRemoteInitialized();
+							this.setState({onloading: false});
+						}
+					} else {
+						this.getCodeTable().loadRemoteCodeSegment(parentValue).done(function() {
+							this.setState({onloading: false});
+						}.bind(this));
+					}
+				} else {
+					this.getCodeTable().initializeRemote().done(function() {
 						this.setState({onloading: false});
 					}.bind(this));
 				}
-			} else if (this.isOnLoadingWhenNoParent()) {
-				this.getCodeTable().initializeRemote().done(function() {
-					this.setState({onloading: false});
-				}.bind(this));
 			}
 		},
 		/**
