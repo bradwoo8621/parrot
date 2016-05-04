@@ -121,7 +121,7 @@
 				}
 			}
 			if (itemText == null) {
-				itemText = this.state.onloading ? $pt.Components.NCodeTableWrapper.ON_LOADING : this.getPlaceholder();
+				itemText = this.state.onloading ? $pt.Components.NCodeTableWrapper.ON_LOADING : (this.isViewMode() ? '' : this.getPlaceholder());
 			}
 			return (<div className='input-group form-control' onClick={this.onComponentClicked}>
 				<span className='text'>{itemText}</span>
@@ -507,19 +507,19 @@
 		},
 		getComponent: function() {
 			return $(ReactDOM.findDOMNode(this.refs.comp));
-		},
-		getTextInViewMode: function() {
-			var value = this.getValueFromModel();
-			if (value != null) {
-				var data = this.getAvailableOptions().some(function(item) {
-					if (item.id == value) {
-						value = item.text;
-						return true;
-					}
-					return false;
-				});
-			}
-			return value;
+		// },
+		// getTextInViewMode: function() {
+		// 	var value = this.getValueFromModel();
+		// 	if (value != null) {
+		// 		var data = this.getAvailableOptions().some(function(item) {
+		// 			if (item.id == value) {
+		// 				value = item.text;
+		// 				return true;
+		// 			}
+		// 			return false;
+		// 		});
+		// 	}
+		// 	return value;
 		}
 	}));
 	$pt.Components.NSelect = NSelect;

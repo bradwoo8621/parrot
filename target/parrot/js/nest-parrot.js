@@ -1,4 +1,4 @@
-/** nest-parrot.V0.4.0 2016-05-03 */
+/** nest-parrot.V0.4.1 2016-05-04 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -11996,7 +11996,7 @@
 				}
 			}
 			if (itemText == null) {
-				itemText = this.state.onloading ? $pt.Components.NCodeTableWrapper.ON_LOADING : this.getPlaceholder();
+				itemText = this.state.onloading ? $pt.Components.NCodeTableWrapper.ON_LOADING : this.isViewMode() ? '' : this.getPlaceholder();
 			}
 			return React.createElement(
 				'div',
@@ -12409,19 +12409,19 @@
 		},
 		getComponent: function () {
 			return $(ReactDOM.findDOMNode(this.refs.comp));
-		},
-		getTextInViewMode: function () {
-			var value = this.getValueFromModel();
-			if (value != null) {
-				var data = this.getAvailableOptions().some(function (item) {
-					if (item.id == value) {
-						value = item.text;
-						return true;
-					}
-					return false;
-				});
-			}
-			return value;
+			// },
+			// getTextInViewMode: function() {
+			// 	var value = this.getValueFromModel();
+			// 	if (value != null) {
+			// 		var data = this.getAvailableOptions().some(function(item) {
+			// 			if (item.id == value) {
+			// 				value = item.text;
+			// 				return true;
+			// 			}
+			// 			return false;
+			// 		});
+			// 	}
+			// 	return value;
 		}
 	}));
 	$pt.Components.NSelect = NSelect;

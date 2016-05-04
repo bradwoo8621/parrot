@@ -1502,6 +1502,9 @@ div.n-select.n-disabled:focus hr.focus-line {
 div.n-select.n-view-mode .form-control {
   cursor: default;
 }
+div.n-select.n-view-mode .form-control .text {
+  cursor: default;
+}
 div.n-select.n-view-mode .form-control .clear,
 div.n-select.n-view-mode .form-control .drop {
   display: none;
