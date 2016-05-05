@@ -866,8 +866,10 @@
 				if (date == null && text.length != 0) {
 					// invalid date
 					this.setValueToModel(null);
+					this.setValueToTextInput(null);
 				} else {
 					this.setValueToModel(date);
+					this.setValueToTextInput(this.getValueFromModel());
 				}
 			}
 		},

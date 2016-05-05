@@ -1,4 +1,4 @@
-/** nest-parrot.V0.4.1 2016-05-04 */
+/** nest-parrot.V0.4.3 2016-05-05 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -6602,8 +6602,10 @@
 				if (date == null && text.length != 0) {
 					// invalid date
 					this.setValueToModel(null);
+					this.setValueToTextInput(null);
 				} else {
 					this.setValueToModel(date);
+					this.setValueToTextInput(this.getValueFromModel());
 				}
 			}
 		},

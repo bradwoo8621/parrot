@@ -1,6 +1,6 @@
 {
   "name": "nest-parrot",
-  "version": "0.4.3", 
+  "version": "0.4.3",
   "description": "Parrot built on react",
   "main": "target/parrot/module/nest-parrot.js",
   "repository": {
@@ -55,10 +55,11 @@
     "grunt-contrib-uglify": "^0.9.1",
     "grunt-replace": "^0.9.2",
     "html5shiv": "^3.7.3",
-    "jquery.browser": "^0.1.0",
     "jquery-mockjax": "^2.0.1",
     "jquery-storage-api": "^1.7.5",
+    "jquery.browser": "^0.1.0",
     "js-cookie": "^2.0.4",
+    "moment": "^2.13.0",
     "moment-taiwan": "0.0.3",
     "respond.js": "^1.4.2"
   }
