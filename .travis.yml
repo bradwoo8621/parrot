@@ -39,3 +39,9 @@ notifications:
     rooms:
       - nest-parrot:z3jqw9krJbPu0CcQBKS90AnZ#travis-ci
 #      - nest-parrot:z3jqw9krJbPu0CcQBKS90AnZ#random
+
+deploy:
+    provider: npm
+    api_key: e15a99c8-cccb-480e-9d0e-3e73c837a748
+    on:
+        tags: true
