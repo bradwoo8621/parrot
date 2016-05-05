@@ -60,7 +60,7 @@
     "jquery.browser": "^0.1.0",
     "js-cookie": "^2.0.4",
     "moment": "^2.13.0",
-    "moment-taiwan": "0.0.3",
+    "moment-taiwan": "0.0.4",
     "respond.js": "^1.4.2"
   }
 }
