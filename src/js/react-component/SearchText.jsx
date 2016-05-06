@@ -227,6 +227,9 @@
 			if (value == null) {
 				value = '';
 			}
+			if (typeof value !== 'string') {
+				value = value + '';
+			}
 			if (value.isBlank() || (value.length != triggerDigits && triggerDigits != -1)) {
 				this.setLabelText(null);
 				return;

@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.4.3 2016-05-05 */
+	/** nest-parrot.V0.4.4 2016-05-06 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -11712,6 +11712,9 @@
 
 			if (value == null) {
 				value = '';
+			}
+			if (typeof value !== 'string') {
+				value = value + '';
 			}
 			if (value.isBlank() || value.length != triggerDigits && triggerDigits != -1) {
 				this.setLabelText(null);
