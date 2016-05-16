@@ -212,7 +212,12 @@
 		 * @returns {string}
 		 */
 		getStyle: function () {
-			return this.getComponentOption("style");
+			var style = this.getComponentOption('style');
+			if (typeof style === 'function') {
+				return style.call(this);
+			} else {
+				return style;
+			}
 		},
 		/**
 		 * get label position

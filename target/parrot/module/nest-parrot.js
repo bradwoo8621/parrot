@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.4.4 2016-05-11 */
+	/** nest-parrot.V0.4.4 2016-05-16 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -5315,7 +5315,12 @@
    * @returns {string}
    */
 		getStyle: function () {
-			return this.getComponentOption("style");
+			var style = this.getComponentOption('style');
+			if (typeof style === 'function') {
+				return style.call(this);
+			} else {
+				return style;
+			}
 		},
 		/**
    * get label position
