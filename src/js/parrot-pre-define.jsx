@@ -189,6 +189,7 @@
 		// date format
 		Default_Date_Format: "YYYY/MM/DD HH:mm:ss.SSS", // see momentjs
 		CODETABLE_PARENT_VALUE_KEY: 'value',
+		CODETABLE_SENDER_PROXY: null,
 		CODETABLE_RECEIVER_PROXY: null,
 		CODETABLE_REMOTE_PROXY: null,
 		// exception codes

@@ -58,7 +58,8 @@
 				this._local = false;
 				this._url = data.url;
 				this._postData = data.data;
-				this._remoteProxy = data.proxy;
+				this._sendProxy = data.proxy;
+				this._receiveProxy = data.receiver;
 			}
 			this._renderer = renderer;
 			this._sorter = sorter;
@@ -156,7 +157,7 @@
 		 */
 		__loadRemoteCodes: function (async) {
 			var _this = this;
-			var remoteProxy = this.__getRemoteProxy();
+			var remoteProxy = this.__getSendProxy();
 			var remoteVisit = remoteProxy ? remoteProxy.call(this, {
 				url: this._url,
 				data: this._postData,
@@ -168,8 +169,9 @@
 			});
 			return remoteVisit.done(function (data) {
 				var receiveData = data;
-				if ($pt.ComponentConstants.CODETABLE_RECEIVER_PROXY) {
-					receiveData = $pt.ComponentConstants.CODETABLE_RECEIVER_PROXY.call(this, receiveData);
+				var receiverProxy = _this.__getReceiveProxy();
+				if (receiverProxy) {
+					receiveData = receiverProxy.call(_this, receiveData);
 				}
 				// init code table element array after get data from remote
 				_this.__initCodesArray(receiveData, _this._renderer, _this._sorter);
@@ -181,8 +183,11 @@
 				_this._initialized = true;
 			});
 		},
-		__getRemoteProxy: function() {
-			return this._remoteProxy || $pt.ComponentConstants.CODETABLE_REMOTE_PROXY;
+		__getSendProxy: function() {
+			return this._sendProxy || $pt.ComponentConstants.CODETABLE_SENDER_PROXY || $pt.ComponentConstants.CODETABLE_REMOTE_PROXY;
+		},
+		__getReceiveProxy: function() {
+			return this._receiveProxy || $pt.ComponentConstants.CODETABLE_RECEIVER_PROXY;
 		},
 		/**
 		 * get code table element array
