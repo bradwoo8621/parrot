@@ -80,7 +80,7 @@
 				// log the first loading promise and returns to all others
 				if (!this._loading) {
 					this._loading = this.__loadRemoteCodes(true).always(function() {
-						delete this._loadding;
+						delete this._loading;
 						this._allLoaded = true;
 					}.bind(this));
 				}

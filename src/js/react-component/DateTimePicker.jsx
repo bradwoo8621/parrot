@@ -1005,7 +1005,7 @@
 			// since the text input might be incorrect date format,
 			// or use un-strict mode to format
 			// cannot know the result of moment format
-			// move process of changing to blur event
+			// move process to changing at blur event
 			var text = this.getTextInput().val();
 			if (text.length == 0 || text.isBlank())  {
 				this.setValueToModel(null);
@@ -1019,7 +1019,23 @@
 			}
 		},
 		onModelChange: function (evt) {
-			this.forceUpdate();
+			var newValue = evt.new;
+			var text = this.getTextInput().val();
+			if (newValue == null || (newValue + '').isBlank()) {
+				if (text == null || text.isBlank()) {
+					// do nothing
+				} else {
+					this.forceUpdate();
+				}
+			} else {
+				var valueDate = this.getValueFromModel();
+				var textDate = this.convertValueFromString(text, this.getDisplayFormat(), true);
+				if (valueDate.isSame(textDate)) {
+					// do nothing
+				} else {
+					this.forceUpdate();
+				}
+			}
 		},
 		getValueFromModel: function () {
 			return this.convertValueFromString(this.getModel().get(this.getDataId()));

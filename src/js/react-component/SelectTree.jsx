@@ -203,7 +203,7 @@
 		},
 		renderText: function() {
 			var renderContent = function() {
-				if (this.isOnLoading()) {
+				if (this.isOnLoading() && !this.isMounted()) {
 					this.state.onloading = true;
 					return <span className='text'>{$pt.Components.NCodeTableWrapper.ON_LOADING}</span>
 				} else {
