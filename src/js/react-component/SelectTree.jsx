@@ -211,7 +211,11 @@
 					var value = this.getValueFromModel();
 					if (value == null || (Array.isArray(value) && value.length == 0)
 				 		|| (typeof value === 'object' && Object.keys(value).length == 0)) {
-						return <span className='text'>{NSelectTree.PLACEHOLDER}</span>
+						if (this.isViewMode()) {
+							return <span className='text'/>;
+						} else {
+							return <span className='text'>{NSelectTree.PLACEHOLDER}</span>
+						}
 					} else {
 						return (<ul className='selection'>
 							{this.renderSelection()}

@@ -1,4 +1,4 @@
-/** nest-parrot.V0.4.5 2016-05-18 */
+/** nest-parrot.V0.4.6 2016-05-20 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -12693,11 +12693,15 @@
 					this.state.onloading = false;
 					var value = this.getValueFromModel();
 					if (value == null || Array.isArray(value) && value.length == 0 || typeof value === 'object' && Object.keys(value).length == 0) {
-						return React.createElement(
-							"span",
-							{ className: "text" },
-							NSelectTree.PLACEHOLDER
-						);
+						if (this.isViewMode()) {
+							return React.createElement("span", { className: "text" });
+						} else {
+							return React.createElement(
+								"span",
+								{ className: "text" },
+								NSelectTree.PLACEHOLDER
+							);
+						}
 					} else {
 						return React.createElement(
 							"ul",
