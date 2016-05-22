@@ -1,4 +1,4 @@
-/** nest-parrot.V0.4.6 2016-05-20 */
+/** nest-parrot.V0.4.6 2016-05-22 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -221,6 +221,93 @@
 	patches.number();
 	patches.array();
 })(window);
+
+// copy from https://github.com/princed/caret
+(function ($, window) {
+	function focus(target) {
+		if (!document.activeElement || document.activeElement !== target) {
+			target.focus();
+		}
+	}
+
+	$.fn.caret = function (pos) {
+		var target = this[0];
+		var range, range1, range2, bookmark;
+		var isContentEditable = target.contentEditable === 'true';
+		//get
+		if (arguments.length == 0) {
+			//HTML5
+			if (window.getSelection) {
+				//contenteditable
+				if (isContentEditable) {
+					focus(target);
+					var selection = window.getSelection();
+					// Opera 12 check
+					if (!selection.rangeCount) {
+						return 0;
+					}
+					range1 = selection.getRangeAt(0);
+					range2 = range1.cloneRange();
+					range2.selectNodeContents(target);
+					range2.setEnd(range1.endContainer, range1.endOffset);
+					return range2.toString().length;
+				}
+				//textarea
+				return target.selectionStart;
+			}
+			//IE<9
+			if (document.selection) {
+				focus(target);
+				//contenteditable
+				if (isContentEditable) {
+					range1 = document.selection.createRange();
+					range2 = document.body.createTextRange();
+					range2.moveToElementText(target);
+					range2.setEndPoint('EndToEnd', range1);
+					return range2.text.length;
+				}
+				//textarea
+				pos = 0;
+				range = target.createTextRange();
+				range2 = document.selection.createRange().duplicate();
+				bookmark = range2.getBookmark();
+				range.moveToBookmark(bookmark);
+				while (range.moveStart('character', -1) !== 0) {
+					pos++;
+				}
+				return pos;
+			}
+			//not supported
+			return 0;
+		}
+		//set
+		if (pos == -1) {
+			pos = this[isContentEditable ? 'text' : 'val']().length;
+		}
+		//HTML5
+		if (window.getSelection) {
+			//contenteditable
+			if (isContentEditable) {
+				focus(target);
+				window.getSelection().collapse(target.firstChild, pos);
+			}
+			//textarea
+			else target.setSelectionRange(pos, pos);
+		}
+		//IE<9
+		else if (document.body.createTextRange) {
+				range = document.body.createTextRange();
+				range.moveToElementText(target);
+				range.moveStart('character', pos);
+				range.collapse(true);
+				range.select();
+			}
+		if (!isContentEditable) {
+			focus(target);
+		}
+		return pos;
+	};
+})(jQuery, window);
 
 (function (window) {
 	var $pt = window.$pt;
@@ -12237,6 +12324,14 @@
 				popover.addClass('right-to-left');
 			}
 			popover.css({ top: styles.top, left: styles.left });
+
+			var filterText = this.state.popoverDiv.find('div.n-text input[type=text]');
+			if (this.state.filteTextCaret != null) {
+				filterText.caret(this.state.filteTextCaret);
+			} else {
+				filterText.caret(filterText.val().length);
+			}
+			filterText.focus();
 		},
 		hidePopover: function () {
 			this.destroyPopover();
@@ -12344,6 +12439,13 @@
 			this.setValueToModel(null);
 		},
 		onFilterTextChange: function (evt) {
+			if (this.state.popoverDiv.is(':visible')) {
+				var filterText = this.state.popoverDiv.find('div.n-text input[type=text]');
+				this.state.filteTextCaret = filterText.caret();
+			} else {
+				this.state.filteTextCaret = null;
+			}
+			console.log('caret', this.state.filteTextCaret);
 			this.showPopover(evt.new);
 		},
 		/**

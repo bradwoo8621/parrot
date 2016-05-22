@@ -302,6 +302,14 @@
 				popover.addClass('right-to-left');
 			}
 			popover.css({top: styles.top, left: styles.left});
+
+			var filterText = this.state.popoverDiv.find('div.n-text input[type=text]');
+			if (this.state.filteTextCaret != null) {
+				filterText.caret(this.state.filteTextCaret);
+			} else {
+				filterText.caret(filterText.val().length)
+			}
+			filterText.focus();
 		},
 		hidePopover: function() {
 			this.destroyPopover();
@@ -410,6 +418,13 @@
 			this.setValueToModel(null);
 		},
 		onFilterTextChange: function(evt) {
+			if (this.state.popoverDiv.is(':visible')) {
+				var filterText = this.state.popoverDiv.find('div.n-text input[type=text]');
+				this.state.filteTextCaret = filterText.caret();
+			} else {
+				this.state.filteTextCaret = null;
+			}
+			console.log('caret', this.state.filteTextCaret);
 			this.showPopover(evt.new);
 		},
 		/**
