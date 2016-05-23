@@ -85,6 +85,7 @@
 					this.setState({onloading: false});
 				}.bind(this));
 			}
+			this.state.mounted = true;
 		},
 		/**
 		 * will unmount
@@ -203,7 +204,7 @@
 		},
 		renderText: function() {
 			var renderContent = function() {
-				if (this.isOnLoading() && !this.isMounted()) {
+				if (this.isOnLoading() && !this.state.mounted) {
 					this.state.onloading = true;
 					return <span className='text'>{$pt.Components.NCodeTableWrapper.ON_LOADING}</span>
 				} else {

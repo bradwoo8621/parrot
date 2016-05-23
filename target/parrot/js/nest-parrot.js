@@ -1,4 +1,4 @@
-/** nest-parrot.V0.4.6 2016-05-22 */
+/** nest-parrot.V0.4.7 2016-05-23 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -12664,6 +12664,7 @@
 					this.setState({ onloading: false });
 				}.bind(this));
 			}
+			this.state.mounted = true;
 		},
 		/**
    * will unmount
@@ -12784,7 +12785,7 @@
 		},
 		renderText: function () {
 			var renderContent = function () {
-				if (this.isOnLoading() && !this.isMounted()) {
+				if (this.isOnLoading() && !this.state.mounted) {
 					this.state.onloading = true;
 					return React.createElement(
 						"span",
