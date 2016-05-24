@@ -1799,6 +1799,7 @@
 			for (var index = 0, count = value.length; index < count; index++) {
 				var item = value[index];
 				var itemModel = $pt.createModel(item, validator);
+				itemModel.parent(model);
 				if (phase) {
 					itemModel.validateByPhase(phase);
 				} else {
