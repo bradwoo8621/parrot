@@ -1,4 +1,4 @@
-/** nest-parrot.V0.4.7 2016-05-23 */
+/** nest-parrot.V0.4.7 2016-05-24 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -7233,7 +7233,8 @@
 					removeIcon: '<i class="fa fa-fw fa-trash-o"></i>',
 					removeClass: 'btn btn-link',
 					showClose: false,
-					showPreview: true
+					showPreview: true,
+					inputName: 'fileData'
 				}
 			};
 		},
@@ -7377,6 +7378,7 @@
 					className: $pt.LayoutHelper.classSet(inputCSS),
 					multiple: this.allowMultipleFiles(),
 					disabled: !this.isEnabled(),
+					name: this.getComponentOption('inputName'),
 					ref: 'file' }),
 				this.renderNormalLine(),
 				this.renderFocusLine()
