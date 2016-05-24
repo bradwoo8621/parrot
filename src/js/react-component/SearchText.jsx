@@ -241,7 +241,7 @@
 					code: value
 				};
 				if (NSearchText.SEARCH_PROXY) {
-					postData = NSearchText.SEARCH_PROXY.call(this, postData);
+					postData = NSearchText.SEARCH_PROXY.call(_this, postData);
 				}
 				$pt.internalDoPost(_this.getSearchUrl(), postData, {
 					quiet: true
@@ -251,7 +251,7 @@
 					}
 					var name = data.name;
 					if (NSearchText.SEARCH_PROXY_CALLBACK) {
-						name = NSearchText.SEARCH_PROXY_CALLBACK.call(this, data);
+						name = NSearchText.SEARCH_PROXY_CALLBACK.call(_this, data);
 					}
 					_this.setLabelText(name);
 				}).fail(function() {
