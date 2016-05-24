@@ -1593,9 +1593,9 @@
    * @returns {string|boolean} return true when pass the validation
    */
 		length: function (model, value, length) {
-			if (value == null || value.length == 0) {
+			if (value == null || (value + '').length == 0) {
 				return true;
-			} else if (value.length != length) {
+			} else if ((value + '').length != length) {
 				return $pt.getMessage('validate.length').format(['%1', '' + length]);
 			}
 		},
@@ -1607,9 +1607,9 @@
    * @returns {string|boolean} return true when pass the validation
    */
 		maxlength: function (model, value, length) {
-			if (value == null || value.length == 0) {
+			if (value == null || (value + '').length == 0) {
 				return true;
-			} else if (value.length > length) {
+			} else if ((value + '').length > length) {
 				return $pt.getMessage('validate.length.max').format(['%1', '' + length]);
 			}
 		},
@@ -1621,9 +1621,9 @@
    * @returns {string|boolean} return true when pass the validation
    */
 		minlength: function (model, value, length) {
-			if (value == null || value.length == 0) {
+			if (value == null || (value + '').length == 0) {
 				return true;
-			} else if (value.length < length) {
+			} else if ((value + '').length < length) {
 				return $pt.getMessage('validate.length.min').format(['%1', '' + length]);
 			}
 		},
