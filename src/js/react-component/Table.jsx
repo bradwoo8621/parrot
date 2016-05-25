@@ -967,6 +967,7 @@
 								} else {
 									column.inline.css = {cell: 'inline-editor'};
 								}
+								column.inline.label = column.inline.label ? column.inline.label : column.title;
 								data = <$pt.Components.NFormCell model={inlineModel}
 								                                 layout={$pt.createCellLayout(column.data, column.inline)}
 								                                 direction='horizontal'

@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.4.7 2016-05-24 */
+	/** nest-parrot.V0.4.8 2016-05-25 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -14694,6 +14694,7 @@
 								} else {
 									column.inline.css = { cell: 'inline-editor' };
 								}
+								column.inline.label = column.inline.label ? column.inline.label : column.title;
 								data = React.createElement($pt.Components.NFormCell, { model: inlineModel,
 									layout: $pt.createCellLayout(column.data, column.inline),
 									direction: 'horizontal',
