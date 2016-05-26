@@ -1090,6 +1090,14 @@
 					index: 50,
 					children: $demo.convertToExampleList(scroll)
 				}
+			},
+			headerAlign: function() {
+				return {
+					id: 'table-style-headerAlign',
+					title: 'Header Align',
+					desc: <span>Header alignment, use <code>headerAlign: 'center'</code> in <code>columns</code> element, possible value is any value can apply to <code>text-align</code>.</span>,
+
+				}
 			}
 		};
 
