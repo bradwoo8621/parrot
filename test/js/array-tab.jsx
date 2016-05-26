@@ -3,7 +3,7 @@
  */
 (function () {
     var model = $pt.createModel({
-        items: [{name: 'Name A', count: 5}, {name: 'Name B', count: 6}]
+        items: [{name: 'Name A', count: 5}, {name: 'Name B', count: 6}, {name: 'Name C', count: 7}]
     });
 
     var panelTemplate = {
@@ -14,6 +14,7 @@
             onAdd: function(model, value) {
                 console.log(model);
                 console.log(value);
+                model.add('items', {});
             },
             canActive: function() {
                 console.log(arguments);
