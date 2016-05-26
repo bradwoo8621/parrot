@@ -320,7 +320,7 @@
 				if (index == data.length) {
 					index = index - 1;
 				}
-				this.state.transientActiveTabIndex = evt.index;
+				this.state.transientActiveTabIndex = index;
 				// this.clearTabs(this.setActiveTabIndex.bind(this, index));
 			} else {
 				// this.forceUpdate();
