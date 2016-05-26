@@ -164,6 +164,12 @@
 		 * @returns {XML}
 		 */
 		render: function () {
+			// when state.clear is true, forcily clear the dom
+			// and then delete the state
+			// see the following code in #onModelChanged
+			// this.setState({clear: true}, this.forceUpdate);
+			// forceUpdate must be passed as callback to #setState
+			// all these are to remove the flicking when remove data from model side
 			if (this.state.clear === true) {
 				delete this.state.clear;
 				return (<div />);
