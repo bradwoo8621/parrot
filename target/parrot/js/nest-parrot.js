@@ -4885,6 +4885,11 @@
    * @returns {XML}
    */
 		render: function () {
+			if (this.state.clear === true) {
+				delete this.state.clear;
+				return React.createElement('div', null);
+			}
+
 			var tabs = this.getTabs();
 			var canActiveProxy = function (newTabValue, newTabIndex, activeTabValue, activeTabIndex) {
 				if (this.isAddable() && newTabIndex == tabs.length - 1) {
@@ -5040,13 +5045,14 @@
 					if (index == data.length) {
 						index = index - 1;
 					}
-					this.state.transientActiveTabIndex = evt.index;
+					this.state.transientActiveTabIndex = index;
 					// this.clearTabs(this.setActiveTabIndex.bind(this, index));
 				} else {
 						// this.forceUpdate();
 						this.state.transientActiveTabIndex = evt.index != null ? evt.index : null;
 					}
-			this.forceUpdate();
+			this.setState({ clear: true }, this.forceUpdate);
+			// this.forceUpdate();
 		},
 		/**
    * monitor the parent model validation

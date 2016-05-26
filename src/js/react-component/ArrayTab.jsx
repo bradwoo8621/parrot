@@ -164,6 +164,11 @@
 		 * @returns {XML}
 		 */
 		render: function () {
+			if (this.state.clear === true) {
+				delete this.state.clear;
+				return (<div />);
+			}
+
 			var tabs = this.getTabs();
 			var canActiveProxy = function(newTabValue, newTabIndex, activeTabValue, activeTabIndex) {
 				if (this.isAddable() && (newTabIndex == tabs.length - 1)) {
@@ -326,7 +331,8 @@
 				// this.forceUpdate();
 				this.state.transientActiveTabIndex = evt.index != null ? evt.index : null;
 			}
-			this.forceUpdate();
+			this.setState({clear: true}, this.forceUpdate);
+			// this.forceUpdate();
 		},
 		/**
 		 * monitor the parent model validation
