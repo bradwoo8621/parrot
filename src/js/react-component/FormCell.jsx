@@ -138,7 +138,9 @@
 				$(ReactDOM.findDOMNode(this.refs.tooltip)).popover(tooltipPopover);
 			}
 
-			if (this.getLayout().getComponentType().popover !== false && this.getModel().hasError(this.getDataId())) {
+			if ($pt.ComponentConstants.ERROR_POPOVER 
+					&& this.getLayout().getComponentType().popover !== false 
+					&& this.getModel().hasError(this.getDataId())) {
 				var messages = this.getModel().getError(this.getDataId());
 				var _this = this;
 				var popover = {

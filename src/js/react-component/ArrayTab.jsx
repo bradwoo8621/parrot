@@ -238,13 +238,16 @@
 		getTabs: function () {
 			var _this = this;
 			if (this.state.tabs) {
+				var activeTabIndex = this.getActiveTabIndex();
 				this.state.tabs.forEach(function(tab, tabIndex) {
 					if ((_this.isAddable() && (tabIndex != _this.state.tabs.length - 1)) || !_this.isAddable()) {
-						var model = tab.data;
+						var model = _this.createItemModel(item); //tab.data;
 						tab.label = _this.getTabTitle(model);
 						tab.icon = _this.getTabIcon(model);
 						tab.layout = _this.getEditLayout(model);
 						tab.badge = _this.getTabBadge(model);
+						tab.data = model;
+						tab.active = tabIndex == activeTabIndex;
 					}
 				});
 				return this.state.tabs;
@@ -277,7 +280,11 @@
 			return this.state.tabs;
 		},
 		clearTabs: function(callback) {
-			this.setState({tabs: null}, callback.bind(this));
+			if (callback) {
+				this.setState({tabs: null}, callback.bind(this));	
+			} else {
+				this.setState({tabs: null});
+			}
 		},
 		/**
 		 * return [] when is null

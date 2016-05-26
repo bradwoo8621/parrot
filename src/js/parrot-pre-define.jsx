@@ -188,10 +188,13 @@
 		Nothing: {type: "nothing", label: false},
 		// date format
 		Default_Date_Format: "YYYY/MM/DD HH:mm:ss.SSS", // see momentjs
+		// code table
 		CODETABLE_PARENT_VALUE_KEY: 'value',
 		CODETABLE_SENDER_PROXY: null,
 		CODETABLE_RECEIVER_PROXY: null,
 		CODETABLE_REMOTE_PROXY: null,
+		// error display
+		ERROR_POPOVER: true,
 		// exception codes
 		Err_Unsupported_Component: "PT-00001",
 		Err_Unuspported_Column_Sort: "PT-00002",

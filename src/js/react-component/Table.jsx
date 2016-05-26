@@ -461,7 +461,7 @@
 		 * render header popover
 		 */
 		renderHeaderPopover: function () {
-			if (this.getModel().hasError(this.getDataId())) {
+			if ($pt.ComponentConstants.ERROR_POPOVER && this.getModel().hasError(this.getDataId())) {
 				var messages = this.getModel().getError(this.getDataId());
 				var _this = this;
 				var content = messages.map(function (msg) {
@@ -581,6 +581,9 @@
 						columnIndex++;
 						var style = {};
 						style.width = column.width;
+						if (column.headerAlign) {
+							style.textAlign = column.headerAlign;
+						}
 						if (!(column.visible === undefined || column.visible === true)) {
 							style.display = "none";
 						}

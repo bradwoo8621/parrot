@@ -1,4 +1,4 @@
-/** nest-parrot.V0.4.8 2016-05-25 */
+/** nest-parrot.V0.4.9 2016-05-26 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -498,10 +498,13 @@
 		Nothing: { type: "nothing", label: false },
 		// date format
 		Default_Date_Format: "YYYY/MM/DD HH:mm:ss.SSS", // see momentjs
+		// code table
 		CODETABLE_PARENT_VALUE_KEY: 'value',
 		CODETABLE_SENDER_PROXY: null,
 		CODETABLE_RECEIVER_PROXY: null,
 		CODETABLE_REMOTE_PROXY: null,
+		// error display
+		ERROR_POPOVER: true,
 		// exception codes
 		Err_Unsupported_Component: "PT-00001",
 		Err_Unuspported_Column_Sort: "PT-00002",
@@ -4955,13 +4958,16 @@
 		getTabs: function () {
 			var _this = this;
 			if (this.state.tabs) {
+				var activeTabIndex = this.getActiveTabIndex();
 				this.state.tabs.forEach(function (tab, tabIndex) {
 					if (_this.isAddable() && tabIndex != _this.state.tabs.length - 1 || !_this.isAddable()) {
-						var model = tab.data;
+						var model = _this.createItemModel(item); //tab.data;
 						tab.label = _this.getTabTitle(model);
 						tab.icon = _this.getTabIcon(model);
 						tab.layout = _this.getEditLayout(model);
 						tab.badge = _this.getTabBadge(model);
+						tab.data = model;
+						tab.active = tabIndex == activeTabIndex;
 					}
 				});
 				return this.state.tabs;
@@ -4994,7 +5000,11 @@
 			return this.state.tabs;
 		},
 		clearTabs: function (callback) {
-			this.setState({ tabs: null }, callback.bind(this));
+			if (callback) {
+				this.setState({ tabs: null }, callback.bind(this));
+			} else {
+				this.setState({ tabs: null });
+			}
 		},
 		/**
    * return [] when is null
@@ -8170,7 +8180,7 @@
 				$(ReactDOM.findDOMNode(this.refs.tooltip)).popover(tooltipPopover);
 			}
 
-			if (this.getLayout().getComponentType().popover !== false && this.getModel().hasError(this.getDataId())) {
+			if ($pt.ComponentConstants.ERROR_POPOVER && this.getLayout().getComponentType().popover !== false && this.getModel().hasError(this.getDataId())) {
 				var messages = this.getModel().getError(this.getDataId());
 				var _this = this;
 				var popover = {
@@ -14127,7 +14137,7 @@
    * render header popover
    */
 		renderHeaderPopover: function () {
-			if (this.getModel().hasError(this.getDataId())) {
+			if ($pt.ComponentConstants.ERROR_POPOVER && this.getModel().hasError(this.getDataId())) {
 				var messages = this.getModel().getError(this.getDataId());
 				var _this = this;
 				var content = messages.map(function (msg) {
@@ -14259,6 +14269,9 @@
 							columnIndex++;
 							var style = {};
 							style.width = column.width;
+							if (column.headerAlign) {
+								style.textAlign = column.headerAlign;
+							}
 							if (!(column.visible === undefined || column.visible === true)) {
 								style.display = "none";
 							}
