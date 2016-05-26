@@ -4988,30 +4988,31 @@
    */
 		getTabs: function () {
 			var _this = this;
-			if (this.state.tabs) {
-				var activeTabIndex = this.getActiveTabIndex();
-				this.state.tabs.forEach(function (tab, tabIndex) {
-					if (_this.isAddable() && tabIndex != _this.state.tabs.length - 1 || !_this.isAddable()) {
-						var model = _this.createItemModel(item); //tab.data;
-						tab.label = _this.getTabTitle(model);
-						tab.icon = _this.getTabIcon(model);
-						tab.layout = _this.getEditLayout(model);
-						tab.badge = _this.getTabBadge(model);
-						tab.data = model;
-						tab.active = tabIndex == activeTabIndex;
-					}
-				});
-				return this.state.tabs;
-			}
+			var activeTabIndex = this.getActiveTabIndex();
+			// if (this.state.tabs) {
+			// 	this.state.tabs.forEach(function(tab, tabIndex) {
+			// 		if ((_this.isAddable() && (tabIndex != _this.state.tabs.length - 1)) || !_this.isAddable()) {
+			// 			var model = _this.createItemModel(item); //tab.data;
+			// 			tab.label = _this.getTabTitle(model);
+			// 			tab.icon = _this.getTabIcon(model);
+			// 			tab.layout = _this.getEditLayout(model);
+			// 			tab.badge = _this.getTabBadge(model);
+			// 			tab.data = model;
+			// 			tab.active = tabIndex == activeTabIndex;
+			// 		}
+			// 	});
+			// 	return this.state.tabs;
+			// }
 
-			this.state.tabs = this.getValueFromModel().map(function (item) {
+			this.state.tabs = this.getValueFromModel().map(function (item, itemIndex) {
 				var model = _this.createItemModel(item);
 				return {
 					label: _this.getTabTitle(model),
 					icon: _this.getTabIcon(model),
 					layout: _this.getEditLayout(model),
 					badge: _this.getTabBadge(model),
-					data: model
+					data: model,
+					active: itemIndex == activeTabIndex
 				};
 			});
 			if (this.isAddable()) {
@@ -5151,6 +5152,9 @@
    */
 		getActiveTabIndex: function () {
 			var tabs = this.state.tabs;
+			if (tabs == null) {
+				return -1;
+			}
 			// find the active tab
 			var activeTabIndex = tabs.findIndex(function (tab, index) {
 				return tab.active === true;
