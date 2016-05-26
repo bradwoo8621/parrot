@@ -237,7 +237,17 @@
 		 */
 		getTabs: function () {
 			var _this = this;
-			var activeTabIndex = this.getActiveTabIndex();
+			var activeTabIndex = 0;
+			if (this.state.transientActiveTabIndex != null) {
+				activeTabIndex = this.state.transientActiveTabIndex;
+				delete this.state.transientActiveTabIndex;
+			} else {
+				activeTabIndex = this.getActiveTabIndex();
+			}
+			// if (activeTabIndex == -1) {
+			// 	activeTabIndex = 0;
+			// }
+			// var activeTabIndex = this.state.transientActiveTabIndex; ? this.getActiveTabIndex();
 			// if (this.state.tabs) {
 			// 	this.state.tabs.forEach(function(tab, tabIndex) {
 			// 		if ((_this.isAddable() && (tabIndex != _this.state.tabs.length - 1)) || !_this.isAddable()) {
@@ -301,17 +311,21 @@
 		 */
 		onModelChanged: function (evt) {
 			if (evt.type === 'add') {
-				this.clearTabs(this.setActiveTabIndex.bind(this, evt.index));
+				this.state.transientActiveTabIndex = evt.index;
+				// this.clearTabs(this.setActiveTabIndex.bind(this, evt.index));
 			} else if (evt.type === 'remove') {
 				var index = evt.index;
 				var data = this.getValueFromModel();
 				if (index == data.length) {
 					index = index - 1;
 				}
-				this.clearTabs(this.setActiveTabIndex.bind(this, index));
+				this.state.transientActiveTabIndex = evt.index;
+				// this.clearTabs(this.setActiveTabIndex.bind(this, index));
 			} else {
-				this.forceUpdate();
+				// this.forceUpdate();
+				this.state.transientActiveTabIndex = evt.index != null ? evt.index : null;
 			}
+			this.forceUpdate();
 		},
 		/**
 		 * monitor the parent model validation
