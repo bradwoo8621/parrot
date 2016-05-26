@@ -5005,7 +5005,8 @@
 							}
 						}
 					},
-					data: $pt.createModel({})
+					data: $pt.createModel({}),
+					css: 'add-tab'
 				});
 			}
 			return this.state.tabs;
@@ -13518,10 +13519,13 @@
    * @returns {XML}
    */
 		renderTab: function (tab, index) {
-			var css = $pt.LayoutHelper.classSet({
+			var css = {
 				active: index == this.getActiveTabIndex(),
 				hide: tab.visible === false
-			});
+			};
+			if (tab.css) {
+				css[tab.css] = true;
+			}
 			var removeButton = React.createElement(
 				'a',
 				{ href: 'javascript:void(0);', className: 'n-tab-delete',
@@ -13530,7 +13534,7 @@
 			);
 			return React.createElement(
 				'li',
-				{ role: 'presentation', className: css, key: index },
+				{ role: 'presentation', className: $pt.LayoutHelper.classSet(css), key: index },
 				React.createElement(
 					'a',
 					{ href: 'javascript:void(0);', onClick: this.onClicked },

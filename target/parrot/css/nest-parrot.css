@@ -1151,8 +1151,6 @@ div.n-tab ul.nav-pills > li > a.n-tab-delete {
   display: none;
 }
 div.n-tab ul.nav-tabs > li.active > a.n-tab-delete,
-div.n-tab ul.nav-pills > li.active > a.n-tab-delete,
-div.n-tab ul.nav-tabs > li.active > a.n-tab-delete,
 div.n-tab ul.nav-pills > li.active > a.n-tab-delete {
   display: block;
   position: absolute;

@@ -19,7 +19,6 @@ div.n-tab {
 	}
 	ul.nav-tabs > li.active,
 	ul.nav-pills > li.active {
-		> a.n-tab-delete,
 		> a.n-tab-delete {
 			display: block;
 			position: absolute;
@@ -30,6 +29,16 @@ div.n-tab {
 			cursor: @link-cursor;
 		}
 	}
+	// ul.nav-tabs > li.active.add-tab {
+	// 	> a:not(.n-tab-delete) {
+	// 		box-shadow: none;
+	// 	}
+	// }
+	// ul.nav-pills > li.active.add-tab {
+	// 	> a:not(.n-tab-delete) {
+	// 		background-color: inherit;
+	// 	}
+	// }
 	ul.nav-tabs > li {
 		> a:hover > span.badge {
 			background-color: @color-primary;

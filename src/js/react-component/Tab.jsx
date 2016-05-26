@@ -100,16 +100,19 @@
 		 * @returns {XML}
 		 */
 		renderTab: function (tab, index) {
-			var css = $pt.LayoutHelper.classSet({
+			var css = {
 				active: index == this.getActiveTabIndex(),
 				hide: tab.visible === false
-			});
+			};
+			if (tab.css) {
+				css[tab.css] = true;
+			}
 			var removeButton = (
 				<a href='javascript:void(0);' className='n-tab-delete'
 				   onClick={this.onRemoveClicked}>
 					<span className='fa fa-fw fa-times'/>
 				</a>);
-			return (<li role="presentation" className={css} key={index}>
+			return (<li role="presentation" className={$pt.LayoutHelper.classSet(css)} key={index}>
 				<a href='javascript:void(0);' onClick={this.onClicked}>
 					{this.renderIcon(tab.icon, this.props.size)}
 					{this.renderLabel(tab.label)}

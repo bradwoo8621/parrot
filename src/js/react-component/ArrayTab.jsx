@@ -285,7 +285,8 @@
 							}
 						}
 					},
-					data: $pt.createModel({})
+					data: $pt.createModel({}),
+					css: 'add-tab'
 				});
 			}
 			return this.state.tabs;
