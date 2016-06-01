@@ -1057,7 +1057,7 @@
 				var _this = this;
 				Object.keys(this.__validateResults ? this.__validateResults : {}).forEach(function (id) {
 					_this.fireEvent({
-						model: this,
+						model: _this,
 						id: id,
 						time: "post",
 						type: "validate"

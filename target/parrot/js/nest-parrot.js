@@ -1,4 +1,4 @@
-/** nest-parrot.V0.4.9 2016-05-26 */
+/** nest-parrot.V0.4.10 2016-06-01 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -2397,7 +2397,7 @@
 				var _this = this;
 				Object.keys(this.__validateResults ? this.__validateResults : {}).forEach(function (id) {
 					_this.fireEvent({
-						model: this,
+						model: _this,
 						id: id,
 						time: "post",
 						type: "validate"
