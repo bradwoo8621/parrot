@@ -1,4 +1,4 @@
-/** nest-parrot.V0.4.10 2016-06-01 */
+/** nest-parrot.V0.4.10 2016-06-02 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -2649,6 +2649,13 @@
 
 			this.__dataId = cell.dataId ? cell.dataId : this.__id;
 			this.__cell = cell;
+		},
+		/**
+   * get definition json
+   * @returns {*}
+   */
+		getDefinition: function () {
+			return this.__cell;
 		},
 		/**
    * get id
@@ -11784,7 +11791,9 @@
 		},
 		initSetValues: function () {
 			var value = this.getValueFromModel();
-			this.getComponent().val(value);
+			if (!this.isViewMode()) {
+				this.getComponent().val(value);
+			}
 			var labelPropertyId = this.getComponentOption('labelPropId');
 			if (labelPropertyId) {
 				this.setLabelText(this.getModel().get(labelPropertyId));
@@ -11805,7 +11814,11 @@
 						} else {
 							label += ' - ' + text;
 						}
-						$(ReactDOM.findDOMNode(this.refs.viewLabel)).text(label);
+						// $(ReactDOM.findDOMNode(this.refs.viewLabel)).text(label);
+						var def = this.refs.viewLabel.getLayout().getDefinition();
+						def.label = label;
+						this.refs.viewLabel.forceUpdate();
+						// this.refs.viewLabel.getLayout()
 						// this.setState({viewLabel: label})
 					}
 			} else {

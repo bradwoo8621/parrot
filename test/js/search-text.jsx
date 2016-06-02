@@ -3,7 +3,7 @@
  */
 (function () {
     var model = $pt.createModel({
-        name: null
+        name: 'code01'
     });
     var plainText = $pt.createCellLayout('name', {
         label: 'Plain Text',

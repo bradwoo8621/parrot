@@ -52,6 +52,13 @@
 			this.__cell = cell;
 		},
 		/**
+		 * get definition json
+		 * @returns {*}
+		 */
+		getDefinition: function() {
+			return this.__cell;
+		},
+		/**
 		 * get id
 		 * @returns {string}
 		 */
