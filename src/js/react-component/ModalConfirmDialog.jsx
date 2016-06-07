@@ -54,14 +54,22 @@
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
 			this.fixDocumentPadding();
-			$(document).on('keyup', this.onDocumentKeyUp);
+			if (this.state.visible) {
+				$(document).on('keyup', this.onDocumentKeyUp);
+			} else {
+				$(document).off('keyup', this.onDocumentKeyUp);
+			}
 		},
 		/**
 		 * did mount
 		 */
 		componentDidMount: function () {
 			this.fixDocumentPadding();
-			$(document).on('keyup', this.onDocumentKeyUp);
+			if (this.state.visible) {
+				$(document).on('keyup', this.onDocumentKeyUp);
+			} else {
+				$(document).off('keyup', this.onDocumentKeyUp);
+			}
 		},
 		componentWillUpdate: function() {
 			$(document).off('keyup', this.onDocumentKeyUp);
@@ -172,8 +180,9 @@
 				<div className={$pt.LayoutHelper.classSet(css)}
 					 tabIndex="-1"
 					 role="dialog"
+					 ref="container"
 					 style={{display: 'block', zIndex: NConfirm.Z_INDEX + 1}}>
-					<div className="modal-dialog">
+					<div className="modal-dialog" tabIndex='0'>
 						<div className="modal-content" role="document">
 							<div className="modal-header">
 								{this.renderDialogCloseButton()}
@@ -191,6 +200,13 @@
 		onDocumentKeyUp: function(evt) {
 			if (evt.keyCode === 27) { // escape
 				this.onCancelClicked();
+			} else if (evt.keyCode === 9) { // tab
+				// evt.preventDefault();
+				var target = $(evt.target);
+				var container = $(this.refs.container);
+				if (target.closest(container).length == 0) {
+					container.focus();
+				}
 			}
 		},
 		/**
@@ -241,16 +257,16 @@
 		 * @param title deprecated title of dialog
 		 * @param options string or string array, or object as below.
 		 *          {
-	 *              disableButtons: true, // hide button bar
-	 *              disableConfirm: true, // hide confirm button
-	 *              disableClose: true, // hide close button
-	 *              messsages: "", // string or string array,
-	 *              close: true, // show close button text as "close"
-	 *              onConfirm: function,
-	 *              onCancel: function,
-	 *              afterClose: function,
-	 *              title: string
-	 *          }
+	 	 *              disableButtons: true, // hide button bar
+	 	 *              disableConfirm: true, // hide confirm button
+	 	 *              disableClose: true, // hide close button
+	 	 *              messsages: "", // string or string array,
+	 	 *              close: true, // show close button text as "close"
+	 	 *              onConfirm: function,
+	 	 *              onCancel: function,
+	 	 *              afterClose: function,
+	 	 *              title: string
+	 	 *          }
 		 * @param onConfirm deprecated callback function when confirm button clicked
 		 * @param onCancel deprecated callback function when cancel button clicked
 		 */

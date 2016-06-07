@@ -133,12 +133,18 @@
 			if (this.isDialogCloseShown()) {
 				$(document).on('keyup', this.onDocumentKeyUp);
 			}
+			if (this.state.visible) {
+				$(document).on('keydown', this.onDocumentKeyDown);
+			} else {
+				$(document).off('keydown', this.onDocumentKeyDown);
+			}
 		},
 		componentWillUpdate: function() {
 			this.stopDraggable();
 			if (this.isDialogCloseShown()) {
 				$(document).off('keyup', this.onDocumentKeyUp);
 			}
+			$(document).off('keydown', this.onDocumentKeyDown);
 		},
 		/**
 		 * did mount
@@ -149,12 +155,18 @@
 			if (this.isDialogCloseShown()) {
 				$(document).on('keyup', this.onDocumentKeyUp);
 			}
+			if (this.state.visible) {
+				$(document).on('keydown', this.onDocumentKeyDown);
+			} else {
+				$(document).off('keydown', this.onDocumentKeyDown);
+			}
 		},
 		componentWillUnmount: function() {
 			this.stopDraggable();
 			if (this.isDialogCloseShown()) {
 				$(document).off('keyup', this.onDocumentKeyUp);
 			}
+			$(document).off('keydown', this.onDocumentKeyDown);
 		},
 		/**
 		 * render footer
@@ -226,6 +238,8 @@
 				<div className="modal-backdrop fade in" style={{zIndex: this.props.zIndex * 1}}></div>
 				<div className={$pt.LayoutHelper.classSet(css)}
 					 role="dialog"
+					 ref="container"
+					 tabIndex="0"
 					 style={{display: 'block', zIndex: this.props.zIndex * 1 + 1}}>
 					<div className="modal-dialog">
 						<div className="modal-content" role="document">
@@ -243,6 +257,18 @@
 		onDocumentKeyUp: function(evt) {
 			if (evt.keyCode === 27) { // escape
 				this.hide();
+			}
+		},
+		onDocumentKeyDown: function(evt) {
+			console.log(evt);
+			if (evt.keyCode === 9) { // tab
+				// evt.preventDefault();
+				var target = $(evt.target);
+				var container = $(this.refs.container);
+				console.log(target.closest(container).length == 0);
+				if (target.closest(container).length == 0) {
+					container.focus();
+				}
 			}
 		},
 		/**

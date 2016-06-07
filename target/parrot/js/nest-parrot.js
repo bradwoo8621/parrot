@@ -1,4 +1,4 @@
-/** nest-parrot.V0.4.10 2016-06-02 */
+/** nest-parrot.V0.4.11 2016-06-07 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -7129,14 +7129,22 @@
    */
 		componentDidUpdate: function (prevProps, prevState) {
 			this.fixDocumentPadding();
-			$(document).on('keyup', this.onDocumentKeyUp);
+			if (this.state.visible) {
+				$(document).on('keyup', this.onDocumentKeyUp);
+			} else {
+				$(document).off('keyup', this.onDocumentKeyUp);
+			}
 		},
 		/**
    * did mount
    */
 		componentDidMount: function () {
 			this.fixDocumentPadding();
-			$(document).on('keyup', this.onDocumentKeyUp);
+			if (this.state.visible) {
+				$(document).on('keyup', this.onDocumentKeyUp);
+			} else {
+				$(document).off('keyup', this.onDocumentKeyUp);
+			}
 		},
 		componentWillUpdate: function () {
 			$(document).off('keyup', this.onDocumentKeyUp);
@@ -7195,10 +7203,11 @@
 					{ className: $pt.LayoutHelper.classSet(css),
 						tabIndex: "-1",
 						role: "dialog",
+						ref: "container",
 						style: { display: 'block', zIndex: NExceptionModal.Z_INDEX + 1 } },
 					React.createElement(
 						"div",
-						{ className: "modal-danger modal-dialog" },
+						{ className: "modal-danger modal-dialog", tabIndex: "0" },
 						React.createElement(
 							"div",
 							{ className: "modal-content", role: "document" },
@@ -7237,6 +7246,14 @@
 			if (evt.keyCode === 27) {
 				// escape
 				this.hide();
+			} else if (evt.keyCode === 9) {
+				// tab
+				// evt.preventDefault();
+				var target = $(evt.target);
+				var container = $(this.refs.container);
+				if (target.closest(container).length == 0) {
+					container.focus();
+				}
 			}
 		},
 		/**
@@ -9057,14 +9074,22 @@
    */
 		componentDidUpdate: function (prevProps, prevState) {
 			this.fixDocumentPadding();
-			$(document).on('keyup', this.onDocumentKeyUp);
+			if (this.state.visible) {
+				$(document).on('keyup', this.onDocumentKeyUp);
+			} else {
+				$(document).off('keyup', this.onDocumentKeyUp);
+			}
 		},
 		/**
    * did mount
    */
 		componentDidMount: function () {
 			this.fixDocumentPadding();
-			$(document).on('keyup', this.onDocumentKeyUp);
+			if (this.state.visible) {
+				$(document).on('keyup', this.onDocumentKeyUp);
+			} else {
+				$(document).off('keyup', this.onDocumentKeyUp);
+			}
 		},
 		componentWillUpdate: function () {
 			$(document).off('keyup', this.onDocumentKeyUp);
@@ -9191,10 +9216,11 @@
 					{ className: $pt.LayoutHelper.classSet(css),
 						tabIndex: "-1",
 						role: "dialog",
+						ref: "container",
 						style: { display: 'block', zIndex: NConfirm.Z_INDEX + 1 } },
 					React.createElement(
 						"div",
-						{ className: "modal-dialog" },
+						{ className: "modal-dialog", tabIndex: "0" },
 						React.createElement(
 							"div",
 							{ className: "modal-content", role: "document" },
@@ -9223,6 +9249,14 @@
 			if (evt.keyCode === 27) {
 				// escape
 				this.onCancelClicked();
+			} else if (evt.keyCode === 9) {
+				// tab
+				// evt.preventDefault();
+				var target = $(evt.target);
+				var container = $(this.refs.container);
+				if (target.closest(container).length == 0) {
+					container.focus();
+				}
 			}
 		},
 		/**
@@ -9273,16 +9307,16 @@
    * @param title deprecated title of dialog
    * @param options string or string array, or object as below.
    *          {
-  *              disableButtons: true, // hide button bar
-  *              disableConfirm: true, // hide confirm button
-  *              disableClose: true, // hide close button
-  *              messsages: "", // string or string array,
-  *              close: true, // show close button text as "close"
-  *              onConfirm: function,
-  *              onCancel: function,
-  *              afterClose: function,
-  *              title: string
-  *          }
+  	 *              disableButtons: true, // hide button bar
+  	 *              disableConfirm: true, // hide confirm button
+  	 *              disableClose: true, // hide close button
+  	 *              messsages: "", // string or string array,
+  	 *              close: true, // show close button text as "close"
+  	 *              onConfirm: function,
+  	 *              onCancel: function,
+  	 *              afterClose: function,
+  	 *              title: string
+  	 *          }
    * @param onConfirm deprecated callback function when confirm button clicked
    * @param onCancel deprecated callback function when cancel button clicked
    */
@@ -9457,12 +9491,18 @@
 			if (this.isDialogCloseShown()) {
 				$(document).on('keyup', this.onDocumentKeyUp);
 			}
+			if (this.state.visible) {
+				$(document).on('keydown', this.onDocumentKeyDown);
+			} else {
+				$(document).off('keydown', this.onDocumentKeyDown);
+			}
 		},
 		componentWillUpdate: function () {
 			this.stopDraggable();
 			if (this.isDialogCloseShown()) {
 				$(document).off('keyup', this.onDocumentKeyUp);
 			}
+			$(document).off('keydown', this.onDocumentKeyDown);
 		},
 		/**
    * did mount
@@ -9473,12 +9513,18 @@
 			if (this.isDialogCloseShown()) {
 				$(document).on('keyup', this.onDocumentKeyUp);
 			}
+			if (this.state.visible) {
+				$(document).on('keydown', this.onDocumentKeyDown);
+			} else {
+				$(document).off('keydown', this.onDocumentKeyDown);
+			}
 		},
 		componentWillUnmount: function () {
 			this.stopDraggable();
 			if (this.isDialogCloseShown()) {
 				$(document).off('keyup', this.onDocumentKeyUp);
 			}
+			$(document).off('keydown', this.onDocumentKeyDown);
 		},
 		/**
    * render footer
@@ -9568,6 +9614,8 @@
 					"div",
 					{ className: $pt.LayoutHelper.classSet(css),
 						role: "dialog",
+						ref: "container",
+						tabIndex: "0",
 						style: { display: 'block', zIndex: this.props.zIndex * 1 + 1 } },
 					React.createElement(
 						"div",
@@ -9596,6 +9644,19 @@
 			if (evt.keyCode === 27) {
 				// escape
 				this.hide();
+			}
+		},
+		onDocumentKeyDown: function (evt) {
+			console.log(evt);
+			if (evt.keyCode === 9) {
+				// tab
+				// evt.preventDefault();
+				var target = $(evt.target);
+				var container = $(this.refs.container);
+				console.log(target.closest(container).length == 0);
+				if (target.closest(container).length == 0) {
+					container.focus();
+				}
 			}
 		},
 		/**
@@ -9983,12 +10044,28 @@
    */
 		componentDidUpdate: function (prevProps, prevState) {
 			this.fixDocumentPadding();
+			if (this.state.visible) {
+				$(document).on('keydown', this.onDocumentKeyDown);
+			} else {
+				$(document).off('keydown', this.onDocumentKeyDown);
+			}
+		},
+		componentWillUpdate: function () {
+			$(document).off('keydown', this.onDocumentKeyDown);
 		},
 		/**
    * did mount
    */
 		componentDidMount: function () {
 			this.fixDocumentPadding();
+			if (this.state.visible) {
+				$(document).on('keydown', this.onDocumentKeyDown);
+			} else {
+				$(document).off('keydown', this.onDocumentKeyDown);
+			}
+		},
+		componentWillUnmount: function () {
+			$(document).off('keydown', this.onDocumentKeyDown);
 		},
 		render: function () {
 			if (!this.state.visible) {
@@ -10012,10 +10089,11 @@
 					{ className: $pt.LayoutHelper.classSet(css),
 						tabIndex: "-1",
 						role: "dialog",
+						ref: "container",
 						style: { display: 'block', zIndex: NOnRequestModal.Z_INDEX + 1 } },
 					React.createElement(
 						"div",
-						{ className: "modal-danger modal-dialog" },
+						{ className: "modal-danger modal-dialog", tabIndex: "0" },
 						React.createElement(
 							"div",
 							{ className: "modal-content", role: "document" },
@@ -10042,6 +10120,17 @@
    */
 		show: function () {
 			this.setState({ visible: true });
+		},
+		onDocumentKeyDown: function (evt) {
+			if (evt.keyCode === 9) {
+				// tab
+				// evt.preventDefault();
+				var target = $(evt.target);
+				var container = $(this.refs.container);
+				if (target.closest(container).length == 0) {
+					container.focus();
+				}
+			}
 		}
 	});
 	$pt.Components.NOnRequestModal = NOnRequestModal;
@@ -16110,7 +16199,8 @@
 				view: function (value) {
 					return isNaN(value) || (value + '').isBlank() ? value : (value + '').movePointRight(2);
 				}
-			}
+			},
+			TRIM: false
 		},
 		propTypes: {
 			// model
@@ -16300,6 +16390,9 @@
 			// 	clearTimeout(this.state.componentChanged);
 			// }
 			var value = evt.target.value;
+			if (this.getComponentOption('trim', NText.TRIM)) {
+				value = value == null ? null : (value + '').trim();
+			}
 			if (value && !value.isBlank()) {
 				var formattedValue = this.getFormattedValue(value);
 				if (formattedValue != value) {

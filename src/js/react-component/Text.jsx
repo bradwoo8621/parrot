@@ -67,7 +67,8 @@
 				view: function(value) {
 					return (isNaN(value) || (value + '').isBlank()) ? value : ((value + '').movePointRight(2));
 				}
-			}
+			},
+			TRIM: false
 		},
 		propTypes: {
 			// model
@@ -251,6 +252,9 @@
 			// 	clearTimeout(this.state.componentChanged);
 			// }
 			var value = evt.target.value;
+			if (this.getComponentOption('trim', NText.TRIM)) {
+				value = value == null ? null : (value + '').trim();
+			}
 			if (value && !value.isBlank()) {
 				var formattedValue = this.getFormattedValue(value);
 				if (formattedValue != value) {

@@ -48,14 +48,22 @@
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
 			this.fixDocumentPadding();
-			$(document).on('keyup', this.onDocumentKeyUp);
+			if (this.state.visible) {
+				$(document).on('keyup', this.onDocumentKeyUp);
+			} else {
+				$(document).off('keyup', this.onDocumentKeyUp);
+			}
 		},
 		/**
 		 * did mount
 		 */
 		componentDidMount: function () {
 			this.fixDocumentPadding();
-			$(document).on('keyup', this.onDocumentKeyUp);
+			if (this.state.visible) {
+				$(document).on('keyup', this.onDocumentKeyUp);
+			} else {
+				$(document).off('keyup', this.onDocumentKeyUp);
+			}
 		},
 		componentWillUpdate: function() {
 			$(document).off('keyup', this.onDocumentKeyUp);
@@ -98,8 +106,9 @@
 				<div className={$pt.LayoutHelper.classSet(css)}
 					 tabIndex="-1"
 					 role="dialog"
+					 ref="container"
 					 style={{display: 'block', zIndex: NExceptionModal.Z_INDEX + 1}}>
-					<div className="modal-danger modal-dialog">
+					<div className="modal-danger modal-dialog" tabIndex="0">
 						<div className="modal-content" role="document">
 							<div className="modal-header">
 								<button className="close"
@@ -121,6 +130,13 @@
 		onDocumentKeyUp: function(evt) {
 			if (evt.keyCode === 27) { // escape
 				this.hide();
+			} else if (evt.keyCode === 9) { // tab
+				// evt.preventDefault();
+				var target = $(evt.target);
+				var container = $(this.refs.container);
+				if (target.closest(container).length == 0) {
+					container.focus();
+				}
 			}
 		},
 		/**

@@ -41,12 +41,28 @@
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
 			this.fixDocumentPadding();
+			if (this.state.visible) {
+				$(document).on('keydown', this.onDocumentKeyDown);
+			} else {
+				$(document).off('keydown', this.onDocumentKeyDown);
+			}
+		},
+		componentWillUpdate: function() {
+			$(document).off('keydown', this.onDocumentKeyDown);
 		},
 		/**
 		 * did mount
 		 */
 		componentDidMount: function () {
 			this.fixDocumentPadding();
+			if (this.state.visible) {
+				$(document).on('keydown', this.onDocumentKeyDown);
+			} else {
+				$(document).off('keydown', this.onDocumentKeyDown);
+			}
+		},
+		componentWillUnmount: function() {
+			$(document).off('keydown', this.onDocumentKeyDown);
 		},
 		render: function () {
 			if (!this.state.visible) {
@@ -66,8 +82,9 @@
 				<div className={$pt.LayoutHelper.classSet(css)}
 					 tabIndex="-1"
 					 role="dialog"
+					 ref="container"
 					 style={{display: 'block', zIndex: NOnRequestModal.Z_INDEX + 1}}>
-					<div className="modal-danger modal-dialog">
+					<div className="modal-danger modal-dialog" tabIndex='0'>
 						<div className="modal-content" role="document">
 							<div className="modal-body" ref='body'>
 								<span className='fa fa-fw fa-lg fa-spin fa-spinner'/> {NOnRequestModal.WAITING_MESSAGE}
@@ -88,6 +105,16 @@
 		 */
 		show: function () {
 			this.setState({visible: true});
+		},
+		onDocumentKeyDown: function(evt) {
+			if (evt.keyCode === 9) { // tab
+				// evt.preventDefault();
+				var target = $(evt.target);
+				var container = $(this.refs.container);
+				if (target.closest(container).length == 0) {
+					container.focus();
+				}
+			}
 		}
 	});
 	$pt.Components.NOnRequestModal = NOnRequestModal;

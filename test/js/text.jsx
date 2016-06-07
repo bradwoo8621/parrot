@@ -2,6 +2,7 @@
  * Created by brad.wu on 8/16/2015.
  */
 (function () {
+    // NText.TRIM = true;
     var model = $pt.createModel({
         name: 'Name'
     });
