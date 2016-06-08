@@ -1,4 +1,4 @@
-/** nest-parrot.V0.4.11 2016-06-07 */
+/** nest-parrot.V0.4.12 2016-06-08 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -14793,13 +14793,15 @@
 								} else {
 									layout.css = { cell: 'inline-editor' };
 								}
+								layout.label = column.title;
 								if (column.inline === 'select' || column.inline === 'radio') {
 									// set code table
-									if (column.codes) {
-										layout = $.extend(true, {}, { comp: { data: column.codes } }, layout);
+									// if (column.codes) {
+									layout = $.extend(true, {}, { comp: { data: column.codes } }, layout);
+									// }
+								} else {
+										layout = $.extend(true, {}, layout);
 									}
-								}
-								layout.label = column.title;
 								// pre-defined, use with data together
 								data = React.createElement($pt.Components.NFormCell, { model: inlineModel,
 									layout: $pt.createCellLayout(column.data, layout),
