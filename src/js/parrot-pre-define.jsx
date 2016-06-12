@@ -165,6 +165,7 @@
 	$pt.ComponentConstants = {
 		// component types
 		Text: "text",
+		TextInJSON: {type: 'text', label: true, popover: true, renderError: true, delay: 1000},
 		TextArea: 'textarea',
 		Select: "select",
 		Check: "check",

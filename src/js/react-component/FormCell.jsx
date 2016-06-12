@@ -50,6 +50,9 @@
 				direction: 'vertical'
 			};
 		},
+		getInitialState: function () {
+			return {};
+		},
 		/**
 		 * will update
 		 * @param nextProps
@@ -188,8 +191,9 @@
 			if (!type) {
 				type = "text";
 			}
+			var innerComponent = $pt.LayoutHelper.getComponentRenderer(type).call(this, this.getFormModel(), this.getLayout(), direction, this.isViewMode());
 			return (<div ref="comp">
-				{$pt.LayoutHelper.getComponentRenderer(type).call(this, this.getFormModel(), this.getLayout(), direction, this.isViewMode())}
+				{innerComponent}
 			</div>);
 		},
 		isRequiredSignPaint: function() {
@@ -315,7 +319,18 @@
 		 * @param evt
 		 */
 		onModelChanged: function (evt) {
-			this.validate();
+			var delay = this.getValidationOption('delay', this.getLayout().getComponentType().delay);
+			if (delay != null && delay > 0) {
+				if (this.state.delayedValidation) {
+					window.clearTimeout(this.state.delayedValidation);
+				}
+				this.state.delayedValidation = window.setTimeout(function() {
+					this.validate();
+				}.bind(this), delay);
+			} else {
+				// no delay for validation
+				this.validate();
+			}
 		},
 		/**
 		 * on model validate change

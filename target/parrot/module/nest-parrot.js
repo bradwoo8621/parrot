@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.4.12 2016-06-08 */
+	/** nest-parrot.V0.4.12 2016-06-12 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -506,6 +506,7 @@
 	$pt.ComponentConstants = {
 		// component types
 		Text: "text",
+		TextInJSON: { type: 'text', label: true, popover: true, renderError: true, delay: 1000 },
 		TextArea: 'textarea',
 		Select: "select",
 		Check: "check",
@@ -2757,7 +2758,7 @@
    */
 		getComponentType: function () {
 			var type = this.getComponentOption("type");
-			type = type == null ? $pt.ComponentConstants.Text : type;
+			type = type == null ? $pt.ComponentConstants.TextInJSON : type;
 			return typeof type === "string" ? { type: type, label: true, popover: true } : type;
 		},
 		/**
@@ -2886,8 +2887,27 @@
 				// it must be a json object
 				return this.transformValidationPhase(phase.phase);
 			} else {
-				console.error('Failed to parse validation phase definition of [' + this.getDataId() + ']', phase);
-				throw 'Failed to parse validation phase definition';
+				// no phase defined
+				return null;
+			}
+		},
+		getValidationOption: function (key, defaultValue) {
+			if (key === 'phase') {
+				return this.getValidationPhase();
+			} else {
+				if (this.__cell && this.__cell.validate) {
+					var define = this.__cell.validate;
+					if (typeof define === 'string' || typeof define === 'function') {
+						// only define the phase, see method transformValidationPhase
+						return defaultValue;
+					} else {
+						// definition must be a JSON object, and returns the delay property
+						return typeof define[key] === 'undefined' ? defaultValue : define[key];
+					}
+				} else {
+					// no validate part defined
+					return defaultValue;
+				}
 			}
 		}
 	});
@@ -4051,6 +4071,9 @@
 				// no phase defined, validate all
 				this.getModel().validate(this.getDataId());
 			}
+		},
+		getValidationOption: function (key, defaultValue) {
+			return this.getLayout().getValidationOption(key, defaultValue);
 		},
 		/**
    * force update, call react API
@@ -8178,6 +8201,9 @@
 				direction: 'vertical'
 			};
 		},
+		getInitialState: function () {
+			return {};
+		},
 		/**
    * will update
    * @param nextProps
@@ -8314,10 +8340,11 @@
 			if (!type) {
 				type = "text";
 			}
+			var innerComponent = $pt.LayoutHelper.getComponentRenderer(type).call(this, this.getFormModel(), this.getLayout(), direction, this.isViewMode());
 			return React.createElement(
 				'div',
 				{ ref: 'comp' },
-				$pt.LayoutHelper.getComponentRenderer(type).call(this, this.getFormModel(), this.getLayout(), direction, this.isViewMode())
+				innerComponent
 			);
 		},
 		isRequiredSignPaint: function () {
@@ -8455,7 +8482,18 @@
    * @param evt
    */
 		onModelChanged: function (evt) {
-			this.validate();
+			var delay = this.getValidationOption('delay', this.getLayout().getComponentType().delay);
+			if (delay != null && delay > 0) {
+				if (this.state.delayedValidation) {
+					window.clearTimeout(this.state.delayedValidation);
+				}
+				this.state.delayedValidation = window.setTimeout(function () {
+					this.validate();
+				}.bind(this), delay);
+			} else {
+				// no delay for validation
+				this.validate();
+			}
 		},
 		/**
    * on model validate change
