@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.4.12 2016-06-12 */
+	/** nest-parrot.V0.4.13 2016-06-13 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -16485,7 +16485,7 @@
 		textEquals: function (v1, v2) {
 			var hasText1 = this.hasText(v1);
 			var hasText2 = this.hasText(v2);
-			return hasText1 ? v1 == v2 : !hasText2;
+			return hasText1 ? v1 + '' === v2 + '' : !hasText2;
 		},
 		/**
    * on component change
