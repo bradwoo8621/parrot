@@ -1,4 +1,4 @@
-/** nest-parrot.V0.4.13 2016-06-13 */
+/** nest-parrot.V0.4.13 2016-06-15 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -14516,7 +14516,7 @@
 					icon: operation.icon,
 					enabled: operation.enabled,
 					visible: operation.visible,
-					click: this.onRowOperationClicked.bind(this, operation.click, rowModel.getCurrentModel()),
+					click: this.onRowOperationClicked.bind(this, operation.click, rowModel),
 					tooltip: operation.tooltip
 				},
 				css: {
@@ -14586,7 +14586,7 @@
 						style: 'link',
 						icon: hasIcon ? operation.icon ? operation.icon : 'placeholder' : null,
 						enabled: operation.enabled,
-						click: _this.onRowOperationClicked.bind(_this, operation.click, rowModel.getCurrentModel())
+						click: _this.onRowOperationClicked.bind(_this, operation.click, rowModel)
 					},
 					css: {
 						comp: 'n-table-op-btn'
@@ -15751,10 +15751,10 @@
 		/**
    * on row user defined operation clicked
    * @param callback
-   * @param data
+   * @param rowModel
    */
-		onRowOperationClicked: function (callback, data) {
-			callback.call(this, data);
+		onRowOperationClicked: function (callback, rowModel) {
+			callback.call(this, rowModel.getCurrentModel(), rowModel);
 		},
 		/**
    * on download clicked
