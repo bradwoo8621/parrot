@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.4.13 2016-06-15 */
+	/** nest-parrot.V0.4.13 2016-06-16 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -12347,7 +12347,8 @@
 			}
 			return React.createElement(
 				'div',
-				{ className: 'input-group form-control', onClick: this.onComponentClicked },
+				{ className: 'input-group form-control',
+					onClick: this.onComponentClicked },
 				React.createElement(
 					'span',
 					{ className: 'text' },
@@ -12369,7 +12370,11 @@
 			css[this.getComponentCSS('n-select')] = true;
 			return React.createElement(
 				'div',
-				{ className: $pt.LayoutHelper.classSet(css), tabIndex: '0', 'aria-readonly': 'true', ref: 'comp' },
+				{ className: $pt.LayoutHelper.classSet(css),
+					tabIndex: '0',
+					onKeyUp: this.onComponentKeyUp,
+					'aria-readonly': 'true',
+					ref: 'comp' },
 				this.renderText(),
 				this.renderNormalLine(),
 				this.renderFocusLine()
@@ -12394,13 +12399,22 @@
 				});
 			}
 			var _this = this;
+			var value = this.getValueFromModel();
 			return React.createElement(
 				'ul',
-				null,
+				{ className: 'options' },
 				options.map(function (item, itemIndex) {
+					var css = {
+						choosen: value == item.id
+					};
 					return React.createElement(
 						'li',
-						{ onClick: _this.onOptionClick.bind(_this, item), key: itemIndex },
+						{ onClick: _this.onOptionClick.bind(_this, item),
+							onMouseEnter: _this.onOptionMouseEnter,
+							onMouseLeave: _this.onOptionMouseLeave,
+							className: $pt.LayoutHelper.classSet(css),
+							key: itemIndex,
+							'data-id': item.id },
 						React.createElement(
 							'span',
 							null,
@@ -12434,6 +12448,9 @@
 				var layout = $pt.createCellLayout('text', {
 					comp: {
 						placeholder: NSelect.FILTER_PLACEHOLDER
+					},
+					evt: {
+						keyUp: this.onComponentKeyUp
 					}
 				});
 				model.addPostChangeListener('text', this.onFilterTextChange);
@@ -12543,7 +12560,7 @@
 			var filterText = this.state.popoverDiv.find('div.n-text input[type=text]');
 			if (this.state.filteTextCaret != null) {
 				filterText.caret(this.state.filteTextCaret);
-			} else {
+			} else if (filterText.val() != null) {
 				filterText.caret(filterText.val().length);
 			}
 			filterText.focus();
@@ -12622,6 +12639,105 @@
 				}
 			}
 		},
+		onComponentKeyUp: function (evt) {
+			if (evt.keyCode === 40) {
+				// down arrow
+				this.onComponentDownArrowKeyUp(evt);
+			} else if (evt.keyCode === 38) {
+				// up arrow
+				this.onComponentUpArrowKeyUp(evt);
+			} else if (evt.keyCode === 13) {
+				// enter
+				this.onComponentEnterKeyUp(evt);
+			}
+		},
+		onComponentEnterKeyUp: function (evt) {
+			evt.preventDefault();
+			evt.stopPropagation();
+
+			if (!this.isEnabled() || this.isViewMode()) {
+				// do nothing
+				return;
+			}
+			if (!this.state.popoverDiv || !this.state.popoverDiv.is(':visible')) {
+				return;
+			}
+			var option = this.state.popoverDiv.find('ul.options > li.active');
+			if (option.length > 0) {
+				this.setValueToModel(option.attr('data-id'));
+				this.hidePopover();
+			}
+		},
+		onComponentDownArrowKeyUp: function (evt) {
+			evt.preventDefault();
+			evt.stopPropagation();
+
+			if (!this.isEnabled() || this.isViewMode()) {
+				// do nothing
+				return;
+			}
+			if (!this.state.popoverDiv || !this.state.popoverDiv.is(':visible')) {
+				this.onComponentClicked();
+			} else {
+				var options = this.state.popoverDiv.find('ul.options > li');
+				var keystepOption = options.filter('.active');
+				if (keystepOption.length == 0) {
+					var first = options.first();
+					first.addClass('active');
+					first[0].scrollIntoView();
+				} else {
+					var last = options.last();
+					if (!keystepOption.first().is(last)) {
+						keystepOption.removeClass('active');
+						var next = keystepOption.next();
+						next.addClass('active');
+						if (!this.checkOptionVisible(next)) {
+							next[0].scrollIntoView();
+						}
+					}
+				}
+			}
+		},
+		onComponentUpArrowKeyUp: function (evt) {
+			evt.preventDefault();
+			evt.stopPropagation();
+
+			if (!this.isEnabled() || this.isViewMode()) {
+				// do nothing
+				return;
+			}
+			if (!this.state.popoverDiv || !this.state.popoverDiv.is(':visible')) {
+				this.onComponentClicked();
+			} else {
+				var options = this.state.popoverDiv.find('ul.options > li');
+				var keystepOption = options.filter('.active');
+				if (keystepOption.length == 0) {
+					var last = options.last();
+					last.addClass('active');
+					last[0].scrollIntoView();
+				} else {
+					var first = options.first();
+					if (!keystepOption.first().is(first)) {
+						keystepOption.removeClass('active');
+						var previous = keystepOption.prev();
+						previous.addClass('active');
+						if (!this.checkOptionVisible(previous)) {
+							previous[0].scrollIntoView();
+						}
+					}
+				}
+			}
+		},
+		checkOptionVisible: function (option) {
+			var parent = option.parent();
+			// console.log(parent.offset().top, option.offset().top);
+			var top = option.offset().top - parent.offset().top;
+			var bottom = top + option.height();
+			var viewTop = parent.scrollTop();
+			var viewBottom = viewTop + parent.height();
+			// console.log(top, bottom, viewTop, viewBottom);
+			return bottom < viewBottom && top > viewTop;
+		},
 		onDocumentMouseDown: function (evt) {
 			var target = $(evt.target);
 			if (target.closest(this.getComponent()).length == 0 && target.closest(this.state.popoverDiv).length == 0) {
@@ -12647,6 +12763,12 @@
 			this.setValueToModel(item.id);
 			this.hidePopover();
 		},
+		onOptionMouseEnter: function (evt) {
+			$(evt.target).addClass('active').siblings().removeClass('active');
+		},
+		onOptionMouseLeave: function (evt) {
+			$(evt.target).removeClass('active');
+		},
 		onClearClick: function () {
 			if (!this.isEnabled() || this.isViewMode()) {
 				return;
@@ -12660,7 +12782,7 @@
 			} else {
 				this.state.filteTextCaret = null;
 			}
-			console.log('caret', this.state.filteTextCaret);
+			// console.log('caret', this.state.filteTextCaret);
 			this.showPopover(evt.new);
 		},
 		/**

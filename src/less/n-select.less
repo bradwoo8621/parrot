@@ -104,8 +104,8 @@ div.n-select {
 	}
 	.popover-content {
 		padding: 5px;
-		overflow: auto;
-		max-height: 300px;
+		// overflow: ;
+		// max-height: 150px;
 		div.n-text {
 			margin: 0 5px 5px;
 		}
@@ -113,12 +113,21 @@ div.n-select {
 			list-style: none;
 			padding: 0;
 			margin-bottom: 0;
+			max-height: 300px;
+			overflow: auto;
 			li {
 				padding: 3px 5px;
 				border-radius: 4px;
 				cursor: pointer;
-				&:hover {
-					background-color: @border-color;
+				// &:hover, &.choosen:hover {
+				// 	background-color: @select-option-hover-color;
+				// }
+				&.active, &.active:hover,
+				&.choosen.active, &.choosen.active:hover {
+					background-color: @select-option-keystep-color;
+				}
+				&.choosen {
+					background-color: @select-option-choosen-color;
 				}
 			}
 		}

@@ -1541,8 +1541,6 @@ div.n-select.n-view-mode hr.normal-line {
 }
 .n-select-popover .popover-content {
   padding: 5px;
-  overflow: auto;
-  max-height: 300px;
 }
 .n-select-popover .popover-content div.n-text {
   margin: 0 5px 5px;
@@ -1551,14 +1549,22 @@ div.n-select.n-view-mode hr.normal-line {
   list-style: none;
   padding: 0;
   margin-bottom: 0;
+  max-height: 300px;
+  overflow: auto;
 }
 .n-select-popover .popover-content ul li {
   padding: 3px 5px;
   border-radius: 4px;
   cursor: pointer;
 }
-.n-select-popover .popover-content ul li:hover {
-  background-color: #e0e0e0;
+.n-select-popover .popover-content ul li.active,
+.n-select-popover .popover-content ul li.active:hover,
+.n-select-popover .popover-content ul li.choosen.active,
+.n-select-popover .popover-content ul li.choosen.active:hover {
+  background-color: #c0c0c0;
+}
+.n-select-popover .popover-content ul li.choosen {
+  background-color: #e3f2fd;
 }
 .n-select-popover .popover-content div.no-option {
   text-align: center;
