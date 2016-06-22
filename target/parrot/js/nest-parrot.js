@@ -2118,7 +2118,7 @@
    */
 		set: function (id, value) {
 			var oldValue = this.get(id);
-			if (oldValue == value) {
+			if (typeof oldValue === typeof value && oldValue == value) {
 				// value is same as old value
 				return;
 			}
