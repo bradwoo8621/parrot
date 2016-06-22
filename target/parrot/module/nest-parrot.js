@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.4.13 2016-06-16 */
+	/** nest-parrot.V0.4.14 2016-06-22 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -11041,7 +11041,7 @@
 							comp: button
 						};
 						// delete layout.comp.label;
-						console.log(layout);
+						// console.log(layout);
 						return React.createElement($pt.Components.NFormButton, { model: _this.getModel(),
 							layout: $pt.createCellLayout('pseudo-button', layout),
 							key: buttonIndex });
@@ -16607,7 +16607,14 @@
 		textEquals: function (v1, v2) {
 			var hasText1 = this.hasText(v1);
 			var hasText2 = this.hasText(v2);
-			return hasText1 ? v1 + '' === v2 + '' : !hasText2;
+			if (hasText1) {
+				var strV1 = v1 + '';
+				var strV2 = v2 + '';
+				return strV1 === strV2;
+			} else {
+				return !hasText2;
+			}
+			//return hasText1 ? ((v1 + '') === (v2 + '')) : !hasText2;
 		},
 		/**
    * on component change

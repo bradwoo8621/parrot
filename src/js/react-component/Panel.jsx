@@ -144,7 +144,7 @@
 							comp: button
 						};
 						// delete layout.comp.label;
-						console.log(layout);
+						// console.log(layout);
 						return <$pt.Components.NFormButton model={_this.getModel()}
 														   layout={$pt.createCellLayout('pseudo-button', layout)}
 														   key={buttonIndex} />;

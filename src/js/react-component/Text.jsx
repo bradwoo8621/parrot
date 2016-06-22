@@ -276,7 +276,14 @@
 		textEquals: function(v1, v2) {
 			var hasText1 = this.hasText(v1);
 			var hasText2 = this.hasText(v2);
-			return hasText1 ? ((v1 + '') === (v2 + '')) : !hasText2;
+			if (hasText1) {
+				var strV1 = v1 + '';
+				var strV2 = v2 + '';
+				return strV1 === strV2;
+			} else {
+				return !hasText2
+			}
+			//return hasText1 ? ((v1 + '') === (v2 + '')) : !hasText2;
 		},
 		/**
 		 * on component change
