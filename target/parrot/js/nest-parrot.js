@@ -7336,7 +7336,9 @@
 			};
 		},
 		getInitialState: function () {
-			return {};
+			return {
+				monitors: {}
+			};
 		},
 		componentWillUpdate: function () {
 			this.unregisterFromComponentCentral();
@@ -7441,9 +7443,16 @@
 				zoomIndicator: null
 			}));
 			// event monitor
+			var _this = this;
 			var monitors = this.getEventMonitor();
 			Object.keys(monitors).forEach(function (eventKey) {
-				input.on(eventKey, monitors[eventKey]);
+				_this.state.monitors[eventKey] = function () {
+					var args = Array.prototype.slice.call(arguments);
+					// attach this component to event object
+					args[0].reactComponent = _this;
+					monitors[eventKey].apply(this, args);
+				};
+				input.on(eventKey, _this.state.monitors[eventKey]);
 			});
 
 			var comp = $(ReactDOM.findDOMNode(this.refs.comp));
@@ -7455,8 +7464,8 @@
 			var input = $(ReactDOM.findDOMNode(this.refs.file));
 			// event monitor
 			var monitors = this.getEventMonitor();
-			Object.keys(monitors).forEach(function (eventKey) {
-				input.off(eventKey, monitors[eventKey]);
+			Object.keys(_this.state.monitors).forEach(function (eventKey) {
+				input.off(eventKey, _this.state.monitors[eventKey]);
 			});
 			// destroy the component
 			input.fileinput('destroy');

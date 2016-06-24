@@ -42,10 +42,7 @@
                 console.log(evt);
             },
             fileuploaded: function(event, data, previewId, index) {
-                console.log(event);
-                console.log(data);
-                console.log(previewId);
-                console.log(index);
+                console.log(arguments);
             },
             filebatchuploadsuccess: function() {
                 console.log(arguments);
