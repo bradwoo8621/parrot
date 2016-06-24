@@ -37,6 +37,8 @@
 			SORT_ASC_ICON: "sort-amount-asc",
 			SORT_DESC_ICON: "sort-amount-desc",
 			NO_DATA_LABEL: "No Data",
+			INDEX_HEADER_TEXT: '#',
+			INDEX_HEADER_WIDTH: 40,
 			DETAIL_ERROR_MESSAGE: "Detail error please open item and do validate.",
 			REMOVE_CONFIRM_TITLE: "Delete data?",
 			REMOVE_CONFIRM_MESSAGE: ["Are you sure you want to delete data?", "Deleted data cannot be recovered."],
@@ -356,8 +358,8 @@
 			if (indexable) {
 				config = {
 					indexable: true,
-					width: 40,
-					title: "#"
+					width: NTable.INDEX_HEADER_WIDTH,
+					title: NTable.INDEX_HEADER_TEXT
 				};
 				this.state.columns.splice(0, 0, config);
 				if (this.fixedLeftColumns > 0 || this.getComponentOption("indexFixed") === true) {
