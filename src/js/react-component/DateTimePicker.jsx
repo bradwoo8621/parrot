@@ -749,6 +749,9 @@
 			}
 		},
 		startClockInterval: function(popoverType, currentTime) {
+			if (!this.getComponentOption('runClock', true)) {
+				return;
+			}
 			var _this = this;
 			var value = this.getValueFromModel();
 			if (value == null) {
@@ -1188,7 +1191,12 @@
 			return moment.localeData(this.getLocale());
 		},
 		getToday: function() {
-			return moment().locale(this.getLocale());
+			var today = moment().locale(this.getLocale());
+			var defaultTime = this.getComponentOption('defaultTime');
+			if (defaultTime && typeof defaultTime === 'function') {
+				today = defaultTime.call(this, today);
+			}
+			return today;
 		}
 	}));
 

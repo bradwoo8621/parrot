@@ -35,7 +35,11 @@
         label: 'Plain Text',
         comp: {
             type: $pt.ComponentConstants.Date,
-            format: 'YYYY/MM/DD HH:mm:ss'
+            format: 'YYYY/MM/DD HH:mm:ss',
+            defaultTime: function(today) {
+                return today.hour(0).minute(0).second(0);
+            },
+            // runClock: false
         },
         pos: {row: 1, col: 1}
     });

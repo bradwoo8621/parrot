@@ -149,7 +149,7 @@
 					id: 'datetime-format-other',
 					title: 'Other',
 					desc: 'Other format support refers to MomentJS.',
-					index: 100
+					index: 999
 				};
 			}
 		};
@@ -196,6 +196,22 @@
 					desc: ['Date time picker automatically switch the display mode by given format.'],
 					index: 30,
 					children: $demo.convertToExampleList(format)
+				};
+			},
+			defaultTime: function() {
+				return {
+					id: 'datetime-defaultTime',
+					title: 'Default Time',
+					desc: [<span>Default time setting via <code>defaultTime</code>, a function with one parameter which is a moment object and returns a moment object as default time.</span>],
+					index: 40
+				};
+			},
+			clock: function() {
+				return {
+					id: 'datetime-clock',
+					title: 'Clock',
+					desc: [<span>Stop the clock via <code>runClock: false</code>, default is run.</span>],
+					index: 41
 				};
 			},
 			properties: function () {
