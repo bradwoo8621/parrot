@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.4.15 2016-06-24 */
+	/** nest-parrot.V0.4.15 2016-06-30 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -12506,6 +12506,13 @@
 			ReactDOM.render(popover, this.state.popoverDiv.get(0), this.onPopoverRenderComplete);
 		},
 		showPopover: function (filterText) {
+			if (this.state.popoverDiv) {
+				// log the last active option
+				var activeOption = this.state.popoverDiv.find('ul.options > li.active');
+				this.state.lastActiveOptionId = activeOption.attr('data-id');
+			} else {
+				delete this.state.lastActiveOptionId;
+			}
 			this.renderPopoverContainer();
 			this.renderPopover(filterText);
 		},
@@ -12573,6 +12580,23 @@
 				popover.addClass('right-to-left');
 			}
 			popover.css({ top: styles.top, left: styles.left });
+
+			// if there is no active option, set first as active
+			var options = this.state.popoverDiv.find('ul.options > li');
+			if (options.length != 0) {
+				if (this.state.lastActiveOptionId) {
+					// according to react mechanism, must remove the existed active option first
+					// since active is not render by react by jquery, react will keep it
+					// active the last active option if exists
+					options.removeClass('active').filter(function (index, option) {
+						return $(option).attr('data-id') == this.state.lastActiveOptionId;
+					}.bind(this)).addClass('active');
+				}
+				if (this.state.popoverDiv.find('ul.options > li.active').length == 0) {
+					// active the first if no active option
+					this.state.popoverDiv.find('ul.options > li').first().addClass('active');
+				}
+			}
 
 			var filterText = this.state.popoverDiv.find('div.n-text input[type=text]');
 			if (this.state.filteTextCaret != null) {
@@ -12784,13 +12808,22 @@
 			$(evt.target).addClass('active').siblings().removeClass('active');
 		},
 		onOptionMouseLeave: function (evt) {
-			$(evt.target).removeClass('active');
+			// $(evt.target).removeClass('active');
 		},
 		onClearClick: function () {
 			if (!this.isEnabled() || this.isViewMode()) {
 				return;
 			}
 			this.setValueToModel(null);
+			// clear highlight
+			var options = this.state.popoverDiv.find('ul.options > li').filter('.choosen').removeClass('choosen');
+			// if (this.state.popoverDiv && this.state.popoverDiv.is(':visible')) {
+			// 	var filterText = this.state.popoverDiv.find('div.n-text input[type=text]');
+			// 	if (filterText.length > 0) {
+			// 		this.state.filterTextCaret = filterText.caret();
+			// 	}
+			// 	this.showPopover(filterText.val());
+			// }
 		},
 		onFilterTextChange: function (evt) {
 			if (this.state.popoverDiv.is(':visible')) {
