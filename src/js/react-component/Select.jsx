@@ -188,7 +188,7 @@
 			return (<ul className='options'>
 				{options.map(function(item, itemIndex) {
 					var css = {
-						choosen: value == item.id
+						chosen: value == item.id
 					};
 					return (<li onClick={_this.onOptionClick.bind(_this, item)}
 								onMouseEnter={_this.onOptionMouseEnter}
@@ -563,7 +563,7 @@
 			}
 			this.setValueToModel(null);
 			// clear highlight
-			var options = this.state.popoverDiv.find('ul.options > li').filter('.choosen').removeClass('choosen');
+			var options = this.state.popoverDiv.find('ul.options > li').filter('.chosen').removeClass('chosen');
 			// if (this.state.popoverDiv && this.state.popoverDiv.is(':visible')) {
 			// 	var filterText = this.state.popoverDiv.find('div.n-text input[type=text]');
 			// 	if (filterText.length > 0) {

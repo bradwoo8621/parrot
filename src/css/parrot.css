@@ -1559,11 +1559,11 @@ div.n-select.n-view-mode hr.normal-line {
 }
 .n-select-popover .popover-content ul li.active,
 .n-select-popover .popover-content ul li.active:hover,
-.n-select-popover .popover-content ul li.choosen.active,
-.n-select-popover .popover-content ul li.choosen.active:hover {
+.n-select-popover .popover-content ul li.chosen.active,
+.n-select-popover .popover-content ul li.chosen.active:hover {
   background-color: #c0c0c0;
 }
-.n-select-popover .popover-content ul li.choosen {
+.n-select-popover .popover-content ul li.chosen {
   background-color: #e3f2fd;
 }
 .n-select-popover .popover-content div.no-option {
@@ -2865,6 +2865,9 @@ div.n-file .file-input .form-control.file-caption.kv-fileinput-caption {
 div.n-file .file-input button.fileinput-upload.fileinput-upload-button,
 div.n-file .file-input button.fileinput-cancel.fileinput-cancel-button,
 div.n-file .file-input button.fileinput-remove.fileinput-remove-button,
+div.n-file .file-input a.fileinput-upload.fileinput-upload-button,
+div.n-file .file-input a.fileinput-cancel.fileinput-cancel-button,
+div.n-file .file-input a.fileinput-remove.fileinput-remove-button,
 div.n-file .file-input div.btn.btn-file {
   height: 30px;
   border: 0;
