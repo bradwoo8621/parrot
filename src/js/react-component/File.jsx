@@ -190,9 +190,9 @@
 			var input = $(ReactDOM.findDOMNode(this.refs.file));
 			// event monitor
 			var monitors = this.getEventMonitor();
-			Object.keys(_this.state.monitors).forEach(function (eventKey) {
-				input.off(eventKey, _this.state.monitors[eventKey]);
-			});
+			Object.keys(this.state.monitors).forEach(function (eventKey) {
+				input.off(eventKey, this.state.monitors[eventKey]);
+			}.bind(this));
 			// destroy the component
 			input.fileinput('destroy');
 			this.unregisterFromComponentCentral();
@@ -223,10 +223,10 @@
 				return key != 'type';
 			}).forEach(function (key) {
 				options[key] = _this.getComponentOption(key);
-				console.log(key, options[key]);
+				// console.log(key, options[key]);
 				if (options[key] == null) {
 					var defaultValue = NFile.DEFAULT_PROPERTY_VALUES[key];
-					console.log(defaultValue);
+					// console.log(defaultValue);
 					if (defaultValue) {
 						options[key] = defaultValue;
 					} else {
