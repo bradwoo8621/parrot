@@ -169,10 +169,11 @@
 				this.state.popoverDiv.appendTo($('body'));
 				$(document).on('mousedown', this.onDocumentMouseDown)
 					.on('keyup', this.onDocumentKeyUp)
+					.on('keydown', this.onDocumentKeyDown)
 					.on('mousewheel', this.onDocumentMouseWheel);
 				$(window).on('resize', this.onWindowResize);
 			}
-			this.state.popoverDiv.hide();
+			// this.state.popoverDiv.hide();
 		},
 		renderOptions: function(options, filterText) {
 			if (options == null || options.length == 0) {
@@ -193,6 +194,7 @@
 					return (<li onClick={_this.onOptionClick.bind(_this, item)}
 								onMouseEnter={_this.onOptionMouseEnter}
 								onMouseLeave={_this.onOptionMouseLeave}
+								onMouseMove={_this.onOptionMouseMove}
 								className={$pt.LayoutHelper.classSet(css)}
 								key={itemIndex}
 								data-id={item.id}>
@@ -345,12 +347,14 @@
 			}
 
 			var filterText = this.state.popoverDiv.find('div.n-text input[type=text]');
-			if (this.state.filteTextCaret != null) {
-				filterText.caret(this.state.filteTextCaret);
-			} else if (filterText.val() != null) {
-				filterText.caret(filterText.val().length)
+			if (!filterText.is(':focus')) {
+				if (this.state.filteTextCaret != null) {
+					filterText.caret(this.state.filteTextCaret);
+				} else if (filterText.val() != null) {
+					filterText.caret(filterText.val().length)
+				}
+				filterText.focus();
 			}
-			filterText.focus();
 		},
 		hidePopover: function() {
 			this.destroyPopover();
@@ -359,6 +363,7 @@
 			if (this.state.popoverDiv) {
 				$(document).off('mousedown', this.onDocumentMouseDown)
 					.off('keyup', this.onDocumentKeyUp)
+					.off('keydown', this.onDocumentKeyDown)
 					.off('mousewheel', this.onDocumentMouseWheel);
 				$(window).off('resize', this.onWindowResize);
 				this.state.popoverDiv.remove();
@@ -473,7 +478,9 @@
 				if (keystepOption.length == 0) {
 					var first = options.first();
 					first.addClass('active');
-					first[0].scrollIntoView();
+					if (!this.checkOptionVisible(first)) {
+						first[0].scrollIntoView();
+					}
 				} else {
 					var last = options.last();
 					if (!keystepOption.first().is(last)) {
@@ -503,7 +510,9 @@
 				if (keystepOption.length == 0) {
 					var last = options.last();
 					last.addClass('active');
-					last[0].scrollIntoView();
+					if (!this.checkOptionVisible(last)) {
+						last[0].scrollIntoView();
+					}
 				} else {
 					var first = options.first();
 					if (!keystepOption.first().is(first)) {
@@ -525,7 +534,7 @@
 			var viewTop = parent.scrollTop();
 			var viewBottom = viewTop + parent.height();
 			// console.log(top, bottom, viewTop, viewBottom);
-			return (bottom < viewBottom) && (top > viewTop);
+			return (bottom <= viewBottom) && (top >= viewTop);
 		},
 		onDocumentMouseDown: function(evt) {
 			var target = $(evt.target);
@@ -544,6 +553,11 @@
 				this.hidePopover();
 			}
 		},
+		onDocumentKeyDown: function(evt)  {
+			if (evt.keyCode === 38 || evt.keyCode === 40) {
+				evt.preventDefault();
+			}
+		},
 		onWindowResize: function() {
 			this.hidePopover();
 		},
@@ -555,7 +569,8 @@
 			$(evt.target).addClass('active').siblings().removeClass('active');
 		},
 		onOptionMouseLeave: function(evt) {
-			// $(evt.target).removeClass('active');
+		},
+		onOptionMouseMove: function(evt) {
 		},
 		onClearClick: function() {
 			if (!this.isEnabled() || this.isViewMode()) {
@@ -563,14 +578,7 @@
 			}
 			this.setValueToModel(null);
 			// clear highlight
-			var options = this.state.popoverDiv.find('ul.options > li').filter('.chosen').removeClass('chosen');
-			// if (this.state.popoverDiv && this.state.popoverDiv.is(':visible')) {
-			// 	var filterText = this.state.popoverDiv.find('div.n-text input[type=text]');
-			// 	if (filterText.length > 0) {
-			// 		this.state.filterTextCaret = filterText.caret();
-			// 	}
-			// 	this.showPopover(filterText.val());
-			// }
+			this.state.popoverDiv.find('ul.options > li').filter('.chosen').removeClass('chosen');
 		},
 		onFilterTextChange: function(evt) {
 			if (this.state.popoverDiv.is(':visible')) {
@@ -594,15 +602,7 @@
 		 * @param evt
 		 */
 		onParentModelChanged: function (evt) {
-			// var options = this.getAvailableOptions();
-			// var currentValue = this.getValueFromModel();
-			// var index = options.findIndex(function(item) {
-			// 	return item.id == currentValue;
-			// });
-			// if (index == -1) {
 			this.setValueToModel(null);
-			// }
-			// this.forceUpdate();
 		},
 		/**
 		 * get parent model
@@ -690,19 +690,6 @@
 		},
 		getComponent: function() {
 			return $(ReactDOM.findDOMNode(this.refs.comp));
-		// },
-		// getTextInViewMode: function() {
-		// 	var value = this.getValueFromModel();
-		// 	if (value != null) {
-		// 		var data = this.getAvailableOptions().some(function(item) {
-		// 			if (item.id == value) {
-		// 				value = item.text;
-		// 				return true;
-		// 			}
-		// 			return false;
-		// 		});
-		// 	}
-		// 	return value;
 		}
 	}));
 	$pt.Components.NSelect = NSelect;
