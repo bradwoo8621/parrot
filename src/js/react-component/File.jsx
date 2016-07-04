@@ -126,7 +126,6 @@
 			// 	zoomIndicator: null
 			// },
 			DEFAULT_PROPERTY_VALUES: {
-				multiple: true,
 				browseLabel: '',
 				browseIcon: '<i class="fa fa-fw fa-folder-open-o"></i>',
 				browseClass: 'btn btn-link',
@@ -149,6 +148,7 @@
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
+					multiple: true,
 					inputName: 'fileData'
 				}
 			};
@@ -223,7 +223,7 @@
 			var options = this.getLayout().getComponentOption();
 			Object.keys(options).filter(function(key) {
 				// the component type should be filterred
-				return key != 'type';
+				return key != 'type' && key != 'multiple' && key != 'inputName';
 			}).forEach(function (key) {
 				options[key] = _this.getComponentOption(key);
 				// console.log(key, options[key]);
