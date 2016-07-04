@@ -137,8 +137,7 @@
 				removeIcon: '<i class="fa fa-fw fa-trash-o"></i>',
 				removeClass: 'btn btn-link',
 				showClose: false,
-				showPreview: true,
-				inputName: 'fileData'
+				showPreview: true
 			}
 		},
 		propTypes: {
@@ -148,7 +147,11 @@
 			layout: React.PropTypes.object
 		},
 		getDefaultProps: function () {
-			return {};
+			return {
+				defaultOptions: {
+					inputName: 'fileData'
+				}
+			};
 		},
 		getInitialState: function () {
 			return {
