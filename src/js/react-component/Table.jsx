@@ -1277,7 +1277,6 @@
 		 */
 		render: function () {
 			this.prepareDisplayOptions();
-			/*{this.renderNoDataReminder()}*/
 			var css = {
 				'n-table-container panel': true
 			};
@@ -1302,6 +1301,7 @@
 						{this.renderFixedRightColumns()}
 						{this.renderRightTopCorner()}
 					</div>
+					{this.renderNoDataReminder()}
 					{this.renderPagination()}
 				</div>
 			</div>);

@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.4.16 2016-07-04 */
+	/** nest-parrot.V0.4.17 2016-07-05 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -15444,7 +15444,6 @@
    */
 		render: function () {
 			this.prepareDisplayOptions();
-			/*{this.renderNoDataReminder()}*/
 			var css = {
 				'n-table-container panel': true
 			};
@@ -15475,6 +15474,7 @@
 						this.renderFixedRightColumns(),
 						this.renderRightTopCorner()
 					),
+					this.renderNoDataReminder(),
 					this.renderPagination()
 				)
 			);
