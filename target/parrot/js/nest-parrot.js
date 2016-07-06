@@ -1,4 +1,4 @@
-/** nest-parrot.V0.4.17 2016-07-06 */
+/** nest-parrot.V0.4.18 2016-07-06 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -9747,7 +9747,7 @@
 			}
 		},
 		onDocumentKeyDown: function (evt) {
-			console.log(evt);
+			// console.log(evt);
 			if (evt.keyCode === 9) {
 				// tab
 				// evt.preventDefault();
