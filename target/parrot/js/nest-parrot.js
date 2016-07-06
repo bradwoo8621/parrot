@@ -1,4 +1,4 @@
-/** nest-parrot.V0.4.17 2016-07-05 */
+/** nest-parrot.V0.4.17 2016-07-06 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -12742,18 +12742,14 @@
 				if (keystepOption.length == 0) {
 					var first = options.first();
 					first.addClass('active');
-					if (!this.checkOptionVisible(first)) {
-						first[0].scrollIntoView();
-					}
+					this.scrollIntoView(first);
 				} else {
 					var last = options.last();
 					if (!keystepOption.first().is(last)) {
 						keystepOption.removeClass('active');
 						var next = keystepOption.next();
 						next.addClass('active');
-						if (!this.checkOptionVisible(next)) {
-							next[0].scrollIntoView();
-						}
+						this.scrollIntoView(next);
 					}
 				}
 			}
@@ -12774,31 +12770,41 @@
 				if (keystepOption.length == 0) {
 					var last = options.last();
 					last.addClass('active');
-					if (!this.checkOptionVisible(last)) {
-						last[0].scrollIntoView();
-					}
+					this.scrollIntoView(last);
 				} else {
 					var first = options.first();
 					if (!keystepOption.first().is(first)) {
 						keystepOption.removeClass('active');
 						var previous = keystepOption.prev();
 						previous.addClass('active');
-						if (!this.checkOptionVisible(previous)) {
-							previous[0].scrollIntoView();
-						}
+						this.scrollIntoView(previous);
 					}
 				}
 			}
 		},
+		scrollIntoView: function (option) {
+			if (!this.checkOptionVisible(option)) {
+				// for forbid the mouse event
+				this.state.onKeyEventProcessed = true;
+				// console.log('scrollIntoView #1', this.state.onKeyEventProcessed);
+				option[0].scrollIntoView();
+				// console.log('scrollIntoView #2', this.state.onKeyEventProcessed);
+			}
+		},
 		checkOptionVisible: function (option) {
 			var parent = option.parent();
+			var optionOffset = option.offset();
 			// console.log(parent.offset().top, option.offset().top);
-			var top = option.offset().top - parent.offset().top;
-			var bottom = top + option.height();
+			var top = optionOffset.top - parent.offset().top;
+			var height = option.height();
+			var bottom = top + height;
 			var viewTop = parent.scrollTop();
 			var viewBottom = viewTop + parent.height();
 			// console.log(top, bottom, viewTop, viewBottom);
-			return bottom <= viewBottom && top >= viewTop;
+			var windowTop = $(window).scrollTop();
+			var windowBottom = windowTop + $(window).height();
+			// console.log('window', windowTop, windowBottom);
+			return bottom <= viewBottom && top >= viewTop && optionOffset.top + height <= windowBottom && optionOffset.top >= windowTop;
 		},
 		onDocumentMouseDown: function (evt) {
 			var target = $(evt.target);
@@ -12830,11 +12836,27 @@
 			this.setValueToModel(item.id);
 			this.hidePopover();
 		},
-		onOptionMouseEnter: function (evt) {
-			$(evt.target).addClass('active').siblings().removeClass('active');
+		onOptionMouseEnter: function (evt) {},
+		onOptionMouseLeave: function (evt) {
+			// if (this.state.onKeyEventProcessed === true) {
+			// }
 		},
-		onOptionMouseLeave: function (evt) {},
-		onOptionMouseMove: function (evt) {},
+		onOptionMouseMove: function (evt) {
+			// when handled the arrow up/down event, highlight the option
+			// in chrome, the mouse event will be triggered after call #scrollIntoView
+			// so use state onKeyEventProcessed to flag this operation
+			// if the flag is true, ignore the mouse event,
+			// and reset the flag, let the following mouse event processed
+			// cannot use mouse enter event, since there is no second enter event triggered
+			// must use mouse move event to handle, seems no performance issue here.
+			if (this.state.onKeyEventProcessed === true) {
+				// console.log('onOptionMouseEnter #1', this.state.onKeyEventProcessed);
+				delete this.state.onKeyEventProcessed;
+			} else {
+				// console.log('onOptionMouseEnter #2', this.state.onKeyEventProcessed);
+				$(evt.target).addClass('active').siblings().removeClass('active');
+			}
+		},
 		onClearClick: function () {
 			if (!this.isEnabled() || this.isViewMode()) {
 				return;
