@@ -260,7 +260,7 @@
 			}
 		},
 		onDocumentKeyDown: function(evt) {
-			console.log(evt);
+			// console.log(evt);
 			if (evt.keyCode === 9) { // tab
 				// evt.preventDefault();
 				var target = $(evt.target);
