@@ -2056,17 +2056,14 @@
 				});
 			}
 			if (this.getModel().hasError(this.getDataId())) {
-				var rowError = null;
+				// var rowError = null;
 				var errors = this.getModel().getError(this.getDataId());
-				console.log('errors', errors);
-				for (var index = 0, count = errors.length; index < count; index++) {
-					if (typeof errors[index] !== "string") {
-						rowError = errors[index].getError(item);
-					}
-				}
-				if (rowError != null) {
-					console.log(rowError);
-					model.mergeError(rowError);
+				if (errors) {
+					errors.forEach(function(error) {
+						if (typeof error !== 'string') {
+							model.mergeError(error.getError(item));
+						}
+					});
 				}
 			}
 			return model;

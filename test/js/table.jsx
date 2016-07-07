@@ -247,13 +247,13 @@
     }, layoutTemplate));
 
     var newColumns = [{
-        width: 200
-    }, {
-        width: 200
-    }, {
-        width: 200
-    }, {
-        width: 200
+            width: 200
+        }, {
+            width: 200
+        }, {
+            width: 200
+        }, {
+            width: 200
     }];
 
     var fixLeft = $pt.createCellLayout('table', $.extend(true, {}, layoutTemplate, {
@@ -574,6 +574,66 @@
         })
     });
 
+    var arrayPanelModel = $pt.createModel({
+        level1: [{
+            level2: [{}, {}]
+        }, {
+            level2: [{}, {}]
+        }]
+    }, $pt.createModelValidator({
+        level1: {
+            table: {
+                name: {
+                    required: true
+                },
+                level2: {
+                    table: {
+                        name: {
+                            required: true
+                        }
+                    }
+                }
+            }
+        }
+    }));
+    var arrayPanelLayout = $pt.createCellLayout('level1', {
+        comp: {
+            editLayout: {
+                name: {
+                    label: 'Name in Level1',
+                    comp: {
+                        type: $pt.ComponentConstants.Text
+                    }
+                },
+                level2: {
+                    comp: {
+                        type: $pt.ComponentConstants.Table,
+                        columns: [{
+                            data: 'name',
+                            title: 'Name in Level2',
+                            inline: 'text'
+                        }, {
+                            data: 'code',
+                            title: 'Code',
+                            inline: 'text'
+                        }]
+                    },
+                    pos: {width: 12}
+                },
+                button: {
+                    label: 'Validate All',
+                    comp: {
+                        type: $pt.ComponentConstants.Button,
+                        click: function(model) {
+                            arrayPanelModel.validate();
+                            console.log(arrayPanelModel.hasError());
+                        }
+                    }
+                }
+            }
+        }
+    });
+
     var panel = (<div>
         <div className='row'>
             <div className='col-sm-6 col-md-6 col-lg-6'>
@@ -687,6 +747,10 @@
             <div className='col-sm-6 col-md-6 col-lg-6'>
                 <span>View Mode Row Selectable Table</span>
                 <NTable model={model} layout={rowSelectable} view={true}/>
+            </div>
+            <div className='col-sm-12 col-md-12 col-lg-12'>
+                <span>ArrayPanel and Table Validation</span>
+                <NArrayPanel model={arrayPanelModel} layout={arrayPanelLayout} />
             </div>
         </div>
         <div style={{height: "500px"}}/>

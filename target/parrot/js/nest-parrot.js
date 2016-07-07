@@ -1,4 +1,4 @@
-/** nest-parrot.V0.4.18 2016-07-06 */
+/** nest-parrot.V0.4.18 2016-07-07 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -1509,14 +1509,20 @@
    * @returns {{}}
    */
 		getError: function (model) {
-			var keys = Object.keys(this.__models);
-			for (var index = 0, count = keys.length; index < count; index++) {
-				var item = this.__models[keys[index]];
-				if (item == model) {
-					return this.__errors[keys[index]];
-				}
-			}
-			return null;
+			// var keys = Object.keys(this.__models);
+			// for (var index = 0, count = keys.length; index < count; index++) {
+			// 	var item = this.__models[keys[index]];
+			// 	if (item == model) {
+			// 		return this.__errors[keys[index]];
+			// 	}
+			// }
+			// return null;
+			var errors = Object.keys(this.__models).map(function (key) {
+				return this.__models[key] == model ? this.__errors[key] : null;
+			}.bind(this)).filter(function (error) {
+				return error != null;
+			});
+			return errors.length === 0 ? null : errors[0];
 		}
 	});
 	/**
@@ -1769,9 +1775,9 @@
 
 			var results = $pt.createTableValidationResult();
 			var validator = $pt.createModelValidator(config);
-			for (var index = 0, count = value.length; index < count; index++) {
-				var item = value[index];
+			value.forEach(function (item) {
 				var itemModel = $pt.createModel(item, validator);
+				itemModel.useBaseAsCurrent();
 				itemModel.parent(model);
 				if (phase) {
 					itemModel.validateByPhase(phase);
@@ -1784,7 +1790,7 @@
 				} else {
 					results.remove(item);
 				}
-			}
+			});
 
 			return results.hasError() ? results : true;
 		}
@@ -4609,13 +4615,11 @@
 			// get errors about current value
 			var errors = this.getModel().getError(this.getDataId());
 			if (errors) {
-				var itemError = null;
-				for (var index = 0, count = errors.length; index < count; index++) {
-					if (typeof errors[index] !== "string") {
-						itemError = errors[index].getError(item);
-						model.mergeError(itemError);
+				errors.forEach(function (error) {
+					if (typeof error !== 'string') {
+						model.mergeError(error.getError(item));
 					}
-				}
+				});
 			}
 
 			var listeners = this.getComponentOption('rowListener');
@@ -16214,17 +16218,14 @@
 				});
 			}
 			if (this.getModel().hasError(this.getDataId())) {
-				var rowError = null;
+				// var rowError = null;
 				var errors = this.getModel().getError(this.getDataId());
-				console.log('errors', errors);
-				for (var index = 0, count = errors.length; index < count; index++) {
-					if (typeof errors[index] !== "string") {
-						rowError = errors[index].getError(item);
-					}
-				}
-				if (rowError != null) {
-					console.log(rowError);
-					model.mergeError(rowError);
+				if (errors) {
+					errors.forEach(function (error) {
+						if (typeof error !== 'string') {
+							model.mergeError(error.getError(item));
+						}
+					});
 				}
 			}
 			return model;

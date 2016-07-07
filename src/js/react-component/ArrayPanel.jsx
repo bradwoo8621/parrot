@@ -127,13 +127,11 @@
 			// get errors about current value
 			var errors = this.getModel().getError(this.getDataId());
 			if (errors) {
-				var itemError = null;
-				for (var index = 0, count = errors.length; index < count; index++) {
-					if (typeof errors[index] !== "string") {
-						itemError = errors[index].getError(item);
-						model.mergeError(itemError);
+				errors.forEach(function(error) {
+					if (typeof error !== 'string') {
+						model.mergeError(error.getError(item));
 					}
-				}
+				});
 			}
 
 			var listeners = this.getComponentOption('rowListener');
