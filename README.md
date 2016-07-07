@@ -73,4 +73,4 @@ var parrot = require('../target/parrot/module/nest-parrot')(window, jQuery, jsfa
 MIT
 
 # Seeking for Cooperator
-If you are interested in this proejct, contact me via bradwoo8621@gmail.com.
+If you are interested in this project, contact me via bradwoo8621@gmail.com.
