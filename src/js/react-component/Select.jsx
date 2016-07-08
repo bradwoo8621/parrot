@@ -519,28 +519,51 @@
 			}
 		},
 		scrollIntoView: function(option) {
-			if (!this.checkOptionVisible(option)) {
-				// for forbid the mouse event
-				this.state.onKeyEventProcessed = true;
-				// console.log('scrollIntoView #1', this.state.onKeyEventProcessed);
-				option[0].scrollIntoView();
-				// console.log('scrollIntoView #2', this.state.onKeyEventProcessed);
-			}
-		},
-		checkOptionVisible: function(option) {
-			var parent = option.parent();
+			// for forbid the mouse event
+			this.state.onKeyEventProcessed = true;
+
 			var optionOffset = option.offset();
-			// console.log(parent.offset().top, option.offset().top);
-			var top = optionOffset.top - parent.offset().top;
-			var height = option.height();
-			var bottom = top + height;
-			var viewTop = parent.scrollTop();
-			var viewBottom = viewTop + parent.height();
-			// console.log(top, bottom, viewTop, viewBottom);
-			var windowTop = $(window).scrollTop();
-			var windowBottom = windowTop + $(window).height();
-			// console.log('window', windowTop, windowBottom);
-			return (bottom <= viewBottom) && (top >= viewTop) && ((optionOffset.top + height) <= windowBottom) && (optionOffset.top >= windowTop);
+			var optionTop = optionOffset.top;
+			var optionHeight = option.outerHeight();
+			var optionBottom = optionTop + optionHeight;
+
+			var parent = option.parent();
+			var parentOffset = parent.offset();
+			var parentTop = parentOffset.top;
+			var parentBottom = parentTop + parent.height();
+			var allOptions = parent.children();
+
+			var win = $(window);
+			var windowTop = win.scrollTop();
+			var windowBottom = windowTop + win.height();
+
+			if (optionTop < parentTop || optionBottom > parentBottom) {
+				// can not see option in its parent, scroll the parent
+				var optionIndex = allOptions.index(option);
+				var height = allOptions.toArray().reduce(function(prev, current, index) {
+					if (index < optionIndex) {
+						prev += $(current).outerHeight();
+					}
+					return prev;
+				}, 0);
+				parent.scrollTop(height);
+			}
+			// get option offset again, since it might be changed
+			// but it is seen in its parent
+			optionOffset = option.offset();
+			optionTop = optionOffset.top;
+			optionBottom = optionTop + optionHeight;
+			if (optionBottom > windowBottom) {
+				win.scrollTop(windowTop + optionBottom - windowBottom);
+			}
+			// get window scroll top again
+			windowTop = win.scrollTop();
+			if (optionTop < windowTop) {
+				// can not see option in window, even it is seen in its parent
+				// option is above the window top, 
+				// which means parent top is less than window top, since option already been seen in parent
+				win.scrollTop(parentTop);
+			}
 		},
 		onDocumentMouseDown: function(evt) {
 			var target = $(evt.target);
