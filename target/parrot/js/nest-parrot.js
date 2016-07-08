@@ -12830,7 +12830,7 @@
 				// can not see option in window, even it is seen in its parent
 				// option is above the window top,
 				// which means parent top is less than window top, since option already been seen in parent
-				win.scrollTop(parentTop);
+				win.scrollTop(windowTop - (windowTop - optionTop));
 			}
 		},
 		onDocumentMouseDown: function (evt) {
