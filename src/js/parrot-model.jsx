@@ -1052,7 +1052,7 @@
 				} else {
 					delete this.__validateResults[id];
 				}
-				this.fireEvent({
+				this.__mergeErrorToParent().fireEvent({
 					model: this,
 					id: id,
 					time: "post",
@@ -1060,6 +1060,7 @@
 				});
 			} else {
 				this.__validateResults = validator.validateByPhase(this, phase);
+				this.__mergeErrorToParent();
 				var _this = this;
 				Object.keys(this.__validateResults ? this.__validateResults : {}).forEach(function (id) {
 					_this.fireEvent({
@@ -1070,6 +1071,55 @@
 					});
 				});
 			}
+			return this;
+		},
+		__mergeErrorToParent: function() {
+			if (this.__parent == null) {
+				return this;
+			}
+			var parentModel = this.__parent.getCurrentModel();
+			Object.keys(parentModel).forEach(function(key) {
+				var value = parentModel[key];
+				if (value == this.__model) {
+					// console.log('Regular Value');
+					this.__parent.mergeError(this.hasError() ? this.getError() : null, key);
+				} else if (Array.isArray(value)) {
+					// console.log('Array Value');
+					value.forEach(function(elm) {
+						// console.log(elm, this.__model, elm == this.__model);
+						if (elm == this.__model) {
+							var errors = this.__parent.getError(key);
+							var tableErrorIndex = errors ? errors.findIndex(function(error) {
+								return typeof error != 'string';
+							}) : -1;
+							if (this.hasError()) {
+								// has error
+								var tableError = null;
+								if (tableErrorIndex == -1) {
+									tableError = $pt.createTableValidationResult();
+									if (!errors) {
+										errors = [];
+									}
+									errors.push(tableError);
+								} else {
+									tableError = errors[tableErrorIndex];
+									tableError.remove(elm);
+								}
+								tableError.push(elm, this.__validateResults);
+								this.__parent.mergeError(errors, key);
+								// console.log(this.__parent.getError());
+							} else {
+								// no error
+								if (tableErrorIndex != -1) {
+									// remove the exists error
+									errors[tableErrorIndex].remove(elm);
+								}
+							}
+						}
+					}.bind(this));
+				}
+			}.bind(this));
+			this.__parent.__mergeErrorToParent();
 			return this;
 		},
 		/**

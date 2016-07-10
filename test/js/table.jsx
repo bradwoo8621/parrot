@@ -574,7 +574,7 @@
         })
     });
 
-    var arrayPanelModel = $pt.createModel({
+    window.arrayPanelModel = $pt.createModel({
         level1: [{
             level2: [{}, {}]
         }, {
@@ -596,41 +596,54 @@
             }
         }
     }));
-    var arrayPanelLayout = $pt.createCellLayout('level1', {
+    var tabLayout = $pt.createCellLayout('test', {
         comp: {
-            editLayout: {
-                name: {
-                    label: 'Name in Level1',
-                    comp: {
-                        type: $pt.ComponentConstants.Text
-                    }
-                },
-                level2: {
-                    comp: {
-                        type: $pt.ComponentConstants.Table,
-                        columns: [{
-                            data: 'name',
-                            title: 'Name in Level2',
-                            inline: 'text'
-                        }, {
-                            data: 'code',
-                            title: 'Code',
-                            inline: 'text'
-                        }]
-                    },
-                    pos: {width: 12}
-                },
-                button: {
-                    label: 'Validate All',
-                    comp: {
-                        type: $pt.ComponentConstants.Button,
-                        click: function(model) {
-                            arrayPanelModel.validate();
-                            console.log(arrayPanelModel.hasError());
-                        }
+            type: $pt.ComponentConstants.Tab,
+            tabs: [{
+                label: 'First',
+                editLayout: {
+                    level1: {
+                        comp: {
+                            type: $pt.ComponentConstants.ArrayPanel,
+                            editLayout: {
+                                name: {
+                                    label: 'Name in Level1',
+                                    comp: {
+                                        type: $pt.ComponentConstants.Text
+                                    }
+                                },
+                                level2: {
+                                    comp: {
+                                        type: $pt.ComponentConstants.Table,
+                                        columns: [{
+                                            data: 'name',
+                                            title: 'Name in Level2',
+                                            inline: 'text'
+                                        }, {
+                                            data: 'code',
+                                            title: 'Code',
+                                            inline: 'text'
+                                        }]
+                                    },
+                                    pos: {width: 12}
+                                },
+                                button: {
+                                    label: 'Validate All',
+                                    comp: {
+                                        type: $pt.ComponentConstants.Button,
+                                        click: function(model) {
+                                            // arrayPanelModel.validate();
+                                            // console.log(arrayPanelModel.hasError());
+                                            model.validate();
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        pos: {width: 12}
                     }
                 }
-            }
+            }, {label: 'Second', editLayout: {another: {}}}]
         }
     });
 
@@ -750,7 +763,7 @@
             </div>
             <div className='col-sm-12 col-md-12 col-lg-12'>
                 <span>ArrayPanel and Table Validation</span>
-                <NArrayPanel model={arrayPanelModel} layout={arrayPanelLayout} />
+                <NFormTab model={arrayPanelModel} layout={tabLayout} />
             </div>
         </div>
         <div style={{height: "500px"}}/>
