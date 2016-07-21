@@ -1457,14 +1457,29 @@ div.n-select .form-control {
   -webkit-box-shadow: none;
   -o-box-shadow: none;
   padding: 0;
+  display: -webkit-box;
+  /* OLD - iOS 6-, Safari 3.1-6 */
+  display: -moz-box;
+  /* OLD - Firefox 19- (buggy but mostly works) */
+  display: -ms-flexbox;
+  /* TWEENER - IE 10 */
+  display: -webkit-flex;
+  /* NEW - Chrome */
   display: flex;
+  /* NEW, Spec - Opera 12.1, Firefox 20+ */
+  -ms-flex-direction: row;
+  -webkit-flex-direction: row;
   flex-direction: row;
   align-items: center;
+  -ms-flex-align: center;
   border: 0;
 }
 div.n-select .form-control .text {
+  -ms-flex-order: 1;
   order: 1;
   flex-grow: 1;
+  -ms-flex: 1 auto;
+  display: inline-block;
   cursor: pointer;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -1473,11 +1488,13 @@ div.n-select .form-control .text {
   overflow: hidden;
 }
 div.n-select .form-control .clear {
+  -ms-flex-order: 2;
   order: 2;
   cursor: pointer;
   font-size: 0.8em;
 }
 div.n-select .form-control .drop {
+  -ms-flex-order: 3;
   order: 3;
   cursor: pointer;
   margin-right: 2px;
