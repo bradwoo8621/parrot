@@ -177,7 +177,7 @@
 			if (defaultClick || !more) {
 				defaultButton = (<a href='javascript:void(0);'
 				   className={$pt.LayoutHelper.classSet(css)}
-				   onClick={this.onClicked}
+				   onMouseUp={this.onClicked}
 				   disabled={!this.isEnabled()}
 				   title={this.getComponentOption('tooltip')}
 				   ref='a'>
@@ -192,6 +192,11 @@
 			</div>);
 		},
 		onClicked: function (evt) {
+			if (evt.button != 0) {
+				// not left button
+				return;
+			}
+			// console.log(evt.button);
 			if (this.isEnabled()) {
 				$(ReactDOM.findDOMNode(this.refs.a)).toggleClass('effect');
 				var onclick = this.getComponentOption("click");

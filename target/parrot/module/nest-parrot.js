@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.4.19 2016-07-10 */
+	/** nest-parrot.V0.4.19 2016-07-21 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -5495,7 +5495,7 @@
 					'a',
 					{ href: 'javascript:void(0);',
 						className: $pt.LayoutHelper.classSet(css),
-						onClick: this.onClicked,
+						onMouseUp: this.onClicked,
 						disabled: !this.isEnabled(),
 						title: this.getComponentOption('tooltip'),
 						ref: 'a' },
@@ -5514,6 +5514,11 @@
 			);
 		},
 		onClicked: function (evt) {
+			if (evt.button != 0) {
+				// not left button
+				return;
+			}
+			// console.log(evt.button);
 			if (this.isEnabled()) {
 				$(ReactDOM.findDOMNode(this.refs.a)).toggleClass('effect');
 				var onclick = this.getComponentOption("click");

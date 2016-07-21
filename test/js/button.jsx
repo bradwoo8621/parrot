@@ -82,7 +82,7 @@
             type: $pt.ComponentConstants.Button,
             icon: 'pencil',
             style: 'success',
-            click: function() {},
+            click: function() {console.log('success icon button 1');},
             more: [
                 {icon: 'commenting-o', text: 'commenting', click: function(model) {alert('Commenting');}},
                 {divider: true},
