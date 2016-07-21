@@ -58,7 +58,7 @@
 			valueAsArray: true,
 			hierarchyCheck: true,
 			// multiple: false,
-			expandLevel: 1,
+			expandLevel: 2,
 			inactiveSlibing: true,
 			border: true
 		},
@@ -74,7 +74,7 @@
 			valueAsArray: true,
 			hierarchyCheck: true,
 			// multiple: false,
-			expandLevel: 1,
+			expandLevel: 'all',
 			inactiveSlibing: true,
 			border: true
 		},

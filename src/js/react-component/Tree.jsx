@@ -107,20 +107,9 @@
             this.addEnableDependencyMonitor();
             this.registerToComponentCentral();
     	},
-        componentWillMount: function() {
-            var expandLevel = this.getComponentOption('expandLevel');
-            if (expandLevel == null) {
-                // default expand root
-                expandLevel = 0;
-            }
-            if (expandLevel === 'all') {
-                expandLevel = 9999;
-            }
-            if (this.state.root.children) {
-                // this.state.root.children = this.getTopLevelNodes();
-                this.expandTo(expandLevel);
-            }
-        },
+        // componentWillMount: function() {
+        //     this.initExpand();
+        // },
     	/**
     	 * did mount
     	 */
@@ -251,7 +240,8 @@
         },
         renderTopLevel: function() {
             return (<$pt.Components.NCodeTableWrapper codetable={this.getCodeTable()}
-                                renderer={this.getRealTopLevelRenderer} />);
+                                renderer={this.getRealTopLevelRenderer} 
+                                onMounted={this.initExpand}/>);
         },
         getRealTopLevelRenderer: function() {
             var root = this.state.root;
@@ -267,6 +257,20 @@
                 </span>);
             } else {
                 return null;
+            }
+        },
+        initExpand: function() {
+            var expandLevel = this.getComponentOption('expandLevel');
+            if (expandLevel == null) {
+                // default expand root
+                expandLevel = 0;
+            }
+            if (expandLevel === 'all') {
+                expandLevel = 9999;
+            }
+            if (this.state.root.children) {
+                // this.state.root.children = this.getTopLevelNodes();
+                this.expandTo(expandLevel);
             }
         },
         render: function() {

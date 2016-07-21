@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.4.19 2016-07-21 */
+	/** nest-parrot.V0.4.20 2016-07-21 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -5834,12 +5834,18 @@
 					// no parent, load all
 					codetable.initializeRemote().done(this.repaint);
 				}
+			} else {
+				var onMounted = this.props.onMounted;
+				if (onMounted) {
+					onMounted.call(this);
+				}
 			}
 		},
 		repaint: function () {
+			var onMounted = this.props.onMounted;
 			this.setState({
 				paintWrapper: false
-			});
+			}, onMounted ? onMounted : undefined);
 		},
 		needWrapper: function () {
 			var codetable = this.getCodeTable();
@@ -17391,20 +17397,9 @@
             this.addEnableDependencyMonitor();
             this.registerToComponentCentral();
         },
-        componentWillMount: function () {
-            var expandLevel = this.getComponentOption('expandLevel');
-            if (expandLevel == null) {
-                // default expand root
-                expandLevel = 0;
-            }
-            if (expandLevel === 'all') {
-                expandLevel = 9999;
-            }
-            if (this.state.root.children) {
-                // this.state.root.children = this.getTopLevelNodes();
-                this.expandTo(expandLevel);
-            }
-        },
+        // componentWillMount: function() {
+        //     this.initExpand();
+        // },
         /**
          * did mount
          */
@@ -17551,7 +17546,8 @@
         },
         renderTopLevel: function () {
             return React.createElement($pt.Components.NCodeTableWrapper, { codetable: this.getCodeTable(),
-                renderer: this.getRealTopLevelRenderer });
+                renderer: this.getRealTopLevelRenderer,
+                onMounted: this.initExpand });
         },
         getRealTopLevelRenderer: function () {
             var root = this.state.root;
@@ -17570,6 +17566,20 @@
                 );
             } else {
                 return null;
+            }
+        },
+        initExpand: function () {
+            var expandLevel = this.getComponentOption('expandLevel');
+            if (expandLevel == null) {
+                // default expand root
+                expandLevel = 0;
+            }
+            if (expandLevel === 'all') {
+                expandLevel = 9999;
+            }
+            if (this.state.root.children) {
+                // this.state.root.children = this.getTopLevelNodes();
+                this.expandTo(expandLevel);
             }
         },
         render: function () {

@@ -37,12 +37,18 @@
 					// no parent, load all
 					codetable.initializeRemote().done(this.repaint);
 				}
+			} else {
+				var onMounted = this.props.onMounted;
+				if (onMounted) {
+					onMounted.call(this);
+				}
 			}
 		},
 		repaint: function() {
+			var onMounted = this.props.onMounted;
 			this.setState({
 				paintWrapper: false
-			});
+			}, onMounted ? onMounted : undefined);
 		},
 		needWrapper: function() {
 			var codetable= this.getCodeTable();
