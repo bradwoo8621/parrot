@@ -1,4 +1,4 @@
-/** nest-parrot.V0.4.20 2016-07-21 */
+/** nest-parrot.V0.4.20 2016-07-25 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -12789,6 +12789,7 @@
 			if (option.length > 0) {
 				this.setValueToModel(option.attr('data-id'));
 				this.hidePopover();
+				$(this.refs.comp).focus();
 			}
 		},
 		onComponentDownArrowKeyUp: function (evt) {
@@ -12923,6 +12924,7 @@
 		onOptionClick: function (item) {
 			this.setValueToModel(item.id);
 			this.hidePopover();
+			$(this.refs.comp).focus();
 		},
 		onOptionMouseEnter: function (evt) {},
 		onOptionMouseLeave: function (evt) {

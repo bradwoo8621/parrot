@@ -460,6 +460,7 @@
 			if (option.length > 0) {
 				this.setValueToModel(option.attr('data-id'));
 				this.hidePopover();
+				$(this.refs.comp).focus();
 			}
 		},
 		onComponentDownArrowKeyUp: function(evt) {
@@ -593,6 +594,7 @@
 		onOptionClick: function(item) {
 			this.setValueToModel(item.id);
 			this.hidePopover();
+			$(this.refs.comp).focus();
 		},
 		onOptionMouseEnter: function(evt) {
 		},
