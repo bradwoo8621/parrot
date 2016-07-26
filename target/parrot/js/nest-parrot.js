@@ -14972,9 +14972,18 @@
 		},
 		onDocumentClicked: function (evt) {
 			var target = $(evt.target);
-			if (target.closest(this.state.popoverDiv).length == 0) {
-				this.hidePopover();
-			}
+			if (target.closest(this.state.popoverDiv).length != 0) {
+				// click in popover
+			} else if (target.closest($('.n-table-op-btn.more')).length != 0) {
+					// click in more button
+					if (target.closest($(this.refs.div)).length == 0) {
+						// in other table's more button
+						this.hidePopover();
+					}
+				} else {
+					// neither popover nor more button
+					this.hidePopover();
+				}
 		},
 		onDocumentKeyUp: function (evt) {
 			if (evt.keyCode === 27) {

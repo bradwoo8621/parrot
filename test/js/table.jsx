@@ -80,7 +80,7 @@
         ]
     }, validator);
     model.validate();
-    model.set('items', []);
+    // model.set('items', []);
     NDateTime.VALUE_FORMAT = 'MM/DD/YYYY';
     var layoutTemplate = {
         label: 'Table',
