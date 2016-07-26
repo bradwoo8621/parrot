@@ -60,7 +60,11 @@
 			// multiple: false,
 			expandLevel: 2,
 			inactiveSlibing: true,
-			border: true
+			border: true,
+			nodeClick: function(node) {
+				alert(node);
+				console.log(node);
+			}
 		},
 		pos: {row: 1, col: 1}
 	});

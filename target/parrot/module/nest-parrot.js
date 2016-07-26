@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.4.20 2016-07-25 */
+	/** nest-parrot.V0.4.21 2016-07-26 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -17515,7 +17515,7 @@
                         'a',
                         { className: 'node-text-link-' + buttons.length,
                             href: 'javascript:void(0);',
-                            onClick: this.onNodeClicked.bind(this, node, nodeId) },
+                            onClick: this.onNodeLabelClicked.bind(this, node, nodeId) },
                         React.createElement(
                             'span',
                             { className: 'node-text' },
@@ -17611,9 +17611,13 @@
                     this.expandNode(node, nodeId);
                 }
             }
+        },
+        onNodeLabelClicked: function (node, nodeId) {
             var nodeClick = this.getComponentOption('nodeClick');
             if (nodeClick) {
                 nodeClick.call(this, node);
+            } else {
+                this.onNodeClicked(node, nodeId);
             }
         },
         onNodeOperationClicked: function (node, click) {

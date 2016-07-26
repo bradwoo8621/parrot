@@ -212,7 +212,7 @@
                         {this.renderCheck(node, nodeId)}
                         <a className={'node-text-link-' + buttons.length}
                             href='javascript:void(0);'
-                            onClick={this.onNodeClicked.bind(this, node, nodeId)}>
+                            onClick={this.onNodeLabelClicked.bind(this, node, nodeId)}>
                             <span className='node-text'>{this.getNodeText(node)}</span>
                         </a>
                         {buttons}
@@ -300,9 +300,13 @@
                     this.expandNode(node, nodeId);
                 }
             }
+        },
+        onNodeLabelClicked: function(node, nodeId) {
             var nodeClick = this.getComponentOption('nodeClick');
             if (nodeClick) {
                 nodeClick.call(this, node);
+            } else {
+                this.onNodeClicked(node, nodeId);
             }
         },
         onNodeOperationClicked: function(node, click) {
