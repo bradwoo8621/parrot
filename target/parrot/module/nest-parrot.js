@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.4.21 2016-07-26 */
+	/** nest-parrot.V0.4.21 2016-07-27 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -12984,7 +12984,9 @@
 			}
 			this.setValueToModel(null);
 			// clear highlight
-			this.state.popoverDiv.find('ul.options > li').filter('.chosen').removeClass('chosen');
+			if (this.state.popoverDiv) {
+				this.state.popoverDiv.find('ul.options > li').filter('.chosen').removeClass('chosen');
+			}
 		},
 		onFilterTextChange: function (evt) {
 			if (this.state.popoverDiv.is(':visible')) {

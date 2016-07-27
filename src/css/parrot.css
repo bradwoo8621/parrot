@@ -1461,44 +1461,60 @@ div.n-select .form-control {
   /* OLD - iOS 6-, Safari 3.1-6 */
   display: -moz-box;
   /* OLD - Firefox 19- (buggy but mostly works) */
-  display: -ms-flexbox;
-  /* TWEENER - IE 10 */
   display: -webkit-flex;
   /* NEW - Chrome */
   display: flex;
   /* NEW, Spec - Opera 12.1, Firefox 20+ */
+  display: table\9;
+  /* IE9/10 */
   -ms-flex-direction: row;
   -webkit-flex-direction: row;
   flex-direction: row;
   align-items: center;
-  -ms-flex-align: center;
   border: 0;
 }
 div.n-select .form-control .text {
-  -ms-flex-order: 1;
   order: 1;
   flex-grow: 1;
-  -ms-flex: 1 auto;
   display: inline-block;
+  display: table-cell\9;
+  /* IE9/10 */
   cursor: pointer;
   white-space: nowrap;
   text-overflow: ellipsis;
   padding-right: 3px;
   width: 0;
+  /* must set an exactly width, it works, no matter what it is. */
+  width: 99%\9;
+  /* IE9/10 */
+  vertical-align: middle\9;
+  /* IE9/10 */
   overflow: hidden;
 }
 div.n-select .form-control .clear {
-  -ms-flex-order: 2;
   order: 2;
   cursor: pointer;
   font-size: 0.8em;
+  display: table-cell\9;
+  /* IE9/10 */
+  width: 1%\9;
+  /* IE9/10 */
+  padding-right: 5px\9;
+  /* IE9/10 */
+  vertical-align: middle\9;
+  /* IE9/10 */
 }
 div.n-select .form-control .drop {
-  -ms-flex-order: 3;
   order: 3;
   cursor: pointer;
   margin-right: 2px;
   margin-top: -4px;
+  display: table-cell\9;
+  /* IE9/10 */
+  width: 1%\9;
+  /* IE9/10 */
+  vertical-align: middle\9;
+  /* IE9/10 */
 }
 div.n-select:focus hr.focus-line {
   transform: scaleX(1);

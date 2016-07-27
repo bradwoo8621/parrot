@@ -7,42 +7,53 @@ div.n-select {
 		-o-box-shadow: none;
 		padding: 0;
 	    // display: flex;
-	    display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
-		display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
-		display: -ms-flexbox;      /* TWEENER - IE 10 */
-		display: -webkit-flex;     /* NEW - Chrome */
-		display: flex;             /* NEW, Spec - Opera 12.1, Firefox 20+ */
+	    display: -webkit-box;		/* OLD - iOS 6-, Safari 3.1-6 */
+		display: -moz-box;			/* OLD - Firefox 19- (buggy but mostly works) */
+		// display: -ms-flexbox;		/* TWEENER - IE 10 */
+		display: -webkit-flex;		/* NEW - Chrome */
+		display: flex;				/* NEW, Spec - Opera 12.1, Firefox 20+ */
+		display: table\9;			/* IE9/10 */
 		-ms-flex-direction: row;
 		-webkit-flex-direction: row;
 	    flex-direction: row;
 	    align-items: center;
-	    -ms-flex-align: center;
+	    // -ms-flex-align: center;		/* TWEENER - IE 10 */
 		border: 0;
 		.text {
-			-ms-flex-order: 1;
+			// -ms-flex-order: 1;		/* TWEENER - IE 10 */
 			order: 1;
 			flex-grow: 1;
-			-ms-flex: 1 auto;
+			// -ms-flex: 1 auto;		/* TWEENER - IE 10 */
 			display: inline-block;
+			display: ~"table-cell\9";		/* IE9/10 */
 			cursor: pointer;
 			white-space: nowrap;
 			text-overflow: ellipsis;
 			padding-right: 3px;
-			width: 0;	// must set an exactly width, it works, no matter what it is.
+			width: 0;						/* must set an exactly width, it works, no matter what it is. */
+			width: 99%\9;		   			/* IE9/10 */
+			vertical-align: middle\9;		/* IE9/10 */
 			overflow: hidden;
 		}
 		.clear {
-			-ms-flex-order: 2;
+			// -ms-flex-order: 2;		/* TWEENER - IE 10 */
 			order: 2;
 			cursor: pointer;
 			font-size: 0.8em;
+			display: ~"table-cell\9";		/* IE9/10 */
+			width: 1%\9;					/* IE9/10 */
+			padding-right: 5px\9;			/* IE9/10 */
+			vertical-align: middle\9;		/* IE9/10 */
 		}
 		.drop {
-			-ms-flex-order: 3;
+			// -ms-flex-order: 3;		/* TWEENER - IE 10 */
 			order: 3;
 			cursor: pointer;
 			margin-right: 2px;
 			margin-top: -4px;
+			display: ~"table-cell\9";		/* IE9/10 */
+			width: 1%\9;					/* IE9/10 */
+			vertical-align: middle\9;		/* IE9/10 */
 		}
 	}
 	&:focus hr.focus-line {

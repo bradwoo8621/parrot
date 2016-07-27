@@ -624,7 +624,9 @@
 			}
 			this.setValueToModel(null);
 			// clear highlight
-			this.state.popoverDiv.find('ul.options > li').filter('.chosen').removeClass('chosen');
+			if (this.state.popoverDiv) {
+				this.state.popoverDiv.find('ul.options > li').filter('.chosen').removeClass('chosen');
+			}
 		},
 		onFilterTextChange: function(evt) {
 			if (this.state.popoverDiv.is(':visible')) {
