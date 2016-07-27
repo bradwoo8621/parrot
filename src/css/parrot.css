@@ -1467,7 +1467,6 @@ div.n-select .form-control {
   /* NEW, Spec - Opera 12.1, Firefox 20+ */
   display: table\9;
   /* IE9/10 */
-  -ms-flex-direction: row;
   -webkit-flex-direction: row;
   flex-direction: row;
   align-items: center;
