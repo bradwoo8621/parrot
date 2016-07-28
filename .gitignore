@@ -19,3 +19,4 @@
 /target/respond
 /target/select2
 /.sublime-grunt.cache
+/npm-debug.log
