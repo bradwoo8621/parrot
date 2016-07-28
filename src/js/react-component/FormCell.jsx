@@ -19,6 +19,7 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NFormCell = React.createClass($pt.defineCellComponent({
 		displayName: 'NFormCell',
+		keepRender: true,
 		statics: {
 			REQUIRED_ICON: 'asterisk',
 			TOOLTIP_ICON: 'question-circle',
@@ -258,20 +259,7 @@
 		 * @returns {XML}
 		 */
 		render: function () {
-			// when the component is not visible
-			// or declared only view in edit mode
-			// hide it
-			var visible = this.isVisible();
-			if (visible) {
-				var view = this.getComponentOption('view');
-				if (this.isViewMode()) {
-					visible = (view == 'edit') != true;
-				} else if (!this.isViewMode()) {
-					visible = (view == 'view') != true;
-				}
-			}
-
-			if (!visible) {
+			if (!this.isVisible()) {
 				return (<div className={this.getCSSClassName() + ' n-form-cell-invisible'}/>);
 			} else {
 				var css = this.getCSSClassName();

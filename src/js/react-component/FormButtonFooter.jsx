@@ -11,15 +11,19 @@
 			layout: React.PropTypes.object
 		},
 		componentWillUpdate: function() {
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		componentDidUpdate: function() {
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		componentDidMount: function() {
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		componentWillUnmount: function() {
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		render: function () {

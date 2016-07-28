@@ -42,6 +42,7 @@
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.__forceUpdate);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			if (this.hasParent()) {
 				// add post change listener into parent model
@@ -57,6 +58,7 @@
 		componentDidUpdate: function (prevProps, prevState) {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.__forceUpdate);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			if (this.hasParent()) {
 				// add post change listener into parent model
@@ -74,6 +76,7 @@
 		componentDidMount: function () {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.__forceUpdate);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			if (this.hasParent()) {
 				// add post change listener into parent model
@@ -94,6 +97,7 @@
 			this.destroyPopover();
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.__forceUpdate);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			if (this.hasParent()) {
 				// add post change listener into parent model

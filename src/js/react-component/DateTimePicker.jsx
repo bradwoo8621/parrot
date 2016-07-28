@@ -71,24 +71,28 @@
 		},
 		componentWillUpdate: function(nextProps) {
 			this.removePostChangeListener(this.onModelChange);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		componentDidUpdate: function(prevProps, prevState) {
 			this.setValueToTextInput(this.getValueFromModel());
 			this.addPostChangeListener(this.onModelChange);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		componentDidMount: function() {
 			this.setValueToTextInput(this.getValueFromModel());
 			this.addPostChangeListener(this.onModelChange);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		componentWillUnmount: function() {
 			this.destroyPopover();
 			this.removePostChangeListener(this.onModelChange);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},

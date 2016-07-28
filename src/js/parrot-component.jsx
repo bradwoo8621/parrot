@@ -1377,7 +1377,19 @@
 		 * @returns {boolean}
 		 */
 		isVisible: function () {
-			return this.getComponentRuleValue("visible", true);
+			// when the component is not visible
+			// or declared only view in edit mode
+			// hide it
+			var visible = this.getComponentRuleValue("visible", true);
+			if (visible) {
+				var view = this.getComponentOption('view');
+				if (this.isViewMode()) {
+					visible = (view == 'edit') != true;
+				} else if (!this.isViewMode()) {
+					visible = (view == 'view') != true;
+				}
+			}
+			return visible;
 		},
 		/**
 		 * is required
@@ -1564,7 +1576,19 @@
 	 * @param config {{}} special component config, will replace the definition from component base if with same name
 	 */
 	$pt.defineCellComponent = function (config) {
-		return $.extend({}, ComponentBase, config);
+		var renderProxy = {};
+		if (config.keepRender !== true) {
+			renderProxy = {
+				render: function() {
+					if (!this.isVisible()) {
+						return null;
+					} else {
+						return config.render.call(this);
+					}
+				}
+			};
+		}
+		return $.extend({}, ComponentBase, config, renderProxy);
 	};
 
 	var LayoutHelper = jsface.Class({

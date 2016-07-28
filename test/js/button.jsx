@@ -8,7 +8,13 @@
     var button = $pt.createCellLayout('name', {
         label: 'Click me',
         comp: {
-            type: $pt.ComponentConstants.Button
+            type: $pt.ComponentConstants.Button,
+            visible: {
+                depends: 'name',
+                when: function() {
+                    return this.getModel().get('name') == null;
+                }
+            }
         },
         pos: {row: 1, col: 1}
     });
@@ -16,7 +22,11 @@
         label: 'Click me',
         comp: {
             type: $pt.ComponentConstants.Button,
-            icon: 'pencil'
+            icon: 'pencil',
+            click: function() {
+                var value = this.getModel().get('name');
+                this.getModel().set('name', value ? null : 'abc');
+            }
         },
         pos: {row: 1, col: 1}
     });
@@ -251,6 +261,7 @@
             <span>Disabled Success Icon Button</span>
             <NFormButton model={model} layout={disabledSuccessIconButton}/>
         </div>
+        <NFormCell model={model} layout={button}/>
     </div>);
     ReactDOM.render(panel, document.getElementById('main'));
 })();

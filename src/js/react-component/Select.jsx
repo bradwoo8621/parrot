@@ -42,6 +42,7 @@
 		 */
 		componentWillUpdate: function (nextProps) {
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			if (this.hasParent()) {
 				// add post change listener into parent model
@@ -56,6 +57,7 @@
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			if (this.hasParent()) {
 				// remove post change listener from parent model
@@ -69,6 +71,7 @@
 		 */
 		componentDidMount: function () {
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 			if (this.state.onloading) {
@@ -104,6 +107,7 @@
 		componentWillUnmount: function () {
 			// remove post change listener
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			if (this.hasParent()) {
 				// remove post change listener from parent model

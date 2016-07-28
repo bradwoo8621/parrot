@@ -55,6 +55,7 @@
 			}
 			this.removeDependencyMonitor(this.getDependencies("collapsedLabel"));
 			this.removeDependencyMonitor(this.getDependencies("expandedLabel"));
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		/**
@@ -68,6 +69,7 @@
 			}
 			this.addDependencyMonitor(this.getDependencies("collapsedLabel"));
 			this.addDependencyMonitor(this.getDependencies("expandedLabel"));
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -79,6 +81,7 @@
 			}
 			this.addDependencyMonitor(this.getDependencies("collapsedLabel"));
 			this.addDependencyMonitor(this.getDependencies("expandedLabel"));
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -90,6 +93,7 @@
 			}
 			this.removeDependencyMonitor(this.getDependencies("collapsedLabel"));
 			this.removeDependencyMonitor(this.getDependencies("expandedLabel"));
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		getDefaultProps: function () {

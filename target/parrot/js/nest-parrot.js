@@ -1,4 +1,4 @@
-/** nest-parrot.V0.4.21 2016-07-27 */
+/** nest-parrot.V0.4.21 2016-07-28 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -4032,7 +4032,19 @@
    * @returns {boolean}
    */
 		isVisible: function () {
-			return this.getComponentRuleValue("visible", true);
+			// when the component is not visible
+			// or declared only view in edit mode
+			// hide it
+			var visible = this.getComponentRuleValue("visible", true);
+			if (visible) {
+				var view = this.getComponentOption('view');
+				if (this.isViewMode()) {
+					visible = view == 'edit' != true;
+				} else if (!this.isViewMode()) {
+					visible = view == 'view' != true;
+				}
+			}
+			return visible;
 		},
 		/**
    * is required
@@ -4219,7 +4231,19 @@
   * @param config {{}} special component config, will replace the definition from component base if with same name
   */
 	$pt.defineCellComponent = function (config) {
-		return $.extend({}, ComponentBase, config);
+		var renderProxy = {};
+		if (config.keepRender !== true) {
+			renderProxy = {
+				render: function () {
+					if (!this.isVisible()) {
+						return null;
+					} else {
+						return config.render.call(this);
+					}
+				}
+			};
+		}
+		return $.extend({}, ComponentBase, config, renderProxy);
 	};
 
 	var LayoutHelper = jsface.Class({
@@ -4413,6 +4437,7 @@
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -4424,6 +4449,7 @@
 		componentDidUpdate: function (prevProps, prevState) {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -4433,6 +4459,7 @@
 		componentDidMount: function () {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -4442,6 +4469,7 @@
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -4606,6 +4634,7 @@
 			this.removePostAddListener(this.onModelChanged);
 			this.removePostRemoveListener(this.onModelChanged);
 			this.removePostValidateListener(this.onModelValidateChanged);
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		/**
@@ -4619,6 +4648,7 @@
 			this.addPostAddListener(this.onModelChanged);
 			this.addPostRemoveListener(this.onModelChanged);
 			this.addPostValidateListener(this.onModelValidateChanged);
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -4630,6 +4660,7 @@
 			this.addPostAddListener(this.onModelChanged);
 			this.addPostRemoveListener(this.onModelChanged);
 			this.addPostValidateListener(this.onModelValidateChanged);
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -4641,6 +4672,7 @@
 			this.removePostAddListener(this.onModelChanged);
 			this.removePostRemoveListener(this.onModelChanged);
 			this.removePostValidateListener(this.onModelValidateChanged);
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		/**
@@ -4883,6 +4915,7 @@
 			this.removePostAddListener(this.onModelChanged);
 			this.removePostRemoveListener(this.onModelChanged);
 			this.removePostValidateListener(this.onModelValidateChanged);
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		/**
@@ -4896,6 +4929,7 @@
 			this.addPostAddListener(this.onModelChanged);
 			this.addPostRemoveListener(this.onModelChanged);
 			this.addPostValidateListener(this.onModelValidateChanged);
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -4907,6 +4941,7 @@
 			this.addPostAddListener(this.onModelChanged);
 			this.addPostRemoveListener(this.onModelChanged);
 			this.addPostValidateListener(this.onModelValidateChanged);
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -4918,6 +4953,7 @@
 			this.removePostAddListener(this.onModelChanged);
 			this.removePostRemoveListener(this.onModelChanged);
 			this.removePostValidateListener(this.onModelValidateChanged);
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		/**
@@ -5323,6 +5359,7 @@
    * @param nextProps
    */
 		componentWillUpdate: function (nextProps) {
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -5332,6 +5369,7 @@
    * @param prevState
    */
 		componentDidUpdate: function (prevProps, prevState) {
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -5339,6 +5377,7 @@
    * did mount
    */
 		componentDidMount: function () {
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -5346,6 +5385,7 @@
    * will unmount
    */
 		componentWillUnmount: function () {
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -5591,6 +5631,7 @@
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -5604,6 +5645,7 @@
 			// this.getComponent().prop("checked", this.getValueFromModel());
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -5615,6 +5657,7 @@
 			// this.getComponent().prop("checked", this.getValueFromModel());
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -5624,6 +5667,7 @@
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -5942,24 +5986,28 @@
 		},
 		componentWillUpdate: function (nextProps) {
 			this.removePostChangeListener(this.onModelChange);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		componentDidUpdate: function (prevProps, prevState) {
 			this.setValueToTextInput(this.getValueFromModel());
 			this.addPostChangeListener(this.onModelChange);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		componentDidMount: function () {
 			this.setValueToTextInput(this.getValueFromModel());
 			this.addPostChangeListener(this.onModelChange);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		componentWillUnmount: function () {
 			this.destroyPopover();
 			this.removePostChangeListener(this.onModelChange);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -7532,9 +7580,11 @@
 			};
 		},
 		componentWillUpdate: function () {
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		componentDidUpdate: function () {
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		componentDidMount: function () {
@@ -7556,6 +7606,7 @@
 			var comp = $(ReactDOM.findDOMNode(this.refs.comp));
 			comp.find('.kv-fileinput-caption').focus(this.onComponentFocused).blur(this.onComponentBlurred);
 			comp.find('.input-group-btn>.btn').focus(this.onComponentFocused).blur(this.onComponentBlurred);
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		componentWillUnmount: function () {
@@ -7567,6 +7618,7 @@
 			}.bind(this));
 			// destroy the component
 			input.fileinput('destroy');
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		render: function () {
@@ -8213,15 +8265,19 @@
 			layout: React.PropTypes.object
 		},
 		componentWillUpdate: function () {
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		componentDidUpdate: function () {
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		componentDidMount: function () {
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		componentWillUnmount: function () {
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		render: function () {
@@ -8266,6 +8322,7 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NFormCell = React.createClass($pt.defineCellComponent({
 		displayName: 'NFormCell',
+		keepRender: true,
 		statics: {
 			REQUIRED_ICON: 'asterisk',
 			TOOLTIP_ICON: 'question-circle',
@@ -8507,20 +8564,7 @@
    * @returns {XML}
    */
 		render: function () {
-			// when the component is not visible
-			// or declared only view in edit mode
-			// hide it
-			var visible = this.isVisible();
-			if (visible) {
-				var view = this.getComponentOption('view');
-				if (this.isViewMode()) {
-					visible = view == 'edit' != true;
-				} else if (!this.isViewMode()) {
-					visible = view == 'view' != true;
-				}
-			}
-
-			if (!visible) {
+			if (!this.isVisible()) {
 				return React.createElement('div', { className: this.getCSSClassName() + ' n-form-cell-invisible' });
 			} else {
 				var css = this.getCSSClassName();
@@ -8754,6 +8798,7 @@
 					_this.removeDependencyMonitor([tab.badgeId]);
 				}
 			});
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		/**
@@ -8768,6 +8813,7 @@
 					_this.addDependencyMonitor([tab.badgeId]);
 				}
 			});
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -8780,6 +8826,7 @@
 					_this.addDependencyMonitor([tab.badgeId]);
 				}
 			});
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -8792,6 +8839,7 @@
 					_this.removeDependencyMonitor([tab.badgeId]);
 				}
 			});
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		renderTabContent: function (layout, index) {
@@ -9088,6 +9136,7 @@
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.__forceUpdate);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -9099,6 +9148,7 @@
 		componentDidUpdate: function (prevProps, prevState) {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.__forceUpdate);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -9108,6 +9158,7 @@
 		componentDidMount: function () {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.__forceUpdate);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -9117,6 +9168,7 @@
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.__forceUpdate);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -11042,6 +11094,7 @@
 			}
 			this.removeDependencyMonitor(this.getDependencies("collapsedLabel"));
 			this.removeDependencyMonitor(this.getDependencies("expandedLabel"));
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		/**
@@ -11055,6 +11108,7 @@
 			}
 			this.addDependencyMonitor(this.getDependencies("collapsedLabel"));
 			this.addDependencyMonitor(this.getDependencies("expandedLabel"));
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -11066,6 +11120,7 @@
 			}
 			this.addDependencyMonitor(this.getDependencies("collapsedLabel"));
 			this.addDependencyMonitor(this.getDependencies("expandedLabel"));
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -11077,6 +11132,7 @@
 			}
 			this.removeDependencyMonitor(this.getDependencies("collapsedLabel"));
 			this.removeDependencyMonitor(this.getDependencies("expandedLabel"));
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		getDefaultProps: function () {
@@ -11703,6 +11759,7 @@
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -11714,6 +11771,7 @@
 		componentDidUpdate: function (prevProps, prevState) {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -11723,6 +11781,7 @@
 		componentDidMount: function () {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -11732,6 +11791,7 @@
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -11910,6 +11970,7 @@
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChange);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -11922,6 +11983,7 @@
 			this.initSetValues();
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChange);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -11933,6 +11995,7 @@
 			this.initSetValues();
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChange);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -11942,6 +12005,7 @@
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChange);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -12347,6 +12411,7 @@
    */
 		componentWillUpdate: function (nextProps) {
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			if (this.hasParent()) {
 				// add post change listener into parent model
@@ -12361,6 +12426,7 @@
    */
 		componentDidUpdate: function (prevProps, prevState) {
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			if (this.hasParent()) {
 				// remove post change listener from parent model
@@ -12374,6 +12440,7 @@
    */
 		componentDidMount: function () {
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 			if (this.state.onloading) {
@@ -12409,6 +12476,7 @@
 		componentWillUnmount: function () {
 			// remove post change listener
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			if (this.hasParent()) {
 				// remove post change listener from parent model
@@ -13119,6 +13187,7 @@
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.__forceUpdate);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			if (this.hasParent()) {
 				// add post change listener into parent model
@@ -13134,6 +13203,7 @@
 		componentDidUpdate: function (prevProps, prevState) {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.__forceUpdate);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			if (this.hasParent()) {
 				// add post change listener into parent model
@@ -13151,6 +13221,7 @@
 		componentDidMount: function () {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.__forceUpdate);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			if (this.hasParent()) {
 				// add post change listener into parent model
@@ -13171,6 +13242,7 @@
 			this.destroyPopover();
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.__forceUpdate);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			if (this.hasParent()) {
 				// add post change listener into parent model
@@ -14346,6 +14418,7 @@
 			this.addPostRemoveListener(this.onModelChanged);
 			this.addPostAddListener(this.onModelChanged);
 			this.addPostValidateListener(this.onModelValidateChanged);
+			this.addVisibleDependencyMonitor();
 		},
 		/**
    * detach listeners
@@ -14359,6 +14432,7 @@
 			this.removePostRemoveListener(this.onModelChanged);
 			this.removePostAddListener(this.onModelChanged);
 			this.removePostValidateListener(this.onModelValidateChanged);
+			this.removeVisibleDependencyMonitor();
 		},
 		/**
    * will update
@@ -16585,6 +16659,7 @@
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.getComponent().off('change', this.onComponentChanged);
 			this.unregisterFromComponentCentral();
@@ -16604,6 +16679,7 @@
 			}
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.getComponent().on('change', this.onComponentChanged);
 			this.registerToComponentCentral();
@@ -16616,6 +16692,7 @@
 			this.getComponent().val(this.getFormattedValue(this.getValueFromModel()));
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.getComponent().on('change', this.onComponentChanged);
 			this.registerToComponentCentral();
@@ -16626,6 +16703,7 @@
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.getComponent().off('change', this.onComponentChanged);
 			this.unregisterFromComponentCentral();
@@ -16958,6 +17036,7 @@
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.getComponent().off('change', this.onComponentChanged);
 			this.unregisterFromComponentCentral();
@@ -16973,6 +17052,7 @@
 			}
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.getComponent().on('change', this.onComponentChanged);
 			this.registerToComponentCentral();
@@ -16985,6 +17065,7 @@
 			this.getComponent().val(this.getValueFromModel());
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.getComponent().on('change', this.onComponentChanged);
 			this.registerToComponentCentral();
@@ -16995,6 +17076,7 @@
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.getComponent().off('change', this.onComponentChanged);
 			this.unregisterFromComponentCentral();
@@ -17116,6 +17198,7 @@
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -17129,6 +17212,7 @@
 			this.getComponent().prop("checked", this.getValueFromModel());
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -17140,6 +17224,7 @@
 			this.getComponent().prop("checked", this.getValueFromModel());
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -17149,6 +17234,7 @@
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -17365,6 +17451,7 @@
         componentWillUpdate: function (nextProps) {
             // remove post change listener to handle model change
             this.removePostChangeListener(this.__forceUpdate);
+            this.removeVisibleDependencyMonitor();
             this.removeEnableDependencyMonitor();
             this.unregisterFromComponentCentral();
         },
@@ -17376,6 +17463,7 @@
         componentDidUpdate: function (prevProps, prevState) {
             // add post change listener to handle model change
             this.addPostChangeListener(this.__forceUpdate);
+            this.addVisibleDependencyMonitor();
             this.addEnableDependencyMonitor();
             this.registerToComponentCentral();
         },
@@ -17388,6 +17476,7 @@
         componentDidMount: function () {
             // add post change listener to handle model change
             this.addPostChangeListener(this.__forceUpdate);
+            this.addVisibleDependencyMonitor();
             this.addEnableDependencyMonitor();
             this.registerToComponentCentral();
         },
@@ -17397,6 +17486,7 @@
         componentWillUnmount: function () {
             // remove post change listener to handle model change
             this.removePostChangeListener(this.__forceUpdate);
+            this.removeVisibleDependencyMonitor();
             this.removeEnableDependencyMonitor();
             this.unregisterFromComponentCentral();
         },

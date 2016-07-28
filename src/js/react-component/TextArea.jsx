@@ -57,6 +57,7 @@
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.getComponent().off('change', this.onComponentChanged);
 			this.unregisterFromComponentCentral();
@@ -72,6 +73,7 @@
 			}
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.getComponent().on('change', this.onComponentChanged);
 			this.registerToComponentCentral();
@@ -84,6 +86,7 @@
 			this.getComponent().val(this.getValueFromModel());
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.getComponent().on('change', this.onComponentChanged);
 			this.registerToComponentCentral();
@@ -94,6 +97,7 @@
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.getComponent().off('change', this.onComponentChanged);
 			this.unregisterFromComponentCentral();

@@ -159,9 +159,11 @@
 			};
 		},
 		componentWillUpdate: function() {
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		componentDidUpdate: function() {
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		componentDidMount: function () {
@@ -187,6 +189,7 @@
 			comp.find('.input-group-btn>.btn')
 				.focus(this.onComponentFocused)
 				.blur(this.onComponentBlurred);
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		componentWillUnmount: function () {
@@ -198,6 +201,7 @@
 			}.bind(this));
 			// destroy the component
 			input.fileinput('destroy');
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		render: function () {

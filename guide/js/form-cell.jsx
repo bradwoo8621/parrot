@@ -379,10 +379,7 @@
 					id: 'form-cell-visible',
 					title: 'Visible',
 					desc: [<span>
-						<code>visible</code> definition is same as <code>enabled</code>,
-						the only difference is <code>visible</code> provided by Form Cell,
-						<code>enabled</code> provided by it's inner component.
-						Which means if component is used alone, <code>visible</code> is not worked.
+						<code>visible</code> definition is same as <code>enabled</code>.
 					</span>
 					],
 					index: 80
@@ -545,7 +542,9 @@
 			centralId: function() {
 				var layoutTemplate = {
 					label: 'Label of Cell',
-					centralId: 'myCentralId'
+					comp: {
+						centralId: 'myCentralId'
+					}
 				};
 				var layoutCode = $demo.convertCellLayoutCreatorToString({
 					variable: 'layout',

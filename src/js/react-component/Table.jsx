@@ -190,6 +190,7 @@
 			this.addPostRemoveListener(this.onModelChanged);
 			this.addPostAddListener(this.onModelChanged);
 			this.addPostValidateListener(this.onModelValidateChanged);
+			this.addVisibleDependencyMonitor();
 		},
 		/**
 		 * detach listeners
@@ -203,6 +204,7 @@
 			this.removePostRemoveListener(this.onModelChanged);
 			this.removePostAddListener(this.onModelChanged);
 			this.removePostValidateListener(this.onModelValidateChanged);
+			this.removeVisibleDependencyMonitor();
 		},
 		/**
 		 * will update

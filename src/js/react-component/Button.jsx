@@ -55,6 +55,7 @@
 		 * @param nextProps
 		 */
 		componentWillUpdate: function (nextProps) {
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -64,6 +65,7 @@
 		 * @param prevState
 		 */
 		componentDidUpdate: function (prevProps, prevState) {
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -71,6 +73,7 @@
 		 * did mount
 		 */
 		componentDidMount: function () {
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -78,6 +81,7 @@
 		 * will unmount
 		 */
 		componentWillUnmount: function () {
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},

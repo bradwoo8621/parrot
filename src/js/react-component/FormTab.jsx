@@ -68,6 +68,7 @@
 					_this.removeDependencyMonitor([tab.badgeId]);
 				}
 			});
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		/**
@@ -82,6 +83,7 @@
 					_this.addDependencyMonitor([tab.badgeId]);
 				}
 			});
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -94,6 +96,7 @@
 					_this.addDependencyMonitor([tab.badgeId]);
 				}
 			});
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -106,6 +109,7 @@
 					_this.removeDependencyMonitor([tab.badgeId]);
 				}
 			});
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		renderTabContent: function (layout, index) {
