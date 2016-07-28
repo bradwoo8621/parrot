@@ -130,6 +130,15 @@
 							Proxy can be defined as a function which has one parameter <code>data : JSON[]</code>,
 							and returns <code>JSON[]</code> which fit the code table format.
 						</span>
+					}, {
+						id: 'sendProxy',
+						title: 'Data Send Proxy',
+						pattern: '$pt.ComponentConstants.CODETABLE_SENDER_PROXY = null;',
+						desc: <span>
+							The default proxy of remote code table options sender is <code>null</code>.<br/>
+							Proxy can be defined as a function which has one JSON parameter <code>{"{url, data, quiet, aysnc}"}</code>,
+							and returns a jQuery Deferred object.
+						</span>
 					}
 				]
 			}

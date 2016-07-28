@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.3.3 2016-04-29 */
+	/** nest-parrot.V0.4.21 2016-07-28 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -253,6 +253,93 @@
 	patches.array();
 })(window);
 
+// copy from https://github.com/princed/caret
+(function ($, window) {
+	function focus(target) {
+		if (!document.activeElement || document.activeElement !== target) {
+			target.focus();
+		}
+	}
+
+	$.fn.caret = function (pos) {
+		var target = this[0];
+		var range, range1, range2, bookmark;
+		var isContentEditable = target.contentEditable === 'true';
+		//get
+		if (arguments.length == 0) {
+			//HTML5
+			if (window.getSelection) {
+				//contenteditable
+				if (isContentEditable) {
+					focus(target);
+					var selection = window.getSelection();
+					// Opera 12 check
+					if (!selection.rangeCount) {
+						return 0;
+					}
+					range1 = selection.getRangeAt(0);
+					range2 = range1.cloneRange();
+					range2.selectNodeContents(target);
+					range2.setEnd(range1.endContainer, range1.endOffset);
+					return range2.toString().length;
+				}
+				//textarea
+				return target.selectionStart;
+			}
+			//IE<9
+			if (document.selection) {
+				focus(target);
+				//contenteditable
+				if (isContentEditable) {
+					range1 = document.selection.createRange();
+					range2 = document.body.createTextRange();
+					range2.moveToElementText(target);
+					range2.setEndPoint('EndToEnd', range1);
+					return range2.text.length;
+				}
+				//textarea
+				pos = 0;
+				range = target.createTextRange();
+				range2 = document.selection.createRange().duplicate();
+				bookmark = range2.getBookmark();
+				range.moveToBookmark(bookmark);
+				while (range.moveStart('character', -1) !== 0) {
+					pos++;
+				}
+				return pos;
+			}
+			//not supported
+			return 0;
+		}
+		//set
+		if (pos == -1) {
+			pos = this[isContentEditable ? 'text' : 'val']().length;
+		}
+		//HTML5
+		if (window.getSelection) {
+			//contenteditable
+			if (isContentEditable) {
+				focus(target);
+				window.getSelection().collapse(target.firstChild, pos);
+			}
+			//textarea
+			else target.setSelectionRange(pos, pos);
+		}
+		//IE<9
+		else if (document.body.createTextRange) {
+				range = document.body.createTextRange();
+				range.moveToElementText(target);
+				range.moveStart('character', pos);
+				range.collapse(true);
+				range.select();
+			}
+		if (!isContentEditable) {
+			focus(target);
+		}
+		return pos;
+	};
+})(jQuery, window);
+
 (function (window) {
 	var $pt = window.$pt;
 	if ($pt == null) {
@@ -419,6 +506,7 @@
 	$pt.ComponentConstants = {
 		// component types
 		Text: "text",
+		TextInJSON: { type: 'text', label: true, popover: true, renderError: true, delay: 1000 },
 		TextArea: 'textarea',
 		Select: "select",
 		Check: "check",
@@ -442,8 +530,13 @@
 		Nothing: { type: "nothing", label: false },
 		// date format
 		Default_Date_Format: "YYYY/MM/DD HH:mm:ss.SSS", // see momentjs
+		// code table
 		CODETABLE_PARENT_VALUE_KEY: 'value',
+		CODETABLE_SENDER_PROXY: null,
 		CODETABLE_RECEIVER_PROXY: null,
+		CODETABLE_REMOTE_PROXY: null,
+		// error display
+		ERROR_POPOVER: true,
 		// exception codes
 		Err_Unsupported_Component: "PT-00001",
 		Err_Unuspported_Column_Sort: "PT-00002",
@@ -872,6 +965,8 @@
 				this._local = false;
 				this._url = data.url;
 				this._postData = data.data;
+				this._sendProxy = data.proxy;
+				this._receiveProxy = data.receiver;
 			}
 			this._renderer = renderer;
 			this._sorter = sorter;
@@ -892,7 +987,7 @@
 				// log the first loading promise and returns to all others
 				if (!this._loading) {
 					this._loading = this.__loadRemoteCodes(true).always(function () {
-						delete this._loadding;
+						delete this._loading;
 						this._allLoaded = true;
 					}.bind(this));
 				}
@@ -969,13 +1064,21 @@
    */
 		__loadRemoteCodes: function (async) {
 			var _this = this;
-			return $pt.doPost(this._url, this._postData, {
+			var remoteProxy = this.__getSendProxy();
+			var remoteVisit = remoteProxy ? remoteProxy.call(this, {
+				url: this._url,
+				data: this._postData,
 				quiet: true,
 				async: async != null ? async : false
-			}).done(function (data) {
+			}) : $pt.doPost(this._url, this._postData, {
+				quiet: true,
+				async: async != null ? async : false
+			});
+			return remoteVisit.done(function (data) {
 				var receiveData = data;
-				if ($pt.ComponentConstants.CODETABLE_RECEIVER_PROXY) {
-					receiveData = $pt.ComponentConstants.CODETABLE_RECEIVER_PROXY.call(this, receiveData);
+				var receiverProxy = _this.__getReceiveProxy();
+				if (receiverProxy) {
+					receiveData = receiverProxy.call(_this, receiveData);
 				}
 				// init code table element array after get data from remote
 				_this.__initCodesArray(receiveData, _this._renderer, _this._sorter);
@@ -986,6 +1089,12 @@
 			}).always(function () {
 				_this._initialized = true;
 			});
+		},
+		__getSendProxy: function () {
+			return this._sendProxy || $pt.ComponentConstants.CODETABLE_SENDER_PROXY || $pt.ComponentConstants.CODETABLE_REMOTE_PROXY;
+		},
+		__getReceiveProxy: function () {
+			return this._receiveProxy || $pt.ComponentConstants.CODETABLE_RECEIVER_PROXY;
 		},
 		/**
    * get code table element array
@@ -1043,8 +1152,9 @@
 				this.__loadRemoteCodeSegment(value);
 				// filter
 				return this.__getCodes().filter(function (code) {
+					this.__setParentValueAsLoaded(code[func.name]);
 					return code[func.name] == value;
-				});
+				}.bind(this));
 			}
 		},
 		isSegmentLoaded: function (parentValue) {
@@ -1072,7 +1182,7 @@
 			}
 		},
 		__needLoadFromRemote: function (parentValue) {
-			return !this._local && !this._allLoaded && (!this._loadedKeys || this._loadedKeys.indexOf(parentValue) == -1);
+			return !this._local && !this._allLoaded && (!this._loadedKeys || this._loadedKeys[parentValue + ''] !== true);
 		},
 		__rebuildPostData: function (parentValue) {
 			var values = {};
@@ -1099,10 +1209,12 @@
 		__setParentValueAsLoaded: function (parentValue) {
 			// init loaded keys
 			if (!this._loadedKeys) {
-				this._loadedKeys = [];
+				// this._loadedKeys = [];
+				this._loadedKeys = {};
 			}
 			// log the loaded keys
-			this._loadedKeys.push(parentValue);
+			// this._loadedKeys.push(parentValue);
+			this._loadedKeys[parentValue + ''] = true;
 			return this;
 		},
 		__loadRemoteCodeSegment: function (parentValue) {
@@ -1428,14 +1540,20 @@
    * @returns {{}}
    */
 		getError: function (model) {
-			var keys = Object.keys(this.__models);
-			for (var index = 0, count = keys.length; index < count; index++) {
-				var item = this.__models[keys[index]];
-				if (item == model) {
-					return this.__errors[keys[index]];
-				}
-			}
-			return null;
+			// var keys = Object.keys(this.__models);
+			// for (var index = 0, count = keys.length; index < count; index++) {
+			// 	var item = this.__models[keys[index]];
+			// 	if (item == model) {
+			// 		return this.__errors[keys[index]];
+			// 	}
+			// }
+			// return null;
+			var errors = Object.keys(this.__models).map(function (key) {
+				return this.__models[key] == model ? this.__errors[key] : null;
+			}.bind(this)).filter(function (error) {
+				return error != null;
+			});
+			return errors.length === 0 ? null : errors[0];
 		}
 	});
 	/**
@@ -1485,9 +1603,9 @@
    * @returns {string|boolean} return true when pass the validation
    */
 		length: function (model, value, length) {
-			if (value == null || value.length == 0) {
+			if (value == null || (value + '').length == 0) {
 				return true;
-			} else if (value.length != length) {
+			} else if ((value + '').length != length) {
 				return $pt.getMessage('validate.length').format(['%1', '' + length]);
 			}
 		},
@@ -1499,9 +1617,9 @@
    * @returns {string|boolean} return true when pass the validation
    */
 		maxlength: function (model, value, length) {
-			if (value == null || value.length == 0) {
+			if (value == null || (value + '').length == 0) {
 				return true;
-			} else if (value.length > length) {
+			} else if ((value + '').length > length) {
 				return $pt.getMessage('validate.length.max').format(['%1', '' + length]);
 			}
 		},
@@ -1513,9 +1631,9 @@
    * @returns {string|boolean} return true when pass the validation
    */
 		minlength: function (model, value, length) {
-			if (value == null || value.length == 0) {
+			if (value == null || (value + '').length == 0) {
 				return true;
-			} else if (value.length < length) {
+			} else if ((value + '').length < length) {
 				return $pt.getMessage('validate.length.min').format(['%1', '' + length]);
 			}
 		},
@@ -1688,9 +1806,10 @@
 
 			var results = $pt.createTableValidationResult();
 			var validator = $pt.createModelValidator(config);
-			for (var index = 0, count = value.length; index < count; index++) {
-				var item = value[index];
+			value.forEach(function (item) {
 				var itemModel = $pt.createModel(item, validator);
+				itemModel.useBaseAsCurrent();
+				itemModel.parent(model);
 				if (phase) {
 					itemModel.validateByPhase(phase);
 				} else {
@@ -1702,7 +1821,7 @@
 				} else {
 					results.remove(item);
 				}
-			}
+			});
 
 			return results.hasError() ? results : true;
 		}
@@ -2036,7 +2155,7 @@
    */
 		set: function (id, value) {
 			var oldValue = this.get(id);
-			if (oldValue == value) {
+			if (typeof oldValue === typeof value && oldValue == value) {
 				// value is same as old value
 				return;
 			}
@@ -2305,7 +2424,7 @@
 				} else {
 					delete this.__validateResults[id];
 				}
-				this.fireEvent({
+				this.__mergeErrorToParent().fireEvent({
 					model: this,
 					id: id,
 					time: "post",
@@ -2313,16 +2432,66 @@
 				});
 			} else {
 				this.__validateResults = validator.validateByPhase(this, phase);
+				this.__mergeErrorToParent();
 				var _this = this;
 				Object.keys(this.__validateResults ? this.__validateResults : {}).forEach(function (id) {
 					_this.fireEvent({
-						model: this,
+						model: _this,
 						id: id,
 						time: "post",
 						type: "validate"
 					});
 				});
 			}
+			return this;
+		},
+		__mergeErrorToParent: function () {
+			if (this.__parent == null) {
+				return this;
+			}
+			var parentModel = this.__parent.getCurrentModel();
+			Object.keys(parentModel).forEach(function (key) {
+				var value = parentModel[key];
+				if (value == this.__model) {
+					// console.log('Regular Value');
+					this.__parent.mergeError(this.hasError() ? this.getError() : null, key);
+				} else if (Array.isArray(value)) {
+					// console.log('Array Value');
+					value.forEach(function (elm) {
+						// console.log(elm, this.__model, elm == this.__model);
+						if (elm == this.__model) {
+							var errors = this.__parent.getError(key);
+							var tableErrorIndex = errors ? errors.findIndex(function (error) {
+								return typeof error != 'string';
+							}) : -1;
+							if (this.hasError()) {
+								// has error
+								var tableError = null;
+								if (tableErrorIndex == -1) {
+									tableError = $pt.createTableValidationResult();
+									if (!errors) {
+										errors = [];
+									}
+									errors.push(tableError);
+								} else {
+									tableError = errors[tableErrorIndex];
+									tableError.remove(elm);
+								}
+								tableError.push(elm, this.__validateResults);
+								this.__parent.mergeError(errors, key);
+								// console.log(this.__parent.getError());
+							} else {
+									// no error
+									if (tableErrorIndex != -1) {
+										// remove the exists error
+										errors[tableErrorIndex].remove(elm);
+									}
+								}
+						}
+					}.bind(this));
+				}
+			}.bind(this));
+			this.__parent.__mergeErrorToParent();
 			return this;
 		},
 		/**
@@ -2570,6 +2739,13 @@
 			this.__cell = cell;
 		},
 		/**
+   * get definition json
+   * @returns {*}
+   */
+		getDefinition: function () {
+			return this.__cell;
+		},
+		/**
    * get id
    * @returns {string}
    */
@@ -2638,7 +2814,7 @@
    */
 		getComponentType: function () {
 			var type = this.getComponentOption("type");
-			type = type == null ? $pt.ComponentConstants.Text : type;
+			type = type == null ? $pt.ComponentConstants.TextInJSON : type;
 			return typeof type === "string" ? { type: type, label: true, popover: true } : type;
 		},
 		/**
@@ -2767,8 +2943,27 @@
 				// it must be a json object
 				return this.transformValidationPhase(phase.phase);
 			} else {
-				console.error('Failed to parse validation phase definition of [' + this.getDataId() + ']', phase);
-				throw 'Failed to parse validation phase definition';
+				// no phase defined
+				return null;
+			}
+		},
+		getValidationOption: function (key, defaultValue) {
+			if (key === 'phase') {
+				return this.getValidationPhase();
+			} else {
+				if (this.__cell && this.__cell.validate) {
+					var define = this.__cell.validate;
+					if (typeof define === 'string' || typeof define === 'function') {
+						// only define the phase, see method transformValidationPhase
+						return defaultValue;
+					} else {
+						// definition must be a JSON object, and returns the delay property
+						return typeof define[key] === 'undefined' ? defaultValue : define[key];
+					}
+				} else {
+					// no validate part defined
+					return defaultValue;
+				}
 			}
 		}
 	});
@@ -3868,7 +4063,19 @@
    * @returns {boolean}
    */
 		isVisible: function () {
-			return this.getComponentRuleValue("visible", true);
+			// when the component is not visible
+			// or declared only view in edit mode
+			// hide it
+			var visible = this.getComponentRuleValue("visible", true);
+			if (visible) {
+				var view = this.getComponentOption('view');
+				if (this.isViewMode()) {
+					visible = view == 'edit' != true;
+				} else if (!this.isViewMode()) {
+					visible = view == 'view' != true;
+				}
+			}
+			return visible;
 		},
 		/**
    * is required
@@ -3932,6 +4139,9 @@
 				// no phase defined, validate all
 				this.getModel().validate(this.getDataId());
 			}
+		},
+		getValidationOption: function (key, defaultValue) {
+			return this.getLayout().getValidationOption(key, defaultValue);
 		},
 		/**
    * force update, call react API
@@ -4052,7 +4262,19 @@
   * @param config {{}} special component config, will replace the definition from component base if with same name
   */
 	$pt.defineCellComponent = function (config) {
-		return $.extend({}, ComponentBase, config);
+		var renderProxy = {};
+		if (config.keepRender !== true) {
+			renderProxy = {
+				render: function () {
+					if (!this.isVisible()) {
+						return null;
+					} else {
+						return config.render.call(this);
+					}
+				}
+			};
+		}
+		return $.extend({}, ComponentBase, config, renderProxy);
 	};
 
 	var LayoutHelper = jsface.Class({
@@ -4246,6 +4468,7 @@
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -4257,6 +4480,7 @@
 		componentDidUpdate: function (prevProps, prevState) {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -4266,6 +4490,7 @@
 		componentDidMount: function () {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -4275,6 +4500,7 @@
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -4439,6 +4665,7 @@
 			this.removePostAddListener(this.onModelChanged);
 			this.removePostRemoveListener(this.onModelChanged);
 			this.removePostValidateListener(this.onModelValidateChanged);
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		/**
@@ -4452,6 +4679,7 @@
 			this.addPostAddListener(this.onModelChanged);
 			this.addPostRemoveListener(this.onModelChanged);
 			this.addPostValidateListener(this.onModelValidateChanged);
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -4463,6 +4691,7 @@
 			this.addPostAddListener(this.onModelChanged);
 			this.addPostRemoveListener(this.onModelChanged);
 			this.addPostValidateListener(this.onModelValidateChanged);
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -4474,6 +4703,7 @@
 			this.removePostAddListener(this.onModelChanged);
 			this.removePostRemoveListener(this.onModelChanged);
 			this.removePostValidateListener(this.onModelValidateChanged);
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		/**
@@ -4498,13 +4728,11 @@
 			// get errors about current value
 			var errors = this.getModel().getError(this.getDataId());
 			if (errors) {
-				var itemError = null;
-				for (var index = 0, count = errors.length; index < count; index++) {
-					if (typeof errors[index] !== "string") {
-						itemError = errors[index].getError(item);
-						model.mergeError(itemError);
+				errors.forEach(function (error) {
+					if (typeof error !== 'string') {
+						model.mergeError(error.getError(item));
 					}
-				}
+				});
 			}
 
 			var listeners = this.getComponentOption('rowListener');
@@ -4718,6 +4946,7 @@
 			this.removePostAddListener(this.onModelChanged);
 			this.removePostRemoveListener(this.onModelChanged);
 			this.removePostValidateListener(this.onModelValidateChanged);
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		/**
@@ -4731,6 +4960,7 @@
 			this.addPostAddListener(this.onModelChanged);
 			this.addPostRemoveListener(this.onModelChanged);
 			this.addPostValidateListener(this.onModelValidateChanged);
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -4742,6 +4972,7 @@
 			this.addPostAddListener(this.onModelChanged);
 			this.addPostRemoveListener(this.onModelChanged);
 			this.addPostValidateListener(this.onModelValidateChanged);
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -4753,6 +4984,7 @@
 			this.removePostAddListener(this.onModelChanged);
 			this.removePostRemoveListener(this.onModelChanged);
 			this.removePostValidateListener(this.onModelValidateChanged);
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		/**
@@ -4804,6 +5036,17 @@
    * @returns {XML}
    */
 		render: function () {
+			// when state.clear is true, forcily clear the dom
+			// and then delete the state
+			// see the following code in #onModelChanged
+			// this.setState({clear: true}, this.forceUpdate);
+			// forceUpdate must be passed as callback to #setState
+			// all these are to remove the flicking when remove data from model side
+			if (this.state.clear === true) {
+				delete this.state.clear;
+				return React.createElement('div', null);
+			}
+
 			var tabs = this.getTabs();
 			var canActiveProxy = function (newTabValue, newTabIndex, activeTabValue, activeTabIndex) {
 				if (this.isAddable() && newTabIndex == tabs.length - 1) {
@@ -4876,27 +5119,41 @@
    */
 		getTabs: function () {
 			var _this = this;
-			if (this.state.tabs) {
-				this.state.tabs.forEach(function (tab, tabIndex) {
-					if (_this.isAddable() && tabIndex != _this.state.tabs.length - 1 || !_this.isAddable()) {
-						var model = tab.data;
-						tab.label = _this.getTabTitle(model);
-						tab.icon = _this.getTabIcon(model);
-						tab.layout = _this.getEditLayout(model);
-						tab.badge = _this.getTabBadge(model);
-					}
-				});
-				return this.state.tabs;
+			var activeTabIndex = 0;
+			if (this.state.transientActiveTabIndex != null) {
+				activeTabIndex = this.state.transientActiveTabIndex;
+				delete this.state.transientActiveTabIndex;
+			} else {
+				activeTabIndex = this.getActiveTabIndex();
 			}
+			// if (activeTabIndex == -1) {
+			// 	activeTabIndex = 0;
+			// }
+			// var activeTabIndex = this.state.transientActiveTabIndex; ? this.getActiveTabIndex();
+			// if (this.state.tabs) {
+			// 	this.state.tabs.forEach(function(tab, tabIndex) {
+			// 		if ((_this.isAddable() && (tabIndex != _this.state.tabs.length - 1)) || !_this.isAddable()) {
+			// 			var model = _this.createItemModel(item); //tab.data;
+			// 			tab.label = _this.getTabTitle(model);
+			// 			tab.icon = _this.getTabIcon(model);
+			// 			tab.layout = _this.getEditLayout(model);
+			// 			tab.badge = _this.getTabBadge(model);
+			// 			tab.data = model;
+			// 			tab.active = tabIndex == activeTabIndex;
+			// 		}
+			// 	});
+			// 	return this.state.tabs;
+			// }
 
-			this.state.tabs = this.getValueFromModel().map(function (item) {
+			this.state.tabs = this.getValueFromModel().map(function (item, itemIndex) {
 				var model = _this.createItemModel(item);
 				return {
 					label: _this.getTabTitle(model),
 					icon: _this.getTabIcon(model),
 					layout: _this.getEditLayout(model),
 					badge: _this.getTabBadge(model),
-					data: model
+					data: model,
+					active: itemIndex == activeTabIndex
 				};
 			});
 			if (this.isAddable()) {
@@ -4910,13 +5167,18 @@
 							}
 						}
 					},
-					data: $pt.createModel({})
+					data: $pt.createModel({}),
+					css: 'add-tab'
 				});
 			}
 			return this.state.tabs;
 		},
 		clearTabs: function (callback) {
-			this.setState({ tabs: null }, callback.bind(this));
+			if (callback) {
+				this.setState({ tabs: null }, callback.bind(this));
+			} else {
+				this.setState({ tabs: null });
+			}
 		},
 		/**
    * return [] when is null
@@ -4932,17 +5194,22 @@
    */
 		onModelChanged: function (evt) {
 			if (evt.type === 'add') {
-				this.clearTabs(this.setActiveTabIndex.bind(this, evt.index));
+				this.state.transientActiveTabIndex = evt.index;
+				// this.clearTabs(this.setActiveTabIndex.bind(this, evt.index));
 			} else if (evt.type === 'remove') {
-				var index = evt.index;
-				var data = this.getValueFromModel();
-				if (index == data.length) {
-					index = index - 1;
-				}
-				this.clearTabs(this.setActiveTabIndex.bind(this, index));
-			} else {
-				this.forceUpdate();
-			}
+					var index = evt.index;
+					var data = this.getValueFromModel();
+					if (index == data.length) {
+						index = index - 1;
+					}
+					this.state.transientActiveTabIndex = index;
+					// this.clearTabs(this.setActiveTabIndex.bind(this, index));
+				} else {
+						// this.forceUpdate();
+						this.state.transientActiveTabIndex = evt.index != null ? evt.index : null;
+					}
+			this.setState({ clear: true }, this.forceUpdate);
+			// this.forceUpdate();
 		},
 		/**
    * monitor the parent model validation
@@ -5032,6 +5299,9 @@
    */
 		getActiveTabIndex: function () {
 			var tabs = this.state.tabs;
+			if (tabs == null) {
+				return -1;
+			}
 			// find the active tab
 			var activeTabIndex = tabs.findIndex(function (tab, index) {
 				return tab.active === true;
@@ -5120,6 +5390,7 @@
    * @param nextProps
    */
 		componentWillUpdate: function (nextProps) {
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -5129,6 +5400,7 @@
    * @param prevState
    */
 		componentDidUpdate: function (prevProps, prevState) {
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -5136,6 +5408,7 @@
    * did mount
    */
 		componentDidMount: function () {
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -5143,6 +5416,7 @@
    * will unmount
    */
 		componentWillUnmount: function () {
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -5261,7 +5535,7 @@
 					'a',
 					{ href: 'javascript:void(0);',
 						className: $pt.LayoutHelper.classSet(css),
-						onClick: this.onClicked,
+						onMouseUp: this.onClicked,
 						disabled: !this.isEnabled(),
 						title: this.getComponentOption('tooltip'),
 						ref: 'a' },
@@ -5280,6 +5554,11 @@
 			);
 		},
 		onClicked: function (evt) {
+			if (evt.button != 0) {
+				// not left button
+				return;
+			}
+			// console.log(evt.button);
 			if (this.isEnabled()) {
 				$(ReactDOM.findDOMNode(this.refs.a)).toggleClass('effect');
 				var onclick = this.getComponentOption("click");
@@ -5300,7 +5579,12 @@
    * @returns {string}
    */
 		getStyle: function () {
-			return this.getComponentOption("style");
+			var style = this.getComponentOption('style');
+			if (typeof style === 'function') {
+				return style.call(this);
+			} else {
+				return style;
+			}
 		},
 		/**
    * get label position
@@ -5378,6 +5662,7 @@
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -5391,6 +5676,7 @@
 			// this.getComponent().prop("checked", this.getValueFromModel());
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -5402,6 +5688,7 @@
 			// this.getComponent().prop("checked", this.getValueFromModel());
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -5411,6 +5698,7 @@
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -5590,12 +5878,18 @@
 					// no parent, load all
 					codetable.initializeRemote().done(this.repaint);
 				}
+			} else {
+				var onMounted = this.props.onMounted;
+				if (onMounted) {
+					onMounted.call(this);
+				}
 			}
 		},
 		repaint: function () {
+			var onMounted = this.props.onMounted;
 			this.setState({
 				paintWrapper: false
-			});
+			}, onMounted ? onMounted : undefined);
 		},
 		needWrapper: function () {
 			var codetable = this.getCodeTable();
@@ -5723,24 +6017,28 @@
 		},
 		componentWillUpdate: function (nextProps) {
 			this.removePostChangeListener(this.onModelChange);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		componentDidUpdate: function (prevProps, prevState) {
 			this.setValueToTextInput(this.getValueFromModel());
 			this.addPostChangeListener(this.onModelChange);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		componentDidMount: function () {
 			this.setValueToTextInput(this.getValueFromModel());
 			this.addPostChangeListener(this.onModelChange);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		componentWillUnmount: function () {
 			this.destroyPopover();
 			this.removePostChangeListener(this.onModelChange);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -6510,6 +6808,9 @@
 			}
 		},
 		startClockInterval: function (popoverType, currentTime) {
+			if (!this.getComponentOption('runClock', true)) {
+				return;
+			}
 			var _this = this;
 			var value = this.getValueFromModel();
 			if (value == null) {
@@ -6618,8 +6919,10 @@
 				if (date == null && text.length != 0) {
 					// invalid date
 					this.setValueToModel(null);
+					this.setValueToTextInput(null);
 				} else {
 					this.setValueToModel(date);
+					this.setValueToTextInput(this.getValueFromModel());
 				}
 			}
 		},
@@ -6755,7 +7058,7 @@
 			// since the text input might be incorrect date format,
 			// or use un-strict mode to format
 			// cannot know the result of moment format
-			// move process of changing to blur event
+			// move process to changing at blur event
 			var text = this.getTextInput().val();
 			if (text.length == 0 || text.isBlank()) {
 				this.setValueToModel(null);
@@ -6769,7 +7072,23 @@
 			}
 		},
 		onModelChange: function (evt) {
-			this.forceUpdate();
+			var newValue = evt.new;
+			var text = this.getTextInput().val();
+			if (newValue == null || (newValue + '').isBlank()) {
+				if (text == null || text.isBlank()) {
+					// do nothing
+				} else {
+						this.forceUpdate();
+					}
+			} else {
+				var valueDate = this.getValueFromModel();
+				var textDate = this.convertValueFromString(text, this.getDisplayFormat(), true);
+				if (valueDate.isSame(textDate)) {
+					// do nothing
+				} else {
+						this.forceUpdate();
+					}
+			}
 		},
 		getValueFromModel: function () {
 			return this.convertValueFromString(this.getModel().get(this.getDataId()));
@@ -6921,7 +7240,12 @@
 			return moment.localeData(this.getLocale());
 		},
 		getToday: function () {
-			return moment().locale(this.getLocale());
+			var today = moment().locale(this.getLocale());
+			var defaultTime = this.getComponentOption('defaultTime');
+			if (defaultTime && typeof defaultTime === 'function') {
+				today = defaultTime.call(this, today);
+			}
+			return today;
 		}
 	}));
 
@@ -6980,14 +7304,22 @@
    */
 		componentDidUpdate: function (prevProps, prevState) {
 			this.fixDocumentPadding();
-			$(document).on('keyup', this.onDocumentKeyUp);
+			if (this.state.visible) {
+				$(document).on('keyup', this.onDocumentKeyUp);
+			} else {
+				$(document).off('keyup', this.onDocumentKeyUp);
+			}
 		},
 		/**
    * did mount
    */
 		componentDidMount: function () {
 			this.fixDocumentPadding();
-			$(document).on('keyup', this.onDocumentKeyUp);
+			if (this.state.visible) {
+				$(document).on('keyup', this.onDocumentKeyUp);
+			} else {
+				$(document).off('keyup', this.onDocumentKeyUp);
+			}
 		},
 		componentWillUpdate: function () {
 			$(document).off('keyup', this.onDocumentKeyUp);
@@ -7046,10 +7378,11 @@
 					{ className: $pt.LayoutHelper.classSet(css),
 						tabIndex: "-1",
 						role: "dialog",
+						ref: "container",
 						style: { display: 'block', zIndex: NExceptionModal.Z_INDEX + 1 } },
 					React.createElement(
 						"div",
-						{ className: "modal-danger modal-dialog" },
+						{ className: "modal-danger modal-dialog", tabIndex: "0" },
 						React.createElement(
 							"div",
 							{ className: "modal-content", role: "document" },
@@ -7088,6 +7421,14 @@
 			if (evt.keyCode === 27) {
 				// escape
 				this.hide();
+			} else if (evt.keyCode === 9) {
+				// tab
+				// evt.preventDefault();
+				var target = $(evt.target);
+				var container = $(this.refs.container);
+				if (target.closest(container).length == 0) {
+					container.focus();
+				}
 			}
 		},
 		/**
@@ -7112,7 +7453,144 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NFile = React.createClass($pt.defineCellComponent({
 		displayName: 'NFile',
-		statics: {},
+		statics: {
+			// PROPERTY_LIST: {
+			// 	ajaxDeleteSettings: null,
+			// 	ajaxSettings: null,
+			// 	allowedFileExtensions: null,
+			// 	allowedFileTypes: null,
+			// 	allowedPreviewMimeTypes: null,
+			// 	allowedPreviewTypes: null,
+			// 	autoReplace: null,
+			// 	browseClass: null,
+			// 	browseIcon: null,
+			// 	browseLabel: null,
+			// 	browseOnZoneClick: null,
+			// 	buttonLabelClass: null,
+			// 	captionClass: null,
+			// 	customLayoutTags: null,
+			// 	customPreviewTags: null,
+			// 	defaultPreviewContent: null,
+			// 	deleteExtraData: null,
+			// 	deleteUrl: null,
+			// 	dropZoneClickTitle: null,
+			// 	dropZoneEnabled: null,
+			// 	dropZoneTitle: null,
+			// 	dropZoneTitleClass: null,
+			// 	fileActionSettings: null,
+			// 	fileSizeGetter: null,
+			// 	fileTypeSettings: null,
+			// 	initialCaption: null,
+			// 	initialPreview: null,
+			// 	initialPreviewAsData: null,
+			// 	initialPreviewConfig: null,
+			// 	initialPreviewCount: null,
+			// 	initialPreviewDelimiter: null,
+			// 	initialPreviewFileType: null,
+			// 	initialPreviewShowDelete: null,
+			// 	initialPreviewThumbTags: null,
+			// 	language: null,
+			// 	layoutTemplates: null,
+			// 	mainClass: null,
+			// 	maxFileCount: null,
+			// 	maxFileSize: null,
+			// 	maxImageHeight: null,
+			// 	maxImageWidth: null,
+			// 	maxPreviewFileSize: null,
+			// 	minFileCount: null,
+			// 	minImageHeight: null,
+			// 	minImageWidth: null,
+			// 	msgCancelled: null,
+			// 	msgErrorClass: null,
+			// 	msgFileNotFound: null,
+			// 	msgFileNotReadable: null,
+			// 	msgFilePreviewAborted: null,
+			// 	msgFilePreviewError: null,
+			// 	msgFileSecured: null,
+			// 	msgFilesTooLess: null,
+			// 	msgFilesTooMany: null,
+			// 	msgFoldersNotAllowed: null,
+			// 	msgImageHeightLarge: null,
+			// 	msgImageHeightSmall: null,
+			// 	msgImageWidthLarge: null,
+			// 	msgImageWidthSmall: null,
+			// 	msgInvalidFileExtension: null,
+			// 	msgInvalidFileType: null,
+			// 	msgLoading: null,
+			// 	msgNo: null,
+			// 	msgProgress: null,
+			// 	msgSelected: null,
+			// 	msgSizeTooLarge: null,
+			// 	msgUploadAborted: null,
+			// 	msgValidationError: null,
+			// 	msgValidationErrorClass: null,
+			// 	msgValidationErrorIcon: null,
+			// 	msgZoomModalHeading: null,
+			// 	msgZoomTitle: null,
+			// 	otherActionButtons: null,
+			// 	overwriteInitial: null,
+			// 	previewClass: null,
+			// 	previewFileExtSettings: null,
+			// 	previewFileIcon: null,
+			// 	previewFileIconClass: null,
+			// 	previewFileIconSettings: null,
+			// 	previewFileType: null,
+			// 	previewSettings: null,
+			// 	previewTemplates: null,
+			// 	previewThumbTags: null,
+			// 	previewZoomButtonClasses: null,
+			// 	previewZoomButtonIcons: null,
+			// 	previewZoomButtonTitles: null,
+			// 	previewZoomSettings: null,
+			// 	progressClass: null,
+			// 	progressCompleteClass: null,
+			// 	progressErrorClass: null,
+			// 	purifyHtml: null,
+			// 	removeClass: null,
+			// 	resizeDefaultImageType: null,
+			// 	removeIcon: null,
+			// 	removeLabel: null,
+			// 	removeFromPreviewOnError: null,
+			// 	removeTitle: null,
+			// 	resizeImage: null,
+			// 	resizeImageQuality: null,
+			// 	resizePreference: null,
+			// 	showBrowse: null,
+			// 	showAjaxErrorDetails: null,
+			// 	showCaption: null,
+			// 	showCancel: null,
+			// 	showClose: null,
+			// 	showPreview: null,
+			// 	showRemove: null,
+			// 	showUpload: null,
+			// 	showUploadedThumbs: null,
+			// 	slugCallback: null,
+			// 	textEncoding: null,
+			// 	theme: null,
+			// 	uploadAsync: null,
+			// 	uploadClass: null,
+			// 	uploadExtraData: null,
+			// 	uploadIcon: null,
+			// 	uploadLabel: null,
+			// 	uploadTitle: null,
+			// 	uploadUrl: null,
+			// 	validateInitialCount: null,
+			// 	zoomIndicator: null
+			// },
+			DEFAULT_PROPERTY_VALUES: {
+				browseLabel: '',
+				browseIcon: '<i class="fa fa-fw fa-folder-open-o"></i>',
+				browseClass: 'btn btn-link',
+				uploadLabel: '',
+				uploadIcon: '<i class="fa fa-fw fa-upload"></i>',
+				uploadClass: 'btn btn-link',
+				removeLabel: '',
+				removeIcon: '<i class="fa fa-fw fa-trash-o"></i>',
+				removeClass: 'btn btn-link',
+				showClose: false,
+				showPreview: true
+			}
+		},
 		propTypes: {
 			// model
 			model: React.PropTypes.object,
@@ -7123,145 +7601,55 @@
 			return {
 				defaultOptions: {
 					multiple: true,
-					browseLabel: '',
-					browseIcon: '<i class="fa fa-fw fa-folder-open-o"></i>',
-					browseClass: 'btn btn-link',
-					uploadLabel: '',
-					uploadIcon: '<i class="fa fa-fw fa-upload"></i>',
-					uploadClass: 'btn btn-link',
-					removeLabel: '',
-					removeIcon: '<i class="fa fa-fw fa-trash-o"></i>',
-					removeClass: 'btn btn-link',
-					showClose: false,
-					showPreview: true
+					inputName: 'fileData'
 				}
 			};
 		},
 		getInitialState: function () {
-			return {};
+			return {
+				monitors: {}
+			};
 		},
 		componentWillUpdate: function () {
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		componentDidUpdate: function () {
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		componentDidMount: function () {
 			var input = $(ReactDOM.findDOMNode(this.refs.file));
-			input.fileinput(this.createDisplayOptions({
-				ajaxDeleteSettings: null,
-				ajaxSettings: null,
-				allowedFileExtensions: null,
-				allowedFileTypes: null,
-				allowedPreviewMimeTypes: null,
-				allowedPreviewTypes: null,
-				autoReplace: null,
-				browseClass: null,
-				browseIcon: null,
-				browseLabel: null,
-				buttonLabelClass: null,
-				captionClass: null,
-				customLayoutTags: null,
-				customPreviewTags: null,
-				deleteExtraData: null,
-				deleteUrl: null,
-				dropZoneEnabled: null,
-				dropZoneTitle: null,
-				dropZoneTitleClass: null,
-				fileTypeSettings: null,
-				initialCaption: null,
-				initialPreview: null,
-				initialPreviewConfig: null,
-				initialPreviewCount: null,
-				initialPreviewDelimiter: null,
-				initialPreviewShowDelete: null,
-				initialPreviewThumbTags: null,
-				language: null,
-				mainClass: null,
-				maxFileCount: null,
-				maxFileSize: null,
-				maxImageHeight: null,
-				maxImageWidth: null,
-				minFileCount: null,
-				minImageHeight: null,
-				minImageWidth: null,
-				msgErrorClass: null,
-				msgFileNotFound: null,
-				msgFileNotReadable: null,
-				msgFilePreviewAborted: null,
-				msgFilePreviewError: null,
-				msgFileSecured: null,
-				msgFilesTooLess: null,
-				msgFilesTooMany: null,
-				msgFoldersNotAllowed: null,
-				msgImageHeightLarge: null,
-				msgImageHeightSmall: null,
-				msgImageWidthLarge: null,
-				msgImageWidthSmall: null,
-				msgInvalidFileExtension: null,
-				msgInvalidFileType: null,
-				msgLoading: null,
-				msgProgress: null,
-				msgSelected: null,
-				msgSizeTooLarge: null,
-				msgUploadAborted: null,
-				msgValidationError: null,
-				msgValidationErrorClass: null,
-				msgValidationErrorIcon: null,
-				msgZoomModalHeading: null,
-				msgZoomTitle: null,
-				overwriteInitial: null,
-				previewClass: null,
-				previewFileExtSettings: null,
-				previewFileIcon: null,
-				previewFileIconClass: null,
-				previewFileIconSettings: null,
-				previewFileType: null,
-				previewSettings: null,
-				previewThumbTags: null,
-				progressClass: null,
-				progressCompleteClass: null,
-				removeClass: null,
-				removeIcon: null,
-				removeLabel: null,
-				removeTitle: null,
-				showAjaxErrorDetails: null,
-				showCaption: null,
-				showClose: null,
-				showPreview: null,
-				showRemove: null,
-				showUpload: null,
-				showUploadedThumbs: null,
-				uploadAsync: null,
-				uploadClass: null,
-				uploadExtraData: null,
-				uploadIcon: null,
-				uploadLabel: null,
-				uploadTitle: null,
-				uploadUrl: null,
-				validateInitialCount: null,
-				zoomIndicator: null
-			}));
+			input.fileinput(this.createDisplayOptions());
 			// event monitor
+			var _this = this;
 			var monitors = this.getEventMonitor();
 			Object.keys(monitors).forEach(function (eventKey) {
-				input.on(eventKey, monitors[eventKey]);
+				_this.state.monitors[eventKey] = function () {
+					var args = Array.prototype.slice.call(arguments);
+					// attach this component to event object
+					args[0].reactComponent = _this;
+					monitors[eventKey].apply(this, args);
+				};
+				input.on(eventKey, _this.state.monitors[eventKey]);
 			});
 
 			var comp = $(ReactDOM.findDOMNode(this.refs.comp));
 			comp.find('.kv-fileinput-caption').focus(this.onComponentFocused).blur(this.onComponentBlurred);
 			comp.find('.input-group-btn>.btn').focus(this.onComponentFocused).blur(this.onComponentBlurred);
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		componentWillUnmount: function () {
 			var input = $(ReactDOM.findDOMNode(this.refs.file));
 			// event monitor
 			var monitors = this.getEventMonitor();
-			Object.keys(monitors).forEach(function (eventKey) {
-				input.off(eventKey, monitors[eventKey]);
-			});
+			Object.keys(this.state.monitors).forEach(function (eventKey) {
+				input.off(eventKey, this.state.monitors[eventKey]);
+			}.bind(this));
 			// destroy the component
 			input.fileinput('destroy');
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		render: function () {
@@ -7277,17 +7665,30 @@
 					className: $pt.LayoutHelper.classSet(inputCSS),
 					multiple: this.allowMultipleFiles(),
 					disabled: !this.isEnabled(),
+					name: this.getComponentOption('inputName'),
 					ref: 'file' }),
 				this.renderNormalLine(),
 				this.renderFocusLine()
 			);
 		},
-		createDisplayOptions: function (options) {
+		createDisplayOptions: function () {
 			var _this = this;
-			Object.keys(options).forEach(function (key) {
+			// get all component options
+			var options = this.getLayout().getComponentOption();
+			Object.keys(options).filter(function (key) {
+				// the component type should be filterred
+				return key != 'type' && key != 'multiple' && key != 'inputName';
+			}).forEach(function (key) {
 				options[key] = _this.getComponentOption(key);
+				// console.log(key, options[key]);
 				if (options[key] == null) {
-					delete options[key];
+					var defaultValue = NFile.DEFAULT_PROPERTY_VALUES[key];
+					// console.log(defaultValue);
+					if (defaultValue) {
+						options[key] = defaultValue;
+					} else {
+						delete options[key];
+					}
 				}
 			});
 			return options;
@@ -7895,15 +8296,19 @@
 			layout: React.PropTypes.object
 		},
 		componentWillUpdate: function () {
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		componentDidUpdate: function () {
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		componentDidMount: function () {
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		componentWillUnmount: function () {
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		render: function () {
@@ -7948,6 +8353,7 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NFormCell = React.createClass($pt.defineCellComponent({
 		displayName: 'NFormCell',
+		keepRender: true,
 		statics: {
 			REQUIRED_ICON: 'asterisk',
 			TOOLTIP_ICON: 'question-circle',
@@ -7978,6 +8384,9 @@
 				},
 				direction: 'vertical'
 			};
+		},
+		getInitialState: function () {
+			return {};
 		},
 		/**
    * will update
@@ -8067,7 +8476,7 @@
 				$(ReactDOM.findDOMNode(this.refs.tooltip)).popover(tooltipPopover);
 			}
 
-			if (this.getLayout().getComponentType().popover !== false && this.getModel().hasError(this.getDataId())) {
+			if ($pt.ComponentConstants.ERROR_POPOVER && this.getLayout().getComponentType().popover !== false && this.getModel().hasError(this.getDataId())) {
 				var messages = this.getModel().getError(this.getDataId());
 				var _this = this;
 				var popover = {
@@ -8115,10 +8524,11 @@
 			if (!type) {
 				type = "text";
 			}
+			var innerComponent = $pt.LayoutHelper.getComponentRenderer(type).call(this, this.getFormModel(), this.getLayout(), direction, this.isViewMode());
 			return React.createElement(
 				'div',
 				{ ref: 'comp' },
-				$pt.LayoutHelper.getComponentRenderer(type).call(this, this.getFormModel(), this.getLayout(), direction, this.isViewMode())
+				innerComponent
 			);
 		},
 		isRequiredSignPaint: function () {
@@ -8185,20 +8595,7 @@
    * @returns {XML}
    */
 		render: function () {
-			// when the component is not visible
-			// or declared only view in edit mode
-			// hide it
-			var visible = this.isVisible();
-			if (visible) {
-				var view = this.getComponentOption('view');
-				if (this.isViewMode()) {
-					visible = view == 'edit' != true;
-				} else if (!this.isViewMode()) {
-					visible = view == 'view' != true;
-				}
-			}
-
-			if (!visible) {
+			if (!this.isVisible()) {
 				return React.createElement('div', { className: this.getCSSClassName() + ' n-form-cell-invisible' });
 			} else {
 				var css = this.getCSSClassName();
@@ -8256,7 +8653,18 @@
    * @param evt
    */
 		onModelChanged: function (evt) {
-			this.validate();
+			var delay = this.getValidationOption('delay', this.getLayout().getComponentType().delay);
+			if (delay != null && delay > 0) {
+				if (this.state.delayedValidation) {
+					window.clearTimeout(this.state.delayedValidation);
+				}
+				this.state.delayedValidation = window.setTimeout(function () {
+					this.validate();
+				}.bind(this), delay);
+			} else {
+				// no delay for validation
+				this.validate();
+			}
 		},
 		/**
    * on model validate change
@@ -8421,6 +8829,7 @@
 					_this.removeDependencyMonitor([tab.badgeId]);
 				}
 			});
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		/**
@@ -8435,6 +8844,7 @@
 					_this.addDependencyMonitor([tab.badgeId]);
 				}
 			});
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -8447,6 +8857,7 @@
 					_this.addDependencyMonitor([tab.badgeId]);
 				}
 			});
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -8459,6 +8870,7 @@
 					_this.removeDependencyMonitor([tab.badgeId]);
 				}
 			});
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		renderTabContent: function (layout, index) {
@@ -8755,6 +9167,7 @@
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.__forceUpdate);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -8766,6 +9179,7 @@
 		componentDidUpdate: function (prevProps, prevState) {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.__forceUpdate);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -8775,6 +9189,7 @@
 		componentDidMount: function () {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.__forceUpdate);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -8784,6 +9199,7 @@
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.__forceUpdate);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -8906,14 +9322,22 @@
    */
 		componentDidUpdate: function (prevProps, prevState) {
 			this.fixDocumentPadding();
-			$(document).on('keyup', this.onDocumentKeyUp);
+			if (this.state.visible) {
+				$(document).on('keyup', this.onDocumentKeyUp);
+			} else {
+				$(document).off('keyup', this.onDocumentKeyUp);
+			}
 		},
 		/**
    * did mount
    */
 		componentDidMount: function () {
 			this.fixDocumentPadding();
-			$(document).on('keyup', this.onDocumentKeyUp);
+			if (this.state.visible) {
+				$(document).on('keyup', this.onDocumentKeyUp);
+			} else {
+				$(document).off('keyup', this.onDocumentKeyUp);
+			}
 		},
 		componentWillUpdate: function () {
 			$(document).off('keyup', this.onDocumentKeyUp);
@@ -9040,10 +9464,11 @@
 					{ className: $pt.LayoutHelper.classSet(css),
 						tabIndex: "-1",
 						role: "dialog",
+						ref: "container",
 						style: { display: 'block', zIndex: NConfirm.Z_INDEX + 1 } },
 					React.createElement(
 						"div",
-						{ className: "modal-dialog" },
+						{ className: "modal-dialog", tabIndex: "0" },
 						React.createElement(
 							"div",
 							{ className: "modal-content", role: "document" },
@@ -9072,6 +9497,14 @@
 			if (evt.keyCode === 27) {
 				// escape
 				this.onCancelClicked();
+			} else if (evt.keyCode === 9) {
+				// tab
+				// evt.preventDefault();
+				var target = $(evt.target);
+				var container = $(this.refs.container);
+				if (target.closest(container).length == 0) {
+					container.focus();
+				}
 			}
 		},
 		/**
@@ -9122,16 +9555,16 @@
    * @param title deprecated title of dialog
    * @param options string or string array, or object as below.
    *          {
-  *              disableButtons: true, // hide button bar
-  *              disableConfirm: true, // hide confirm button
-  *              disableClose: true, // hide close button
-  *              messsages: "", // string or string array,
-  *              close: true, // show close button text as "close"
-  *              onConfirm: function,
-  *              onCancel: function,
-  *              afterClose: function,
-  *              title: string
-  *          }
+  	 *              disableButtons: true, // hide button bar
+  	 *              disableConfirm: true, // hide confirm button
+  	 *              disableClose: true, // hide close button
+  	 *              messsages: "", // string or string array,
+  	 *              close: true, // show close button text as "close"
+  	 *              onConfirm: function,
+  	 *              onCancel: function,
+  	 *              afterClose: function,
+  	 *              title: string
+  	 *          }
    * @param onConfirm deprecated callback function when confirm button clicked
    * @param onCancel deprecated callback function when cancel button clicked
    */
@@ -9306,12 +9739,18 @@
 			if (this.isDialogCloseShown()) {
 				$(document).on('keyup', this.onDocumentKeyUp);
 			}
+			if (this.state.visible) {
+				$(document).on('keydown', this.onDocumentKeyDown);
+			} else {
+				$(document).off('keydown', this.onDocumentKeyDown);
+			}
 		},
 		componentWillUpdate: function () {
 			this.stopDraggable();
 			if (this.isDialogCloseShown()) {
 				$(document).off('keyup', this.onDocumentKeyUp);
 			}
+			$(document).off('keydown', this.onDocumentKeyDown);
 		},
 		/**
    * did mount
@@ -9322,12 +9761,18 @@
 			if (this.isDialogCloseShown()) {
 				$(document).on('keyup', this.onDocumentKeyUp);
 			}
+			if (this.state.visible) {
+				$(document).on('keydown', this.onDocumentKeyDown);
+			} else {
+				$(document).off('keydown', this.onDocumentKeyDown);
+			}
 		},
 		componentWillUnmount: function () {
 			this.stopDraggable();
 			if (this.isDialogCloseShown()) {
 				$(document).off('keyup', this.onDocumentKeyUp);
 			}
+			$(document).off('keydown', this.onDocumentKeyDown);
 		},
 		/**
    * render footer
@@ -9417,6 +9862,8 @@
 					"div",
 					{ className: $pt.LayoutHelper.classSet(css),
 						role: "dialog",
+						ref: "container",
+						tabIndex: "0",
 						style: { display: 'block', zIndex: this.props.zIndex * 1 + 1 } },
 					React.createElement(
 						"div",
@@ -9445,6 +9892,19 @@
 			if (evt.keyCode === 27) {
 				// escape
 				this.hide();
+			}
+		},
+		onDocumentKeyDown: function (evt) {
+			// console.log(evt);
+			if (evt.keyCode === 9) {
+				// tab
+				// evt.preventDefault();
+				var target = $(evt.target);
+				var container = $(this.refs.container);
+				console.log(target.closest(container).length == 0);
+				if (target.closest(container).length == 0) {
+					container.focus();
+				}
 			}
 		},
 		/**
@@ -9832,12 +10292,28 @@
    */
 		componentDidUpdate: function (prevProps, prevState) {
 			this.fixDocumentPadding();
+			if (this.state.visible) {
+				$(document).on('keydown', this.onDocumentKeyDown);
+			} else {
+				$(document).off('keydown', this.onDocumentKeyDown);
+			}
+		},
+		componentWillUpdate: function () {
+			$(document).off('keydown', this.onDocumentKeyDown);
 		},
 		/**
    * did mount
    */
 		componentDidMount: function () {
 			this.fixDocumentPadding();
+			if (this.state.visible) {
+				$(document).on('keydown', this.onDocumentKeyDown);
+			} else {
+				$(document).off('keydown', this.onDocumentKeyDown);
+			}
+		},
+		componentWillUnmount: function () {
+			$(document).off('keydown', this.onDocumentKeyDown);
 		},
 		render: function () {
 			if (!this.state.visible) {
@@ -9861,10 +10337,11 @@
 					{ className: $pt.LayoutHelper.classSet(css),
 						tabIndex: "-1",
 						role: "dialog",
+						ref: "container",
 						style: { display: 'block', zIndex: NOnRequestModal.Z_INDEX + 1 } },
 					React.createElement(
 						"div",
-						{ className: "modal-danger modal-dialog" },
+						{ className: "modal-danger modal-dialog", tabIndex: "0" },
 						React.createElement(
 							"div",
 							{ className: "modal-content", role: "document" },
@@ -9891,6 +10368,17 @@
    */
 		show: function () {
 			this.setState({ visible: true });
+		},
+		onDocumentKeyDown: function (evt) {
+			if (evt.keyCode === 9) {
+				// tab
+				// evt.preventDefault();
+				var target = $(evt.target);
+				var container = $(this.refs.container);
+				if (target.closest(container).length == 0) {
+					container.focus();
+				}
+			}
 		}
 	});
 	$pt.Components.NOnRequestModal = NOnRequestModal;
@@ -10637,6 +11125,7 @@
 			}
 			this.removeDependencyMonitor(this.getDependencies("collapsedLabel"));
 			this.removeDependencyMonitor(this.getDependencies("expandedLabel"));
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		/**
@@ -10650,6 +11139,7 @@
 			}
 			this.addDependencyMonitor(this.getDependencies("collapsedLabel"));
 			this.addDependencyMonitor(this.getDependencies("expandedLabel"));
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -10661,6 +11151,7 @@
 			}
 			this.addDependencyMonitor(this.getDependencies("collapsedLabel"));
 			this.addDependencyMonitor(this.getDependencies("expandedLabel"));
+			this.addVisibleDependencyMonitor();
 			this.registerToComponentCentral();
 		},
 		/**
@@ -10672,6 +11163,7 @@
 			}
 			this.removeDependencyMonitor(this.getDependencies("collapsedLabel"));
 			this.removeDependencyMonitor(this.getDependencies("expandedLabel"));
+			this.removeVisibleDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
 		getDefaultProps: function () {
@@ -10732,7 +11224,7 @@
 							comp: button
 						};
 						// delete layout.comp.label;
-						console.log(layout);
+						// console.log(layout);
 						return React.createElement($pt.Components.NFormButton, { model: _this.getModel(),
 							layout: $pt.createCellLayout('pseudo-button', layout),
 							key: buttonIndex });
@@ -11298,6 +11790,7 @@
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -11309,6 +11802,7 @@
 		componentDidUpdate: function (prevProps, prevState) {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -11318,6 +11812,7 @@
 		componentDidMount: function () {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -11327,6 +11822,7 @@
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -11505,6 +12001,7 @@
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChange);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -11517,6 +12014,7 @@
 			this.initSetValues();
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChange);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -11528,6 +12026,7 @@
 			this.initSetValues();
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChange);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -11537,6 +12036,7 @@
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChange);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -11640,7 +12140,9 @@
 		},
 		initSetValues: function () {
 			var value = this.getValueFromModel();
-			this.getComponent().val(value);
+			if (!this.isViewMode()) {
+				this.getComponent().val(value);
+			}
 			var labelPropertyId = this.getComponentOption('labelPropId');
 			if (labelPropertyId) {
 				this.setLabelText(this.getModel().get(labelPropertyId));
@@ -11661,7 +12163,11 @@
 						} else {
 							label += ' - ' + text;
 						}
-						$(ReactDOM.findDOMNode(this.refs.viewLabel)).text(label);
+						// $(ReactDOM.findDOMNode(this.refs.viewLabel)).text(label);
+						var def = this.refs.viewLabel.getLayout().getDefinition();
+						def.label = label;
+						this.refs.viewLabel.forceUpdate();
+						// this.refs.viewLabel.getLayout()
 						// this.setState({viewLabel: label})
 					}
 			} else {
@@ -11696,6 +12202,9 @@
 			if (value == null) {
 				value = '';
 			}
+			if (typeof value !== 'string') {
+				value = value + '';
+			}
 			if (value.isBlank() || value.length != triggerDigits && triggerDigits != -1) {
 				this.setLabelText(null);
 				return;
@@ -11707,7 +12216,7 @@
 					code: value
 				};
 				if (NSearchText.SEARCH_PROXY) {
-					postData = NSearchText.SEARCH_PROXY.call(this, postData);
+					postData = NSearchText.SEARCH_PROXY.call(_this, postData);
 				}
 				$pt.internalDoPost(_this.getSearchUrl(), postData, {
 					quiet: true
@@ -11717,7 +12226,7 @@
 					}
 					var name = data.name;
 					if (NSearchText.SEARCH_PROXY_CALLBACK) {
-						name = NSearchText.SEARCH_PROXY_CALLBACK.call(this, data);
+						name = NSearchText.SEARCH_PROXY_CALLBACK.call(_this, data);
 					}
 					_this.setLabelText(name);
 				}).fail(function () {
@@ -11933,6 +12442,7 @@
    */
 		componentWillUpdate: function (nextProps) {
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			if (this.hasParent()) {
 				// add post change listener into parent model
@@ -11947,6 +12457,7 @@
    */
 		componentDidUpdate: function (prevProps, prevState) {
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			if (this.hasParent()) {
 				// remove post change listener from parent model
@@ -11960,20 +12471,34 @@
    */
 		componentDidMount: function () {
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
-			if (this.hasParent()) {
-				// add post change listener into parent model
-				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
-				if (this.isOnLoadingWhenHasParent()) {
-					this.getCodeTable().loadRemoteCodeSegment(this.getParentPropertyValue()).done(function () {
+			if (this.state.onloading) {
+				if (this.hasParent()) {
+					// add post change listener into parent model
+					this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+					var parentValue = this.getParentPropertyValue();
+					if (parentValue == null) {
+						// no parent value
+						if (this.isAvailableWhenNoParentValue()) {
+							this.getCodeTable().initializeRemote().done(function () {
+								this.setState({ onloading: false });
+							}.bind(this));
+						} else {
+							this.getCodeTable().setAsRemoteInitialized();
+							this.setState({ onloading: false });
+						}
+					} else {
+						this.getCodeTable().loadRemoteCodeSegment(parentValue).done(function () {
+							this.setState({ onloading: false });
+						}.bind(this));
+					}
+				} else {
+					this.getCodeTable().initializeRemote().done(function () {
 						this.setState({ onloading: false });
 					}.bind(this));
 				}
-			} else if (this.isOnLoadingWhenNoParent()) {
-				this.getCodeTable().initializeRemote().done(function () {
-					this.setState({ onloading: false });
-				}.bind(this));
 			}
 		},
 		/**
@@ -11982,6 +12507,7 @@
 		componentWillUnmount: function () {
 			// remove post change listener
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			if (this.hasParent()) {
 				// remove post change listener from parent model
@@ -12012,11 +12538,12 @@
 				}
 			}
 			if (itemText == null) {
-				itemText = this.state.onloading ? $pt.Components.NCodeTableWrapper.ON_LOADING : this.getPlaceholder();
+				itemText = this.state.onloading ? $pt.Components.NCodeTableWrapper.ON_LOADING : this.isViewMode() ? '' : this.getPlaceholder();
 			}
 			return React.createElement(
 				'div',
-				{ className: 'input-group form-control', onClick: this.onComponentClicked },
+				{ className: 'input-group form-control',
+					onClick: this.onComponentClicked },
 				React.createElement(
 					'span',
 					{ className: 'text' },
@@ -12038,7 +12565,11 @@
 			css[this.getComponentCSS('n-select')] = true;
 			return React.createElement(
 				'div',
-				{ className: $pt.LayoutHelper.classSet(css), tabIndex: '0', 'aria-readonly': 'true', ref: 'comp' },
+				{ className: $pt.LayoutHelper.classSet(css),
+					tabIndex: '0',
+					onKeyUp: this.onComponentKeyUp,
+					'aria-readonly': 'true',
+					ref: 'comp' },
 				this.renderText(),
 				this.renderNormalLine(),
 				this.renderFocusLine()
@@ -12048,10 +12579,10 @@
 			if (this.state.popoverDiv == null) {
 				this.state.popoverDiv = $('<div>');
 				this.state.popoverDiv.appendTo($('body'));
-				$(document).on('mousedown', this.onDocumentMouseDown).on('keyup', this.onDocumentKeyUp).on('mousewheel', this.onDocumentMouseWheel);
+				$(document).on('mousedown', this.onDocumentMouseDown).on('keyup', this.onDocumentKeyUp).on('keydown', this.onDocumentKeyDown).on('mousewheel', this.onDocumentMouseWheel);
 				$(window).on('resize', this.onWindowResize);
 			}
-			this.state.popoverDiv.hide();
+			// this.state.popoverDiv.hide();
 		},
 		renderOptions: function (options, filterText) {
 			if (options == null || options.length == 0) {
@@ -12063,13 +12594,23 @@
 				});
 			}
 			var _this = this;
+			var value = this.getValueFromModel();
 			return React.createElement(
 				'ul',
-				null,
+				{ className: 'options' },
 				options.map(function (item, itemIndex) {
+					var css = {
+						chosen: value == item.id
+					};
 					return React.createElement(
 						'li',
-						{ onClick: _this.onOptionClick.bind(_this, item), key: itemIndex },
+						{ onClick: _this.onOptionClick.bind(_this, item),
+							onMouseEnter: _this.onOptionMouseEnter,
+							onMouseLeave: _this.onOptionMouseLeave,
+							onMouseMove: _this.onOptionMouseMove,
+							className: $pt.LayoutHelper.classSet(css),
+							key: itemIndex,
+							'data-id': item.id },
 						React.createElement(
 							'span',
 							null,
@@ -12103,6 +12644,9 @@
 				var layout = $pt.createCellLayout('text', {
 					comp: {
 						placeholder: NSelect.FILTER_PLACEHOLDER
+					},
+					evt: {
+						keyUp: this.onComponentKeyUp
 					}
 				});
 				model.addPostChangeListener('text', this.onFilterTextChange);
@@ -12141,6 +12685,13 @@
 			ReactDOM.render(popover, this.state.popoverDiv.get(0), this.onPopoverRenderComplete);
 		},
 		showPopover: function (filterText) {
+			if (this.state.popoverDiv) {
+				// log the last active option
+				var activeOption = this.state.popoverDiv.find('ul.options > li.active');
+				this.state.lastActiveOptionId = activeOption.attr('data-id');
+			} else {
+				delete this.state.lastActiveOptionId;
+			}
 			this.renderPopoverContainer();
 			this.renderPopover(filterText);
 		},
@@ -12208,13 +12759,40 @@
 				popover.addClass('right-to-left');
 			}
 			popover.css({ top: styles.top, left: styles.left });
+
+			// if there is no active option, set first as active
+			var options = this.state.popoverDiv.find('ul.options > li');
+			if (options.length != 0) {
+				if (this.state.lastActiveOptionId) {
+					// according to react mechanism, must remove the existed active option first
+					// since active is not render by react by jquery, react will keep it
+					// active the last active option if exists
+					options.removeClass('active').filter(function (index, option) {
+						return $(option).attr('data-id') == this.state.lastActiveOptionId;
+					}.bind(this)).addClass('active');
+				}
+				if (this.state.popoverDiv.find('ul.options > li.active').length == 0) {
+					// active the first if no active option
+					this.state.popoverDiv.find('ul.options > li').first().addClass('active');
+				}
+			}
+
+			var filterText = this.state.popoverDiv.find('div.n-text input[type=text]');
+			if (!filterText.is(':focus')) {
+				if (this.state.filteTextCaret != null) {
+					filterText.caret(this.state.filteTextCaret);
+				} else if (filterText.val() != null) {
+					filterText.caret(filterText.val().length);
+				}
+				filterText.focus();
+			}
 		},
 		hidePopover: function () {
 			this.destroyPopover();
 		},
 		destroyPopover: function () {
 			if (this.state.popoverDiv) {
-				$(document).off('mousedown', this.onDocumentMouseDown).off('keyup', this.onDocumentKeyUp).off('mousewheel', this.onDocumentMouseWheel);
+				$(document).off('mousedown', this.onDocumentMouseDown).off('keyup', this.onDocumentKeyUp).off('keydown', this.onDocumentKeyDown).off('mousewheel', this.onDocumentMouseWheel);
 				$(window).off('resize', this.onWindowResize);
 				this.state.popoverDiv.remove();
 				delete this.state.popoverDiv;
@@ -12283,6 +12861,139 @@
 				}
 			}
 		},
+		onComponentKeyUp: function (evt) {
+			if (evt.keyCode === 40) {
+				// down arrow
+				this.onComponentDownArrowKeyUp(evt);
+			} else if (evt.keyCode === 38) {
+				// up arrow
+				this.onComponentUpArrowKeyUp(evt);
+			} else if (evt.keyCode === 13) {
+				// enter
+				this.onComponentEnterKeyUp(evt);
+			}
+		},
+		onComponentEnterKeyUp: function (evt) {
+			evt.preventDefault();
+			evt.stopPropagation();
+
+			if (!this.isEnabled() || this.isViewMode()) {
+				// do nothing
+				return;
+			}
+			if (!this.state.popoverDiv || !this.state.popoverDiv.is(':visible')) {
+				return;
+			}
+			var option = this.state.popoverDiv.find('ul.options > li.active');
+			if (option.length > 0) {
+				this.setValueToModel(option.attr('data-id'));
+				this.hidePopover();
+				$(this.refs.comp).focus();
+			}
+		},
+		onComponentDownArrowKeyUp: function (evt) {
+			evt.preventDefault();
+			evt.stopPropagation();
+
+			if (!this.isEnabled() || this.isViewMode()) {
+				// do nothing
+				return;
+			}
+			if (!this.state.popoverDiv || !this.state.popoverDiv.is(':visible')) {
+				this.onComponentClicked();
+			} else {
+				var options = this.state.popoverDiv.find('ul.options > li');
+				var keystepOption = options.filter('.active');
+				if (keystepOption.length == 0) {
+					var first = options.first();
+					first.addClass('active');
+					this.scrollIntoView(first);
+				} else {
+					var last = options.last();
+					if (!keystepOption.first().is(last)) {
+						keystepOption.removeClass('active');
+						var next = keystepOption.next();
+						next.addClass('active');
+						this.scrollIntoView(next);
+					}
+				}
+			}
+		},
+		onComponentUpArrowKeyUp: function (evt) {
+			evt.preventDefault();
+			evt.stopPropagation();
+
+			if (!this.isEnabled() || this.isViewMode()) {
+				// do nothing
+				return;
+			}
+			if (!this.state.popoverDiv || !this.state.popoverDiv.is(':visible')) {
+				this.onComponentClicked();
+			} else {
+				var options = this.state.popoverDiv.find('ul.options > li');
+				var keystepOption = options.filter('.active');
+				if (keystepOption.length == 0) {
+					var last = options.last();
+					last.addClass('active');
+					this.scrollIntoView(last);
+				} else {
+					var first = options.first();
+					if (!keystepOption.first().is(first)) {
+						keystepOption.removeClass('active');
+						var previous = keystepOption.prev();
+						previous.addClass('active');
+						this.scrollIntoView(previous);
+					}
+				}
+			}
+		},
+		scrollIntoView: function (option) {
+			// for forbid the mouse event
+			this.state.onKeyEventProcessed = true;
+
+			var optionOffset = option.offset();
+			var optionTop = optionOffset.top;
+			var optionHeight = option.outerHeight();
+			var optionBottom = optionTop + optionHeight;
+
+			var parent = option.parent();
+			var parentOffset = parent.offset();
+			var parentTop = parentOffset.top;
+			var parentBottom = parentTop + parent.height();
+			var allOptions = parent.children();
+
+			var win = $(window);
+			var windowTop = win.scrollTop();
+			var windowBottom = windowTop + win.height();
+
+			if (optionTop < parentTop || optionBottom > parentBottom) {
+				// can not see option in its parent, scroll the parent
+				var optionIndex = allOptions.index(option);
+				var height = allOptions.toArray().reduce(function (prev, current, index) {
+					if (index < optionIndex) {
+						prev += $(current).outerHeight();
+					}
+					return prev;
+				}, 0);
+				parent.scrollTop(height);
+			}
+			// get option offset again, since it might be changed
+			// but it is seen in its parent
+			optionOffset = option.offset();
+			optionTop = optionOffset.top;
+			optionBottom = optionTop + optionHeight;
+			if (optionBottom > windowBottom) {
+				win.scrollTop(windowTop + optionBottom - windowBottom);
+			}
+			// get window scroll top again
+			windowTop = win.scrollTop();
+			if (optionTop < windowTop) {
+				// can not see option in window, even it is seen in its parent
+				// option is above the window top,
+				// which means parent top is less than window top, since option already been seen in parent
+				win.scrollTop(windowTop - (windowTop - optionTop));
+			}
+		},
 		onDocumentMouseDown: function (evt) {
 			var target = $(evt.target);
 			if (target.closest(this.getComponent()).length == 0 && target.closest(this.state.popoverDiv).length == 0) {
@@ -12301,20 +13012,58 @@
 				this.hidePopover();
 			}
 		},
+		onDocumentKeyDown: function (evt) {
+			if (evt.keyCode === 38 || evt.keyCode === 40) {
+				evt.preventDefault();
+			}
+		},
 		onWindowResize: function () {
 			this.hidePopover();
 		},
 		onOptionClick: function (item) {
 			this.setValueToModel(item.id);
 			this.hidePopover();
+			$(this.refs.comp).focus();
+		},
+		onOptionMouseEnter: function (evt) {},
+		onOptionMouseLeave: function (evt) {
+			// if (this.state.onKeyEventProcessed === true) {
+			// }
+		},
+		onOptionMouseMove: function (evt) {
+			// when handled the arrow up/down event, highlight the option
+			// in chrome, the mouse event will be triggered after call #scrollIntoView
+			// so use state onKeyEventProcessed to flag this operation
+			// if the flag is true, ignore the mouse event,
+			// and reset the flag, let the following mouse event processed
+			// cannot use mouse enter event, since there is no second enter event triggered
+			// must use mouse move event to handle, seems no performance issue here.
+			if (this.state.onKeyEventProcessed === true) {
+				// console.log('onOptionMouseEnter #1', this.state.onKeyEventProcessed);
+				delete this.state.onKeyEventProcessed;
+			} else {
+				// console.log('onOptionMouseEnter #2', this.state.onKeyEventProcessed);
+				$(evt.target).addClass('active').siblings().removeClass('active');
+			}
 		},
 		onClearClick: function () {
 			if (!this.isEnabled() || this.isViewMode()) {
 				return;
 			}
 			this.setValueToModel(null);
+			// clear highlight
+			if (this.state.popoverDiv) {
+				this.state.popoverDiv.find('ul.options > li').filter('.chosen').removeClass('chosen');
+			}
 		},
 		onFilterTextChange: function (evt) {
+			if (this.state.popoverDiv.is(':visible')) {
+				var filterText = this.state.popoverDiv.find('div.n-text input[type=text]');
+				this.state.filteTextCaret = filterText.caret();
+			} else {
+				this.state.filteTextCaret = null;
+			}
+			// console.log('caret', this.state.filteTextCaret);
 			this.showPopover(evt.new);
 		},
 		/**
@@ -12329,15 +13078,7 @@
    * @param evt
    */
 		onParentModelChanged: function (evt) {
-			// var options = this.getAvailableOptions();
-			// var currentValue = this.getValueFromModel();
-			// var index = options.findIndex(function(item) {
-			// 	return item.id == currentValue;
-			// });
-			// if (index == -1) {
 			this.setValueToModel(null);
-			// }
-			// this.forceUpdate();
 		},
 		/**
    * get parent model
@@ -12425,19 +13166,6 @@
 		},
 		getComponent: function () {
 			return $(ReactDOM.findDOMNode(this.refs.comp));
-		},
-		getTextInViewMode: function () {
-			var value = this.getValueFromModel();
-			if (value != null) {
-				var data = this.getAvailableOptions().some(function (item) {
-					if (item.id == value) {
-						value = item.text;
-						return true;
-					}
-					return false;
-				});
-			}
-			return value;
 		}
 	}));
 	$pt.Components.NSelect = NSelect;
@@ -12490,6 +13218,7 @@
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.__forceUpdate);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			if (this.hasParent()) {
 				// add post change listener into parent model
@@ -12505,6 +13234,7 @@
 		componentDidUpdate: function (prevProps, prevState) {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.__forceUpdate);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			if (this.hasParent()) {
 				// add post change listener into parent model
@@ -12522,17 +13252,19 @@
 		componentDidMount: function () {
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.__forceUpdate);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			if (this.hasParent()) {
 				// add post change listener into parent model
 				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
 			}
 			this.registerToComponentCentral();
-			if (this.isOnLoading()) {
+			if (this.state.onloading) {
 				this.getCodeTable().initializeRemote().done(function () {
 					this.setState({ onloading: false });
 				}.bind(this));
 			}
+			this.state.mounted = true;
 		},
 		/**
    * will unmount
@@ -12541,6 +13273,7 @@
 			this.destroyPopover();
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.__forceUpdate);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			if (this.hasParent()) {
 				// add post change listener into parent model
@@ -12653,7 +13386,7 @@
 		},
 		renderText: function () {
 			var renderContent = function () {
-				if (this.isOnLoading()) {
+				if (this.isOnLoading() && !this.state.mounted) {
 					this.state.onloading = true;
 					return React.createElement(
 						"span",
@@ -12664,11 +13397,15 @@
 					this.state.onloading = false;
 					var value = this.getValueFromModel();
 					if (value == null || Array.isArray(value) && value.length == 0 || typeof value === 'object' && Object.keys(value).length == 0) {
-						return React.createElement(
-							"span",
-							{ className: "text" },
-							NSelectTree.PLACEHOLDER
-						);
+						if (this.isViewMode()) {
+							return React.createElement("span", { className: "text" });
+						} else {
+							return React.createElement(
+								"span",
+								{ className: "text" },
+								NSelectTree.PLACEHOLDER
+							);
+						}
 					} else {
 						return React.createElement(
 							"ul",
@@ -13351,10 +14088,13 @@
    * @returns {XML}
    */
 		renderTab: function (tab, index) {
-			var css = $pt.LayoutHelper.classSet({
+			var css = {
 				active: index == this.getActiveTabIndex(),
 				hide: tab.visible === false
-			});
+			};
+			if (tab.css) {
+				css[tab.css] = true;
+			}
 			var removeButton = React.createElement(
 				'a',
 				{ href: 'javascript:void(0);', className: 'n-tab-delete',
@@ -13363,7 +14103,7 @@
 			);
 			return React.createElement(
 				'li',
-				{ role: 'presentation', className: css, key: index },
+				{ role: 'presentation', className: $pt.LayoutHelper.classSet(css), key: index },
 				React.createElement(
 					'a',
 					{ href: 'javascript:void(0);', onClick: this.onClicked },
@@ -13557,6 +14297,8 @@
 			SORT_ASC_ICON: "sort-amount-asc",
 			SORT_DESC_ICON: "sort-amount-desc",
 			NO_DATA_LABEL: "No Data",
+			INDEX_HEADER_TEXT: '#',
+			INDEX_HEADER_WIDTH: 40,
 			DETAIL_ERROR_MESSAGE: "Detail error please open item and do validate.",
 			REMOVE_CONFIRM_TITLE: "Delete data?",
 			REMOVE_CONFIRM_MESSAGE: ["Are you sure you want to delete data?", "Deleted data cannot be recovered."],
@@ -13707,6 +14449,7 @@
 			this.addPostRemoveListener(this.onModelChanged);
 			this.addPostAddListener(this.onModelChanged);
 			this.addPostValidateListener(this.onModelValidateChanged);
+			this.addVisibleDependencyMonitor();
 		},
 		/**
    * detach listeners
@@ -13720,6 +14463,7 @@
 			this.removePostRemoveListener(this.onModelChanged);
 			this.removePostAddListener(this.onModelChanged);
 			this.removePostValidateListener(this.onModelValidateChanged);
+			this.removeVisibleDependencyMonitor();
 		},
 		/**
    * will update
@@ -13875,8 +14619,8 @@
 			if (indexable) {
 				config = {
 					indexable: true,
-					width: 40,
-					title: "#"
+					width: NTable.INDEX_HEADER_WIDTH,
+					title: NTable.INDEX_HEADER_TEXT
 				};
 				this.state.columns.splice(0, 0, config);
 				if (this.fixedLeftColumns > 0 || this.getComponentOption("indexFixed") === true) {
@@ -13988,7 +14732,7 @@
    * render header popover
    */
 		renderHeaderPopover: function () {
-			if (this.getModel().hasError(this.getDataId())) {
+			if ($pt.ComponentConstants.ERROR_POPOVER && this.getModel().hasError(this.getDataId())) {
 				var messages = this.getModel().getError(this.getDataId());
 				var _this = this;
 				var content = messages.map(function (msg) {
@@ -14120,6 +14864,9 @@
 							columnIndex++;
 							var style = {};
 							style.width = column.width;
+							if (column.headerAlign) {
+								style.textAlign = column.headerAlign;
+							}
 							if (!(column.visible === undefined || column.visible === true)) {
 								style.display = "none";
 							}
@@ -14190,7 +14937,7 @@
 					icon: operation.icon,
 					enabled: operation.enabled,
 					visible: operation.visible,
-					click: this.onRowOperationClicked.bind(this, operation.click, rowModel.getCurrentModel()),
+					click: this.onRowOperationClicked.bind(this, operation.click, rowModel),
 					tooltip: operation.tooltip
 				},
 				css: {
@@ -14260,7 +15007,7 @@
 						style: 'link',
 						icon: hasIcon ? operation.icon ? operation.icon : 'placeholder' : null,
 						enabled: operation.enabled,
-						click: _this.onRowOperationClicked.bind(_this, operation.click, rowModel.getCurrentModel())
+						click: _this.onRowOperationClicked.bind(_this, operation.click, rowModel)
 					},
 					css: {
 						comp: 'n-table-op-btn'
@@ -14332,9 +15079,18 @@
 		},
 		onDocumentClicked: function (evt) {
 			var target = $(evt.target);
-			if (target.closest(this.state.popoverDiv).length == 0) {
-				this.hidePopover();
-			}
+			if (target.closest(this.state.popoverDiv).length != 0) {
+				// click in popover
+			} else if (target.closest($('.n-table-op-btn.more')).length != 0) {
+					// click in more button
+					if (target.closest($(this.refs.div)).length == 0) {
+						// in other table's more button
+						this.hidePopover();
+					}
+				} else {
+					// neither popover nor more button
+					this.hidePopover();
+				}
 		},
 		onDocumentKeyUp: function (evt) {
 			if (evt.keyCode === 27) {
@@ -14505,13 +15261,15 @@
 								} else {
 									layout.css = { cell: 'inline-editor' };
 								}
+								layout.label = column.title;
 								if (column.inline === 'select' || column.inline === 'radio') {
 									// set code table
-									if (column.codes) {
-										layout = $.extend(true, {}, { comp: { data: column.codes } }, layout);
+									// if (column.codes) {
+									layout = $.extend(true, {}, { comp: { data: column.codes } }, layout);
+									// }
+								} else {
+										layout = $.extend(true, {}, layout);
 									}
-								}
-								layout.label = column.title;
 								// pre-defined, use with data together
 								data = React.createElement($pt.Components.NFormCell, { model: inlineModel,
 									layout: $pt.createCellLayout(column.data, layout),
@@ -14524,6 +15282,7 @@
 								} else {
 									column.inline.css = { cell: 'inline-editor' };
 								}
+								column.inline.label = column.inline.label ? column.inline.label : column.title;
 								data = React.createElement($pt.Components.NFormCell, { model: inlineModel,
 									layout: $pt.createCellLayout(column.data, column.inline),
 									direction: 'horizontal',
@@ -14882,7 +15641,6 @@
    */
 		render: function () {
 			this.prepareDisplayOptions();
-			/*{this.renderNoDataReminder()}*/
 			var css = {
 				'n-table-container panel': true
 			};
@@ -14913,6 +15671,7 @@
 						this.renderFixedRightColumns(),
 						this.renderRightTopCorner()
 					),
+					this.renderNoDataReminder(),
 					this.renderPagination()
 				)
 			);
@@ -15422,10 +16181,10 @@
 		/**
    * on row user defined operation clicked
    * @param callback
-   * @param data
+   * @param rowModel
    */
-		onRowOperationClicked: function (callback, data) {
-			callback.call(this, data);
+		onRowOperationClicked: function (callback, rowModel) {
+			callback.call(this, rowModel.getCurrentModel(), rowModel);
 		},
 		/**
    * on download clicked
@@ -15661,17 +16420,14 @@
 				});
 			}
 			if (this.getModel().hasError(this.getDataId())) {
-				var rowError = null;
+				// var rowError = null;
 				var errors = this.getModel().getError(this.getDataId());
-				console.log('errors', errors);
-				for (var index = 0, count = errors.length; index < count; index++) {
-					if (typeof errors[index] !== "string") {
-						rowError = errors[index].getError(item);
-					}
-				}
-				if (rowError != null) {
-					console.log(rowError);
-					model.mergeError(rowError);
+				if (errors) {
+					errors.forEach(function (error) {
+						if (typeof error !== 'string') {
+							model.mergeError(error.getError(item));
+						}
+					});
 				}
 			}
 			return model;
@@ -15910,7 +16666,8 @@
 				view: function (value) {
 					return isNaN(value) || (value + '').isBlank() ? value : (value + '').movePointRight(2);
 				}
-			}
+			},
+			TRIM: false
 		},
 		propTypes: {
 			// model
@@ -15933,6 +16690,7 @@
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.getComponent().off('change', this.onComponentChanged);
 			this.unregisterFromComponentCentral();
@@ -15952,6 +16710,7 @@
 			}
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.getComponent().on('change', this.onComponentChanged);
 			this.registerToComponentCentral();
@@ -15964,6 +16723,7 @@
 			this.getComponent().val(this.getFormattedValue(this.getValueFromModel()));
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.getComponent().on('change', this.onComponentChanged);
 			this.registerToComponentCentral();
@@ -15974,6 +16734,7 @@
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.getComponent().off('change', this.onComponentChanged);
 			this.unregisterFromComponentCentral();
@@ -16100,6 +16861,9 @@
 			// 	clearTimeout(this.state.componentChanged);
 			// }
 			var value = evt.target.value;
+			if (this.getComponentOption('trim', NText.TRIM)) {
+				value = value == null ? null : (value + '').trim();
+			}
 			if (value && !value.isBlank()) {
 				var formattedValue = this.getFormattedValue(value);
 				if (formattedValue != value) {
@@ -16121,7 +16885,14 @@
 		textEquals: function (v1, v2) {
 			var hasText1 = this.hasText(v1);
 			var hasText2 = this.hasText(v2);
-			return hasText1 ? v1 == v2 : !hasText2;
+			if (hasText1) {
+				var strV1 = v1 + '';
+				var strV2 = v2 + '';
+				return strV1 === strV2;
+			} else {
+				return !hasText2;
+			}
+			//return hasText1 ? ((v1 + '') === (v2 + '')) : !hasText2;
 		},
 		/**
    * on component change
@@ -16296,6 +17067,7 @@
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.getComponent().off('change', this.onComponentChanged);
 			this.unregisterFromComponentCentral();
@@ -16311,6 +17083,7 @@
 			}
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.getComponent().on('change', this.onComponentChanged);
 			this.registerToComponentCentral();
@@ -16323,6 +17096,7 @@
 			this.getComponent().val(this.getValueFromModel());
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.getComponent().on('change', this.onComponentChanged);
 			this.registerToComponentCentral();
@@ -16333,6 +17107,7 @@
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.getComponent().off('change', this.onComponentChanged);
 			this.unregisterFromComponentCentral();
@@ -16454,6 +17229,7 @@
 		componentWillUpdate: function (nextProps) {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -16467,6 +17243,7 @@
 			this.getComponent().prop("checked", this.getValueFromModel());
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -16478,6 +17255,7 @@
 			this.getComponent().prop("checked", this.getValueFromModel());
 			// add post change listener to handle model change
 			this.addPostChangeListener(this.onModelChanged);
+			this.addVisibleDependencyMonitor();
 			this.addEnableDependencyMonitor();
 			this.registerToComponentCentral();
 		},
@@ -16487,6 +17265,7 @@
 		componentWillUnmount: function () {
 			// remove post change listener to handle model change
 			this.removePostChangeListener(this.onModelChanged);
+			this.removeVisibleDependencyMonitor();
 			this.removeEnableDependencyMonitor();
 			this.unregisterFromComponentCentral();
 		},
@@ -16703,6 +17482,7 @@
         componentWillUpdate: function (nextProps) {
             // remove post change listener to handle model change
             this.removePostChangeListener(this.__forceUpdate);
+            this.removeVisibleDependencyMonitor();
             this.removeEnableDependencyMonitor();
             this.unregisterFromComponentCentral();
         },
@@ -16714,29 +17494,20 @@
         componentDidUpdate: function (prevProps, prevState) {
             // add post change listener to handle model change
             this.addPostChangeListener(this.__forceUpdate);
+            this.addVisibleDependencyMonitor();
             this.addEnableDependencyMonitor();
             this.registerToComponentCentral();
         },
-        componentWillMount: function () {
-            var expandLevel = this.getComponentOption('expandLevel');
-            if (expandLevel == null) {
-                // default expand root
-                expandLevel = 0;
-            }
-            if (expandLevel === 'all') {
-                expandLevel = 9999;
-            }
-            if (this.state.root.children) {
-                // this.state.root.children = this.getTopLevelNodes();
-                this.expandTo(expandLevel);
-            }
-        },
+        // componentWillMount: function() {
+        //     this.initExpand();
+        // },
         /**
          * did mount
          */
         componentDidMount: function () {
             // add post change listener to handle model change
             this.addPostChangeListener(this.__forceUpdate);
+            this.addVisibleDependencyMonitor();
             this.addEnableDependencyMonitor();
             this.registerToComponentCentral();
         },
@@ -16746,6 +17517,7 @@
         componentWillUnmount: function () {
             // remove post change listener to handle model change
             this.removePostChangeListener(this.__forceUpdate);
+            this.removeVisibleDependencyMonitor();
             this.removeEnableDependencyMonitor();
             this.unregisterFromComponentCentral();
         },
@@ -16842,9 +17614,9 @@
                     this.renderCheck(node, nodeId),
                     React.createElement(
                         'a',
-                        {
+                        { className: 'node-text-link-' + buttons.length,
                             href: 'javascript:void(0);',
-                            onClick: this.onNodeClicked.bind(this, node, nodeId) },
+                            onClick: this.onNodeLabelClicked.bind(this, node, nodeId) },
                         React.createElement(
                             'span',
                             { className: 'node-text' },
@@ -16877,7 +17649,8 @@
         },
         renderTopLevel: function () {
             return React.createElement($pt.Components.NCodeTableWrapper, { codetable: this.getCodeTable(),
-                renderer: this.getRealTopLevelRenderer });
+                renderer: this.getRealTopLevelRenderer,
+                onMounted: this.initExpand });
         },
         getRealTopLevelRenderer: function () {
             var root = this.state.root;
@@ -16896,6 +17669,20 @@
                 );
             } else {
                 return null;
+            }
+        },
+        initExpand: function () {
+            var expandLevel = this.getComponentOption('expandLevel');
+            if (expandLevel == null) {
+                // default expand root
+                expandLevel = 0;
+            }
+            if (expandLevel === 'all') {
+                expandLevel = 9999;
+            }
+            if (this.state.root.children) {
+                // this.state.root.children = this.getTopLevelNodes();
+                this.expandTo(expandLevel);
             }
         },
         render: function () {
@@ -16925,9 +17712,13 @@
                     this.expandNode(node, nodeId);
                 }
             }
+        },
+        onNodeLabelClicked: function (node, nodeId) {
             var nodeClick = this.getComponentOption('nodeClick');
             if (nodeClick) {
                 nodeClick.call(this, node);
+            } else {
+                this.onNodeClicked(node, nodeId);
             }
         },
         onNodeOperationClicked: function (node, click) {

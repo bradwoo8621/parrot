@@ -1090,6 +1090,14 @@
 					index: 50,
 					children: $demo.convertToExampleList(scroll)
 				}
+			},
+			headerAlign: function() {
+				return {
+					id: 'table-style-headerAlign',
+					title: 'Header Align',
+					desc: <span>Header alignment, use <code>headerAlign: 'center'</code> in <code>columns</code> element, possible value is any value can apply to <code>text-align</code>.</span>,
+
+				}
 			}
 		};
 
@@ -1423,6 +1431,7 @@
 				var statics = {
 					TOOLTIP_EDIT: NTable.TOOLTIP_EDIT,
 					TOOLTIP_REMOVE: NTable.TOOLTIP_REMOVE,
+					TOOLTIP_MORE: NTable.TOOLTIP_MORE,
 					/**
 					 * set operation button width
 					 * @param width {number}
@@ -1431,21 +1440,30 @@
 					},
 					ADD_BUTTON_ICON: NTable.ADD_BUTTON_ICON,
 					ADD_BUTTON_TEXT: NTable.ADD_BUTTON_TEXT,
+					DOWNLOADABLE: NTable.DOWNLOADABLE,
+					DOWNLOAD_BUTTON_ICON: NTable.DOWNLOAD_BUTTON_ICON,
+					DOWNLOAD_BUTTON_TEXT: NTable.DOWNLOAD_BUTTON_TEXT,
+					NO_DATA_DOWNLOAD_TITLE: NTable.NO_DATA_DOWNLOAD_TITLE,
+					NO_DATA_DOWNLOAD: NTable.NO_DATA_DOWNLOAD,
 					SEARCH_PLACE_HOLDER: NTable.SEARCH_PLACE_HOLDER,
 					ROW_EDIT_BUTTON_ICON: NTable.ROW_EDIT_BUTTON_ICON,
 					ROW_REMOVE_BUTTON_ICON: NTable.ROW_REMOVE_BUTTON_ICON,
+					ROW_MORE_BUTTON_ICON: NTable.ROW_MORE_BUTTON_ICON,
 					EDIT_DIALOG_SAVE_BUTTON_TEXT: NTable.EDIT_DIALOG_SAVE_BUTTON_TEXT,
 					EDIT_DIALOG_SAVE_BUTTON_ICON: NTable.EDIT_DIALOG_SAVE_BUTTON_ICON,
 					SORT_ICON: NTable.SORT_ICON,
 					SORT_ASC_ICON: NTable.SORT_ASC_ICON,
 					SORT_DESC_ICON: NTable.SORT_DESC_ICON,
 					NO_DATA_LABEL: NTable.NO_DATA_LABEL,
+					INDEX_HEADER_TEXT: NTable.INDEX_HEADER_TEXT,
+					INDEX_HEADER_WIDTH: NTable.INDEX_HEADER_WIDTH,
 					DETAIL_ERROR_MESSAGE: NTable.DETAIL_ERROR_MESSAGE,
 					REMOVE_CONFIRM_TITLE: NTable.REMOVE_CONFIRM_TITLE,
 					REMOVE_CONFIRM_MESSAGE: NTable.REMOVE_CONFIRM_MESSAGE,
 					BOOLEAN_TRUE_DISPLAY_TEXT: NTable.BOOLEAN_TRUE_DISPLAY_TEXT,
 					BOOLEAN_FALSE_DISPLAY_TEXT: NTable.BOOLEAN_FALSE_DISPLAY_TEXT,
-					PAGE_JUMPING_PROXY: NTable.PAGE_JUMPING_PROXY
+					PAGE_JUMPING_PROXY: NTable.PAGE_JUMPING_PROXY,
+					PAGE_JUMPING_PROXY_CALLBACK: NTable.PAGE_JUMPING_PROXY_CALLBACK
 				};
 				return {
 					id: 'table-constants',

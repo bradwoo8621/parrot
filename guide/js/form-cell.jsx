@@ -278,7 +278,14 @@
 						Phase string should be returned by function.<br/>
 						<code>{'{validate: {phase: \'phase\'}}'}</code> means the same and recommended, for further extension of <code>validate</code> attribute.<br/>
 						In some cases, validation can be invoked by other value changed. Use <code>{'{comp: {validation: {depends: \'otherPropId\'}}'}</code> to monitor.
-						same as <code>enabled</code> and <code>when</code> is not needed.
+						same as <code>enabled</code> and <code>when</code> is not needed.<br/>
+						<br/>
+						About <code>delay</code> of validation:<br/>
+						<span>1. delay is only effectived when a component is form cell wrappred,</span><br/>
+						<span>2. default there is one second delay for text validation. no delay for any other components,</span><br/>
+						<span>3. <code>delay</code> attribute can be defined in <code>$pt.ComponentConstants.XXX</code>, 
+						such as <code>{"$pt.ComponentConstants.TextInJSON = {type: 'text', label: true, popover: true, renderError: true, delay: 1000}"}</code> which is already pre-defined in parrot. or change the parrot constants to defined your own,</span><br/>
+						<span>4. <code>delay</code> is also can be defined in cell layout, such as <code>{"{validate: {delay: 1000}}"}</code> to define that the validation of this component will delay for one second.</span>
 					</span>,
 					index: 45
 				};
@@ -372,10 +379,7 @@
 					id: 'form-cell-visible',
 					title: 'Visible',
 					desc: [<span>
-						<code>visible</code> definition is same as <code>enabled</code>,
-						the only difference is <code>visible</code> provided by Form Cell,
-						<code>enabled</code> provided by it's inner component.
-						Which means if component is used alone, <code>visible</code> is not worked.
+						<code>visible</code> definition is same as <code>enabled</code>.
 					</span>
 					],
 					index: 80
@@ -538,7 +542,9 @@
 			centralId: function() {
 				var layoutTemplate = {
 					label: 'Label of Cell',
-					centralId: 'myCentralId'
+					comp: {
+						centralId: 'myCentralId'
+					}
 				};
 				var layoutCode = $demo.convertCellLayoutCreatorToString({
 					variable: 'layout',

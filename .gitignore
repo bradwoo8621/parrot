@@ -84,3 +84,4 @@
 /.idea/
 /.settings/
 /.project
+*.sublime-grunt.cache

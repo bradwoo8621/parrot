@@ -1151,8 +1151,6 @@ div.n-tab ul.nav-pills > li > a.n-tab-delete {
   display: none;
 }
 div.n-tab ul.nav-tabs > li.active > a.n-tab-delete,
-div.n-tab ul.nav-pills > li.active > a.n-tab-delete,
-div.n-tab ul.nav-tabs > li.active > a.n-tab-delete,
 div.n-tab ul.nav-pills > li.active > a.n-tab-delete {
   display: block;
   position: absolute;
@@ -1459,7 +1457,17 @@ div.n-select .form-control {
   -webkit-box-shadow: none;
   -o-box-shadow: none;
   padding: 0;
+  display: -webkit-box;
+  /* OLD - iOS 6-, Safari 3.1-6 */
+  display: -moz-box;
+  /* OLD - Firefox 19- (buggy but mostly works) */
+  display: -webkit-flex;
+  /* NEW - Chrome */
   display: flex;
+  /* NEW, Spec - Opera 12.1, Firefox 20+ */
+  display: table\9;
+  /* IE9/10 */
+  -webkit-flex-direction: row;
   flex-direction: row;
   align-items: center;
   border: 0;
@@ -1467,23 +1475,45 @@ div.n-select .form-control {
 div.n-select .form-control .text {
   order: 1;
   flex-grow: 1;
+  display: inline-block;
+  display: table-cell\9;
+  /* IE9/10 */
   cursor: pointer;
   white-space: nowrap;
   text-overflow: ellipsis;
   padding-right: 3px;
   width: 0;
+  /* must set an exactly width, it works, no matter what it is. */
+  width: 99%\9;
+  /* IE9/10 */
+  vertical-align: middle\9;
+  /* IE9/10 */
   overflow: hidden;
 }
 div.n-select .form-control .clear {
   order: 2;
   cursor: pointer;
   font-size: 0.8em;
+  display: table-cell\9;
+  /* IE9/10 */
+  width: 1%\9;
+  /* IE9/10 */
+  padding-right: 5px\9;
+  /* IE9/10 */
+  vertical-align: middle\9;
+  /* IE9/10 */
 }
 div.n-select .form-control .drop {
   order: 3;
   cursor: pointer;
   margin-right: 2px;
   margin-top: -4px;
+  display: table-cell\9;
+  /* IE9/10 */
+  width: 1%\9;
+  /* IE9/10 */
+  vertical-align: middle\9;
+  /* IE9/10 */
 }
 div.n-select:focus hr.focus-line {
   transform: scaleX(1);
@@ -1500,6 +1530,9 @@ div.n-select.n-disabled:focus hr.focus-line {
   -webkit-transform: scaleX(0);
 }
 div.n-select.n-view-mode .form-control {
+  cursor: default;
+}
+div.n-select.n-view-mode .form-control .text {
   cursor: default;
 }
 div.n-select.n-view-mode .form-control .clear,
@@ -1540,8 +1573,6 @@ div.n-select.n-view-mode hr.normal-line {
 }
 .n-select-popover .popover-content {
   padding: 5px;
-  overflow: auto;
-  max-height: 300px;
 }
 .n-select-popover .popover-content div.n-text {
   margin: 0 5px 5px;
@@ -1550,14 +1581,22 @@ div.n-select.n-view-mode hr.normal-line {
   list-style: none;
   padding: 0;
   margin-bottom: 0;
+  max-height: 300px;
+  overflow: auto;
 }
 .n-select-popover .popover-content ul li {
   padding: 3px 5px;
   border-radius: 4px;
   cursor: pointer;
 }
-.n-select-popover .popover-content ul li:hover {
-  background-color: #e0e0e0;
+.n-select-popover .popover-content ul li.active,
+.n-select-popover .popover-content ul li.active:hover,
+.n-select-popover .popover-content ul li.chosen.active,
+.n-select-popover .popover-content ul li.chosen.active:hover {
+  background-color: #c0c0c0;
+}
+.n-select-popover .popover-content ul li.chosen {
+  background-color: #e3f2fd;
 }
 .n-select-popover .popover-content div.no-option {
   text-align: center;
@@ -2858,6 +2897,9 @@ div.n-file .file-input .form-control.file-caption.kv-fileinput-caption {
 div.n-file .file-input button.fileinput-upload.fileinput-upload-button,
 div.n-file .file-input button.fileinput-cancel.fileinput-cancel-button,
 div.n-file .file-input button.fileinput-remove.fileinput-remove-button,
+div.n-file .file-input a.fileinput-upload.fileinput-upload-button,
+div.n-file .file-input a.fileinput-cancel.fileinput-cancel-button,
+div.n-file .file-input a.fileinput-remove.fileinput-remove-button,
 div.n-file .file-input div.btn.btn-file {
   height: 30px;
   border: 0;
@@ -2910,6 +2952,86 @@ div.n-file .file-input div.btn.btn-file {
   min-height: 30px;
   display: inline-block;
   text-decoration: none;
+}
+.n-tree li > div.node-content > a.node-text-link-1,
+.n-tree li > div.node-content > a:hover.node-text-link-1,
+.n-tree li > div.node-content > a:visited.node-text-link-1,
+.n-tree li > div.node-content > a:active.node-text-link-1,
+.n-tree li > div.node-content > a:focus.node-text-link-1 {
+  padding-right: 22px;
+  margin-right: -22px;
+}
+.n-tree li > div.node-content > a.node-text-link-2,
+.n-tree li > div.node-content > a:hover.node-text-link-2,
+.n-tree li > div.node-content > a:visited.node-text-link-2,
+.n-tree li > div.node-content > a:active.node-text-link-2,
+.n-tree li > div.node-content > a:focus.node-text-link-2 {
+  padding-right: 39px;
+  margin-right: -39px;
+}
+.n-tree li > div.node-content > a.node-text-link-3,
+.n-tree li > div.node-content > a:hover.node-text-link-3,
+.n-tree li > div.node-content > a:visited.node-text-link-3,
+.n-tree li > div.node-content > a:active.node-text-link-3,
+.n-tree li > div.node-content > a:focus.node-text-link-3 {
+  padding-right: 56px;
+  margin-right: -56px;
+}
+.n-tree li > div.node-content > a.node-text-link-4,
+.n-tree li > div.node-content > a:hover.node-text-link-4,
+.n-tree li > div.node-content > a:visited.node-text-link-4,
+.n-tree li > div.node-content > a:active.node-text-link-4,
+.n-tree li > div.node-content > a:focus.node-text-link-4 {
+  padding-right: 73px;
+  margin-right: -73px;
+}
+.n-tree li > div.node-content > a.node-text-link-5,
+.n-tree li > div.node-content > a:hover.node-text-link-5,
+.n-tree li > div.node-content > a:visited.node-text-link-5,
+.n-tree li > div.node-content > a:active.node-text-link-5,
+.n-tree li > div.node-content > a:focus.node-text-link-5 {
+  padding-right: 90px;
+  margin-right: -90px;
+}
+.n-tree li > div.node-content > a.node-text-link-6,
+.n-tree li > div.node-content > a:hover.node-text-link-6,
+.n-tree li > div.node-content > a:visited.node-text-link-6,
+.n-tree li > div.node-content > a:active.node-text-link-6,
+.n-tree li > div.node-content > a:focus.node-text-link-6 {
+  padding-right: 107px;
+  margin-right: -107px;
+}
+.n-tree li > div.node-content > a.node-text-link-7,
+.n-tree li > div.node-content > a:hover.node-text-link-7,
+.n-tree li > div.node-content > a:visited.node-text-link-7,
+.n-tree li > div.node-content > a:active.node-text-link-7,
+.n-tree li > div.node-content > a:focus.node-text-link-7 {
+  padding-right: 124px;
+  margin-right: -124px;
+}
+.n-tree li > div.node-content > a.node-text-link-8,
+.n-tree li > div.node-content > a:hover.node-text-link-8,
+.n-tree li > div.node-content > a:visited.node-text-link-8,
+.n-tree li > div.node-content > a:active.node-text-link-8,
+.n-tree li > div.node-content > a:focus.node-text-link-8 {
+  padding-right: 141px;
+  margin-right: -141px;
+}
+.n-tree li > div.node-content > a.node-text-link-9,
+.n-tree li > div.node-content > a:hover.node-text-link-9,
+.n-tree li > div.node-content > a:visited.node-text-link-9,
+.n-tree li > div.node-content > a:active.node-text-link-9,
+.n-tree li > div.node-content > a:focus.node-text-link-9 {
+  padding-right: 158px;
+  margin-right: -158px;
+}
+.n-tree li > div.node-content > a.node-text-link-10,
+.n-tree li > div.node-content > a:hover.node-text-link-10,
+.n-tree li > div.node-content > a:visited.node-text-link-10,
+.n-tree li > div.node-content > a:active.node-text-link-10,
+.n-tree li > div.node-content > a:focus.node-text-link-10 {
+  padding-right: 175px;
+  margin-right: -175px;
 }
 .n-tree li > div.node-content > a.node-button {
   display: none;

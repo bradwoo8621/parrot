@@ -356,7 +356,7 @@
 				return {
 					id: 'tree-click',
 					title: 'Click',
-					desc: <span>Handle node click by <code>nodeClick</code>.<br/>
+					desc: <span>Handle node label click by <code>nodeClick</code>.<br/>
 					<code>nodeOperations</code> can be used to define node buttons (JSON or JSON array),
 					which has <code>icon</code>, <code>text</code>, <code>click</code> and <code>visible</code>.
 					<code>visible</code> can be a function, returns boolean to define the icon button visiblility.</span>,
