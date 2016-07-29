@@ -245,6 +245,8 @@
         renderTopLevel: function() {
             return (<$pt.Components.NCodeTableWrapper codetable={this.getCodeTable()}
                                 renderer={this.getRealTopLevelRenderer} 
+                                model={this.getModel()}
+                                layout={this.getLayout()}
                                 onMounted={this.initExpand}/>);
         },
         getRealTopLevelRenderer: function() {

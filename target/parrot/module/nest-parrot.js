@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.4.24 2016-07-28 */
+	/** nest-parrot.V0.4.24 2016-07-29 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -4528,6 +4528,8 @@
 			css[this.getComponentCSS('n-array-check')] = true;
 			return React.createElement($pt.Components.NCodeTableWrapper, { codetable: this.getCodeTable(),
 				className: $pt.LayoutHelper.classSet(css),
+				model: this.getModel(),
+				layout: this.getLayout(),
 				renderer: this.getRealRenderer });
 		},
 		getRealRenderer: function () {
@@ -11888,6 +11890,8 @@
 			};
 			return React.createElement($pt.Components.NCodeTableWrapper, { codetable: this.getCodeTable(),
 				className: $pt.LayoutHelper.classSet(css),
+				model: this.getModel(),
+				layout: this.getLayout(),
 				renderer: this.getRealRenderer });
 		},
 		getRealRenderer: function () {
@@ -17650,6 +17654,8 @@
         renderTopLevel: function () {
             return React.createElement($pt.Components.NCodeTableWrapper, { codetable: this.getCodeTable(),
                 renderer: this.getRealTopLevelRenderer,
+                model: this.getModel(),
+                layout: this.getLayout(),
                 onMounted: this.initExpand });
         },
         getRealTopLevelRenderer: function () {

@@ -143,6 +143,8 @@
 			};
 			return (<$pt.Components.NCodeTableWrapper codetable={this.getCodeTable()}
 								className={$pt.LayoutHelper.classSet(css)}
+								model={this.getModel()}
+								layout={this.getLayout()}
 								renderer={this.getRealRenderer} />);
 		},
 		getRealRenderer: function() {
