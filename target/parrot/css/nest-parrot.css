@@ -1457,63 +1457,59 @@ div.n-select .form-control {
   -webkit-box-shadow: none;
   -o-box-shadow: none;
   padding: 0;
-  display: -webkit-box;
-  /* OLD - iOS 6-, Safari 3.1-6 */
-  display: -moz-box;
-  /* OLD - Firefox 19- (buggy but mostly works) */
-  display: -webkit-flex;
-  /* NEW - Chrome */
-  display: flex;
-  /* NEW, Spec - Opera 12.1, Firefox 20+ */
-  display: table\9;
-  /* IE9/10 */
-  -webkit-flex-direction: row;
-  flex-direction: row;
-  align-items: center;
   border: 0;
+  display: block;
+  position: relative;
+}
+div.n-select .form-control:before {
+  content: '';
+  display: table;
+}
+div.n-select .form-control:after {
+  content: '';
+  display: table;
+  clear: both;
 }
 div.n-select .form-control .text {
-  order: 1;
-  flex-grow: 1;
-  display: inline-block;
-  display: table-cell\9;
-  /* IE9/10 */
   cursor: pointer;
   white-space: nowrap;
-  text-overflow: ellipsis;
-  padding-right: 3px;
-  width: 0;
-  /* must set an exactly width, it works, no matter what it is. */
-  width: 99%\9;
-  /* IE9/10 */
-  vertical-align: middle\9;
-  /* IE9/10 */
   overflow: hidden;
+  text-overflow: ellipsis;
+  width: -webkit-calc(100% - 31px);
+  width: -moz-calc(100% - 31px);
+  width: calc(100% - 31px);
+  float: left;
+  line-height: 30px;
+  position: relative;
 }
 div.n-select .form-control .clear {
-  order: 2;
   cursor: pointer;
   font-size: 0.8em;
-  display: table-cell\9;
-  /* IE9/10 */
-  width: 1%\9;
-  /* IE9/10 */
-  padding-right: 5px\9;
-  /* IE9/10 */
-  vertical-align: middle\9;
-  /* IE9/10 */
+  float: right;
+  line-height: 30px;
+  position: relative;
+  right: 17px;
+  width: 14px;
 }
 div.n-select .form-control .drop {
-  order: 3;
   cursor: pointer;
-  margin-right: 2px;
-  margin-top: -4px;
-  display: table-cell\9;
-  /* IE9/10 */
-  width: 1%\9;
-  /* IE9/10 */
-  vertical-align: middle\9;
-  /* IE9/10 */
+  margin-top: -2px;
+  float: right;
+  line-height: 30px;
+  position: relative;
+  left: 14px;
+  width: 17px;
+}
+div.n-select .form-control.no-clear .text {
+  width: -webkit-calc(100% - 17px);
+  width: -moz-calc(100% - 17px);
+  width: calc(100% - 17px);
+}
+div.n-select .form-control.no-clear .clear {
+  display: none;
+}
+div.n-select .form-control.no-clear .drop {
+  left: auto;
 }
 div.n-select:focus hr.focus-line {
   transform: scaleX(1);
@@ -1529,14 +1525,19 @@ div.n-select.n-disabled:focus hr.focus-line {
   -o-transform: scaleX(0);
   -webkit-transform: scaleX(0);
 }
-div.n-select.n-view-mode .form-control {
+div.n-select.n-view-mode .form-control,
+div.n-select.n-view-mode .form-control.no-clear {
   cursor: default;
 }
-div.n-select.n-view-mode .form-control .text {
+div.n-select.n-view-mode .form-control .text,
+div.n-select.n-view-mode .form-control.no-clear .text {
   cursor: default;
+  width: 100%;
 }
 div.n-select.n-view-mode .form-control .clear,
-div.n-select.n-view-mode .form-control .drop {
+div.n-select.n-view-mode .form-control.no-clear .clear,
+div.n-select.n-view-mode .form-control .drop,
+div.n-select.n-view-mode .form-control.no-clear .drop {
   display: none;
 }
 div.n-select.n-view-mode hr.focus-line,

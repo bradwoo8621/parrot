@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.4.25 2016-08-09 */
+	/** nest-parrot.V0.4.25 2016-08-11 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -12544,9 +12544,14 @@
 			if (itemText == null) {
 				itemText = this.state.onloading ? $pt.Components.NCodeTableWrapper.ON_LOADING : this.isViewMode() ? '' : this.getPlaceholder();
 			}
+			var css = {
+				'input-group': true,
+				'form-control': true,
+				'no-clear': !this.getComponentOption('allowClear')
+			};
 			return React.createElement(
 				'div',
-				{ className: 'input-group form-control',
+				{ className: $pt.LayoutHelper.classSet(css),
 					onClick: this.onComponentClicked },
 				React.createElement(
 					'span',

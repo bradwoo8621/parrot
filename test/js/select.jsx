@@ -103,7 +103,8 @@
         comp: {
             type: $pt.ComponentConstants.Select,
             data: data,
-            minimumResultsForSearch: Infinity
+            minimumResultsForSearch: Infinity,
+            allowClear: false
         },
         pos: {row: 1, col: 1}
     });
@@ -126,14 +127,16 @@
                     return false;
                 },
                 depends: 'name'
-            }
+            },
+            allowClear: false
         },
         pos: {row: 1, col: 1}
     });
     var remote = $pt.createCellLayout('name', {
         comp: {
             type: $pt.ComponentConstants.Select,
-            data: $pt.createCodeTable({url: '/app/codetable'})
+            data: $pt.createCodeTable({url: '/app/codetable'}),
+            allowClear: false
         },
         pos: {row: 1, col: 1}
     });

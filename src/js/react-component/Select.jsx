@@ -140,7 +140,12 @@
 			if (itemText == null) {
 				itemText = this.state.onloading ? $pt.Components.NCodeTableWrapper.ON_LOADING : (this.isViewMode() ? '' : this.getPlaceholder());
 			}
-			return (<div className='input-group form-control' 
+			var css = {
+				'input-group': true,
+				'form-control': true,
+				'no-clear': !this.getComponentOption('allowClear')
+			}
+			return (<div className={$pt.LayoutHelper.classSet(css)}
 						 onClick={this.onComponentClicked}>
 				<span className='text'>{itemText}</span>
 				{this.renderClear()}
