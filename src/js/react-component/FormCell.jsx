@@ -357,7 +357,7 @@
 			var css = {
 				'n-form-cell': true
 			};
-			if (typeof width === 'number') {
+			if (typeof width === 'number' || typeof width === 'string') {
 				css['col-sm-' + width] = true;
 				css['col-md-' + width] = true;
 				css['col-lg-' + width] = true;
@@ -365,6 +365,15 @@
 				Object.keys(width).forEach(function(key) {
 					css['col-' + key + '-' + width[key]] = true;
 				});
+				if (typeof width.sm === 'undefined') {
+					css['col-sm-' + width.width] = true;
+				}
+				if (typeof width.md === 'undefined') {
+					css['col-md-' + width.width] = true;
+				}
+				if (typeof width.lg === 'undefined') {
+					css['col-lg-' + width.width] = true;
+				}
 				// css['col-sm-' + (width.sm ? width.sm : width.width)] = true;
 				// css['col-md-' + (width.md ? width.md : width.width)] = true;
 				// css['col-lg-' + (width.lg ? width.lg : width.width)] = true;

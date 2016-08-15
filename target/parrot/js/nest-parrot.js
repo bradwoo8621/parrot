@@ -1,4 +1,4 @@
-/** nest-parrot.V0.4.26 2016-08-11 */
+/** nest-parrot.V0.4.26 2016-08-15 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -6727,7 +6727,7 @@
 					styles.top = offset.top - NDateTime.TOTAL_HEIGHT;
 					popoverCSS.top = true;
 				} else if (styles.top + NDateTime.TOTAL_HEIGHT <= $(document).height()) {
-					// cannot show in bottom and in current document
+					// can show in bottom and in current document
 					popoverCSS.bottom = true;
 				} else if (offset.top < NDateTime.TOTAL_HEIGHT) {
 					// cannot show in top and in current document
@@ -8674,7 +8674,7 @@
 			var css = {
 				'n-form-cell': true
 			};
-			if (typeof width === 'number') {
+			if (typeof width === 'number' || typeof width === 'string') {
 				css['col-sm-' + width] = true;
 				css['col-md-' + width] = true;
 				css['col-lg-' + width] = true;
@@ -8682,6 +8682,15 @@
 				Object.keys(width).forEach(function (key) {
 					css['col-' + key + '-' + width[key]] = true;
 				});
+				if (typeof width.sm === 'undefined') {
+					css['col-sm-' + width.width] = true;
+				}
+				if (typeof width.md === 'undefined') {
+					css['col-md-' + width.width] = true;
+				}
+				if (typeof width.lg === 'undefined') {
+					css['col-lg-' + width.width] = true;
+				}
 				// css['col-sm-' + (width.sm ? width.sm : width.width)] = true;
 				// css['col-md-' + (width.md ? width.md : width.width)] = true;
 				// css['col-lg-' + (width.lg ? width.lg : width.width)] = true;
@@ -12698,7 +12707,7 @@
 					styles.top = offset.top - realHeight;
 					onTop = true;
 				} else if (styles.top + realHeight <= $(document).height()) {
-					// cannot show in bottom and in current document
+					// can show in bottom and in current document
 					onTop = false;
 				} else if (offset.top < realHeight) {
 					// cannot show in top and in current document

@@ -298,7 +298,7 @@
 					styles.top = offset.top - realHeight;
 					onTop = true;
 				} else if ((styles.top + realHeight) <= $(document).height()) {
-					// cannot show in bottom and in current document
+					// can show in bottom and in current document
 					onTop = false;
 				} else if (offset.top < realHeight) {
 					// cannot show in top and in current document

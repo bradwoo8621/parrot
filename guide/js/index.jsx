@@ -138,8 +138,6 @@
 				<a href="https://github.com/bradwoo8621/parrot" className="btn btn-outline-inverse btn-lg">Download
 					Parrot</a>
 			</p>
-
-			<p className='version'>Currently v0.0.5 Released. v0.0.6 under development.</p>
 		</div>);
 
 		React.render(index, document.getElementById('main'));

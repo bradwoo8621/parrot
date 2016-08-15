@@ -701,7 +701,7 @@
 					styles.top = offset.top - NDateTime.TOTAL_HEIGHT;
 					popoverCSS.top = true;
 				} else if ((styles.top + NDateTime.TOTAL_HEIGHT) <= $(document).height()) {
-					// cannot show in bottom and in current document
+					// can show in bottom and in current document
 					popoverCSS.bottom = true;
 				} else if (offset.top < NDateTime.TOTAL_HEIGHT) {
 					// cannot show in top and in current document
