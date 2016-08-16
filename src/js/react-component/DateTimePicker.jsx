@@ -107,32 +107,60 @@
 			}
 			return <span className={$pt.LayoutHelper.classSet(css)} onClick={options.click}/>;
 		},
+		renderInputArea: function() {
+			if (this.isMobile()) {
+				var inputType = 'date';
+				if (this.hasDay()) {
+					if (this.hasTimeToDisplay()) {
+						inputType = 'datetime-local';
+					}
+				} else if (this.hasMonth()) {
+					inputType = 'month';
+				} else if (this.hasYear()) {
+					// no type matched, down to plain text input
+					inputType = 'text';
+				} else if (this.hasTimeToDisplay()) {
+					inputType = 'time';
+				}
+				return (<div className='mobile-date-time' ref='comp'>
+					<input type={inputType} 
+						   className='form-control'
+						   onChange={this.onTextInputChange}
+						   onFocus={this.onTextInputFocused}
+						   onBlur={this.onTextInputBlurred}
+						   ref='text' />
+				</div>);
+			} else {
+				// desktop
+				var css = {
+					'input-group-addon': true,
+					link: true,
+					disabled: !this.isEnabled()
+				};
+				return (<div className='input-group' ref='comp'>
+					<input type='text'
+						   className='form-control'
+						   disabled={!this.isEnabled()}
+						   onChange={this.onTextInputChange}
+						   onFocus={this.onTextInputFocused}
+						   onBlur={this.onTextInputBlurred}
+						   ref='text'/>
+					<span className={$pt.LayoutHelper.classSet(css)}>
+						{this.renderIcon({icon: this.getIcon('calendar'), click: this.onCalendarButtonClicked})}
+					</span>
+				</div>)
+			}
+		},
 		render: function() {
 			if (this.isViewMode()) {
 				return this.renderInViewMode();
 			}
-			var css = {
-				'input-group-addon': true,
-				link: true,
-				disabled: !this.isEnabled()
-			};
 			var divCSS = {
 				'n-datetime': true,
 				'n-disabled': !this.isEnabled()
 			};
 			return (<div className={$pt.LayoutHelper.classSet(divCSS)}>
-				<div className='input-group' ref='comp'>
-					<input type='text'
-					       className='form-control'
-					       disabled={!this.isEnabled()}
-						   onChange={this.onTextInputChange}
-					       onFocus={this.onTextInputFocused}
-					       onBlur={this.onTextInputBlurred}
-						   ref='text'/>
-	                <span className={$pt.LayoutHelper.classSet(css)}>
-	                    {this.renderIcon({icon: this.getIcon('calendar'), click: this.onCalendarButtonClicked})}
-	                </span>
-				</div>
+				{this.renderInputArea()}
 				{this.renderNormalLine()}
 				{this.renderFocusLine()}
 			</div>);
@@ -797,6 +825,9 @@
 		 * @returns {boolean}
 		 */
 		hasTimeToDisplay: function(type) {
+			if (typeof type === 'undefined') {
+				type = this.guessDisplayFormatType();
+			}
 			return (type &
 				(NDateTime.FORMAT_TYPES.HOUR | NDateTime.FORMAT_TYPES.MINUTE |
 					NDateTime.FORMAT_TYPES.SECOND | NDateTime.FORMAT_TYPES.MILLSECOND)) != 0;
@@ -806,6 +837,9 @@
 		 * @returns {boolean}
 		 */
 		hasDateToDisplay: function(type) {
+			if (typeof type === 'undefined') {
+				type = this.guessDisplayFormatType();
+			}
 			return (type & NDateTime.FORMAT_TYPES.YMD) != 0;
 		},
 		/**
@@ -1017,7 +1051,9 @@
 			if (text.length == 0 || text.isBlank())  {
 				this.setValueToModel(null);
 			} else {
-				var date = this.convertValueFromString(text, this.getDisplayFormat(), true);
+				var date = this.convertValueFromString(text, 
+									this.getDisplayFormat(), 
+									this.isMobile() ? false : true);
 				if (date == null && text.length != 0) {
 					// TODO invalid date, do nothing now. donot know how to deal with it...
 				} else {
@@ -1065,7 +1101,25 @@
 			this.getModel().set(this.getDataId(), formattedValue);
 		},
 		setValueToTextInput: function(value) {
-			this.getTextInput().val(this.convertValueToString(value, this.getPrimaryDisplayFormat()));
+			if (this.isMobile()) {
+				var input = this.getTextInput();
+				var type = input.prop('type');
+				if (value == null) {
+					input.val(null);
+				} else if (type === 'date') {
+					input.val(this.convertValueToString(value, 'YYYY-MM-DD'));
+				} else if (type === 'time') {
+					input.val(this.convertValueToString(value, 'HH:mm'));
+				} else if (type === 'datetime-local') {
+					input.val(this.convertValueToString(value, 'YYYY-MM-DDTHH:mm'));
+				} else if (type === 'text') {
+					input.val(this.convertValueToString(value, 'YYYY'));
+				} else if (type === 'month') {
+					input.val(this.convertValueToString(value, 'YYYY-MM'));
+				}
+			} else {
+				this.getTextInput().val(this.convertValueToString(value, this.getPrimaryDisplayFormat()));
+			}
 		},
 		/**
 		 * convert value from string
@@ -1172,6 +1226,18 @@
 			}
 			return hourRadius;
 		},
+		hasYear: function() {
+			return (this.guessDisplayFormatType() & NDateTime.FORMAT_TYPES.YEAR) != 0;
+		},
+		hasMonth: function() {
+			return (this.guessDisplayFormatType() & NDateTime.FORMAT_TYPES.MONTH) != 0;
+		},
+		hasDay: function() {
+			return (this.guessDisplayFormatType() & NDateTime.FORMAT_TYPES.DAY) != 0;
+		},
+		hasHour: function() {
+			return (this.guessDisplayFormatType() & NDateTime.FORMAT_TYPES.HOUR) != 0;
+		},
 		hasMinute: function() {
 			return (this.guessDisplayFormatType() & NDateTime.FORMAT_TYPES.MINUTE) != 0;
 		},
@@ -1201,6 +1267,9 @@
 				today = defaultTime.call(this, today);
 			}
 			return today;
+		},
+		isMobile: function() {
+			return $pt.browser.mobile === true;
 		}
 	}));
 

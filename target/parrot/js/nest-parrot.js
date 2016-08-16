@@ -1,4 +1,4 @@
-/** nest-parrot.V0.4.27 2016-08-15 */
+/** nest-parrot.V0.4.27 2016-08-16 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -554,30 +554,152 @@
 		}
 	};
 
+	/*!
+  * jQuery Browser Plugin 0.1.0
+  * https://github.com/gabceb/jquery-browser-plugin
+  *
+  * Original jquery-browser code Copyright 2005, 2015 jQuery Foundation, Inc. and other contributors
+  * http://jquery.org/license
+  *
+  * Modifications Copyright 2015 Gabriel Cebrian
+  * https://github.com/gabceb
+  *
+  * Released under the MIT license
+  *
+  * Date: 05-07-2015
+  */
+	/*global window: false */
 	(function () {
-		var matched,
-		    userAgent = navigator.userAgent || "";
+		"use strict";
 
-		// merge jquery.browser here
-		var uaMatch = function (ua) {
+		function uaMatch(ua) {
+			// If an UA is not provided, default to the current browser UA.
+			if (ua === undefined) {
+				ua = window.navigator.userAgent;
+			}
 			ua = ua.toLowerCase();
 
-			var match = /(chrome)[ \/]([\w.]+)/.exec(ua) || /(webkit)[ \/]([\w.]+)/.exec(ua) || /(opera)(?:.*version)?[ \/]([\w.]+)/.exec(ua) || /(msie) ([\w.]+)/.exec(ua) || ua.indexOf("compatible") < 0 && /(mozilla)(?:.*? rv:([\w.]+))?/.exec(ua) || [];
+			var match = /(edge)\/([\w.]+)/.exec(ua) || /(opr)[\/]([\w.]+)/.exec(ua) || /(chrome)[ \/]([\w.]+)/.exec(ua) || /(iemobile)[\/]([\w.]+)/.exec(ua) || /(version)(applewebkit)[ \/]([\w.]+).*(safari)[ \/]([\w.]+)/.exec(ua) || /(webkit)[ \/]([\w.]+).*(version)[ \/]([\w.]+).*(safari)[ \/]([\w.]+)/.exec(ua) || /(webkit)[ \/]([\w.]+)/.exec(ua) || /(opera)(?:.*version|)[ \/]([\w.]+)/.exec(ua) || /(msie) ([\w.]+)/.exec(ua) || ua.indexOf("trident") >= 0 && /(rv)(?::| )([\w.]+)/.exec(ua) || ua.indexOf("compatible") < 0 && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec(ua) || [];
 
-			return {
-				browser: match[1] || "",
-				version: match[2] || "0"
+			var platform_match = /(ipad)/.exec(ua) || /(ipod)/.exec(ua) || /(windows phone)/.exec(ua) || /(iphone)/.exec(ua) || /(kindle)/.exec(ua) || /(silk)/.exec(ua) || /(android)/.exec(ua) || /(win)/.exec(ua) || /(mac)/.exec(ua) || /(linux)/.exec(ua) || /(cros)/.exec(ua) || /(playbook)/.exec(ua) || /(bb)/.exec(ua) || /(blackberry)/.exec(ua) || [];
+
+			var browser = {},
+			    matched = {
+				browser: match[5] || match[3] || match[1] || "",
+				version: match[2] || match[4] || "0",
+				versionNumber: match[4] || match[2] || "0",
+				platform: platform_match[0] || ""
 			};
-		};
-		matched = uaMatch(userAgent);
-		$pt.browser = {};
-		if (matched.browser) {
-			$pt.browser[matched.browser] = true;
-			$pt.browser.version = matched.version;
+
+			if (matched.browser) {
+				browser[matched.browser] = true;
+				browser.version = matched.version;
+				browser.versionNumber = parseInt(matched.versionNumber, 10);
+			}
+
+			if (matched.platform) {
+				browser[matched.platform] = true;
+			}
+
+			// These are all considered mobile platforms, meaning they run a mobile browser
+			if (browser.android || browser.bb || browser.blackberry || browser.ipad || browser.iphone || browser.ipod || browser.kindle || browser.playbook || browser.silk || browser["windows phone"]) {
+				browser.mobile = true;
+			}
+
+			// These are all considered desktop platforms, meaning they run a desktop browser
+			if (browser.cros || browser.mac || browser.linux || browser.win) {
+				browser.desktop = true;
+			}
+
+			// Chrome, Opera 15+ and Safari are webkit based browsers
+			if (browser.chrome || browser.opr || browser.safari) {
+				browser.webkit = true;
+			}
+
+			// IE11 has a new token so we will assign it msie to avoid breaking changes
+			if (browser.rv || browser.iemobile) {
+				var ie = "msie";
+
+				matched.browser = ie;
+				browser[ie] = true;
+			}
+
+			// Edge is officially known as Microsoft Edge, so rewrite the key to match
+			if (browser.edge) {
+				delete browser.edge;
+				var msedge = "msedge";
+
+				matched.browser = msedge;
+				browser[msedge] = true;
+			}
+
+			// Blackberry browsers are marked as Safari on BlackBerry
+			if (browser.safari && browser.blackberry) {
+				var blackberry = "blackberry";
+
+				matched.browser = blackberry;
+				browser[blackberry] = true;
+			}
+
+			// Playbook browsers are marked as Safari on Playbook
+			if (browser.safari && browser.playbook) {
+				var playbook = "playbook";
+
+				matched.browser = playbook;
+				browser[playbook] = true;
+			}
+
+			// BB10 is a newer OS version of BlackBerry
+			if (browser.bb) {
+				var bb = "blackberry";
+
+				matched.browser = bb;
+				browser[bb] = true;
+			}
+
+			// Opera 15+ are identified as opr
+			if (browser.opr) {
+				var opera = "opera";
+
+				matched.browser = opera;
+				browser[opera] = true;
+			}
+
+			// Stock Android browsers are marked as Safari on Android.
+			if (browser.safari && browser.android) {
+				var android = "android";
+
+				matched.browser = android;
+				browser[android] = true;
+			}
+
+			// Kindle browsers are marked as Safari on Kindle
+			if (browser.safari && browser.kindle) {
+				var kindle = "kindle";
+
+				matched.browser = kindle;
+				browser[kindle] = true;
+			}
+
+			// Kindle Silk browsers are marked as Safari on Kindle
+			if (browser.safari && browser.silk) {
+				var silk = "silk";
+
+				matched.browser = silk;
+				browser[silk] = true;
+			}
+
+			// Assign the name and platform variable
+			browser.name = matched.browser;
+			browser.platform = matched.platform;
+			return browser;
 		}
-		if ($pt.browser.webkit) {
-			$pt.browser.safari = true;
-		}
+
+		// Run the matching process, also assign the function to the returned object
+		// for manual, jQuery-free use if desired
+		window.jQBrowser = uaMatch(window.navigator.userAgent);
+		window.jQBrowser.uaMatch = uaMatch;
+		$pt.browser = window.jQBrowser;
 	})();
 
 	var _context = window;
@@ -6024,23 +6146,39 @@
 			}
 			return React.createElement('span', { className: $pt.LayoutHelper.classSet(css), onClick: options.click });
 		},
-		render: function () {
-			if (this.isViewMode()) {
-				return this.renderInViewMode();
-			}
-			var css = {
-				'input-group-addon': true,
-				link: true,
-				disabled: !this.isEnabled()
-			};
-			var divCSS = {
-				'n-datetime': true,
-				'n-disabled': !this.isEnabled()
-			};
-			return React.createElement(
-				'div',
-				{ className: $pt.LayoutHelper.classSet(divCSS) },
-				React.createElement(
+		renderInputArea: function () {
+			if (this.isMobile()) {
+				var inputType = 'date';
+				if (this.hasDay()) {
+					if (this.hasTimeToDisplay()) {
+						inputType = 'datetime-local';
+					}
+				} else if (this.hasMonth()) {
+					inputType = 'month';
+				} else if (this.hasYear()) {
+					// no type matched, down to plain text input
+					inputType = 'text';
+				} else if (this.hasTimeToDisplay()) {
+					inputType = 'time';
+				}
+				return React.createElement(
+					'div',
+					{ className: 'mobile-date-time', ref: 'comp' },
+					React.createElement('input', { type: inputType,
+						className: 'form-control',
+						onChange: this.onTextInputChange,
+						onFocus: this.onTextInputFocused,
+						onBlur: this.onTextInputBlurred,
+						ref: 'text' })
+				);
+			} else {
+				// desktop
+				var css = {
+					'input-group-addon': true,
+					link: true,
+					disabled: !this.isEnabled()
+				};
+				return React.createElement(
 					'div',
 					{ className: 'input-group', ref: 'comp' },
 					React.createElement('input', { type: 'text',
@@ -6055,7 +6193,21 @@
 						{ className: $pt.LayoutHelper.classSet(css) },
 						this.renderIcon({ icon: this.getIcon('calendar'), click: this.onCalendarButtonClicked })
 					)
-				),
+				);
+			}
+		},
+		render: function () {
+			if (this.isViewMode()) {
+				return this.renderInViewMode();
+			}
+			var divCSS = {
+				'n-datetime': true,
+				'n-disabled': !this.isEnabled()
+			};
+			return React.createElement(
+				'div',
+				{ className: $pt.LayoutHelper.classSet(divCSS) },
+				this.renderInputArea(),
 				this.renderNormalLine(),
 				this.renderFocusLine()
 			);
@@ -6821,6 +6973,9 @@
    * @returns {boolean}
    */
 		hasTimeToDisplay: function (type) {
+			if (typeof type === 'undefined') {
+				type = this.guessDisplayFormatType();
+			}
 			return (type & (NDateTime.FORMAT_TYPES.HOUR | NDateTime.FORMAT_TYPES.MINUTE | NDateTime.FORMAT_TYPES.SECOND | NDateTime.FORMAT_TYPES.MILLSECOND)) != 0;
 		},
 		/**
@@ -6828,6 +6983,9 @@
    * @returns {boolean}
    */
 		hasDateToDisplay: function (type) {
+			if (typeof type === 'undefined') {
+				type = this.guessDisplayFormatType();
+			}
 			return (type & NDateTime.FORMAT_TYPES.YMD) != 0;
 		},
 		/**
@@ -7034,7 +7192,7 @@
 			if (text.length == 0 || text.isBlank()) {
 				this.setValueToModel(null);
 			} else {
-				var date = this.convertValueFromString(text, this.getDisplayFormat(), true);
+				var date = this.convertValueFromString(text, this.getDisplayFormat(), this.isMobile() ? false : true);
 				if (date == null && text.length != 0) {
 					// TODO invalid date, do nothing now. donot know how to deal with it...
 				} else {
@@ -7081,7 +7239,25 @@
 			this.getModel().set(this.getDataId(), formattedValue);
 		},
 		setValueToTextInput: function (value) {
-			this.getTextInput().val(this.convertValueToString(value, this.getPrimaryDisplayFormat()));
+			if (this.isMobile()) {
+				var input = this.getTextInput();
+				var type = input.prop('type');
+				if (value == null) {
+					input.val(null);
+				} else if (type === 'date') {
+					input.val(this.convertValueToString(value, 'YYYY-MM-DD'));
+				} else if (type === 'time') {
+					input.val(this.convertValueToString(value, 'HH:mm'));
+				} else if (type === 'datetime-local') {
+					input.val(this.convertValueToString(value, 'YYYY-MM-DDTHH:mm'));
+				} else if (type === 'text') {
+					input.val(this.convertValueToString(value, 'YYYY'));
+				} else if (type === 'month') {
+					input.val(this.convertValueToString(value, 'YYYY-MM'));
+				}
+			} else {
+				this.getTextInput().val(this.convertValueToString(value, this.getPrimaryDisplayFormat()));
+			}
 		},
 		/**
    * convert value from string
@@ -7188,6 +7364,18 @@
 			}
 			return hourRadius;
 		},
+		hasYear: function () {
+			return (this.guessDisplayFormatType() & NDateTime.FORMAT_TYPES.YEAR) != 0;
+		},
+		hasMonth: function () {
+			return (this.guessDisplayFormatType() & NDateTime.FORMAT_TYPES.MONTH) != 0;
+		},
+		hasDay: function () {
+			return (this.guessDisplayFormatType() & NDateTime.FORMAT_TYPES.DAY) != 0;
+		},
+		hasHour: function () {
+			return (this.guessDisplayFormatType() & NDateTime.FORMAT_TYPES.HOUR) != 0;
+		},
 		hasMinute: function () {
 			return (this.guessDisplayFormatType() & NDateTime.FORMAT_TYPES.MINUTE) != 0;
 		},
@@ -7217,6 +7405,9 @@
 				today = defaultTime.call(this, today);
 			}
 			return today;
+		},
+		isMobile: function () {
+			return $pt.browser.mobile === true;
 		}
 	}));
 
@@ -16207,7 +16398,16 @@
 						if (typeof data === 'string') {
 							data = JSON.parse(data);
 						}
-						_this.exposeDownloading(data);
+						if (NTable.PAGE_JUMPING_PROXY_CALLBACK) {
+							data = NTable.PAGE_JUMPING_PROXY_CALLBACK.call(_this, data, _this.getDataId());
+						}
+						var rows = null;
+						if (data && data[_this.getDataId()]) {
+							rows = data[_this.getDataId()];
+						} else {
+							rows = [];
+						}
+						_this.exposeDownloading(rows);
 					});
 				}
 				// todo how to handle failure?

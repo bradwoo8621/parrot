@@ -1511,6 +1511,13 @@ div.n-select .form-control.no-clear .clear {
 div.n-select .form-control.no-clear .drop {
   left: auto;
 }
+div.n-select .form-control select {
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  width: 100%;
+  line-height: 30px;
+  font-size: 13px;
+}
 div.n-select:focus hr.focus-line {
   transform: scaleX(1);
   -o-transform: scaleX(1);

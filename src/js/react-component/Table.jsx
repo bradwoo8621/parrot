@@ -1863,7 +1863,16 @@
 						if (typeof data === 'string') {
 							data = JSON.parse(data);
 						}
-						_this.exposeDownloading(data);
+						if (NTable.PAGE_JUMPING_PROXY_CALLBACK) {
+							data = NTable.PAGE_JUMPING_PROXY_CALLBACK.call(_this, data, _this.getDataId());
+						}
+						var rows = null;
+						if (data && data[_this.getDataId()]) {
+							rows = data[_this.getDataId()];
+						} else {
+							rows = [];
+						}
+						_this.exposeDownloading(rows);
 					});
 				}
 				// todo how to handle failure?
