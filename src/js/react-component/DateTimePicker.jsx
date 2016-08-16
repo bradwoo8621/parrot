@@ -1051,8 +1051,27 @@
 			if (text.length == 0 || text.isBlank())  {
 				this.setValueToModel(null);
 			} else {
+				var format = null;
+				if (this.isMobile()) {
+					var type = this.getTextInput().prop('type');
+					if (type === 'date') {
+						format = 'YYYY-MM-DD';
+					} else if (type === 'time') {
+						format = 'HH:mm';
+					} else if (type === 'datetime-local') {
+						format = 'YYYY-MM-DDTHH:mm';
+					} else if (type === 'text') {
+						format = 'YYYY';
+					} else if (type === 'month') {
+						format = 'YYYY-MM';
+					} else {
+						throw 'Type [' + type + '] not supported.';
+					}
+				} else {
+					format = this.getDisplayFormat();
+				}
 				var date = this.convertValueFromString(text, 
-									this.getDisplayFormat(), 
+									format, 
 									this.isMobile() ? false : true);
 				if (date == null && text.length != 0) {
 					// TODO invalid date, do nothing now. donot know how to deal with it...
@@ -1103,6 +1122,9 @@
 		setValueToTextInput: function(value) {
 			if (this.isMobile()) {
 				var input = this.getTextInput();
+				if (input.length === 0) {
+					return;
+				}
 				var type = input.prop('type');
 				if (value == null) {
 					input.val(null);
@@ -1116,6 +1138,8 @@
 					input.val(this.convertValueToString(value, 'YYYY'));
 				} else if (type === 'month') {
 					input.val(this.convertValueToString(value, 'YYYY-MM'));
+				} else {
+					throw 'Type [' + type + '] not supported.';
 				}
 			} else {
 				this.getTextInput().val(this.convertValueToString(value, this.getPrimaryDisplayFormat()));
