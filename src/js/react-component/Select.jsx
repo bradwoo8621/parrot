@@ -122,7 +122,7 @@
 			return (<span className='fa fa-fw fa-close clear'
 						  onClick={this.onClearClick} />);
 		},
-		renderText: function() {
+		getCurrentDisplayText: function() {
 			var value = this.getValueFromModel();
 			var itemText = null;
 			if (this.hasParent() && this.isOnLoadingWhenHasParent() && value != null) {
@@ -140,6 +140,9 @@
 			if (itemText == null) {
 				itemText = this.state.onloading ? $pt.Components.NCodeTableWrapper.ON_LOADING : (this.isViewMode() ? '' : this.getPlaceholder());
 			}
+			return itemText;
+		},
+		renderText: function() {
 			var css = {
 				'input-group': true,
 				'form-control': true,
@@ -147,7 +150,7 @@
 			}
 			return (<div className={$pt.LayoutHelper.classSet(css)}
 						 onClick={this.onComponentClicked}>
-				<span className='text'>{itemText}</span>
+				<span className='text'>{this.getCurrentDisplayText()}</span>
 				{this.renderClear()}
 				<span className='fa fa-fw fa-sort-down drop' />
 			</div>);
@@ -166,6 +169,7 @@
 						 tabIndex='0'
 						 onKeyUp={this.onComponentKeyUp}
 						 aria-readonly='true' 
+						 readOnly='true'
 						 ref='comp'>
 				{this.renderText()}
 				{this.renderNormalLine()}

@@ -1,4 +1,4 @@
-/** nest-parrot.V0.4.27 2016-08-16 */
+/** nest-parrot.V0.4.27 2016-08-17 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -4168,6 +4168,9 @@
 			}
 			return visible;
 		},
+		isMobile: function () {
+			return $pt.browser.mobile !== true;
+		},
 		/**
    * is required
    * @returns {boolean}
@@ -6147,54 +6150,28 @@
 			return React.createElement('span', { className: $pt.LayoutHelper.classSet(css), onClick: options.click });
 		},
 		renderInputArea: function () {
-			if (this.isMobile()) {
-				var inputType = 'date';
-				if (this.hasDay()) {
-					if (this.hasTimeToDisplay()) {
-						inputType = 'datetime-local';
-					}
-				} else if (this.hasMonth()) {
-					inputType = 'month';
-				} else if (this.hasYear()) {
-					// no type matched, down to plain text input
-					inputType = 'text';
-				} else if (this.hasTimeToDisplay()) {
-					inputType = 'time';
-				}
-				return React.createElement(
-					'div',
-					{ className: 'mobile-date-time', ref: 'comp' },
-					React.createElement('input', { type: inputType,
-						className: 'form-control',
-						onChange: this.onTextInputChange,
-						onFocus: this.onTextInputFocused,
-						onBlur: this.onTextInputBlurred,
-						ref: 'text' })
-				);
-			} else {
-				// desktop
-				var css = {
-					'input-group-addon': true,
-					link: true,
-					disabled: !this.isEnabled()
-				};
-				return React.createElement(
-					'div',
-					{ className: 'input-group', ref: 'comp' },
-					React.createElement('input', { type: 'text',
-						className: 'form-control',
-						disabled: !this.isEnabled(),
-						onChange: this.onTextInputChange,
-						onFocus: this.onTextInputFocused,
-						onBlur: this.onTextInputBlurred,
-						ref: 'text' }),
-					React.createElement(
-						'span',
-						{ className: $pt.LayoutHelper.classSet(css) },
-						this.renderIcon({ icon: this.getIcon('calendar'), click: this.onCalendarButtonClicked })
-					)
-				);
-			}
+			// desktop
+			var css = {
+				'input-group-addon': true,
+				link: true,
+				disabled: !this.isEnabled()
+			};
+			return React.createElement(
+				'div',
+				{ className: 'input-group', ref: 'comp' },
+				React.createElement('input', { type: 'text',
+					className: 'form-control',
+					disabled: !this.isEnabled(),
+					onChange: this.onTextInputChange,
+					onFocus: this.onTextInputFocused,
+					onBlur: this.onTextInputBlurred,
+					ref: 'text' }),
+				React.createElement(
+					'span',
+					{ className: $pt.LayoutHelper.classSet(css) },
+					this.renderIcon({ icon: this.getIcon('calendar'), click: this.onCalendarButtonClicked })
+				)
+			);
 		},
 		render: function () {
 			if (this.isViewMode()) {
@@ -7192,26 +7169,7 @@
 			if (text.length == 0 || text.isBlank()) {
 				this.setValueToModel(null);
 			} else {
-				var format = null;
-				if (this.isMobile()) {
-					var type = this.getTextInput().prop('type');
-					if (type === 'date') {
-						format = 'YYYY-MM-DD';
-					} else if (type === 'time') {
-						format = 'HH:mm';
-					} else if (type === 'datetime-local') {
-						format = 'YYYY-MM-DDTHH:mm';
-					} else if (type === 'text') {
-						format = 'YYYY';
-					} else if (type === 'month') {
-						format = 'YYYY-MM';
-					} else {
-						throw 'Type [' + type + '] not supported.';
-					}
-				} else {
-					format = this.getDisplayFormat();
-				}
-				var date = this.convertValueFromString(text, format, this.isMobile() ? false : true);
+				var date = this.convertValueFromString(text, this.getDisplayFormat(), true);
 				if (date == null && text.length != 0) {
 					// TODO invalid date, do nothing now. donot know how to deal with it...
 				} else {
@@ -7258,30 +7216,7 @@
 			this.getModel().set(this.getDataId(), formattedValue);
 		},
 		setValueToTextInput: function (value) {
-			if (this.isMobile()) {
-				var input = this.getTextInput();
-				if (input.length === 0) {
-					return;
-				}
-				var type = input.prop('type');
-				if (value == null) {
-					input.val(null);
-				} else if (type === 'date') {
-					input.val(this.convertValueToString(value, 'YYYY-MM-DD'));
-				} else if (type === 'time') {
-					input.val(this.convertValueToString(value, 'HH:mm'));
-				} else if (type === 'datetime-local') {
-					input.val(this.convertValueToString(value, 'YYYY-MM-DDTHH:mm'));
-				} else if (type === 'text') {
-					input.val(this.convertValueToString(value, 'YYYY'));
-				} else if (type === 'month') {
-					input.val(this.convertValueToString(value, 'YYYY-MM'));
-				} else {
-					throw 'Type [' + type + '] not supported.';
-				}
-			} else {
-				this.getTextInput().val(this.convertValueToString(value, this.getPrimaryDisplayFormat()));
-			}
+			this.getTextInput().val(this.convertValueToString(value, this.getPrimaryDisplayFormat()));
 		},
 		/**
    * convert value from string
@@ -7429,9 +7364,6 @@
 				today = defaultTime.call(this, today);
 			}
 			return today;
-		},
-		isMobile: function () {
-			return $pt.browser.mobile === true;
 		}
 	}));
 
@@ -12719,7 +12651,7 @@
 			return React.createElement('span', { className: 'fa fa-fw fa-close clear',
 				onClick: this.onClearClick });
 		},
-		renderText: function () {
+		getCurrentDisplayText: function () {
 			var value = this.getValueFromModel();
 			var itemText = null;
 			if (this.hasParent() && this.isOnLoadingWhenHasParent() && value != null) {
@@ -12737,6 +12669,9 @@
 			if (itemText == null) {
 				itemText = this.state.onloading ? $pt.Components.NCodeTableWrapper.ON_LOADING : this.isViewMode() ? '' : this.getPlaceholder();
 			}
+			return itemText;
+		},
+		renderText: function () {
 			var css = {
 				'input-group': true,
 				'form-control': true,
@@ -12749,7 +12684,7 @@
 				React.createElement(
 					'span',
 					{ className: 'text' },
-					itemText
+					this.getCurrentDisplayText()
 				),
 				this.renderClear(),
 				React.createElement('span', { className: 'fa fa-fw fa-sort-down drop' })
@@ -12771,6 +12706,7 @@
 					tabIndex: '0',
 					onKeyUp: this.onComponentKeyUp,
 					'aria-readonly': 'true',
+					readOnly: 'true',
 					ref: 'comp' },
 				this.renderText(),
 				this.renderNormalLine(),

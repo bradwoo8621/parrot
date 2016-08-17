@@ -1551,6 +1551,12 @@ div.n-select.n-view-mode hr.focus-line,
 div.n-select.n-view-mode hr.normal-line {
   display: none;
 }
+div.n-select select.form-control {
+  font-size: 13px;
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+}
 .n-select-popover.popover.top,
 .n-select-popover.popover.bottom {
   margin-top: 2px;
