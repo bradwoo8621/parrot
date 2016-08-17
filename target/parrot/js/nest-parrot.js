@@ -11375,7 +11375,8 @@
 		renderHeading: function () {
 			var label = this.getTitle();
 			var css = {
-				'panel-title': true
+				'panel-title': true,
+				'panel-expanded': this.state.expanded
 			};
 			if (this.isCollapsible()) {
 				css['n-collapsible-title-check'] = this.hasCheckInTitle();
