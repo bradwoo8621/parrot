@@ -114,13 +114,17 @@
 				link: true,
 				disabled: !this.isEnabled()
 			};
-			return (<div className='input-group' ref='comp'>
+			return (<div className='input-group' 
+						 onClick={this.onCalendarButtonClicked}
+						 ref='comp'>
 				<input type='text'
 					   className='form-control'
 					   disabled={!this.isEnabled()}
 					   onChange={this.onTextInputChange}
 					   onFocus={this.onTextInputFocused}
 					   onBlur={this.onTextInputBlurred}
+					   aria-readonly={this.isMobile() ? true : false}
+					   readOnly={this.isMobile() ? true : false}
 					   ref='text'/>
 				<span className={$pt.LayoutHelper.classSet(css)}>
 					{this.renderIcon({icon: this.getIcon('calendar'), click: this.onCalendarButtonClicked})}
@@ -733,6 +737,7 @@
 				}
 			}
 
+			delete styles.width;	// width is not necessary since there is min-width and max-width in css
 			var popover = (<div role="tooltip" className={$pt.LayoutHelper.classSet(popoverCSS)} style={styles}>
 				<div className="arrow"></div>
 				{this.renderPopoverContent(options.date, options.type)}

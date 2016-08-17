@@ -4169,7 +4169,7 @@
 			return visible;
 		},
 		isMobile: function () {
-			return $pt.browser.mobile !== true;
+			return $pt.browser.mobile === true;
 		},
 		/**
    * is required
@@ -6158,13 +6158,17 @@
 			};
 			return React.createElement(
 				'div',
-				{ className: 'input-group', ref: 'comp' },
+				{ className: 'input-group',
+					onClick: this.onCalendarButtonClicked,
+					ref: 'comp' },
 				React.createElement('input', { type: 'text',
 					className: 'form-control',
 					disabled: !this.isEnabled(),
 					onChange: this.onTextInputChange,
 					onFocus: this.onTextInputFocused,
 					onBlur: this.onTextInputBlurred,
+					'aria-readonly': this.isMobile() ? true : false,
+					readOnly: this.isMobile() ? true : false,
 					ref: 'text' }),
 				React.createElement(
 					'span',
@@ -6884,6 +6888,7 @@
 					}
 			}
 
+			delete styles.width; // width is not necessary since there is min-width and max-width in css
 			var popover = React.createElement(
 				'div',
 				{ role: 'tooltip', className: $pt.LayoutHelper.classSet(popoverCSS), style: styles },
@@ -13568,7 +13573,10 @@
 			css[this.getComponentCSS('n-select-tree')] = true;
 			return React.createElement(
 				"div",
-				{ className: $pt.LayoutHelper.classSet(css), tabIndex: "0" },
+				{ className: $pt.LayoutHelper.classSet(css),
+					"aria-readonly": "true",
+					readOnly: "true",
+					tabIndex: "0" },
 				this.renderText(),
 				this.renderNormalLine(),
 				this.renderFocusLine()

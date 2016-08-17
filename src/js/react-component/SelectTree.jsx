@@ -239,7 +239,10 @@
 				'n-view-mode': this.isViewMode()
 			};
 			css[this.getComponentCSS('n-select-tree')] = true;
-			return (<div className={$pt.LayoutHelper.classSet(css)} tabIndex='0'>
+			return (<div className={$pt.LayoutHelper.classSet(css)} 
+						 aria-readonly='true' 
+						 readOnly='true'
+						 tabIndex='0'>
 				{this.renderText()}
 				{this.renderNormalLine()}
 				{this.renderFocusLine()}

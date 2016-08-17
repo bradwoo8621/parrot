@@ -1392,7 +1392,7 @@
 			return visible;
 		},
 		isMobile: function() {
-			return $pt.browser.mobile !== true;
+			return $pt.browser.mobile === true;
 		},
 		/**
 		 * is required
