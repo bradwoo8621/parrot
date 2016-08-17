@@ -1044,28 +1044,16 @@ div.n-panel-footer div.btn-toolbar {
   border-top: 0;
   background-color: transparent;
 }
-div.n-panel-footer div.btn-toolbar.n-panel-footer-left {
-  display: inline-block;
-}
-div.n-panel-footer div.btn-toolbar.n-panel-footer-left > div.n-button,
-div.n-panel-footer div.btn-toolbar.n-panel-footer-left > div.n-form-cell {
+div.n-panel-footer div.btn-toolbar > div.n-button.on-left {
   float: left;
 }
-div.n-panel-footer div.btn-toolbar.n-panel-footer-left > div.n-button:not(:first-child),
-div.n-panel-footer div.btn-toolbar.n-panel-footer-left > div.n-form-cell:not(:first-child) {
+div.n-panel-footer div.btn-toolbar > div.n-button.on-left:not(:first-child) {
   margin-left: 5px;
 }
-div.n-panel-footer div.btn-toolbar.n-panel-footer-right {
-  float: right;
-  display: inline-block;
-  margin-bottom: 0;
-}
-div.n-panel-footer div.btn-toolbar.n-panel-footer-right > div.n-button,
-div.n-panel-footer div.btn-toolbar.n-panel-footer-right > div.n-form-cell {
+div.n-panel-footer div.btn-toolbar > div.n-button.on-right {
   float: right;
 }
-div.n-panel-footer div.btn-toolbar.n-panel-footer-right > div.n-button:not(:last-child),
-div.n-panel-footer div.btn-toolbar.n-panel-footer-right > div.n-form-cell:not(:last-child) {
+div.n-panel-footer div.btn-toolbar > div.n-button.on-right:not(:last-child) {
   margin-left: 5px;
 }
 div.n-array-tab > div.n-array-tab-content {

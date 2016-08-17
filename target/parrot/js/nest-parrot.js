@@ -11747,9 +11747,11 @@
 		renderLeftButtons: function () {
 			if (this.props.left) {
 				if (Array.isArray(this.props.left)) {
-					return this.props.left.map(this.renderButton);
+					return this.props.left.map(function (button, buttonIndex) {
+						return this.renderButton(button, buttonIndex, true);
+					}.bind(this));
 				} else {
-					return this.renderButton(this.props.left);
+					return this.renderButton(this.props.left, 'left', true);
 				}
 			} else {
 				return null;
@@ -11761,9 +11763,11 @@
 		renderRightButtons: function () {
 			if (this.props.right) {
 				if (Array.isArray(this.props.right)) {
-					return this.props.right.map(this.renderButton);
+					return this.props.right.map(function (button, buttonIndex) {
+						return this.renderButton(button, buttonIndex, false);
+					}.bind(this));
 				} else {
-					return this.renderButton(this.props.right);
+					return this.renderButton(this.props.right, 'right', false);
 				}
 			} else {
 				return null;
@@ -11772,7 +11776,7 @@
 		/**
    * render button
    */
-		renderButton: function (option, buttonIndex) {
+		renderButton: function (option, buttonIndex, onLeft) {
 			if (this.isViewMode() && option.view == 'edit') {
 				return null;
 			} else if (!this.isViewMode() && option.view == 'view') {
@@ -11780,22 +11784,22 @@
 			}
 			var layout = $.extend(true, {
 				label: option.text,
-				comp: { type: $pt.ComponentConstants.Button }
+				comp: { type: $pt.ComponentConstants.Button },
+				css: { comp: onLeft ? 'on-left' : 'on-right' }
 			}, {
-				comp: option,
-				pos: { width: 999 }
+				comp: option
 			});
 			delete layout.comp.label;
 			var model = this.getModel();
-			if (model) {
-				return React.createElement($pt.Components.NFormCell, { model: this.getModel(),
-					layout: $pt.createCellLayout('pseudo-button', layout),
-					key: buttonIndex });
-			} else {
-				return React.createElement($pt.Components.NFormButton, { model: this.getModel(),
-					layout: $pt.createCellLayout('pseudo-button', layout),
-					key: buttonIndex });
-			}
+			// if (model) {
+			// 	return <$pt.Components.NFormCell model={this.getModel()}
+			// 									   layout={$pt.createCellLayout('pseudo-button', layout)}
+			// 									   key={buttonIndex}/>;
+			// } else {
+			return React.createElement($pt.Components.NFormButton, { model: this.getModel(),
+				layout: $pt.createCellLayout('pseudo-button', layout),
+				key: buttonIndex });
+			// }
 		},
 		/**
    * render
@@ -11810,7 +11814,7 @@
 					{ className: "col-sm-12 col-md-12 col-lg-12" },
 					React.createElement(
 						"div",
-						{ className: "btn-toolbar n-panel-footer-left", role: "toolbar" },
+						{ className: "btn-toolbar", role: "toolbar" },
 						this.props.reset ? this.renderButton({
 							icon: NPanelFooter.RESET_ICON,
 							text: NPanelFooter.RESET_TEXT,
@@ -11818,7 +11822,7 @@
 							click: this.props.reset.click ? this.props.reset.click : this.props.reset,
 							enabled: this.props.reset.enabled ? this.props.reset.enabled : true,
 							visible: this.props.reset.visible ? this.props.reset.visible : true
-						}) : null,
+						}, 'reset', true) : null,
 						this.props.validate ? this.renderButton({
 							icon: NPanelFooter.VALIDATE_ICON,
 							text: NPanelFooter.VALIDATE_TEXT,
@@ -11826,12 +11830,8 @@
 							click: this.props.validate.click ? this.props.validate.click : this.props.validate,
 							enabled: this.props.validate.enabled ? this.props.validate.enabled : true,
 							visible: this.props.validate.visible ? this.props.validate.visible : true
-						}) : null,
-						this.renderLeftButtons()
-					),
-					React.createElement(
-						"div",
-						{ className: "btn-toolbar n-panel-footer-right", role: "toolbar" },
+						}, 'validate', true) : null,
+						this.renderLeftButtons(),
 						this.props.cancel ? this.renderButton({
 							icon: NPanelFooter.CANCEL_ICON,
 							text: NPanelFooter.CANCEL_TEXT,
@@ -11839,7 +11839,7 @@
 							click: this.props.cancel.click ? this.props.cancel.click : this.props.cancel,
 							enabled: this.props.cancel.enabled ? this.props.cancel.enabled : true,
 							visible: this.props.cancel.visible ? this.props.cancel.visible : true
-						}) : null,
+						}, 'cancel', false) : null,
 						this.props.save ? this.renderButton({
 							icon: NPanelFooter.SAVE_ICON,
 							text: NPanelFooter.SAVE_TEXT,
@@ -11847,7 +11847,7 @@
 							click: this.props.save.click ? this.props.save.click : this.props.save,
 							enabled: this.props.save.enabled ? this.props.save.enabled : true,
 							visible: this.props.save.visible ? this.props.save.visible : true
-						}) : null,
+						}, 'save', false) : null,
 						this.renderRightButtons()
 					)
 				)

@@ -7,28 +7,48 @@ div.n-panel-footer {
 			padding: 0;
 			border-top: 0;
 			background-color: transparent;
-			&.n-panel-footer-left {
-				display: inline-block;
-				> div.n-button,
-				> div.n-form-cell {
+			> div.n-button {
+				&.on-left {
 					float: left;
 					&:not(:first-child) {
 						margin-left: 5px;
 					}
 				}
-			}
-			&.n-panel-footer-right {
-				float: right;
-				display: inline-block;
-				margin-bottom: 0;
-				> div.n-button,
-				> div.n-form-cell {
+				&.on-right {
 					float: right;
 					&:not(:last-child) {
 						margin-left: 5px;
 					}
 				}
 			}
+			// &.n-panel-footer-left {
+			// 	display: inline-block;
+			// 	&:empty {
+			// 		display: none;
+			// 	}
+			// 	> div.n-button,
+			// 	> div.n-form-cell {
+			// 		float: left;
+			// 		&:not(:first-child) {
+			// 			margin-left: 5px;
+			// 		}
+			// 	}
+			// }
+			// &.n-panel-footer-right {
+			// 	float: right;
+			// 	display: inline-block;
+			// 	margin-bottom: 0;
+			// 	&:empty {
+			// 		display: none;
+			// 	}
+			// 	> div.n-button,
+			// 	> div.n-form-cell {
+			// 		float: right;
+			// 		&:not(:last-child) {
+			// 			margin-left: 5px;
+			// 		}
+			// 	}
+			// }
 			// > div.n-button {
 			// 	margin-left: 5px;
 			// }
