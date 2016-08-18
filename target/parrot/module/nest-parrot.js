@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.4.28 2016-08-17 */
+	/** nest-parrot.V0.4.28 2016-08-18 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -11406,8 +11406,7 @@
 		renderHeading: function () {
 			var label = this.getTitle();
 			var css = {
-				'panel-title': true,
-				'panel-expanded': this.state.expanded
+				'panel-title': true
 			};
 			if (this.isCollapsible()) {
 				css['n-collapsible-title-check'] = this.hasCheckInTitle();
@@ -11486,12 +11485,14 @@
 				);
 			}
 			var css = {
-				panel: true
+				panel: true,
+				'panel-collapsible': this.isCollapsible(),
+				'panel-expanded': this.isExpanded()
 			};
 			css['panel-' + this.getStyle()] = true;
 			css[this.getComponentCSS('n-panel')] = true;
 			var bodyStyle = {
-				display: this.isInitExpanded() ? 'block' : 'none'
+				display: this.isExpanded() ? 'block' : 'none'
 			};
 			return React.createElement(
 				'div',
@@ -11522,7 +11523,7 @@
    * is expanded
    * @returns {boolean}
    */
-		isInitExpanded: function () {
+		isExpanded: function () {
 			if (this.state.expanded == null) {
 				// first equals 'expanded' definition
 				this.state.expanded = this.getComponentOption('expanded');

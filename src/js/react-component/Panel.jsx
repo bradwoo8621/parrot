@@ -167,8 +167,7 @@
 		renderHeading: function () {
 			var label = this.getTitle();
 			var css = {
-				'panel-title': true,
-				'panel-expanded': this.state.expanded
+				'panel-title': true
 			};
 			if (this.isCollapsible()) {
 				css['n-collapsible-title-check'] = this.hasCheckInTitle();
@@ -223,12 +222,14 @@
 				</div>);
 			}
 			var css = {
-				panel: true
+				panel: true,
+				'panel-collapsible': this.isCollapsible(),
+				'panel-expanded': this.isExpanded()
 			};
 			css['panel-' + this.getStyle()] = true;
 			css[this.getComponentCSS('n-panel')] = true;
 			var bodyStyle = {
-				display: this.isInitExpanded() ? 'block' : 'none'
+				display: this.isExpanded() ? 'block' : 'none'
 			};
 			return (<div className={$pt.LayoutHelper.classSet(css)} ref='panel'>
 				{this.renderHeading()}
@@ -255,7 +256,7 @@
 		 * is expanded
 		 * @returns {boolean}
 		 */
-		isInitExpanded: function () {
+		isExpanded: function () {
 			if (this.state.expanded == null) {
 				// first equals 'expanded' definition
 				this.state.expanded = this.getComponentOption('expanded');
