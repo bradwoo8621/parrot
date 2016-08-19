@@ -13444,7 +13444,8 @@
 	var NSelectTree = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelectTree',
 		statics: {
-			PLACEHOLDER: "Please Select..."
+			PLACEHOLDER: "Please Select...",
+			CLOSE_TEXT: 'Close'
 		},
 		propTypes: {
 			// model
@@ -13548,9 +13549,9 @@
 		},
 		renderSelectionItem: function (codeItem, nodeId) {
 			return React.createElement(
-				"li",
+				'li',
 				{ key: nodeId },
-				React.createElement("span", { className: "fa fa-fw fa-remove", onClick: this.onSelectionItemRemove.bind(this, nodeId) }),
+				React.createElement('span', { className: 'fa fa-fw fa-remove', onClick: this.onSelectionItemRemove.bind(this, nodeId) }),
 				codeItem.text
 			);
 		},
@@ -13648,8 +13649,8 @@
 				if (this.isOnLoading() && !this.state.mounted) {
 					this.state.onloading = true;
 					return React.createElement(
-						"span",
-						{ className: "text" },
+						'span',
+						{ className: 'text' },
 						$pt.Components.NCodeTableWrapper.ON_LOADING
 					);
 				} else {
@@ -13657,28 +13658,28 @@
 					var value = this.getValueFromModel();
 					if (value == null || Array.isArray(value) && value.length == 0 || typeof value === 'object' && Object.keys(value).length == 0) {
 						if (this.isViewMode()) {
-							return React.createElement("span", { className: "text" });
+							return React.createElement('span', { className: 'text' });
 						} else {
 							return React.createElement(
-								"span",
-								{ className: "text" },
+								'span',
+								{ className: 'text' },
 								NSelectTree.PLACEHOLDER
 							);
 						}
 					} else {
 						return React.createElement(
-							"ul",
-							{ className: "selection" },
+							'ul',
+							{ className: 'selection' },
 							this.renderSelection()
 						);
 					}
 				}
 			}.bind(this);
 			return React.createElement(
-				"div",
-				{ className: "input-group form-control", onClick: this.onComponentClicked, ref: "comp" },
+				'div',
+				{ className: 'input-group form-control', onClick: this.onComponentClicked, ref: 'comp' },
 				renderContent(),
-				React.createElement("span", { className: "fa fa-fw fa-sort-down pull-right" })
+				React.createElement('span', { className: 'fa fa-fw fa-sort-down pull-right' })
 			);
 		},
 		render: function () {
@@ -13688,11 +13689,11 @@
 			};
 			css[this.getComponentCSS('n-select-tree')] = true;
 			return React.createElement(
-				"div",
+				'div',
 				{ className: $pt.LayoutHelper.classSet(css),
-					"aria-readonly": "true",
-					readOnly: "true",
-					tabIndex: "0" },
+					'aria-readonly': 'true',
+					readOnly: 'true',
+					tabIndex: '0' },
 				this.renderText(),
 				this.renderNormalLine(),
 				this.renderFocusLine()
@@ -13702,10 +13703,34 @@
 			if (this.state.popoverDiv == null) {
 				this.state.popoverDiv = $('<div>');
 				this.state.popoverDiv.appendTo($('body'));
-				$(document).on('mousedown', this.onDocumentMouseDown).on('keyup', this.onDocumentKeyUp).on('mousewheel', this.onDocumentMouseWheel);
-				$(window).on('resize', this.onWindowResize);
+				if (!this.isMobilePhone()) {
+					$(document).on('mousedown', this.onDocumentMouseDown).on('keyup', this.onDocumentKeyUp).on('mousewheel', this.onDocumentMouseWheel);
+					$(window).on('resize', this.onWindowResize);
+				}
 			}
 			this.state.popoverDiv.hide();
+		},
+		renderPopoverOperations: function () {
+			if (!this.isMobilePhone()) {
+				return null;
+			}
+			return React.createElement(
+				'div',
+				{ className: 'operations' },
+				React.createElement(
+					'div',
+					null,
+					React.createElement(
+						'a',
+						{ href: 'javascript:void(0);', onClick: this.hidePopover },
+						React.createElement(
+							'span',
+							null,
+							NSelectTree.CLOSE_TEXT
+						)
+					)
+				)
+			);
 		},
 		renderPopover: function () {
 			var styles = { display: 'block' };
@@ -13714,14 +13739,25 @@
 			var offset = component.offset();
 			styles.top = -10000; // let it out of screen
 			styles.left = 0;
+			var css = {
+				'n-select-tree-popover': true,
+				'popover': true,
+				'bottom': true,
+				'in': true
+			};
+			if (this.isMobilePhone()) {
+				css['mobile-phone'] = true;
+				styles = { display: 'block' }; // reset styles
+			}
 			var popover = React.createElement(
-				"div",
-				{ role: "tooltip", className: "n-select-tree-popover popover bottom in", style: styles },
-				React.createElement("div", { className: "arrow" }),
+				'div',
+				{ role: 'tooltip', className: $pt.LayoutHelper.classSet(css), style: styles },
+				React.createElement('div', { className: 'arrow' }),
 				React.createElement(
-					"div",
-					{ className: "popover-content" },
-					this.renderTree()
+					'div',
+					{ className: 'popover-content' },
+					this.renderTree(),
+					this.renderPopoverOperations()
 				)
 			);
 			ReactDOM.render(popover, this.state.popoverDiv.get(0), this.onPopoverRenderComplete);
@@ -13732,6 +13768,10 @@
 		},
 		onPopoverRenderComplete: function () {
 			this.state.popoverDiv.show();
+			if (this.isMobilePhone()) {
+				$('html').addClass('on-mobile-popover-shown');
+				return;
+			}
 
 			var popover = this.state.popoverDiv.children('.popover');
 			var styles = {};
@@ -13804,6 +13844,7 @@
 			this.destroyPopover();
 		},
 		destroyPopover: function () {
+			$('html').removeClass('on-mobile-popover-shown');
 			if (this.state.popoverDiv) {
 				$(document).off('mousedown', this.onDocumentMouseDown).off('keyup', this.onDocumentKeyUp).off('mousewheel', this.onDocumentMouseWheel);
 				$(window).off('resize', this.onWindowResize);

@@ -10,6 +10,7 @@
 		displayName: 'NSelectTree',
 		statics: {
 			PLACEHOLDER: "Please Select...",
+			CLOSE_TEXT: 'Close'
 		},
 		propTypes: {
 			// model
@@ -252,12 +253,26 @@
 			if (this.state.popoverDiv == null) {
 				this.state.popoverDiv = $('<div>');
 				this.state.popoverDiv.appendTo($('body'));
-				$(document).on('mousedown', this.onDocumentMouseDown)
-					.on('keyup', this.onDocumentKeyUp)
-					.on('mousewheel', this.onDocumentMouseWheel);
-				$(window).on('resize', this.onWindowResize);
+				if (!this.isMobilePhone()) {
+					$(document).on('mousedown', this.onDocumentMouseDown)
+						.on('keyup', this.onDocumentKeyUp)
+						.on('mousewheel', this.onDocumentMouseWheel);
+					$(window).on('resize', this.onWindowResize);
+				}
 			}
 			this.state.popoverDiv.hide();
+		},
+		renderPopoverOperations: function() {
+			if (!this.isMobilePhone()) {
+				return null;
+			}
+			return (<div className='operations'>
+				<div>
+					<a href='javascript:void(0);' onClick={this.hidePopover}>
+						<span>{NSelectTree.CLOSE_TEXT}</span>
+					</a>
+				</div>
+			</div>);
 		},
 		renderPopover: function() {
 			var styles = {display: 'block'};
@@ -266,10 +281,21 @@
 			var offset = component.offset();
 			styles.top = -10000; // let it out of screen
 			styles.left = 0;
-			var popover = (<div role="tooltip" className="n-select-tree-popover popover bottom in" style={styles}>
+			var css = {
+				'n-select-tree-popover': true,
+				'popover': true,
+				'bottom': true,
+				'in': true,
+			};
+			if (this.isMobilePhone()) {
+				css['mobile-phone'] = true;
+				styles = {display: 'block'};	// reset styles
+			}
+			var popover = (<div role="tooltip" className={$pt.LayoutHelper.classSet(css)} style={styles}>
 				<div className="arrow"></div>
 				<div className="popover-content">
 					{this.renderTree()}
+					{this.renderPopoverOperations()}
 				</div>
 			</div>);
 			ReactDOM.render(popover, this.state.popoverDiv.get(0), this.onPopoverRenderComplete);
@@ -280,6 +306,10 @@
 		},
 		onPopoverRenderComplete: function() {
 			this.state.popoverDiv.show();
+			if (this.isMobilePhone()) {
+				$('html').addClass('on-mobile-popover-shown');
+				return;
+			}
 
 			var popover = this.state.popoverDiv.children('.popover');
 			var styles = {};
@@ -352,6 +382,7 @@
 			this.destroyPopover();
 		},
 		destroyPopover: function() {
+			$('html').removeClass('on-mobile-popover-shown');
 			if (this.state.popoverDiv) {
 				$(document).off('mousedown', this.onDocumentMouseDown)
 					.off('keyup', this.onDocumentKeyUp)
