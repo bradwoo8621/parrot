@@ -162,9 +162,9 @@ div.n-datetime {
 			.day-view-body-body,
 			.month-view-body-body,
 			.year-view-body-body {
-				flex-grow: 1;
-				display: flex;
-				flex-wrap: wrap;
+				// flex-grow: 1;
+				// display: flex;
+				// flex-wrap: wrap;
 				div {
 					border-radius: 4px;
 					cursor: pointer;
@@ -284,6 +284,80 @@ div.n-datetime {
 				}
 				&:hover {
 					background-color: @border-color;
+				}
+			}
+		}
+	}
+	&.mobile-phone.popover.top,
+	&.mobile-phone.popover.bottom {
+		width: 100%;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		background-color: rgba(0, 0, 0, 0.541176);
+		margin-top: 0;
+		padding: 15px;
+		> div.arrow {
+			display: none;
+		}
+		> div.popover-content {
+			background-color: @container-background-color;
+			box-shadow: rgba(0, 0, 0, 0.247059) 0px 14px 45px, rgba(0, 0, 0, 0.219608) 0px 10px 18px;
+			padding: 0;
+			position: fixed;
+			margin-left: 0;
+		    margin-right: 0;
+		    max-height: none;
+		    height: initial;
+		    width: ~'-webkit-calc(100% - 30px)';
+		    width: ~'-moz-calc(100% - 30px)';
+		    width: ~'calc(100% - 30px)';
+			.date-view,
+			.time-view {
+				min-width: 100%;
+				padding-top: 0;
+			}
+			.calendar-header {
+				line-height: 33px;
+				height: 33px;
+				.header-btn {
+					line-height: 33px;
+					font-size: 1.5em;
+					margin-top: -1px;
+				}
+				.header-date-btn {
+					font-size: 1.3em;
+				}
+				span:not(.header-btn):not(.header-date-btn) {
+					font-size: 1.3em;
+					min-width: 15px;
+    				display: inline-block;
+				}
+				span:first-child {
+					margin-left: 5px;
+				}
+				span:nth-last-child(2) {
+					margin-right: 5px;
+				}
+			}
+			.calendar-body {
+				display: block;
+				font-size: 1.3em;
+				.day-view-body-body,
+				.month-view-body-body,
+				.year-view-body-body {
+					// flex-grow: 1;
+					// display: flex;
+					// flex-wrap: wrap;
+					div {
+						border-radius: 0;
+					}
+				}
+			}
+			.calendar-footer {
+				> div {
+					height: 33px;
+					font-size: 1.4em;
 				}
 			}
 		}

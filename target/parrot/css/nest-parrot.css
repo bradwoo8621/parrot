@@ -714,16 +714,6 @@ div.n-datetime.popover.bottom > div.popover-content .calendar-body .year-view-bo
   padding-top: 7px;
   padding-bottom: 7px;
 }
-div.n-datetime.popover.top > div.popover-content .calendar-body .day-view-body-body,
-div.n-datetime.popover.bottom > div.popover-content .calendar-body .day-view-body-body,
-div.n-datetime.popover.top > div.popover-content .calendar-body .month-view-body-body,
-div.n-datetime.popover.bottom > div.popover-content .calendar-body .month-view-body-body,
-div.n-datetime.popover.top > div.popover-content .calendar-body .year-view-body-body,
-div.n-datetime.popover.bottom > div.popover-content .calendar-body .year-view-body-body {
-  flex-grow: 1;
-  display: flex;
-  flex-wrap: wrap;
-}
 div.n-datetime.popover.top > div.popover-content .calendar-body .day-view-body-body div,
 div.n-datetime.popover.bottom > div.popover-content .calendar-body .day-view-body-body div,
 div.n-datetime.popover.top > div.popover-content .calendar-body .month-view-body-body div,
@@ -896,6 +886,88 @@ div.n-datetime.popover.bottom > div.popover-content .calendar-footer div > span 
 div.n-datetime.popover.top > div.popover-content .calendar-footer div:hover,
 div.n-datetime.popover.bottom > div.popover-content .calendar-footer div:hover {
   background-color: #e0e0e0;
+}
+div.n-datetime.mobile-phone.popover.top,
+div.n-datetime.mobile-phone.popover.bottom {
+  width: 100%;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.541176);
+  margin-top: 0;
+  padding: 15px;
+}
+div.n-datetime.mobile-phone.popover.top > div.arrow,
+div.n-datetime.mobile-phone.popover.bottom > div.arrow {
+  display: none;
+}
+div.n-datetime.mobile-phone.popover.top > div.popover-content,
+div.n-datetime.mobile-phone.popover.bottom > div.popover-content {
+  background-color: #ffffff;
+  box-shadow: rgba(0, 0, 0, 0.247059) 0px 14px 45px, rgba(0, 0, 0, 0.219608) 0px 10px 18px;
+  padding: 0;
+  position: fixed;
+  margin-left: 0;
+  margin-right: 0;
+  max-height: none;
+  height: initial;
+  width: -webkit-calc(100% - 30px);
+  width: -moz-calc(100% - 30px);
+  width: calc(100% - 30px);
+}
+div.n-datetime.mobile-phone.popover.top > div.popover-content .date-view,
+div.n-datetime.mobile-phone.popover.bottom > div.popover-content .date-view,
+div.n-datetime.mobile-phone.popover.top > div.popover-content .time-view,
+div.n-datetime.mobile-phone.popover.bottom > div.popover-content .time-view {
+  min-width: 100%;
+  padding-top: 0;
+}
+div.n-datetime.mobile-phone.popover.top > div.popover-content .calendar-header,
+div.n-datetime.mobile-phone.popover.bottom > div.popover-content .calendar-header {
+  line-height: 33px;
+  height: 33px;
+}
+div.n-datetime.mobile-phone.popover.top > div.popover-content .calendar-header .header-btn,
+div.n-datetime.mobile-phone.popover.bottom > div.popover-content .calendar-header .header-btn {
+  line-height: 33px;
+  font-size: 1.5em;
+  margin-top: -1px;
+}
+div.n-datetime.mobile-phone.popover.top > div.popover-content .calendar-header .header-date-btn,
+div.n-datetime.mobile-phone.popover.bottom > div.popover-content .calendar-header .header-date-btn {
+  font-size: 1.3em;
+}
+div.n-datetime.mobile-phone.popover.top > div.popover-content .calendar-header span:not(.header-btn):not(.header-date-btn),
+div.n-datetime.mobile-phone.popover.bottom > div.popover-content .calendar-header span:not(.header-btn):not(.header-date-btn) {
+  font-size: 1.3em;
+  min-width: 15px;
+  display: inline-block;
+}
+div.n-datetime.mobile-phone.popover.top > div.popover-content .calendar-header span:first-child,
+div.n-datetime.mobile-phone.popover.bottom > div.popover-content .calendar-header span:first-child {
+  margin-left: 5px;
+}
+div.n-datetime.mobile-phone.popover.top > div.popover-content .calendar-header span:nth-last-child(2),
+div.n-datetime.mobile-phone.popover.bottom > div.popover-content .calendar-header span:nth-last-child(2) {
+  margin-right: 5px;
+}
+div.n-datetime.mobile-phone.popover.top > div.popover-content .calendar-body,
+div.n-datetime.mobile-phone.popover.bottom > div.popover-content .calendar-body {
+  display: block;
+  font-size: 1.3em;
+}
+div.n-datetime.mobile-phone.popover.top > div.popover-content .calendar-body .day-view-body-body div,
+div.n-datetime.mobile-phone.popover.bottom > div.popover-content .calendar-body .day-view-body-body div,
+div.n-datetime.mobile-phone.popover.top > div.popover-content .calendar-body .month-view-body-body div,
+div.n-datetime.mobile-phone.popover.bottom > div.popover-content .calendar-body .month-view-body-body div,
+div.n-datetime.mobile-phone.popover.top > div.popover-content .calendar-body .year-view-body-body div,
+div.n-datetime.mobile-phone.popover.bottom > div.popover-content .calendar-body .year-view-body-body div {
+  border-radius: 0;
+}
+div.n-datetime.mobile-phone.popover.top > div.popover-content .calendar-footer > div,
+div.n-datetime.mobile-phone.popover.bottom > div.popover-content .calendar-footer > div {
+  height: 33px;
+  font-size: 1.4em;
 }
 div.n-card {
   display: none;

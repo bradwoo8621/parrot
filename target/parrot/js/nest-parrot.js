@@ -6892,6 +6892,10 @@
 			}
 
 			delete styles.width; // width is not necessary since there is min-width and max-width in css
+			if (this.isMobilePhone()) {
+				popoverCSS['mobile-phone'] = true;
+				styles = { display: 'block' }; // reset styles
+			}
 			var popover = React.createElement(
 				'div',
 				{ role: 'tooltip', className: $pt.LayoutHelper.classSet(popoverCSS), style: styles },
@@ -6904,8 +6908,10 @@
 			if (this.state.popover == null) {
 				this.state.popover = $('<div>');
 				this.state.popover.appendTo($('body'));
-				$(document).on('mousedown', this.onDocumentMouseDown).on('keyup', this.onDocumentKeyUp).on('mousewheel', this.onDocumentMouseWheel);
-				$(window).on('resize', this.onWindowResize);
+				if (!this.isMobilePhone()) {
+					$(document).on('mousedown', this.onDocumentMouseDown).on('keyup', this.onDocumentKeyUp).on('mousewheel', this.onDocumentMouseWheel);
+					$(window).on('resize', this.onWindowResize);
+				}
 			}
 			this.state.popover.hide();
 		},
@@ -6939,16 +6945,18 @@
 		showPopover: function () {
 			this.renderPopoverContainer();
 			this.renderPopover();
+			$('html').addClass('on-mobile-popover-shown');
 			this.state.popover.show();
 		},
 		hidePopover: function () {
 			this.destroyPopover();
 		},
 		destroyPopover: function () {
+			$('html').removeClass('on-mobile-popover-shown');
 			if (this.state.popover) {
 				this.stopClockInterval();
 				$(document).off('mousedown', this.onDocumentMouseDown).off('keyup', this.onDocumentKeyUp).off('mousewheel', this.onDocumentMouseWheel);
-				$(window).on('resize', this.onWindowResize);
+				$(window).off('resize', this.onWindowResize);
 				this.state.popover.remove();
 				delete this.state.popover;
 			}
@@ -7015,7 +7023,11 @@
 				return;
 			}
 			this.showPopover();
-			this.getTextInput().focus();
+			if (!this.isMobilePhone()) {
+				this.getTextInput().focus();
+			} else {
+				this.getTextInput().blur();
+			}
 		},
 		onTextInputFocused: function () {
 			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
