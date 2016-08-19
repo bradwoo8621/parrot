@@ -1,4 +1,4 @@
-/** nest-parrot.V0.4.28 2016-08-18 */
+/** nest-parrot.V0.4.28 2016-08-19 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -4170,6 +4170,9 @@
 		},
 		isMobile: function () {
 			return $pt.browser.mobile === true;
+		},
+		isMobilePhone: function () {
+			return this.isMobile() && $('body').width() < 768;
 		},
 		/**
    * is required
@@ -12540,7 +12543,10 @@
 		statics: {
 			PLACEHOLDER: "Please Select...",
 			NO_OPTION_FOUND: 'No Option Found',
-			FILTER_PLACEHOLDER: 'Search...'
+			FILTER_PLACEHOLDER: 'Search...',
+			CLOSE_TEXT: 'Close',
+			CONFIRM_TEXT: 'Set',
+			CLEAR_TEXT: 'Clear'
 		},
 		propTypes: {
 			// model
@@ -12652,7 +12658,7 @@
 			this.unregisterFromComponentCentral();
 		},
 		renderClear: function () {
-			if (!this.getComponentOption('allowClear')) {
+			if (!this.isClearAllowed()) {
 				return null;
 			}
 			return React.createElement('span', { className: 'fa fa-fw fa-close clear',
@@ -12682,7 +12688,7 @@
 			var css = {
 				'input-group': true,
 				'form-control': true,
-				'no-clear': !this.getComponentOption('allowClear')
+				'no-clear': !this.isClearAllowed()
 			};
 			return React.createElement(
 				'div',
@@ -12724,8 +12730,10 @@
 			if (this.state.popoverDiv == null) {
 				this.state.popoverDiv = $('<div>');
 				this.state.popoverDiv.appendTo($('body'));
-				$(document).on('mousedown', this.onDocumentMouseDown).on('keyup', this.onDocumentKeyUp).on('keydown', this.onDocumentKeyDown).on('mousewheel', this.onDocumentMouseWheel);
-				$(window).on('resize', this.onWindowResize);
+				if (!this.isMobilePhone()) {
+					$(document).on('mousedown', this.onDocumentMouseDown).on('keyup', this.onDocumentKeyUp).on('keydown', this.onDocumentKeyDown).on('mousewheel', this.onDocumentMouseWheel);
+					$(window).on('resize', this.onWindowResize);
+				}
 			}
 			// this.state.popoverDiv.hide();
 		},
@@ -12800,6 +12808,41 @@
 				return null;
 			}
 		},
+		renderPopoverOperations: function () {
+			if (!this.isMobilePhone()) {
+				return null;
+			}
+			//<a href='javascript:void(0);' onClick={}>
+			//	<span className='fa fa-fw fa-close'>{NSelect.CONFIRM_TEXT}</span>
+			//</a>
+
+			return React.createElement(
+				'div',
+				{ className: 'operations row' },
+				React.createElement(
+					'div',
+					null,
+					React.createElement(
+						'a',
+						{ href: 'javascript:void(0);', onClick: this.hidePopover },
+						React.createElement(
+							'span',
+							null,
+							NSelect.CLOSE_TEXT
+						)
+					),
+					React.createElement(
+						'a',
+						{ href: 'javascript:void(0);', onClick: this.onClearClick },
+						React.createElement(
+							'span',
+							null,
+							NSelect.CLEAR_TEXT
+						)
+					)
+				)
+			);
+		},
 		renderPopoverContent: function (filterText) {
 			var options = this.getAvailableOptions();
 			return React.createElement(
@@ -12807,7 +12850,8 @@
 				null,
 				this.renderFilterText(options, filterText),
 				this.renderNoOption(options),
-				this.renderOptions(options, filterText)
+				this.renderOptions(options, filterText),
+				this.renderPopoverOperations()
 			);
 		},
 		renderPopover: function (filterText) {
@@ -12817,9 +12861,19 @@
 			var offset = component.offset();
 			styles.top = -10000; // let it out of screen
 			styles.left = 0;
+			var css = {
+				'n-select-popover': true,
+				'popover': true,
+				'bottom': true,
+				'in': true
+			};
+			if (this.isMobilePhone()) {
+				css['mobile-phone'] = true;
+				styles = { display: 'block' }; // reset styles
+			}
 			var popover = React.createElement(
 				'div',
-				{ role: 'tooltip', className: 'n-select-popover popover bottom in', style: styles },
+				{ role: 'tooltip', className: $pt.LayoutHelper.classSet(css), style: styles },
 				React.createElement('div', { className: 'arrow' }),
 				React.createElement(
 					'div',
@@ -12840,8 +12894,13 @@
 			this.renderPopoverContainer();
 			this.renderPopover(filterText);
 		},
-		onPopoverRenderComplete: function () {
-			this.state.popoverDiv.show();
+		recalculatePopoverPosition: function () {
+			// only recalculate when not mobile phone
+			if (this.isMobilePhone()) {
+				$('html').addClass('on-mobile-popover-shown');
+				return;
+			}
+
 			var popover = this.state.popoverDiv.children('.popover');
 			var styles = {};
 			var component = this.getComponent();
@@ -12921,6 +12980,10 @@
 					this.state.popoverDiv.find('ul.options > li').first().addClass('active');
 				}
 			}
+		},
+		onPopoverRenderComplete: function () {
+			this.state.popoverDiv.show();
+			this.recalculatePopoverPosition();
 
 			var filterText = this.state.popoverDiv.find('div.n-text input[type=text]');
 			if (!filterText.is(':focus')) {
@@ -12929,13 +12992,16 @@
 				} else if (filterText.val() != null) {
 					filterText.caret(filterText.val().length);
 				}
-				filterText.focus();
+				if (!this.isMobilePhone()) {
+					filterText.focus();
+				}
 			}
 		},
 		hidePopover: function () {
 			this.destroyPopover();
 		},
 		destroyPopover: function () {
+			$('html').removeClass('on-mobile-popover-shown');
 			if (this.state.popoverDiv) {
 				$(document).off('mousedown', this.onDocumentMouseDown).off('keyup', this.onDocumentKeyUp).off('keydown', this.onDocumentKeyDown).off('mousewheel', this.onDocumentMouseWheel);
 				$(window).off('resize', this.onWindowResize);
@@ -13197,9 +13263,11 @@
 			}
 			this.setValueToModel(null);
 			// clear highlight
-			if (this.state.popoverDiv) {
-				this.state.popoverDiv.find('ul.options > li').filter('.chosen').removeClass('chosen');
-			}
+			//if (this.state.popoverDiv) {
+			//this.state.popoverDiv.find('ul.options > li').filter('.chosen').removeClass('chosen');
+			//}
+			// for mobile
+			this.hidePopover();
 		},
 		onFilterTextChange: function (evt) {
 			if (this.state.popoverDiv.is(':visible')) {
@@ -13264,6 +13332,9 @@
 		},
 		getPlaceholder: function () {
 			return this.getComponentOption('placeholder', NSelect.PLACEHOLDER);
+		},
+		isClearAllowed: function () {
+			return this.getComponentOption('allowClear') && !this.isMobilePhone();
 		},
 		getCodeTable: function () {
 			return this.getComponentOption('data');

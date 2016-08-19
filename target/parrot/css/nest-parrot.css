@@ -201,6 +201,16 @@ html {
   min-height: 100%;
   overflow-y: scroll;
 }
+html.on-mobile-popover-shown {
+  overflow: hidden;
+  overflow-y: hidden;
+  height: 100%;
+}
+html.on-mobile-popover-shown body {
+  overflow: hidden;
+  overflow-y: hidden;
+  height: 100%;
+}
 body {
   /* Sticky header styles*/
   padding-top: 80px;
@@ -1602,6 +1612,78 @@ div.n-select select.form-control {
 }
 .n-select-popover .popover-content div.no-option {
   text-align: center;
+}
+.n-select-popover.mobile-phone {
+  width: 100%;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.541176);
+  margin-top: 0;
+  padding: 15px;
+}
+.n-select-popover.mobile-phone > div.arrow {
+  display: none;
+}
+.n-select-popover.mobile-phone > div.popover-content {
+  background-color: #ffffff;
+  box-shadow: rgba(0, 0, 0, 0.247059) 0px 14px 45px, rgba(0, 0, 0, 0.219608) 0px 10px 18px;
+  padding: 0;
+  position: fixed;
+  width: -webkit-calc(100% - 30px);
+  width: -moz-calc(100% - 30px);
+  width: calc(100% - 30px);
+}
+.n-select-popover.mobile-phone > div.popover-content > div > div.n-text {
+  margin: 0;
+}
+.n-select-popover.mobile-phone > div.popover-content > div > div.n-text + ul {
+  /* 159 = 30 margin + 33 text + 33 operations + 63 browser footer */
+  max-height: -webkit-calc(100vh - 159px);
+  max-height: -moz-calc(100vh - 159px);
+  max-height: calc(100vh - 159px);
+}
+.n-select-popover.mobile-phone > div.popover-content > div > div.n-text > div.input-group > input {
+  padding-left: 5px;
+  height: 33px;
+}
+.n-select-popover.mobile-phone > div.popover-content > div > ul {
+  /* 126 = 30 margin + 33 operations + 63 browser footer */
+  max-height: -webkit-calc(100vh - 126px);
+  max-height: -moz-calc(100vh - 126px);
+  max-height: calc(100vh - 126px);
+}
+.n-select-popover.mobile-phone > div.popover-content > div > ul > li {
+  border-radius: 0;
+  line-height: 33px;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-bottom: 1px solid #e3f2fd;
+}
+.n-select-popover.mobile-phone > div.popover-content > div > ul > li.active,
+.n-select-popover.mobile-phone > div.popover-content > div > ul > li.active:hover,
+.n-select-popover.mobile-phone > div.popover-content > div > ul > li.chosen.active,
+.n-select-popover.mobile-phone > div.popover-content > div > ul > li.chosen.active:hover {
+  background-color: transparent;
+}
+.n-select-popover.mobile-phone > div.popover-content > div > ul > li:last-child {
+  border-bottom: none;
+}
+.n-select-popover.mobile-phone > div.popover-content > div > .operations {
+  height: 33px;
+  line-height: 33px;
+}
+.n-select-popover.mobile-phone > div.popover-content > div > .operations > div {
+  border-top: 1px solid #e3f2fd;
+  margin-left: 15px;
+  margin-right: 15px;
+}
+.n-select-popover.mobile-phone > div.popover-content > div > .operations > div > a {
+  float: right;
+  color: #2196f3;
+  font-size: 1.3em;
+  padding-left: 16px;
+  padding-right: 16px;
 }
 div.n-table-container {
   margin-bottom: 0;

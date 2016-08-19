@@ -1394,6 +1394,9 @@
 		isMobile: function() {
 			return $pt.browser.mobile === true;
 		},
+		isMobilePhone: function() {
+			return this.isMobile() && $('body').width() < 768;
+		},
 		/**
 		 * is required
 		 * @returns {boolean}

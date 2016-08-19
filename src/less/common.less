@@ -76,6 +76,16 @@ html {
 	position: relative;
 	min-height: 100%;
 	overflow-y: scroll;
+	&.on-mobile-popover-shown {
+		overflow: hidden;
+		overflow-y: hidden;
+		height: 100%;
+		body {
+			overflow: hidden;
+			overflow-y: hidden;
+			height: 100%;
+		}
+	}
 }
 
 body {
