@@ -2,6 +2,7 @@
 	var NSelect = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelect',
 		statics: {
+			POP_FIX_ON_BOTTOM: true,
 			PLACEHOLDER: "Please Select...",
 			NO_OPTION_FOUND: 'No Option Found',
 			FILTER_PLACEHOLDER: 'Search...',
@@ -189,6 +190,8 @@
 						.on('keydown', this.onDocumentKeyDown)
 						.on('mousewheel', this.onDocumentMouseWheel);
 					$(window).on('resize', this.onWindowResize);
+				} else {
+					$('body').on('touchmove mousewheel', this.onDocumentMouseWheel);
 				}
 			}
 			// this.state.popoverDiv.hide();
@@ -204,7 +207,10 @@
 			}
 			var _this = this;
 			var value = this.getValueFromModel();
-			return (<ul className='options'>
+			return (<ul className='options' 
+						onTouchStart={this.isMobilePhone() ? this.onOptionTouchStart : null}
+						onTouchMove={this.isMobilePhone() ? this.onOptionTouchMove : null}
+						onTouchEnd={this.isMobilePhone() ? this.onOptionTouchEnd : null}>
 				{options.map(function(item, itemIndex) {
 					var css = {
 						chosen: value == item.id
@@ -231,18 +237,30 @@
 			if (options == null || options.length == 0) {
 				return;
 			}
-			var minimumResultsForSearch = this.getComponentOption('minimumResultsForSearch');
-			if (minimumResultsForSearch >=0 && minimumResultsForSearch != Infinity) {
-				var model = $pt.createModel({text: filterText});
+			if (this.hasFilterText()) {
+				var model = $pt.createModel({
+					text: filterText,
+					// on mobile phone, set as true to disable the soft keyboard
+					// set as false to enable it when popover render completed
+					// see #onPopoverRenderComplete
+					disabled: this.isMobilePhone() ? true : false
+				});
 				var layout = $pt.createCellLayout('text', {
 					comp: {
-						placeholder: NSelect.FILTER_PLACEHOLDER
+						placeholder: NSelect.FILTER_PLACEHOLDER,
+						enabled: {
+							depends: 'disabled',
+							when: function(model) {
+								return model.get('disabled') !== true;
+							}
+						}
 					},
 					evt: {
 						keyUp: this.onComponentKeyUp
 					}
 				});
 				model.addPostChangeListener('text', this.onFilterTextChange);
+				this.state.filterModel = model;
 				return <$pt.Components.NText model={model} layout={layout} />;
 			} else {
 				return null;
@@ -269,7 +287,7 @@
 		},
 		renderPopoverContent: function(filterText) {
 			var options = this.getAvailableOptions();
-			return (<div>
+			return (<div className={this.hasFilterText() ? 'has-filter' : ''}>
 				{this.renderFilterText(options, filterText)}
 				{this.renderNoOption(options)}
 				{this.renderOptions(options, filterText)}
@@ -291,6 +309,7 @@
 			};
 			if (this.isMobilePhone()) {
 				css['mobile-phone'] = true;
+				css['fix-bottom'] = this.isPopoverFixOnBottom();
 				styles = {display: 'block'};	// reset styles
 			}
 			var popover = (<div role="tooltip" className={$pt.LayoutHelper.classSet(css)} style={styles}>
@@ -412,7 +431,15 @@
 				}
 				if (!this.isMobilePhone()) {
 					filterText.focus();
+				} else {
+					// filterText.blur();
 				}
+			}
+			// set as false anyway to let search text enabled
+			// actually only in mobile phone, it is set as true when renderring
+			// see #renderFilterText
+			if (this.state.filterModel) {
+				this.state.filterModel.set('disabled', false);
 			}
 		},
 		hidePopover: function() {
@@ -426,6 +453,9 @@
 					.off('keydown', this.onDocumentKeyDown)
 					.off('mousewheel', this.onDocumentMouseWheel);
 				$(window).off('resize', this.onWindowResize);
+				if (this.isMobilePhone()) {
+					$('body').off('touchmove mousewheel', this.onDocumentMouseWheel);
+				}
 				this.state.popoverDiv.remove();
 				delete this.state.popoverDiv;
 			}
@@ -633,6 +663,12 @@
 			}
 		},
 		onDocumentMouseWheel: function(evt) {
+			if (this.isMobilePhone()) {
+				// when popover is fix on bottom, prevent the touch move and mouse wheel event
+				evt.preventDefault();
+				return;
+			}
+
 			var target = $(evt.target);
 			if (target.closest(this.state.popoverDiv).length == 0) {
 				this.hidePopover();
@@ -700,6 +736,80 @@
 			// console.log('caret', this.state.filteTextCaret);
 			this.showPopover(evt.new);
 		},
+		getOptionTouchEventContainer: function(evt) {
+			var target = $(evt.target);
+			if (target[0].tagName != 'UL') {
+				target = target.closest('ul');
+			}
+			return target;
+		},
+		getOptionContainerOffsetY: function(container) {
+			var transform = container.css('transform').split(',');
+			if (transform.length > 5) {
+				return parseFloat(transform[5]);
+			} else {
+				return 0;
+			}
+		},
+		calcOptionContainerOffsetY: function(target, offsetY) {
+			if (offsetY > 0) {
+				offsetY = 0;
+			} else {
+				var optionsHeight = target.height();
+				var totalHeight = target.parent().height();
+				if (offsetY < (totalHeight - optionsHeight)) {
+					offsetY = totalHeight - optionsHeight;
+				}
+			}
+			return offsetY;
+		},
+		onOptionTouchStart: function(evt) {
+			this.state.touchStartClientY = evt.touches[0].clientY;
+			var target = this.getOptionTouchEventContainer(evt);
+			this.state.touchStartRelatedY = this.getOptionContainerOffsetY(target);
+			this.state.touchStartTime = moment();
+		},
+		onOptionTouchMove: function(evt) {
+			var touches = evt.touches;
+			var length = touches.length;
+			if (length > 0) {
+				var target = this.getOptionTouchEventContainer(evt);
+				// calculate the distance of touch moving
+				// make sure the first and last option are in viewport
+				var distance = touches[length - 1].clientY - this.state.touchStartClientY;
+				var offsetY = this.calcOptionContainerOffsetY(target, this.state.touchStartRelatedY + distance);
+				target.css('transform', 'translateY(' + offsetY + 'px)');
+				this.state.touchLastClientY = touches[length - 1].clientY;
+			}
+		},
+		onOptionTouchEnd: function(evt) {
+			// continue scrolling
+			// calculate the speed
+			var timeUsed = moment().diff(this.state.touchStartTime, 'ms');
+			// alert(timeUsed);
+			if (timeUsed <= 300) {
+				var distance = this.state.touchLastClientY - this.state.touchStartClientY;
+				var speed = distance / timeUsed * 10;	// pixels per 10 ms
+				var target = this.getOptionTouchEventContainer(evt);
+				var startOffsetY = this.getOptionContainerOffsetY(target);
+				var targetOffsetY = this.calcOptionContainerOffsetY(target, startOffsetY + (speed * 100 / 2));
+				target.one('webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend', function() {
+					target.css({
+						'transition-timing-function': '', 
+						'transition-duration': ''
+					});
+				});
+				target.css({
+					'transition-timing-function': 'cubic-bezier(0.1, 0.57, 0.1, 1)', 
+					'transition-duration': '500ms',
+					'transform': 'translateY(' + targetOffsetY + 'px)'
+				});
+			}
+
+			delete this.state.touchStartClientY;
+			delete this.state.touchStartRelatedY;
+			delete this.state.touchStartTime;
+		},
 		/**
 		 * on model change
 		 * @param evt
@@ -742,6 +852,10 @@
 		 */
 		hasParent: function () {
 			return this.getParentPropertyId() != null;
+		},
+		hasFilterText: function() {
+			var minimumResultsForSearch = this.getComponentOption('minimumResultsForSearch');
+			return minimumResultsForSearch >= 0 && minimumResultsForSearch != Infinity;
 		},
 		/**
 		 * convert data options, options can be CodeTable object or an array
@@ -803,6 +917,9 @@
 		},
 		getComponent: function() {
 			return $(ReactDOM.findDOMNode(this.refs.comp));
+		},
+		isPopoverFixOnBottom: function() {
+			return this.isMobilePhone() && NSelect.POP_FIX_ON_BOTTOM === true;
 		}
 	}));
 	$pt.Components.NSelect = NSelect;
