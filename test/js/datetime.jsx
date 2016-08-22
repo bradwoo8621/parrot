@@ -37,8 +37,9 @@
             type: $pt.ComponentConstants.Date,
             format: 'YYYY/MM/DD HH:mm:ss',
             defaultTime: function(today) {
-                return today.hour(0).minute(0).second(0);
+                return today.hour(0).minute(0).second(0).subtract(30, 'y');
             },
+            popoverType: NDateTime.FORMAT_TYPES.YEAR
             // runClock: false
         },
         pos: {row: 1, col: 1}

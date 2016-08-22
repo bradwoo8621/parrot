@@ -622,7 +622,7 @@
 			date = date ? date : this.getValueFromModel();
 			date = date ? date : this.getToday();
 			if (popoverType == null) {
-				popoverType = this.guessDisplayFormatType();
+				popoverType = this.getInitialPopoverType() || this.guessDisplayFormatType();
 			}
 			var styles = {
 				float: 'left',
@@ -1236,10 +1236,17 @@
 		getToday: function() {
 			var today = moment().locale(this.getLocale());
 			var defaultTime = this.getComponentOption('defaultTime');
-			if (defaultTime && typeof defaultTime === 'function') {
-				today = defaultTime.call(this, today);
-			}
+			if (defaultTime) {
+				if (typeof defaultTime === 'function') {
+					today = defaultTime.call(this, today);
+				} else {
+					today = defaultTime;
+				}
+			} 
 			return today;
+		},
+		getInitialPopoverType: function() {
+			return this.getComponentOption('popoverType');
 		}
 	}));
 
