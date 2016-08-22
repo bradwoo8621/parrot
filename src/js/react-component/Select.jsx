@@ -2,7 +2,7 @@
 	var NSelect = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelect',
 		statics: {
-			POP_FIX_ON_BOTTOM: true,
+			POP_FIX_ON_BOTTOM: false,
 			PLACEHOLDER: "Please Select...",
 			NO_OPTION_FOUND: 'No Option Found',
 			FILTER_PLACEHOLDER: 'Search...',
@@ -734,6 +734,16 @@
 				this.state.filteTextCaret = null;
 			}
 			// console.log('caret', this.state.filteTextCaret);
+			if (this.isMobilePhone()) {
+				var optionContainer = this.state.popoverDiv.find('ul.options');
+				if (this.getOptionContainerOffsetY(optionContainer) !== 0) {
+					optionContainer.css({
+						'transform': '',
+						'transition-timing-function': '',
+						'transition-duration': ''
+					});
+				}
+			}
 			this.showPopover(evt.new);
 		},
 		getOptionTouchEventContainer: function(evt) {

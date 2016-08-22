@@ -1722,6 +1722,28 @@ div.n-select select.form-control {
   background: white;
   z-index: 3;
 }
+.n-select-popover.mobile-phone > div.popover-content > div > div.n-text > div.input-group {
+  padding-left: 18px;
+}
+.n-select-popover.mobile-phone > div.popover-content > div > div.n-text > div.input-group:before {
+  content: '\f002';
+  position: absolute;
+  font-style: normal;
+  font-variant-ligatures: normal;
+  font-variant-caps: normal;
+  font-variant-numeric: normal;
+  font-weight: normal;
+  font-stretch: normal;
+  font-family: FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  line-height: 34px;
+  padding-left: 5px;
+}
 .n-select-popover.mobile-phone > div.popover-content > div > div.n-text > div.input-group > input {
   padding-left: 5px;
   height: 33px;
@@ -1787,27 +1809,8 @@ div.n-select select.form-control {
   top: 0;
   right: auto;
 }
-.n-select-popover.mobile-phone.fix-bottom > div.popover-content > div > div.n-text > div.input-group {
-  padding-left: 18px;
-}
 .n-select-popover.mobile-phone.fix-bottom > div.popover-content > div > div.n-text > div.input-group:before {
-  content: '\f002';
-  position: absolute;
-  font-style: normal;
-  font-variant-ligatures: normal;
-  font-variant-caps: normal;
-  font-variant-numeric: normal;
-  font-weight: normal;
-  font-stretch: normal;
-  font-family: FontAwesome;
-  font-size: inherit;
-  text-rendering: auto;
-  -webkit-font-smoothing: antialiased;
-  top: 0;
-  left: 0;
-  z-index: 2;
   line-height: 40px;
-  padding-left: 5px;
 }
 .n-select-popover.mobile-phone.fix-bottom > div.popover-content > div > div.n-text > div.input-group > input {
   margin-top: 4px;
