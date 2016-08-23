@@ -24,17 +24,20 @@
 			margin: 0;
 			margin-top: -3px;
 			padding: 0;
-			width: 100%;
+			width: ~'-webkit-calc(100% - 13px)';
+			width: ~'-moz-calc(100% - 13px)';
+			width: ~'calc(100% - 13px)';
 			> li {
 				border: 1px solid @border-color;
 				border-radius: 4px;
 				padding: 1px 3px;
-				margin: 1px 0 1px 3px;
+				margin: 1px 6px 1px 0;
 				float: left;
 				line-height: 1.5;
+				word-break: break-word;
 			}
-			> li:first-child {
-				margin-left: 0;
+			> li:last-child {
+				margin-right: 0;
 			}
 		}
 		> .fa {
@@ -145,7 +148,41 @@
 				max-height: ~'-webkit-calc(100vh - 45px - 126px)';
 				max-height: ~'-moz-calc(100vh - 45px - 126px)';
 				max-height: ~'calc(100vh - 45px - 126px)';
-				overflow-y: auto;
+				overflow-y: hidden;
+				overflow-x: hidden;
+				ul.nav > li {
+					white-space: normal;
+					word-break: break-word;
+					> div.node-content {
+						display: table;
+						> a:first-child {
+							display: table-cell;
+							width: 25px;
+	    					min-width: 25px;
+							vertical-align: middle;
+							text-align: center;
+							padding-bottom: 5px;
+						}
+						> div.n-checkbox {
+							display: table-cell;
+							width: 30px;
+							min-width: 30px;
+							vertical-align: middle;
+							text-align: center;
+						}
+						> a:last-child {
+							display: table-cell;
+							width: 100%;
+							padding-left: 5px;
+							padding-right: 5px;
+							vertical-align: middle;
+							> span {
+								padding-left: 0;
+								padding-right: 0;
+							}
+						}
+					}
+				}
 				span.buttons {
 					display: block;
 					top: 25px;
@@ -170,6 +207,45 @@
 						font-size: 1.3em;
 						padding-left: 16px;
 						padding-right: 16px;
+					}
+				}
+			}
+		}
+		&.fix-bottom {
+			background-color: transparent;
+			padding: 0;
+			> div.popover-content {
+				width: 100%;
+				bottom: 0;
+				box-shadow: none;
+				padding: 40px 0 0;
+			    height: 210px;
+			    min-height: inherit;
+			    background-color: #d4d5d9;
+			    overflow: hidden;
+				> .n-tree {
+					position: relative;
+					max-height: inherit;
+					height: 170px;
+					padding-top: 10px;
+					> span.buttons {
+						top: auto;
+						bottom: 138px;
+    					right: 10px;
+					}
+				}
+				> .operations {
+					position: absolute;
+					height: 40px;
+					line-height: 40px;
+					top: 0;
+					left: 0;
+					right: 0;
+					border-top: 1px solid #c8c9cc;
+					border-bottom: 1px solid #d4d5d9;
+					background-color: #f0f1f2;
+					> div {
+						border-top: 0;
 					}
 				}
 			}

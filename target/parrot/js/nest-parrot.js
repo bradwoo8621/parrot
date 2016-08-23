@@ -1,4 +1,4 @@
-/** nest-parrot.V0.4.28 2016-08-22 */
+/** nest-parrot.V0.4.28 2016-08-23 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -13262,7 +13262,7 @@
 		},
 		onDocumentMouseWheel: function (evt) {
 			if (this.isMobilePhone()) {
-				// when popover is fix on bottom, prevent the touch move and mouse wheel event
+				// when mobile phone, prevent the touch move and mouse wheel event
 				evt.preventDefault();
 				return;
 			}
@@ -13360,11 +13360,14 @@
 			}
 		},
 		calcOptionContainerOffsetY: function (target, offsetY) {
-			if (offsetY > 0) {
+			if (offsetY >= 0) {
 				offsetY = 0;
 			} else {
 				var optionsHeight = target.height();
 				var totalHeight = target.parent().height();
+				if (optionsHeight <= totalHeight) {
+					return 0;
+				}
 				if (offsetY < totalHeight - optionsHeight) {
 					offsetY = totalHeight - optionsHeight;
 				}
@@ -13547,6 +13550,7 @@
 	var NSelectTree = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelectTree',
 		statics: {
+			POP_FIX_ON_BOTTOM: false,
 			PLACEHOLDER: "Please Select...",
 			CLOSE_TEXT: 'Close'
 		},
@@ -13651,12 +13655,20 @@
 			return React.createElement($pt.Components.NTree, { model: model, layout: layout });
 		},
 		renderSelectionItem: function (codeItem, nodeId) {
-			return React.createElement(
-				'li',
-				{ key: nodeId },
-				React.createElement('span', { className: 'fa fa-fw fa-remove', onClick: this.onSelectionItemRemove.bind(this, nodeId) }),
-				codeItem.text
-			);
+			if (this.isMobilePhone()) {
+				return React.createElement(
+					'li',
+					{ key: nodeId },
+					codeItem.text
+				);
+			} else {
+				return React.createElement(
+					'li',
+					{ key: nodeId },
+					React.createElement('span', { className: 'fa fa-fw fa-remove', onClick: this.onSelectionItemRemove.bind(this, nodeId) }),
+					codeItem.text
+				);
+			}
 		},
 		renderSelectionWhenValueAsArray: function (values) {
 			var _this = this;
@@ -13809,6 +13821,8 @@
 				if (!this.isMobilePhone()) {
 					$(document).on('mousedown', this.onDocumentMouseDown).on('keyup', this.onDocumentKeyUp).on('mousewheel', this.onDocumentMouseWheel);
 					$(window).on('resize', this.onWindowResize);
+				} else {
+					$('body').on('touchmove mousewheel', this.onDocumentMouseWheel);
 				}
 			}
 			this.state.popoverDiv.hide();
@@ -13850,6 +13864,7 @@
 			};
 			if (this.isMobilePhone()) {
 				css['mobile-phone'] = true;
+				css['fix-bottom'] = this.isPopoverFixOnBottom();
 				styles = { display: 'block' }; // reset styles
 			}
 			var popover = React.createElement(
@@ -13873,6 +13888,8 @@
 			this.state.popoverDiv.show();
 			if (this.isMobilePhone()) {
 				$('html').addClass('on-mobile-popover-shown');
+				var tree = this.state.popoverDiv.find('div.n-tree > ul');
+				tree.on('touchstart', this.onTreeTouchStart).on('touchmove', this.onTreeTouchMove).on('touchend', this.onTreeTouchEnd);
 				return;
 			}
 
@@ -13951,6 +13968,11 @@
 			if (this.state.popoverDiv) {
 				$(document).off('mousedown', this.onDocumentMouseDown).off('keyup', this.onDocumentKeyUp).off('mousewheel', this.onDocumentMouseWheel);
 				$(window).off('resize', this.onWindowResize);
+				if (this.isMobilePhone()) {
+					$('body').off('touchmove mousewheel', this.onDocumentMouseWheel);
+					var tree = this.state.popoverDiv.find('div.n-tree > ul');
+					tree.off('touchstart', this.onTreeTouchStart).off('touchmove', this.onTreeTouchMove).off('touchend', this.onTreeTouchEnd);
+				}
 				this.state.popoverDiv.remove();
 				delete this.state.popoverDiv;
 			}
@@ -13984,6 +14006,12 @@
 			}
 		},
 		onDocumentMouseWheel: function (evt) {
+			if (this.isMobilePhone()) {
+				// when mobile phone, prevent the touch move and mouse wheel event
+				evt.preventDefault();
+				return;
+			}
+
 			var target = $(evt.target);
 			if (target.closest(this.state.popoverDiv).length == 0) {
 				this.hidePopover();
@@ -14086,6 +14114,94 @@
 					this.getModel().firePostChangeEvent(this.getDataId(), values, values);
 				}
 		},
+		isNodeCheckClicked: function (evt) {
+			return $(evt.target).closest('.n-checkbox').length != 0;
+		},
+		getNodeTouchEventContainer: function (evt) {
+			return $(evt.target).closest('.n-tree').children('ul').first();
+		},
+		getNodeContainerOffsetY: function (container) {
+			var transform = container.css('transform').split(',');
+			if (transform.length > 5) {
+				return parseFloat(transform[5]);
+			} else {
+				return 0;
+			}
+		},
+		calcNodeContainerOffsetY: function (target, offsetY) {
+			if (offsetY >= 0) {
+				offsetY = 0;
+			} else {
+				var treeHeight = target.height();
+				var totalHeight = target.parent().height();
+				if (treeHeight <= totalHeight) {
+					return 0;
+				}
+				if (offsetY < totalHeight - treeHeight) {
+					offsetY = totalHeight - treeHeight;
+				}
+			}
+			return offsetY;
+		},
+		unwrapTouchEvent: function (evt) {
+			return evt.touches ? evt : evt.originalEvent;
+		},
+		onTreeTouchStart: function (evt) {
+			if (this.isNodeCheckClicked(evt)) {
+				return;
+			}
+			this.state.touchStartClientY = this.unwrapTouchEvent(evt).touches[0].clientY;
+			var target = this.getNodeTouchEventContainer(evt);
+			this.state.touchStartRelatedY = this.getNodeContainerOffsetY(target);
+			this.state.touchStartTime = moment();
+		},
+		onTreeTouchMove: function (evt) {
+			if (this.isNodeCheckClicked(evt)) {
+				return;
+			}
+			var touches = this.unwrapTouchEvent(evt).touches;
+			var length = touches.length;
+			if (length > 0) {
+				var target = this.getNodeTouchEventContainer(evt);
+				// calculate the distance of touch moving
+				// make sure the first and last option are in viewport
+				var distance = touches[length - 1].clientY - this.state.touchStartClientY;
+				var offsetY = this.calcNodeContainerOffsetY(target, this.state.touchStartRelatedY + distance);
+				target.css('transform', 'translateY(' + offsetY + 'px)');
+				this.state.touchLastClientY = touches[length - 1].clientY;
+			}
+		},
+		onTreeTouchEnd: function (evt) {
+			if (this.isNodeCheckClicked(evt)) {
+				return;
+			}
+			// continue scrolling
+			// calculate the speed
+			var timeUsed = moment().diff(this.state.touchStartTime, 'ms');
+			// alert(timeUsed);
+			if (timeUsed <= 300) {
+				var distance = this.state.touchLastClientY - this.state.touchStartClientY;
+				var speed = distance / timeUsed * 10; // pixels per 10 ms
+				var target = this.getNodeTouchEventContainer(evt);
+				var startOffsetY = this.getNodeContainerOffsetY(target);
+				var targetOffsetY = this.calcNodeContainerOffsetY(target, startOffsetY + speed * 100 / 2);
+				target.one('webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend', function () {
+					target.css({
+						'transition-timing-function': '',
+						'transition-duration': ''
+					});
+				});
+				target.css({
+					'transition-timing-function': 'cubic-bezier(0.1, 0.57, 0.1, 1)',
+					'transition-duration': '500ms',
+					'transform': 'translateY(' + targetOffsetY + 'px)'
+				});
+			}
+
+			delete this.state.touchStartClientY;
+			delete this.state.touchStartRelatedY;
+			delete this.state.touchStartTime;
+		},
 		getComponent: function () {
 			return $(ReactDOM.findDOMNode(this.refs.comp));
 		},
@@ -14166,6 +14282,9 @@
    */
 		getParentPropertyValue: function () {
 			return this.getParentModel().get(this.getParentPropertyId());
+		},
+		isPopoverFixOnBottom: function () {
+			return this.isMobilePhone() && NSelectTree.POP_FIX_ON_BOTTOM === true;
 		}
 	}));
 	$pt.Components.NSelectTree = NSelectTree;

@@ -664,7 +664,7 @@
 		},
 		onDocumentMouseWheel: function(evt) {
 			if (this.isMobilePhone()) {
-				// when popover is fix on bottom, prevent the touch move and mouse wheel event
+				// when mobile phone, prevent the touch move and mouse wheel event
 				evt.preventDefault();
 				return;
 			}
@@ -762,11 +762,14 @@
 			}
 		},
 		calcOptionContainerOffsetY: function(target, offsetY) {
-			if (offsetY > 0) {
+			if (offsetY >= 0) {
 				offsetY = 0;
 			} else {
 				var optionsHeight = target.height();
 				var totalHeight = target.parent().height();
+				if (optionsHeight <= totalHeight) {
+					return 0;
+				}
 				if (offsetY < (totalHeight - optionsHeight)) {
 					offsetY = totalHeight - optionsHeight;
 				}
