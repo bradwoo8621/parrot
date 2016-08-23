@@ -7,7 +7,6 @@
 			NO_OPTION_FOUND: 'No Option Found',
 			FILTER_PLACEHOLDER: 'Search...',
 			CLOSE_TEXT: 'Close',
-			CONFIRM_TEXT: 'Set',
 			CLEAR_TEXT: 'Clear'
 		},
 		propTypes: {
@@ -270,10 +269,6 @@
 			if (!this.isMobilePhone()) {
 				return null;
 			}
-			//<a href='javascript:void(0);' onClick={}>
-			//	<span className='fa fa-fw fa-close'>{NSelect.CONFIRM_TEXT}</span>
-			//</a>
-
 			return (<div className='operations row'>
 				<div>
 					<a href='javascript:void(0);' onClick={this.hidePopover}>
@@ -339,67 +334,8 @@
 			}
 
 			var popover = this.state.popoverDiv.children('.popover');
-			var styles = {};
 			var component = this.getComponent();
-			styles.width = component.outerWidth();
-			var offset = component.offset();
-			styles.top = offset.top + component.outerHeight();
-			styles.left = offset.left;
-
-			var onTop = false;
-			var rightToLeft = false;
-			var realHeight = popover.outerHeight();
-			var realWidth = popover.outerWidth();
-			// set the real top, assumpt it is on bottom
-			styles.top = offset.top + component.outerHeight();
-			// check popover in top or bottom
-			if ((styles.top + realHeight) > ($(window).height() + $(window).scrollTop())) {
-				// cannot show in bottom and in current viewport
-				// check it is enough top or not
-				if ((offset.top - $(window).scrollTop()) >= realHeight) {
-					// enough
-					styles.top = offset.top - realHeight;
-					onTop = true;
-				} else if ((styles.top + realHeight) <= $(document).height()) {
-					// can show in bottom and in current document
-					onTop = false;
-				} else if (offset.top < realHeight) {
-					// cannot show in top and in current document
-					onTop = false;
-				} else {
-					styles.top = offset.top - realHeight;
-					onTop = true;
-				}
-			} else {
-				// can show in bottom and in current viewport
-				onTop = false;
-			}
-
-			// check popover to left or right
-			if (realWidth > styles.width) {
-				var width = $(document).width();
-				if ((styles.left + realWidth) <= width) {
-					// normal from left to right, do nothing
-				} else if ((styles.left + styles.width) >= realWidth) {
-					// from right to left
-					styles.left = styles.left + styles.width - realWidth;
-					rightToLeft = true;
-				} else {
-					// still left to right, do nothing
-				}
-			}
-
-			if (onTop) {
-				popover.addClass('top');
-				popover.removeClass('bottom');
-			} else {
-				popover.removeClass('top');
-				popover.addClass('bottom');
-			}
-			if (rightToLeft) {
-				popover.addClass('right-to-left');
-			}
-			popover.css({top: styles.top, left: styles.left});
+			this.recalcPopoverPosition(popover, component);
 
 			// if there is no active option, set first as active
 			var options = this.state.popoverDiv.find('ul.options > li');

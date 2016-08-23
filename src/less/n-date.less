@@ -12,30 +12,34 @@ div.n-datetime {
 		}
 	}
 
-	&.popover.top {
-		margin-top: 2px;
-		position: absolute;
-		max-width: 9999px;
-		z-index: 10000;
-		.arrow {
-			margin-left: -8px;
-			bottom: -8px;
-			border-width: 8px;
-			border-bottom-width: 0;
-			left: 20px;
-		}
-	}
+	&.popover.top,
 	&.popover.bottom {
 		margin-top: 2px;
 		position: absolute;
-		max-width: 9999px;
 		z-index: 10000;
 		.arrow {
 			margin-left: -8px;
-			top: -8px;
 			border-width: 8px;
-			border-top-width: 0;
 			left: 20px;
+		}
+		&.date-only,
+		&.time-only {
+			max-width: 290px;
+		}
+		&.date-and-time {
+			max-width: 580px;
+		}
+	}
+	&.popover.top {
+		.arrow {
+			bottom: -8px;
+			border-bottom-width: 0;
+		}
+	}
+	&.popover.bottom {
+		.arrow {
+			top: -8px;
+			border-top-width: 0;
 		}
 	}
 	&.popover.top.right-to-left,
@@ -49,19 +53,19 @@ div.n-datetime {
 	&.popover.top > div.popover-content,
 	&.popover.bottom > div.popover-content {
 		padding: 0;
-		overflow: auto;
-		height: 270px;
-		max-height: 300px;
+		overflow: hidden;
+		// height: 270px;
+		// max-height: 300px;
 		margin-left: -1px;
 		margin-right: -1px;
 		.date-view,
 		.time-view {
 			// display: inline;
 			position: relative;
-			min-width: 250px;
-			max-width: 300px;
+			min-width: 290px;
+			max-width: 290px;
 			padding: 5px;
-			height: 100%;
+			// height: 100%;
 			display: flex;
 			flex-direction: column;
 		}
@@ -198,12 +202,13 @@ div.n-datetime {
 			}
 			.time-view-body-body {
 				text-align: center;
-				padding-top: 15px;
+				padding-top: 5px;
 				flex-grow: 1;
 				display: flex;
 				justify-content: space-around;
 				svg.clock {
 					overflow: overlay;
+					z-index: 2;
 					text.text {
 						fill: lighten(@font-color, 20%);
 						font-family: 'Engravers MT', Roboto, 'Helvetica Neue', Helvetica, Arial;
@@ -271,8 +276,11 @@ div.n-datetime {
 		}
 		.calendar-footer {
 			position: relative;
+			float: left;
+			width: 100%;
 			margin-left: 0;
 			margin-right: 0;
+			padding-bottom: 5px;
 			div {
 				padding-top: 4px;
 				padding-bottom: 4px;
@@ -297,6 +305,7 @@ div.n-datetime {
 		background-color: rgba(0, 0, 0, 0.541176);
 		margin-top: 0;
 		padding: 15px;
+		max-width: none;
 		> div.arrow {
 			display: none;
 		}
@@ -304,18 +313,19 @@ div.n-datetime {
 			background-color: @container-background-color;
 			box-shadow: rgba(0, 0, 0, 0.247059) 0px 14px 45px, rgba(0, 0, 0, 0.219608) 0px 10px 18px;
 			padding: 0;
+			padding-bottom: 33px;
 			position: fixed;
 			margin-left: 0;
-		    margin-right: 0;
-		    max-height: none;
-		    height: initial;
-		    width: ~'-webkit-calc(100% - 30px)';
-		    width: ~'-moz-calc(100% - 30px)';
-		    width: ~'calc(100% - 30px)';
+			margin-right: 0;
+			// max-height: none;
+			height: initial;
+			width: ~'-webkit-calc(100% - 30px)';
+			width: ~'-moz-calc(100% - 30px)';
+			width: ~'calc(100% - 30px)';
 			.date-view,
 			.time-view {
 				min-width: 100%;
-				padding-top: 0;
+				padding: 0;
 			}
 			.calendar-header {
 				line-height: 33px;
@@ -331,7 +341,7 @@ div.n-datetime {
 				span:not(.header-btn):not(.header-date-btn) {
 					font-size: 1.3em;
 					min-width: 15px;
-    				display: inline-block;
+					display: inline-block;
 				}
 				span:first-child {
 					margin-left: 5px;
@@ -351,13 +361,78 @@ div.n-datetime {
 					// flex-wrap: wrap;
 					div {
 						border-radius: 0;
+						&.current-value:hover {
+							background-color: @color-primary;
+							color: @font-color-reverse;
+						}
+						&:hover {
+							background-color: inherit;
+						}
+					}
+				}
+				.time-view-body-body {
+					padding-bottom: 15px;
+				}
+			}
+			> .calendar-footer {
+				height: 33px;
+				line-height: 33px;
+				position: absolute;
+			    bottom: 0;
+			    left: 0;
+			    right: 0;
+			    z-index: 2;
+			    background-color: @container-background-color;
+			    margin-left: 0;
+			    margin-right: 0;
+			    border-top: 1px solid #e3f2fd;
+				> div {
+					padding: 0;
+				    border-radius: 0; 
+				    cursor: default; 
+				    position: initial;
+					> a {
+						float: right;
+						color: @color-primary;
+						font-size: 1.3em;
+						padding-left: 16px;
+						padding-right: 16px;
 					}
 				}
 			}
-			.calendar-footer {
-				> div {
-					height: 33px;
-					font-size: 1.4em;
+		}
+		&.fix-bottom {
+			background: transparent;
+			> div.popover-content {
+				position: fixed;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				box-shadow: none;
+				width: 100%;
+				padding-bottom: 0;
+    			padding-top: 40px;
+    			background-color: #d9d9d9;
+    			// > .time-view {
+    			// 	> .calendar-body {
+    			// 		> .time-view-body-body {
+    			// 			padding-bottom: 10px;
+    			// 		}
+    			// 	}
+    			// }
+				> .calendar-footer {
+					position: absolute;
+					height: 40px;
+					line-height: 40px;
+					top: 0;
+					left: 0;
+					right: 0;
+					border-top: 1px solid #c8c9cc;
+					border-bottom: 1px solid #d9d9d9;
+					background-color: #f0f1f2;
+					> div {
+						border-top: 0;
+					}
 				}
 			}
 		}

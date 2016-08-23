@@ -4382,6 +4382,68 @@
 		},
 		removePostValidateListener: function (listener) {
 			this.getModel().removePostValidateListener(this.getDataId(), listener);
+		},
+		recalcPopoverPosition: function (popover, component) {
+			var styles = {};
+			styles.width = component.outerWidth();
+			var offset = component.offset();
+			styles.top = offset.top + component.outerHeight();
+			styles.left = offset.left;
+
+			var onTop = false;
+			var rightToLeft = false;
+			var realHeight = popover.outerHeight();
+			var realWidth = popover.outerWidth();
+			// set the real top, assumpt it is on bottom
+			styles.top = offset.top + component.outerHeight();
+			// check popover in top or bottom
+			if (styles.top + realHeight > $(window).height() + $(window).scrollTop()) {
+				// cannot show in bottom and in current viewport
+				// check it is enough top or not
+				if (offset.top - $(window).scrollTop() >= realHeight) {
+					// enough
+					styles.top = offset.top - realHeight;
+					onTop = true;
+				} else if (styles.top + realHeight <= $(document).height()) {
+					// can show in bottom and in current document
+					onTop = false;
+				} else if (offset.top < realHeight) {
+					// cannot show in top and in current document
+					onTop = false;
+				} else {
+					styles.top = offset.top - realHeight;
+					onTop = true;
+				}
+			} else {
+				// can show in bottom and in current viewport
+				onTop = false;
+			}
+
+			// check popover to left or right
+			if (realWidth > styles.width) {
+				var width = $(document).width();
+				if (styles.left + realWidth <= width) {
+					// normal from left to right, do nothing
+				} else if (styles.left + styles.width >= realWidth) {
+						// from right to left
+						styles.left = styles.left + styles.width - realWidth;
+						rightToLeft = true;
+					} else {
+						// still left to right, do nothing
+					}
+			}
+
+			if (onTop) {
+				popover.addClass('top');
+				popover.removeClass('bottom');
+			} else {
+				popover.removeClass('top');
+				popover.addClass('bottom');
+			}
+			if (rightToLeft) {
+				popover.addClass('right-to-left');
+			}
+			popover.css({ top: styles.top, left: styles.left });
 		}
 	};
 
@@ -6086,6 +6148,7 @@
 	var NDateTime = React.createClass($pt.defineCellComponent({
 		displayName: 'NDateTime',
 		statics: {
+			POP_FIX_ON_BOTTOM: false,
 			FORMAT: 'YYYY/MM/DD',
 			HEADER_MONTH_FORMAT: 'MMMM',
 			HEADER_YEAR_FORMAT: 'YYYY',
@@ -6106,7 +6169,6 @@
 				SECOND: 2,
 				MILLSECOND: 1
 			},
-			MIN_WIDTH: 250,
 			CLOCK_RADIUS: 100,
 			CLOCK_HOUR_PERCENTAGE: 0.6,
 			CLOCK_BIG_ENGRAVE_LENGTH: 8,
@@ -6118,7 +6180,11 @@
 				BOTTOM: { X: 100, Y: 203 }
 			},
 			CLOCK_HAND_OFFSET: 10,
-			TOTAL_HEIGHT: 272
+			CLOSE_TEXT: 'Close',
+			TODAY_TEXT: 'Now',
+			CLEAR_TEXT: 'Clear',
+			DATE_SWITCH_TEXT: 'Date',
+			TIME_SWITCH_TEXT: 'Time'
 		},
 		propTypes: {
 			model: React.PropTypes.object,
@@ -6507,7 +6573,83 @@
 				this.renderIcon({ icon: this.getIcon(options.icon) })
 			);
 		},
-		renderPopoverContentFooter: function (today, type) {
+		renderPopoverContentFooterForMobile: function (today, type) {
+			var viewSwitch = null;
+			if (this.hasDateToDisplay() && this.hasTimeToDisplay()) {
+				viewSwitch = [];
+				// is date view, show time switch
+				viewSwitch.push(React.createElement(
+					'a',
+					{ href: 'javascript:void(0);',
+						onClick: this.switchToTimeViewOnMobile,
+						className: 'time-switch' + (this.state.dateViewWhenMobilePhone ? '' : ' hidden'),
+						key: 'date' },
+					React.createElement(
+						'span',
+						null,
+						NDateTime.TIME_SWITCH_TEXT
+					)
+				));
+				// not date view, show date switch
+				viewSwitch.push(React.createElement(
+					'a',
+					{ href: 'javascript:void(0);',
+						onClick: this.switchToDateViewOnMobile,
+						className: 'date-switch' + (this.state.dateViewWhenMobilePhone ? ' hidden' : ''),
+						key: 'time' },
+					React.createElement(
+						'span',
+						null,
+						NDateTime.DATE_SWITCH_TEXT
+					)
+				));
+			}
+			return React.createElement(
+				'div',
+				{ className: 'calendar-footer row' },
+				React.createElement(
+					'div',
+					null,
+					React.createElement(
+						'a',
+						{ href: 'javascript:void(0);', onClick: this.hidePopover },
+						React.createElement(
+							'span',
+							null,
+							NDateTime.CLOSE_TEXT
+						)
+					),
+					React.createElement(
+						'a',
+						{ href: 'javascript:void(0);', onClick: this.renderPopover.bind(this, {
+								date: null,
+								type: type,
+								set: true
+							}) },
+						React.createElement(
+							'span',
+							null,
+							NDateTime.CLEAR_TEXT
+						)
+					),
+					React.createElement(
+						'a',
+						{ href: 'javascript:void(0);', onClick: this.renderPopover.bind(this, {
+								date: today,
+								type: type,
+								set: true
+							}) },
+						React.createElement(
+							'span',
+							null,
+							NDateTime.TODAY_TEXT
+						)
+					),
+					viewSwitch
+				)
+			);
+		},
+		renderPopoverContentFooterForDesk: function (today, type) {
 			return React.createElement(
 				'div',
 				{ className: 'calendar-footer row' },
@@ -6532,6 +6674,13 @@
 					click: this.hidePopover
 				})
 			);
+		},
+		renderPopoverContentFooter: function (today, type) {
+			if (this.isMobilePhone()) {
+				return this.renderPopoverContentFooterForMobile(today, type);
+			} else {
+				return this.renderPopoverContentFooterForDesk(today, type);
+			}
 		},
 		renderEngrave: function (degree, radius, length, className, offset) {
 			var startLength = radius - length;
@@ -6744,9 +6893,10 @@
 			} else if (this.hasMinute()) {
 				titleFormat = 'HH:mm';
 			}
+			var hiddenWhenMobile = this.state.dateViewWhenMobilePhone ? ' hidden' : '';
 			return React.createElement(
 				'div',
-				{ className: 'time-view', style: styles },
+				{ className: 'time-view' + hiddenWhenMobile, style: styles },
 				React.createElement(
 					'div',
 					{ className: 'calendar-header' },
@@ -6794,6 +6944,10 @@
 			date = date ? date : this.getToday();
 			if (popoverType == null) {
 				popoverType = this.getInitialPopoverType() || this.guessDisplayFormatType();
+				if (this.isMobilePhone() && this.hasDateToDisplay(popoverType)) {
+					// first time show in mobile phone
+					this.state.dateViewWhenMobilePhone = true;
+				}
 			}
 			var styles = {
 				float: 'left',
@@ -6809,10 +6963,10 @@
 						'div',
 						{ className: 'date-view', style: styles },
 						this.renderDayHeader(date),
-						this.renderDayBody(date),
-						this.renderPopoverContentFooter(this.getToday(), NDateTime.FORMAT_TYPES.DAY)
+						this.renderDayBody(date)
 					),
-					this.renderTime(date, NDateTime.FORMAT_TYPES.DAY)
+					this.renderTime(date, NDateTime.FORMAT_TYPES.DAY),
+					this.renderPopoverContentFooter(this.getToday(), NDateTime.FORMAT_TYPES.DAY)
 				);
 			} else if ((popoverType & NDateTime.FORMAT_TYPES.MONTH) != 0) {
 				// has month, YM
@@ -6824,10 +6978,10 @@
 						'div',
 						{ className: 'date-view', style: styles },
 						this.renderMonthHeader(date),
-						this.renderMonthBody(date),
-						this.renderPopoverContentFooter(this.getToday(), NDateTime.FORMAT_TYPES.MONTH)
+						this.renderMonthBody(date)
 					),
-					this.renderTime(date, NDateTime.FORMAT_TYPES.MONTH)
+					this.renderTime(date, NDateTime.FORMAT_TYPES.MONTH),
+					this.renderPopoverContentFooter(this.getToday(), NDateTime.FORMAT_TYPES.MONTH)
 				);
 			} else if ((popoverType & NDateTime.FORMAT_TYPES.YEAR) != 0) {
 				// has year, YEAR
@@ -6839,10 +6993,10 @@
 						'div',
 						{ className: 'date-view', style: styles },
 						this.renderYearHeader(date),
-						this.renderYearBody(date),
-						this.renderPopoverContentFooter(this.getToday(), NDateTime.FORMAT_TYPES.YEAR)
+						this.renderYearBody(date)
 					),
-					this.renderTime(date, NDateTime.FORMAT_TYPES.YEAR)
+					this.renderTime(date, NDateTime.FORMAT_TYPES.YEAR),
+					this.renderPopoverContentFooter(this.getToday(), NDateTime.FORMAT_TYPES.YEAR)
 				);
 			} else {
 				this.startClockInterval(popoverType, date);
@@ -6850,7 +7004,8 @@
 				return React.createElement(
 					'div',
 					{ className: 'popover-content row' },
-					this.renderTime(date, this.guessDisplayFormatType())
+					this.renderTime(date, this.guessDisplayFormatType()),
+					this.renderPopoverContentFooter(this.getToday(), popoverType)
 				);
 			}
 		},
@@ -6867,64 +7022,23 @@
 			}
 
 			var styles = { display: 'block' };
-			var component = this.getComponent();
-			styles.width = component.outerWidth();
 			var displayFormatType = this.guessDisplayFormatType();
-			var width = (this.hasDateToDisplay(displayFormatType) ? NDateTime.MIN_WIDTH : 0) + (this.hasTimeToDisplay(displayFormatType) ? NDateTime.MIN_WIDTH : 0);
-			var widerThanComponent = false;
-			if (styles.width < width) {
-				widerThanComponent = true;
-				styles.width = width;
-			}
-			var offset = component.offset();
-			styles.top = offset.top + component.outerHeight();
-			styles.left = offset.left;
+			styles.top = -10000;
+			styles.left = 0;
 
 			var popoverCSS = {
 				'n-datetime': true,
 				'popover': true,
-				'in': true
+				'bottom': true,
+				'in': true,
+				'time-only': !this.hasDateToDisplay(displayFormatType) && this.hasTimeToDisplay(displayFormatType),
+				'date-only': this.hasDateToDisplay(displayFormatType) && !this.hasTimeToDisplay(displayFormatType),
+				'date-and-time': this.hasDateToDisplay(displayFormatType) && this.hasTimeToDisplay(displayFormatType)
 			};
-			// check popover in top or bottom
-			if (styles.top + NDateTime.TOTAL_HEIGHT > $(window).height() + $(window).scrollTop()) {
-				// cannot show in bottom and in current viewport
-				// check it is enough top or not
-				if (offset.top - $(window).scrollTop() >= NDateTime.TOTAL_HEIGHT) {
-					// enough
-					styles.top = offset.top - NDateTime.TOTAL_HEIGHT;
-					popoverCSS.top = true;
-				} else if (styles.top + NDateTime.TOTAL_HEIGHT <= $(document).height()) {
-					// can show in bottom and in current document
-					popoverCSS.bottom = true;
-				} else if (offset.top < NDateTime.TOTAL_HEIGHT) {
-					// cannot show in top and in current document
-					popoverCSS.bottom = true;
-				} else {
-					styles.top = offset.top - NDateTime.TOTAL_HEIGHT;
-					popoverCSS.top = true;
-				}
-			} else {
-				// can show in bottom and in current viewport
-				popoverCSS.bottom = true;
-			}
 
-			// check popover to left or right
-			if (widerThanComponent) {
-				width = $(document).width();
-				if (styles.left + styles.width <= width) {
-					// normal from left to right, do nothing
-				} else if (styles.left + component.outerWidth() >= styles.width) {
-						// from right to left
-						styles.left = styles.left + component.outerWidth() - styles.width;
-						popoverCSS['right-to-left'] = true;
-					} else {
-						// still left to right, do nothing
-					}
-			}
-
-			delete styles.width; // width is not necessary since there is min-width and max-width in css
 			if (this.isMobilePhone()) {
 				popoverCSS['mobile-phone'] = true;
+				popoverCSS['fix-bottom'] = this.isPopoverFixOnBottom();
 				styles = { display: 'block' }; // reset styles
 			}
 			var popover = React.createElement(
@@ -6933,18 +7047,31 @@
 				React.createElement('div', { className: 'arrow' }),
 				this.renderPopoverContent(options.date, options.type)
 			);
-			ReactDOM.render(popover, this.state.popover.get(0));
+			ReactDOM.render(popover, this.state.popoverDiv.get(0), this.onPopoverRenderComplete);
+		},
+		onPopoverRenderComplete: function () {
+			this.state.popoverDiv.show();
+			if (this.isMobilePhone()) {
+				$('html').addClass('on-mobile-popover-shown');
+				return;
+			}
+
+			var popover = this.state.popoverDiv.children('.popover');
+			var component = this.getComponent();
+			this.recalcPopoverPosition(popover, component);
 		},
 		renderPopoverContainer: function () {
-			if (this.state.popover == null) {
-				this.state.popover = $('<div>');
-				this.state.popover.appendTo($('body'));
+			if (this.state.popoverDiv == null) {
+				this.state.popoverDiv = $('<div>');
+				this.state.popoverDiv.appendTo($('body'));
 				if (!this.isMobilePhone()) {
 					$(document).on('mousedown', this.onDocumentMouseDown).on('keyup', this.onDocumentKeyUp).on('mousewheel', this.onDocumentMouseWheel);
 					$(window).on('resize', this.onWindowResize);
+				} else {
+					$('body').on('touchmove mousewheel', this.onDocumentMouseWheel);
 				}
 			}
-			this.state.popover.hide();
+			this.state.popoverDiv.hide();
 		},
 		stopClockInterval: function () {
 			if (this.state.clockInterval) {
@@ -6976,20 +7103,21 @@
 		showPopover: function () {
 			this.renderPopoverContainer();
 			this.renderPopover();
-			$('html').addClass('on-mobile-popover-shown');
-			this.state.popover.show();
 		},
 		hidePopover: function () {
 			this.destroyPopover();
 		},
 		destroyPopover: function () {
 			$('html').removeClass('on-mobile-popover-shown');
-			if (this.state.popover) {
+			if (this.state.popoverDiv) {
 				this.stopClockInterval();
 				$(document).off('mousedown', this.onDocumentMouseDown).off('keyup', this.onDocumentKeyUp).off('mousewheel', this.onDocumentMouseWheel);
 				$(window).off('resize', this.onWindowResize);
-				this.state.popover.remove();
-				delete this.state.popover;
+				if (this.isMobilePhone()) {
+					$('body').off('touchmove mousewheel', this.onDocumentMouseWheel);
+				}
+				this.state.popoverDiv.remove();
+				delete this.state.popoverDiv;
 			}
 		},
 		/**
@@ -7032,11 +7160,16 @@
 		},
 		onDocumentMouseDown: function (evt) {
 			var target = $(evt.target);
-			if (target.closest(this.getComponent()).length == 0 && target.closest(this.state.popover).length == 0) {
+			if (target.closest(this.getComponent()).length == 0 && target.closest(this.state.popoverDiv).length == 0) {
 				this.hidePopover();
 			}
 		},
 		onDocumentMouseWheel: function (evt) {
+			if (this.isMobilePhone()) {
+				// when mobile phone, prevent the touch move and mouse wheel event
+				evt.preventDefault();
+				return;
+			}
 			this.hidePopover();
 		},
 		onDocumentKeyUp: function (evt) {
@@ -7210,6 +7343,28 @@
 			this.setValueToModel(value);
 
 			this.renderPopover({ date: value, type: type });
+		},
+		switchToTimeViewOnMobile: function (evt) {
+			var target = $(evt.target);
+			if (target[0].tagName === 'SPAN') {
+				target = target.closest('a');
+			}
+			target.addClass('hidden').siblings('.date-switch').removeClass('hidden');
+			this.state.dateViewWhenMobilePhone = false;
+			var parent = target.closest('.popover-content');
+			parent.children('.time-view').removeClass('hidden');
+			parent.children('.date-view').addClass('hidden');
+		},
+		switchToDateViewOnMobile: function (evt) {
+			var target = $(evt.target);
+			if (target[0].tagName === 'SPAN') {
+				target = target.closest('a');
+			}
+			target.addClass('hidden').siblings('.time-switch').removeClass('hidden');
+			this.state.dateViewWhenMobilePhone = true;
+			var parent = target.closest('.popover-content');
+			parent.children('.time-view').addClass('hidden');
+			parent.children('.date-view').removeClass('hidden');
 		},
 		onTextInputChange: function () {
 			// since the text input might be incorrect date format,
@@ -7422,6 +7577,9 @@
 		},
 		getInitialPopoverType: function () {
 			return this.getComponentOption('popoverType');
+		},
+		isPopoverFixOnBottom: function () {
+			return this.isMobilePhone() && NDateTime.POP_FIX_ON_BOTTOM === true;
 		}
 	}));
 
@@ -12596,7 +12754,6 @@
 			NO_OPTION_FOUND: 'No Option Found',
 			FILTER_PLACEHOLDER: 'Search...',
 			CLOSE_TEXT: 'Close',
-			CONFIRM_TEXT: 'Set',
 			CLEAR_TEXT: 'Clear'
 		},
 		propTypes: {
@@ -12880,10 +13037,6 @@
 			if (!this.isMobilePhone()) {
 				return null;
 			}
-			//<a href='javascript:void(0);' onClick={}>
-			//	<span className='fa fa-fw fa-close'>{NSelect.CONFIRM_TEXT}</span>
-			//</a>
-
 			return React.createElement(
 				'div',
 				{ className: 'operations row' },
@@ -12971,67 +13124,8 @@
 			}
 
 			var popover = this.state.popoverDiv.children('.popover');
-			var styles = {};
 			var component = this.getComponent();
-			styles.width = component.outerWidth();
-			var offset = component.offset();
-			styles.top = offset.top + component.outerHeight();
-			styles.left = offset.left;
-
-			var onTop = false;
-			var rightToLeft = false;
-			var realHeight = popover.outerHeight();
-			var realWidth = popover.outerWidth();
-			// set the real top, assumpt it is on bottom
-			styles.top = offset.top + component.outerHeight();
-			// check popover in top or bottom
-			if (styles.top + realHeight > $(window).height() + $(window).scrollTop()) {
-				// cannot show in bottom and in current viewport
-				// check it is enough top or not
-				if (offset.top - $(window).scrollTop() >= realHeight) {
-					// enough
-					styles.top = offset.top - realHeight;
-					onTop = true;
-				} else if (styles.top + realHeight <= $(document).height()) {
-					// can show in bottom and in current document
-					onTop = false;
-				} else if (offset.top < realHeight) {
-					// cannot show in top and in current document
-					onTop = false;
-				} else {
-					styles.top = offset.top - realHeight;
-					onTop = true;
-				}
-			} else {
-				// can show in bottom and in current viewport
-				onTop = false;
-			}
-
-			// check popover to left or right
-			if (realWidth > styles.width) {
-				var width = $(document).width();
-				if (styles.left + realWidth <= width) {
-					// normal from left to right, do nothing
-				} else if (styles.left + styles.width >= realWidth) {
-						// from right to left
-						styles.left = styles.left + styles.width - realWidth;
-						rightToLeft = true;
-					} else {
-						// still left to right, do nothing
-					}
-			}
-
-			if (onTop) {
-				popover.addClass('top');
-				popover.removeClass('bottom');
-			} else {
-				popover.removeClass('top');
-				popover.addClass('bottom');
-			}
-			if (rightToLeft) {
-				popover.addClass('right-to-left');
-			}
-			popover.css({ top: styles.top, left: styles.left });
+			this.recalcPopoverPosition(popover, component);
 
 			// if there is no active option, set first as active
 			var options = this.state.popoverDiv.find('ul.options > li');
@@ -13925,67 +14019,8 @@
 			}
 
 			var popover = this.state.popoverDiv.children('.popover');
-			var styles = {};
 			var component = this.getComponent();
-			styles.width = component.outerWidth();
-			var offset = component.offset();
-			styles.top = offset.top + component.outerHeight(); // let it out of screen
-			styles.left = offset.left;
-
-			var onTop = false;
-			var rightToLeft = false;
-			var realHeight = popover.outerHeight();
-			var realWidth = popover.outerWidth();
-			// set the real top, assumpt it is on bottom
-			styles.top = offset.top + component.outerHeight();
-			// check popover in top or bottom
-			if (styles.top + realHeight > $(window).height() + $(window).scrollTop()) {
-				// cannot show in bottom and in current viewport
-				// check it is enough top or not
-				if (offset.top - $(window).scrollTop() >= realHeight) {
-					// enough
-					styles.top = offset.top - realHeight;
-					onTop = true;
-				} else if (styles.top + realHeight <= $(document).height()) {
-					// cannot show in bottom and in current document
-					onTop = false;
-				} else if (offset.top < realHeight) {
-					// cannot show in top and in current document
-					onTop = false;
-				} else {
-					styles.top = offset.top - realHeight;
-					onTop = true;
-				}
-			} else {
-				// can show in bottom and in current viewport
-				onTop = false;
-			}
-
-			// check popover to left or right
-			if (realWidth > styles.width) {
-				var width = $(document).width();
-				if (styles.left + realWidth <= width) {
-					// normal from left to right, do nothing
-				} else if (styles.left + styles.width >= realWidth) {
-						// from right to left
-						styles.left = styles.left + styles.width - realWidth;
-						rightToLeft = true;
-					} else {
-						// still left to right, do nothing
-					}
-			}
-
-			if (onTop) {
-				popover.addClass('top');
-				popover.removeClass('bottom');
-			} else {
-				popover.removeClass('top');
-				popover.addClass('bottom');
-			}
-			if (rightToLeft) {
-				popover.addClass('right-to-left');
-			}
-			popover.css({ top: styles.top, left: styles.left });
+			this.recalcPopoverPosition(popover, component);
 		},
 		hidePopover: function () {
 			// if (this.state.popoverDiv && this.state.popoverDiv.is(':visible')) {
