@@ -210,7 +210,7 @@
 							}, {
 								id: 'data-reset',
 								title: '#reset',
-								pattern: '#reset(id: string|RegExp, listener: function) : ModelInterface',
+								pattern: '#reset() : ModelInterface',
 								desc: <span>Reset current model, clear validation result and reset changed to false.
 								Note the current model is recreated base on original model.</span>
 							}, {
