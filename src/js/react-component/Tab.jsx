@@ -1,32 +1,6 @@
-/**
- * normal tab
- */
 (function (window, $, React, ReactDOM, $pt) {
 	var NTab = React.createClass({
 		displayName: 'NTab',
-		propTypes: {
-			type: React.PropTypes.oneOf(['tab', 'pill']),
-			justified: React.PropTypes.bool,
-			direction: React.PropTypes.oneOf(['vertical', 'horizontal']),
-			size: React.PropTypes.oneOf(["lg", "2x", "3x", "4x", "5x"]),
-			removable: React.PropTypes.bool,
-			canActive: React.PropTypes.func,
-			onActive: React.PropTypes.func,
-			canRemove: React.PropTypes.func,
-			onRemove: React.PropTypes.func,
-			tabClassName: React.PropTypes.string,
-
-			tabs: React.PropTypes.arrayOf(React.PropTypes.shape({
-				label: React.PropTypes.string,
-				icon: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.element]),
-				active: React.PropTypes.bool,
-				value: React.PropTypes.any,
-				badge: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number]),
-				innerId: React.PropTypes.string,
-				removable: React.PropTypes.bool,
-				className: React.PropTypes.string
-			}))
-		},
 		getDefaultProps: function () {
 			return {
 				type: 'tab',

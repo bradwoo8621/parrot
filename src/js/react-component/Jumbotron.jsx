@@ -4,11 +4,6 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NJumbortron = React.createClass({
 		displayName: 'NJumbortron',
-		propTypes: {
-			highlightText: React.PropTypes.oneOfType([
-				React.PropTypes.string,
-				React.PropTypes.arrayOf(React.PropTypes.string)]).isRequired
-		},
 		renderText: function () {
 			if (Array.isArray(this.props.highlightText)) {
 				return this.props.highlightText.map(function (text, textIndex) {

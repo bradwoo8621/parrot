@@ -16,13 +16,6 @@
 			ADVANCED_SEARCH_PROXY: null,
 			ADVANCED_SEARCH_PROXY_CALLBACK: null,
 		},
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object,
-			view: React.PropTypes.bool
-		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {}
@@ -33,51 +26,12 @@
 				stopRetrieveLabelFromRemote: false
 			};
 		},
-		/**
-		 * will update
-		 * @param nextProps
-		 */
-		componentWillUpdate: function (nextProps) {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChange);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
-		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
-		componentDidUpdate: function (prevProps, prevState) {
+		beforeDidUpdate: function (prevProps, prevState) {
 			this.initSetValues();
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChange);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
 		},
-		/**
-		 * did mount
-		 */
-		componentDidMount: function () {
+		beforeDidMount: function () {
 			// set model value to component
 			this.initSetValues();
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChange);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-		 * will unmount
-		 */
-		componentWillUnmount: function () {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChange);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * render
@@ -138,11 +92,10 @@
 		 * on model change
 		 * @param evt
 		 */
-		onModelChange: function (evt) {
+		onModelChanged: function (evt) {
 			var value = evt.new;
 			this.getComponent().val(value);
 			this.retrieveAndSetLabelTextFromRemote(value);
-			// this.forceUpdate();
 		},
 		/**
 		 * show advanced search dialog

@@ -20,9 +20,6 @@
 			WAITING_MESSAGE: 'Send request to server and waiting for response...',
 			Z_INDEX: 9898
 		},
-		propTypes: {
-			className: React.PropTypes.string
-		},
 		getInitialState: function () {
 			return {
 				visible: false

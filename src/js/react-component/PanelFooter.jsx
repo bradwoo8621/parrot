@@ -22,60 +22,14 @@
 			CANCEL_ICON: 'ban',
 			CANCEL_STYLE: 'danger'
 		},
-		propTypes: {
-			save: React.PropTypes.func,
-			validate: React.PropTypes.func,
-			cancel: React.PropTypes.func,
-			reset: React.PropTypes.func,
-
-			// left: React.PropTypes.arrayOf(React.PropTypes.shape({
-			// 	icon: React.PropTypes.string,
-			// 	text: React.PropTypes.string,
-			// 	style: React.PropTypes.string,
-			// 	click: React.PropTypes.func.isRequired,
-			// 	enabled: React.PropTypes.oneOfType([React.PropTypes.bool, React.PropTypes.shape({
-			// 		when: React.PropTypes.func,
-			// 		depends: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.arrayOf(React.PropTypes.string)])
-			// 	})])
-			// })),
-			// right: React.PropTypes.arrayOf(React.PropTypes.shape({
-			// 	icon: React.PropTypes.string,
-			// 	text: React.PropTypes.string,
-			// 	style: React.PropTypes.string, // references to bootstrap styles
-			// 	click: React.PropTypes.func.isRequired,
-			// 	enabled: React.PropTypes.oneOfType([React.PropTypes.bool, React.PropTypes.shape({
-			// 		when: React.PropTypes.func,
-			// 		depends: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.arrayOf(React.PropTypes.string)])
-			// 	})])
-			// })),
-
-			// model, pass to click
-			model: React.PropTypes.object,
-			view: React.PropTypes.bool
-		},
-		/**
-		 * will update
-		 * @param nextProps
-		 */
-		componentWillUpdate: function (nextProps) {
-		},
-		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
-		componentDidUpdate: function (prevProps, prevState) {
-		},
-		/**
-		 * did mount
-		 */
-		componentDidMount: function () {
-		},
-		/**
-		 * will unmount
-		 */
-		componentWillUnmount: function () {
-		},
+		// componentWillUpdate: function (nextProps) {
+		// },
+		// componentDidUpdate: function (prevProps, prevState) {
+		// },
+		// componentDidMount: function () {
+		// },
+		// componentWillUnmount: function () {
+		// },
 		/**
 		 * render left buttons
 		 */

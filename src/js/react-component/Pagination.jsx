@@ -1,30 +1,6 @@
-/**
- * pagination
- *
- * NOTE: never jump by itself, must register the toPage and refresh this component manually
- */
 (function (window, $, React, ReactDOM, $pt) {
 	var NPagination = React.createClass({
 		displayName: 'NPagination',
-		/**
-		 * @override
-		 */
-		propTypes: {
-			// max page buttons
-			maxPageButtons: React.PropTypes.number,
-			// page count
-			pageCount: React.PropTypes.number,
-			// current page index, start from 1
-			currentPageIndex: React.PropTypes.number,
-
-			// jump to page, will be invoked when page index changed
-			toPage: React.PropTypes.func.isRequired,
-
-			className: React.PropTypes.string,
-
-			// show status label
-			showStatus: React.PropTypes.bool
-		},
 		/**
 		 * override react method
 		 * @returns {*}

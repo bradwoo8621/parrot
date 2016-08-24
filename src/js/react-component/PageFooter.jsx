@@ -11,9 +11,6 @@
 			COMPANY_URL: 'https://github.com/bradwoo8621/nest',
 			LEFT_TEXT: 'For best viewing, we recommend using the latest Chrome version.'
 		},
-		propTypes: {
-			name: React.PropTypes.string.isRequired
-		},
 		getDefaultProps: function () {
 			return {};
 		},

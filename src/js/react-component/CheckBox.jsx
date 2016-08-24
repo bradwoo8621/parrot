@@ -1,90 +1,6 @@
-/**
- * checkbox
- *
- * layout: {
- *      label: string,
- *      dataId: string,
- *      pos: {
- *          row: number,
- *          col: number,
- *          width: number,
- *          section: string,
- *          card: string
- *      },
- *      css: {
- *          cell: string,
- *          comp: string
- *      },
- *      comp: {
- *          type: $pt.ComponentConstants.Check,
- *          labelAttached: boolean,
- *          enabled: {
- *              when: function,
- *              depends: string|string[]
- *          },
- *          visible: {
- *              when: function,
- *              depends: string|string[]
- *          }
- *      }
- * }
- */
 (function (window, $, React, ReactDOM, $pt) {
 	var NCheck = React.createClass($pt.defineCellComponent({
 		displayName: 'NCheck',
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object
-		},
-		/**
-		 * will update
-		 * @param nextProps
-		 */
-		componentWillUpdate: function (nextProps) {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
-		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
-		componentDidUpdate: function (prevProps, prevState) {
-			// set model value to component
-			// this.getComponent().prop("checked", this.getValueFromModel());
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-		 * did mount
-		 */
-		componentDidMount: function () {
-			// set model value to component
-			// this.getComponent().prop("checked", this.getValueFromModel());
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-		 * will unmount
-		 */
-		componentWillUnmount: function () {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
 		/**
 		 * render label
 		 * @param labelInLeft {boolean}
@@ -167,22 +83,6 @@
 			if (evt.keyCode == '32') {
 				this.onButtonClicked();
 			}
-		},
-		/**
-		 * on component change
-		 * @param evt
-		 */
-		// onComponentChanged: function (evt) {
-		// 	// synchronize value to model
-		// 	this.setValueToModel(evt.target.checked);
-		// },
-		/**
-		 * on model change
-		 * @param evt
-		 */
-		onModelChanged: function (evt) {
-			// this.getComponent().prop("checked", evt.new === true);
-			this.forceUpdate();
 		},
 		/**
 		 * is checked or not

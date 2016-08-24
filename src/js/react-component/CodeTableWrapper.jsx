@@ -5,13 +5,12 @@
 			ON_LOADING_ICON: 'fa fa-fw fa-spinner fa-spin',
 			ON_LOADING: 'On Loading...'
 		},
-		propTypes: {
-		},
 		getDefaultProps: function () {
 			return {};
 		},
-		getInitialState: function () {
-			return {};
+		componentWillUpdate: function() {
+		},
+		componentDidUpdate: function() {
 		},
 		/**
 		 * did mount
@@ -43,6 +42,8 @@
 					onMounted.call(this);
 				}
 			}
+		},
+		componentWillUnmount: function() {
 		},
 		repaint: function() {
 			var onMounted = this.props.onMounted;

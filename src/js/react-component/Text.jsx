@@ -1,51 +1,3 @@
-/**
- * text input
- * onKeyUp listener makes sure the keyboard operation monitored.
- * and change listener makes sure the mouse operation monitored on blur.
- *
- * layout: {
- *      label: string,
- *      dataId: string,
- *      pos: {
- *          row: number,
- *          col: number,
- *          width: number,
- *          section: string,
- *          card: string
- *      },
- *      css: {
- *          cell: string,
- *          comp: string,
- *          'normal-line': string,
- *          'focus-line': string
- *      },
- *      comp: {
- *          type: $pt.ComponentConstants.Text,
- *          pwd: boolean,
- *          placeholder: string,
- *          enabled: {
- *              when: function,
- *              depends: string|string[]
- *          },
- *          visible: {
- *              when: function,
- *              depends: string|string[]
- *          },
- *          leftAddon: {
- *              text: string,
- *              icon: string,
- *              iconFirst: boolean,
- *              click: function
- *          },
- *          rightAddon: {
- *              text: string,
- *              icon: string,
- *              iconFirst: boolean,
- *              click: function
- *          }
- *      }
- * }
- */
 (function (window, $, React, ReactDOM, $pt) {
 	var NText = React.createClass($pt.defineCellComponent({
 		displayName: 'NText',
@@ -70,38 +22,20 @@
 			},
 			TRIM: false
 		},
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object
-		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {}
 			};
 		},
-		getInitialState: function () {
-			return {};
-		},
-		/**
-		 * will update
-		 * @param nextProps
-		 */
-		componentWillUpdate: function (nextProps) {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
+		afterWillUpdate: function (nextProps) {
 			this.getComponent().off('change', this.onComponentChanged);
-			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * did update
 		 * @param prevProps
 		 * @param prevState
 		 */
-		componentDidUpdate: function (prevProps, prevState) {
+		beforeDidUpdate: function (prevProps, prevState) {
 			var formattedValue = this.getValueFromModel();
 			if (!$(ReactDOM.findDOMNode(this.refs.focusLine)).hasClass('focus')) {
 				formattedValue = this.getFormattedValue(formattedValue);
@@ -109,36 +43,19 @@
 			if (this.getComponent().val() != formattedValue) {
 				this.getComponent().val(formattedValue);
 			}
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.getComponent().on('change', this.onComponentChanged);
-			this.registerToComponentCentral();
 		},
-		/**
-		 * did mount
-		 */
-		componentDidMount: function () {
+		afterDidUpdate: function() {
+			this.getComponent().on('change', this.onComponentChanged);
+		},
+		beforeDidMount: function () {
 			// set model value to component
 			this.getComponent().val(this.getFormattedValue(this.getValueFromModel()));
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.getComponent().on('change', this.onComponentChanged);
-			this.registerToComponentCentral();
 		},
-		/**
-		 * will unmount
-		 */
-		componentWillUnmount: function () {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
+		afterDidMount: function() {
+			this.getComponent().on('change', this.onComponentChanged);
+		},
+		afterWillUnmount: function () {
 			this.getComponent().off('change', this.onComponentChanged);
-			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * render left add-on
@@ -300,24 +217,6 @@
 			if (!this.textEquals(newValue, oldValue)) {
 				this.setValueToModel(evt.target.value);
 			}
-		},
-		/**
-		 * on model change
-		 * @param evt
-		 */
-		onModelChanged: function (evt) {
-			this.forceUpdate();
-			// return;
-			//
-			// var formattedValue = this.getValueFromModel();
-			// if (!$(ReactDOM.findDOMNode(this.refs.focusLine)).hasClass('focus')) {
-			// 	formattedValue = this.getFormattedValue(formattedValue);
-			// }
-			// if (formattedValue == this.getComponent().val()) {
-			// 	return;
-			// }
-			// // window.console.debug('Text model changed[modelValue=' + evt.new + ', compValue=' + this.getComponent().val() + '].');
-			// this.getComponent().val(formattedValue);
 		},
 		onKeyUp: function (evt) {
 			var monitor = this.getEventMonitor('keyUp');

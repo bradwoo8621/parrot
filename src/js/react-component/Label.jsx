@@ -4,61 +4,12 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NLabel = React.createClass($pt.defineCellComponent({
 		displayName: 'NLabel',
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object
-		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
 					textFromModel: true
 				}
 			};
-		},
-		/**
-		 * will update
-		 * @param nextProps
-		 */
-		componentWillUpdate: function (nextProps) {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.__forceUpdate);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
-		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
-		componentDidUpdate: function (prevProps, prevState) {
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.__forceUpdate);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-		 * did mount
-		 */
-		componentDidMount: function () {
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.__forceUpdate);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-		 * will unmount
-		 */
-		componentWillUnmount: function () {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.__forceUpdate);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
 		},
 		render: function () {
 			var texts = this.getText();

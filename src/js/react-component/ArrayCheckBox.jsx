@@ -1,14 +1,6 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NArrayCheck = React.createClass($pt.defineCellComponent({
 		displayName: 'NArrayCheck',
-		statics: {
-		},
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object
-		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
@@ -16,52 +8,6 @@
 					labelAttached: 'right'
 				}
 			};
-		},
-		getInitialState: function () {
-			return {};
-		},
-		/**
-		 * will update
-		 * @param nextProps
-		 */
-		componentWillUpdate: function (nextProps) {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
-		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
-		componentDidUpdate: function (prevProps, prevState) {
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-		 * did mount
-		 */
-		componentDidMount: function () {
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-		 * will unmount
-		 */
-		componentWillUnmount: function () {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
 		},
 		renderItem: function(enabled, item, itemIndex) {
 			var model = $pt.createModel({
@@ -101,9 +47,6 @@
 			return (<div className={$pt.LayoutHelper.classSet(css)}>
 				{this.getCodeTable().list().map(this.renderItem.bind(this, enabled))}
 			</div>);
-		},
-		onModelChanged: function() {
-			this.forceUpdate();
 		},
 		onCodeItemCheckedChanged: function(codeTableItem, evt) {
 			if (evt.new) {

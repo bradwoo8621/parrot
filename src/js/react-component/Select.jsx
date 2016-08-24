@@ -1,6 +1,7 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NSelect = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelect',
+		mixins: [$pt.mixins.PopoverMixin],
 		statics: {
 			POP_FIX_ON_BOTTOM: false,
 			PLACEHOLDER: "Please Select...",
@@ -8,13 +9,6 @@
 			FILTER_PLACEHOLDER: 'Search...',
 			CLOSE_TEXT: 'Close',
 			CLEAR_TEXT: 'Clear'
-		},
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object,
-			view: React.PropTypes.bool
 		},
 		getDefaultProps: function () {
 			return {
@@ -37,50 +31,23 @@
 				}
 			};
 		},
-		getInitialState: function() {
-			return {};
-		},
-		/**
-		 * will update
-		 */
-		componentWillUpdate: function (nextProps) {
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
+		afterWillUpdate: function (nextProps) {
 			if (this.hasParent()) {
 				// add post change listener into parent model
-				this.getParentModel().removeListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+				this.getParentModel().removePostChangeListener(this.getParentPropertyId(), this.onParentModelChanged);
 			}
-			this.unregisterFromComponentCentral();
 		},
-		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
-		componentDidUpdate: function (prevProps, prevState) {
-			this.addPostChangeListener(this.onModelChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
+		afterDidUpdate: function (prevProps, prevState) {
 			if (this.hasParent()) {
 				// remove post change listener from parent model
-				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+				this.getParentModel().addPostChangeListener(this.getParentPropertyId(), this.onParentModelChanged);
 			}
-
-			this.registerToComponentCentral();
 		},
-		/**
-		 * did mount
-		 */
-		componentDidMount: function () {
-			this.addPostChangeListener(this.onModelChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
+		afterDidMount: function () {
 			if (this.state.onloading) {
 				if (this.hasParent()) {
 					// add post change listener into parent model
-					this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+					this.getParentModel().addPostChangeListener(this.getParentPropertyId(), this.onParentModelChanged);
 					var parentValue = this.getParentPropertyValue();
 					if (parentValue == null) {
 						// no parent value
@@ -104,19 +71,11 @@
 				}
 			}
 		},
-		/**
-		 * will unmount
-		 */
-		componentWillUnmount: function () {
-			// remove post change listener
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
+		afterWillUnmount: function () {
 			if (this.hasParent()) {
 				// remove post change listener from parent model
-				this.getParentModel().removeListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+				this.getParentModel().removePostChangeListener(this.getParentPropertyId(), this.onParentModelChanged);
 			}
-			this.unregisterFromComponentCentral();
 		},
 		renderClear: function() {
 			if (!this.isClearAllowed()) {
@@ -758,13 +717,6 @@
 			delete this.state.touchStartClientY;
 			delete this.state.touchStartRelatedY;
 			delete this.state.touchStartTime;
-		},
-		/**
-		 * on model change
-		 * @param evt
-		 */
-		onModelChanged: function (evt) {
-			this.forceUpdate();
 		},
 		/**
 		 * on parent model change

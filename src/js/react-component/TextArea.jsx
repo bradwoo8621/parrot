@@ -1,48 +1,6 @@
-/**
- * text input
- * onKeyUp listener makes sure the keyboard operation monitored.
- * and change listener makes sure the mouse operation monitored on blur.
- *
- * layout: {
- *      label: string,
- *      dataId: string,
- *      pos: {
- *          row: number,
- *          col: number,
- *          width: number,
- *          section: string,
- *          card: string
- *      },
- *      css: {
- *          cell: string,
- *          comp: string,
- *          'normal-line': string,
- *          'focus-line': string
- *      },
- *      comp: {
- *          type: $pt.ComponentConstants.TextArea,
- *          placeholder: string,
- *          lines: number,
- *          enabled: {
- *              when: function,
- *              depends: string|string[]
- *          },
- *          visible: {
- *              when: function,
- *              depends: string|string[]
- *          }
- *      }
- * }
- */
 (function (window, $, React, ReactDOM, $pt) {
 	var NTextArea = React.createClass($pt.defineCellComponent({
 		displayName: 'NTextArea',
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object
-		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
@@ -50,57 +8,32 @@
 				}
 			};
 		},
-		/**
-		 * will update
-		 * @param nextProps
-		 */
-		componentWillUpdate: function (nextProps) {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
+		afterWillUpdate: function (nextProps) {
 			this.getComponent().off('change', this.onComponentChanged);
-			this.unregisterFromComponentCentral();
 		},
-		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
-		componentDidUpdate: function (prevProps, prevState) {
+		beforeDidUpdate: function (prevProps, prevState) {
 			if (this.getComponent().val() != this.getValueFromModel()) {
 				this.getComponent().val(this.getValueFromModel());
 			}
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
+		},
+		afterDidUpdate: function() {
 			this.getComponent().on('change', this.onComponentChanged);
-			this.registerToComponentCentral();
 		},
 		/**
 		 * did mount
 		 */
-		componentDidMount: function () {
+		beforeDidMount: function () {
 			// set model value to component
 			this.getComponent().val(this.getValueFromModel());
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
+		},
+		afterDidMount: function () {
 			this.getComponent().on('change', this.onComponentChanged);
-			this.registerToComponentCentral();
 		},
 		/**
 		 * will unmount
 		 */
-		componentWillUnmount: function () {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
+		afterWillUnmount: function () {
 			this.getComponent().off('change', this.onComponentChanged);
-			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * render text
@@ -154,18 +87,6 @@
 		 */
 		onComponentChanged: function (evt) {
 			this.setValueToModel(evt.target.value);
-		},
-		/**
-		 * on model change
-		 * @param evt
-		 */
-		onModelChanged: function (evt) {
-			// var value = evt.new;
-			// if (value == this.getComponent().val()) {
-			// 	return;
-			// }
-			// this.getComponent().val(evt.new);
-			this.forceUpdate();
 		},
 		/**
 		 * on addon clicked

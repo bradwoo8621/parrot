@@ -7,17 +7,6 @@
 		statics: {
 			SEARCH_PLACEHOLDER: 'Search...'
 		},
-		propTypes: {
-			// brand string
-			brand: React.PropTypes.oneOfType([React.PropTypes.object, React.PropTypes.string]).isRequired,
-			brandUrl: React.PropTypes.string,
-			brandFunc: React.PropTypes.func,
-			// menu object
-			menus: React.PropTypes.array,
-			side: React.PropTypes.bool,
-			// search box properties
-			search: React.PropTypes.func
-		},
 		getDefaultProps: function () {
 			return {
 				side: false

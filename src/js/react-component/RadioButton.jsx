@@ -1,43 +1,6 @@
-/**
- * radio button
- * layout: {
- *      label: string,
- *      dataId: string,
- *      pos: {
- *          row: number,
- *          col: number,
- *          width: number,
- *          section: string,
- *          card: string
- *      },
- *      css: {
- *          cell: string,
- *          comp: string
- *      },
- *      comp: {
- *          type: $pt.ComponentConstants.Radio,
- *          direction: string,
- *          data: CodeTable,
- *          enabled: {
- *              when: function,
- *              depends: string|string[]
- *          },
- *          visible: {
- *              when: function,
- *              depends: string|string[]
- *          }
- *      }
- * }
- */
 (function (window, $, React, ReactDOM, $pt) {
 	var NRadio = React.createClass($pt.defineCellComponent({
 		displayName: 'NRadio',
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object
-		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
@@ -45,49 +8,6 @@
 					labelAtLeft: false
 				}
 			};
-		},
-		/**
-		 * will update
-		 * @param nextProps
-		 */
-		componentWillUpdate: function (nextProps) {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
-		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
-		componentDidUpdate: function (prevProps, prevState) {
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-		 * did mount
-		 */
-		componentDidMount: function () {
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-		 * will unmount
-		 */
-		componentWillUnmount: function () {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * render label
@@ -181,29 +101,6 @@
 				this.onButtonClicked(option);
 			}
 		},
-		/**
-		 * on component change
-		 * @param evt
-		 */
-		// onComponentChanged: function (evt) {
-		// 	// synchronize value to model
-		// 	this.setValueToModel(evt.target.checked);
-		// },
-		/**
-		 * on model changed
-		 * @param evt
-		 */
-		onModelChanged: function (evt) {
-			// this.getComponent().val(evt.new);
-			this.forceUpdate();
-		},
-		/**
-		 * get component
-		 * @returns {jQuery}
-		 */
-		// getComponent: function () {
-		// 	return $(ReactDOM.findDOMNode(this.refs.txt));
-		// },
 		isLabelAtLeft: function () {
 			return this.getComponentOption('labelAtLeft');
 		}

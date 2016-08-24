@@ -31,12 +31,6 @@
                 return array;
             }
         },
-        propTypes: {
-            // model
-            model: React.PropTypes.object,
-            // CellLayout
-            layout: React.PropTypes.object
-        },
         getDefaultProps: function() {
             return {
                 defaultOptions: {
@@ -86,52 +80,6 @@
                 collapseButton: collapseBtn,
             };
         },
-        /**
-    	 * will update
-    	 * @param nextProps
-    	 */
-    	componentWillUpdate: function (nextProps) {
-    		// remove post change listener to handle model change
-    		this.removePostChangeListener(this.__forceUpdate);
-            this.removeVisibleDependencyMonitor();
-            this.removeEnableDependencyMonitor();
-            this.unregisterFromComponentCentral();
-    	},
-    	/**
-    	 * did update
-    	 * @param prevProps
-    	 * @param prevState
-    	 */
-    	componentDidUpdate: function (prevProps, prevState) {
-    		// add post change listener to handle model change
-    		this.addPostChangeListener(this.__forceUpdate);
-            this.addVisibleDependencyMonitor();
-            this.addEnableDependencyMonitor();
-            this.registerToComponentCentral();
-    	},
-        // componentWillMount: function() {
-        //     this.initExpand();
-        // },
-    	/**
-    	 * did mount
-    	 */
-    	componentDidMount: function () {
-    		// add post change listener to handle model change
-    		this.addPostChangeListener(this.__forceUpdate);
-            this.addVisibleDependencyMonitor();
-            this.addEnableDependencyMonitor();
-            this.registerToComponentCentral();
-    	},
-    	/**
-    	 * will unmount
-    	 */
-    	componentWillUnmount: function () {
-    		// remove post change listener to handle model change
-    		this.removePostChangeListener(this.__forceUpdate);
-            this.removeVisibleDependencyMonitor();
-            this.removeEnableDependencyMonitor();
-            this.unregisterFromComponentCentral();
-    	},
         renderCheck: function(node, nodeId) {
             var canSelected = this.isNodeCanSelect(node);
             if (!canSelected) {

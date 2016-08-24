@@ -95,12 +95,6 @@
 				}
 			}
 		},
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object
-		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
@@ -184,7 +178,7 @@
 				var index = $(this).parent().children().index($(this));
 				_this.getDivComponent().find("tbody tr:nth-child(" + (index + 1) + ")").removeClass("hover");
 			});
-			this.renderIfIE8();
+			// this.renderIfIE8();
 			this.renderHeaderPopover();
 			this.addPostChangeListener(this.onModelChanged);
 			this.state.searchModel.addPostChangeListener('text', this.onSearchBoxChanged);
@@ -246,33 +240,33 @@
 		/**
 		 * render when IE8, fixed the height of table since IE8 doesn't support max-height
 		 */
-		renderIfIE8: function () {
-			if (!this.isIE8() || !this.hasVerticalScrollBar()) {
-				return;
-			}
-			var mainTable = this.getComponent();
-			var leftFixedDiv = this.getFixedLeftBodyComponent();
-			var rightFixedDiv = this.getFixedRightBodyComponent();
-			var trs = mainTable.find("tr");
-			var rowCount = trs.length;
-			var height = rowCount * NTable.ROW_HEIGHT; // 32 is defined in css, if value in css is changed, it must be changed together
-			if (height > this.getComponentOption("scrollY")) {
-				height = this.getComponentOption("scrollY");
-			}
-			// calculate height of body if ie8 and scrollY
-			mainTable.closest("div").css({
-				height: height + 17
-			});
-			leftFixedDiv.css({
-				height: height
-			});
-			rightFixedDiv.css({
-				height: height
-			});
-		},
-		isIE: function () {
-			return $pt.browser.msie;
-		},
+		// renderIfIE8: function () {
+		// 	if (!this.isIE8() || !this.hasVerticalScrollBar()) {
+		// 		return;
+		// 	}
+		// 	var mainTable = this.getComponent();
+		// 	var leftFixedDiv = this.getFixedLeftBodyComponent();
+		// 	var rightFixedDiv = this.getFixedRightBodyComponent();
+		// 	var trs = mainTable.find("tr");
+		// 	var rowCount = trs.length;
+		// 	var height = rowCount * NTable.ROW_HEIGHT; // 32 is defined in css, if value in css is changed, it must be changed together
+		// 	if (height > this.getComponentOption("scrollY")) {
+		// 		height = this.getComponentOption("scrollY");
+		// 	}
+		// 	// calculate height of body if ie8 and scrollY
+		// 	mainTable.closest("div").css({
+		// 		height: height + 17
+		// 	});
+		// 	leftFixedDiv.css({
+		// 		height: height
+		// 	});
+		// 	rightFixedDiv.css({
+		// 		height: height
+		// 	});
+		// },
+		// isIE: function () {
+		// 	return $pt.browser.msie;
+		// },
 		/**
 		 * check browser is IE8 or not
 		 * @returns {boolean}
@@ -2085,14 +2079,6 @@
 			} else {
 				this.forceUpdate();
 			}
-		},
-		/**
-		 * on model validate change
-		 * @param evt
-		 */
-		onModelValidateChanged: function (evt) {
-			// maybe will introduce performance issue, cannot sure now.
-			this.forceUpdate();
 		},
 		/**
 		 * jump to page by given page index

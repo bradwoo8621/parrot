@@ -1,50 +1,6 @@
-/**
- * Created by brad.wu on 8/20/2015.
- * depends NTab, NForm
- *
- * layout: {
- *      label: string,
- *      pos: {
- *          row: number,
- *          col: number,
- *          width: number,
- *          section: string,
- *          card: string
- *      },
- *      css: {
- *          cell: string,
- *          comp: string
- *      },
- *      comp: {
- *          type: $pt.ComponentConstants.Tab,
- *          tabType: string,
- *          justified: boolean,
- *          titleDirection: string,
- *          titleIconSize: string,
- *          canActive: function,
- *          onActive: function,
- *          tabs: {
- *              active: boolean,
- *              label: string,
- *              icon: string,
- *              badgeId: string,
- *              badgeRender: function,
- *              editLayout: {}
- *              layout: {} // see form layout, official key is 'editLayout'. for compatibility, keep key 'layout'
- *          }[]
- *      }
- * }
- */
 (function (window, $, React, ReactDOM, $pt) {
 	var NFormTab = React.createClass($pt.defineCellComponent({
 		displayName: 'NFormTab',
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object,
-			direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
-		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
@@ -54,63 +10,31 @@
 				}
 			};
 		},
-		getInitialState: function () {
-			return {};
+		beforeWillUpdate: function (nextProps) {
+			this.uninstallBadgeMonitor();
 		},
-		/**
-		 * will update
-		 * @param nextProps
-		 */
-		componentWillUpdate: function (nextProps) {
-			var _this = this;
+		beforeDidUpdate: function (prevProps, prevState) {
+			this.installBadgeMonitor();
+		},
+		beforeDidMount: function () {
+			this.installBadgeMonitor();
+		},
+		beforeWillUnmount: function () {
+			this.uninstallBadgeMonitor();
+		},
+		installBadgeMonitor: function() {
 			this.getTabs().forEach(function (tab) {
 				if (tab.badgeId) {
-					_this.removeDependencyMonitor([tab.badgeId]);
+					this.addDependencyMonitor([tab.badgeId]);
 				}
-			});
-			this.removeVisibleDependencyMonitor();
-			this.unregisterFromComponentCentral();
+			}.bind(this));
 		},
-		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
-		componentDidUpdate: function (prevProps, prevState) {
-			var _this = this;
+		uninstallBadgeMonitor: function() {
 			this.getTabs().forEach(function (tab) {
 				if (tab.badgeId) {
-					_this.addDependencyMonitor([tab.badgeId]);
+					this.removeDependencyMonitor([tab.badgeId]);
 				}
-			});
-			this.addVisibleDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-		 * did mount
-		 */
-		componentDidMount: function () {
-			var _this = this;
-			this.getTabs().forEach(function (tab) {
-				if (tab.badgeId) {
-					_this.addDependencyMonitor([tab.badgeId]);
-				}
-			});
-			this.addVisibleDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-		 * will unmount
-		 */
-		componentWillUnmount: function () {
-			var _this = this;
-			this.getTabs().forEach(function (tab) {
-				if (tab.badgeId) {
-					_this.removeDependencyMonitor([tab.badgeId]);
-				}
-			});
-			this.removeVisibleDependencyMonitor();
-			this.unregisterFromComponentCentral();
+			}.bind(this));
 		},
 		renderTabContent: function (layout, index) {
 			var activeIndex = this.getActiveTabIndex();

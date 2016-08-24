@@ -27,18 +27,12 @@
 			CANCEL_ICON: 'ban',
 			Z_INDEX: 9698
 		},
-		propTypes: {
-			className: React.PropTypes.string
-		},
 		getDefaultProps: function () {
 			return {};
 		},
 		getInitialState: function () {
 			return {
-				visible: false,
-				title: null,
-				options: null,
-				onConfirm: null
+				visible: false
 			};
 		},
 		/**

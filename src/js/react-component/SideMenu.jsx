@@ -33,13 +33,6 @@
 				return $pt.sideMenu[containerId];
 			}
 		},
-		propTypes: {
-			// menu object
-			menus: React.PropTypes.array,
-			hover: React.PropTypes.bool,
-
-			className: React.PropTypes.string
-		},
 		getDefaultProps: function () {
 			return {
 				hover: false

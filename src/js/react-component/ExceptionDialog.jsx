@@ -30,9 +30,7 @@
 		},
 		getInitialState: function () {
 			return {
-				visible: false,
-				status: null,
-				message: null
+				visible: false
 			};
 		},
 		/**

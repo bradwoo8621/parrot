@@ -1,47 +1,6 @@
-/**
- * Created by brad.wu on 8/18/2015.
- *
- * layout: {
- *      label: string,
- *      dataId: string,
- *      pos: {
- *          row: number,
- *          col: number,
- *          width: number,
- *          section: string,
- *          card: string
- *      },
- *      css: {
- *          cell: string,
- *          comp: string
- *      },
- *      comp: {
- *          type: $pt.ComponentConstants.Button,
- *          icon: string,
- *          style: string,
- *          labelPosition: string,
- *          enabled: {
- *              when: function,
- *              depends: string|string[]
- *          },
- *          visible: {
- *              when: function,
- *              depends: string|string[]
- *          },
- *          click: function
- *      }
- * }
- */
 (function (window, $, React, ReactDOM, $pt) {
 	var NFormButton = React.createClass($pt.defineCellComponent({
 		displayName: 'NFormButton',
-		propTypes: {
-			// model, whole model, not only for this cell
-			// use id to get the value of this cell from model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object
-		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
@@ -49,41 +8,6 @@
 					labelFromModel: false
 				}
 			};
-		},
-		/**
-		 * will update
-		 * @param nextProps
-		 */
-		componentWillUpdate: function (nextProps) {
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
-		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
-		componentDidUpdate: function (prevProps, prevState) {
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-		 * did mount
-		 */
-		componentDidMount: function () {
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-		 * will unmount
-		 */
-		componentWillUnmount: function () {
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
 		},
 		renderIcon: function(icon) {
 			if (icon == null) {

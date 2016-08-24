@@ -139,12 +139,6 @@
 				showPreview: true
 			}
 		},
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object
-		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
@@ -158,15 +152,7 @@
 				monitors: {}
 			};
 		},
-		componentWillUpdate: function() {
-			this.removeVisibleDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
-		componentDidUpdate: function() {
-			this.addVisibleDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		componentDidMount: function () {
+		beforeDidMount: function () {
 			var input = $(ReactDOM.findDOMNode(this.refs.file));
 			input.fileinput(this.createDisplayOptions());
 			// event monitor
@@ -189,10 +175,8 @@
 			comp.find('.input-group-btn>.btn')
 				.focus(this.onComponentFocused)
 				.blur(this.onComponentBlurred);
-			this.addVisibleDependencyMonitor();
-			this.registerToComponentCentral();
 		},
-		componentWillUnmount: function () {
+		beforeWillUnmount: function () {
 			var input = $(ReactDOM.findDOMNode(this.refs.file));
 			// event monitor
 			var monitors = this.getEventMonitor();
@@ -201,8 +185,6 @@
 			}.bind(this));
 			// destroy the component
 			input.fileinput('destroy');
-			this.removeVisibleDependencyMonitor();
-			this.unregisterFromComponentCentral();
 		},
 		render: function () {
 			var css = {};

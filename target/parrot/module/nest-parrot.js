@@ -3925,6 +3925,92 @@
   * @type {*}
   */
 	var ComponentBase = {
+		// react methods
+		getInitialState: function () {
+			return {};
+		},
+		executePointcutBefore: function (pointcut) {
+			if (pointcut && pointcut.before) {
+				pointcut.before.call(this, Array.prototype.slice.call(arguments, 1));
+			}
+		},
+		executePointcutAfter: function (pointcut) {
+			if (pointcut && pointcut.after) {
+				pointcut.after.call(this, Array.prototype.slice.call(arguments, 1));
+			}
+		},
+		installBaseMonitors: function () {
+			this.executePointcutBefore.apply(this, arguments);
+			// add post change listener to handle model change
+			this.addPostChangeListener(this.onModelChanged);
+			if (this.isArrayData && this.isArrayData()) {
+				this.addPostAddListener(this.onModelChanged);
+				this.addPostRemoveListener(this.onModelChanged);
+				this.addPostValidateListener(this.onModelValidateChanged);
+			}
+			if (this.getDependencyOptions) {
+				var options = this.getDependencyOptions();
+				if (options) {
+					this.addDependencyMonitor(this.getDependencies(options));
+				}
+			}
+			this.addEnableDependencyMonitor();
+			this.addVisibleDependencyMonitor();
+			this.registerToComponentCentral();
+			this.executePointcutAfter.apply(this, arguments);
+		},
+		uninstallBaseMonitors: function () {
+			this.executePointcutBefore.apply(this, arguments);
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.onModelChanged);
+			if (this.isArrayData && this.isArrayData()) {
+				this.removePostAddListener(this.onModelChanged);
+				this.removePostRemoveListener(this.onModelChanged);
+				this.removePostValidateListener(this.onModelValidateChanged);
+			}
+			if (this.getDependencyOptions) {
+				var options = this.getDependencyOptions();
+				if (options) {
+					this.removeDependencyMonitor(this.getDependencies(options));
+				}
+			}
+			this.removeEnableDependencyMonitor();
+			this.removeVisibleDependencyMonitor();
+			this.unregisterFromComponentCentral();
+			this.executePointcutAfter.apply(this, arguments);
+		},
+		componentWillUpdate: function (nextProps, nextState) {
+			this.uninstallBaseMonitors({
+				before: this.beforeWillUpdate,
+				after: this.afterWillUpdate
+			}, nextProps, nextState);
+		},
+		componentDidUpdate: function (prevProps, prevState) {
+			this.installBaseMonitors({
+				before: this.beforeDidUpdate,
+				after: this.afterDidUpdate
+			}, prevProps, prevState);
+		},
+		componentDidMount: function () {
+			this.installBaseMonitors({
+				before: this.beforeDidMount,
+				after: this.afterDidMount
+			});
+		},
+		componentWillUnmount: function () {
+			this.uninstallBaseMonitors({
+				before: this.beforeWillUnmount,
+				after: this.afterWillUnmount
+			});
+		},
+		onModelChanged: function () {
+			this.forceUpdate();
+		},
+		onModelValidateChanged: function (evt) {
+			this.forceUpdate();
+		},
+
+		// customized methods
 		/**
    * get model
    * @returns {ModelInterface}
@@ -4382,68 +4468,6 @@
 		},
 		removePostValidateListener: function (listener) {
 			this.getModel().removePostValidateListener(this.getDataId(), listener);
-		},
-		recalcPopoverPosition: function (popover, component) {
-			var styles = {};
-			styles.width = component.outerWidth();
-			var offset = component.offset();
-			styles.top = offset.top + component.outerHeight();
-			styles.left = offset.left;
-
-			var onTop = false;
-			var rightToLeft = false;
-			var realHeight = popover.outerHeight();
-			var realWidth = popover.outerWidth();
-			// set the real top, assumpt it is on bottom
-			styles.top = offset.top + component.outerHeight();
-			// check popover in top or bottom
-			if (styles.top + realHeight > $(window).height() + $(window).scrollTop()) {
-				// cannot show in bottom and in current viewport
-				// check it is enough top or not
-				if (offset.top - $(window).scrollTop() >= realHeight) {
-					// enough
-					styles.top = offset.top - realHeight;
-					onTop = true;
-				} else if (styles.top + realHeight <= $(document).height()) {
-					// can show in bottom and in current document
-					onTop = false;
-				} else if (offset.top < realHeight) {
-					// cannot show in top and in current document
-					onTop = false;
-				} else {
-					styles.top = offset.top - realHeight;
-					onTop = true;
-				}
-			} else {
-				// can show in bottom and in current viewport
-				onTop = false;
-			}
-
-			// check popover to left or right
-			if (realWidth > styles.width) {
-				var width = $(document).width();
-				if (styles.left + realWidth <= width) {
-					// normal from left to right, do nothing
-				} else if (styles.left + styles.width >= realWidth) {
-						// from right to left
-						styles.left = styles.left + styles.width - realWidth;
-						rightToLeft = true;
-					} else {
-						// still left to right, do nothing
-					}
-			}
-
-			if (onTop) {
-				popover.addClass('top');
-				popover.removeClass('bottom');
-			} else {
-				popover.removeClass('top');
-				popover.addClass('bottom');
-			}
-			if (rightToLeft) {
-				popover.addClass('right-to-left');
-			}
-			popover.css({ top: styles.top, left: styles.left });
 		}
 	};
 	/**
@@ -4451,6 +4475,9 @@
   */
 	$pt.mixins = {
 		ArrayComponentMixin: {
+			isArrayData: function () {
+				return true;
+			},
 			addRowListener: function (rowModel) {
 				this.getRowListeners().forEach(function (listener) {
 					rowModel.addListener(listener.id, listener.time ? listener.time : 'post', listener.type ? listener.type : 'change', listener.listener);
@@ -4501,6 +4528,70 @@
 					model.useBaseAsCurrent();
 				}
 				return model;
+			}
+		},
+		PopoverMixin: {
+			recalcPopoverPosition: function (popover, component) {
+				var styles = {};
+				styles.width = component.outerWidth();
+				var offset = component.offset();
+				styles.top = offset.top + component.outerHeight();
+				styles.left = offset.left;
+
+				var onTop = false;
+				var rightToLeft = false;
+				var realHeight = popover.outerHeight();
+				var realWidth = popover.outerWidth();
+				// set the real top, assumpt it is on bottom
+				styles.top = offset.top + component.outerHeight();
+				// check popover in top or bottom
+				if (styles.top + realHeight > $(window).height() + $(window).scrollTop()) {
+					// cannot show in bottom and in current viewport
+					// check it is enough top or not
+					if (offset.top - $(window).scrollTop() >= realHeight) {
+						// enough
+						styles.top = offset.top - realHeight;
+						onTop = true;
+					} else if (styles.top + realHeight <= $(document).height()) {
+						// can show in bottom and in current document
+						onTop = false;
+					} else if (offset.top < realHeight) {
+						// cannot show in top and in current document
+						onTop = false;
+					} else {
+						styles.top = offset.top - realHeight;
+						onTop = true;
+					}
+				} else {
+					// can show in bottom and in current viewport
+					onTop = false;
+				}
+
+				// check popover to left or right
+				if (realWidth > styles.width) {
+					var width = $(document).width();
+					if (styles.left + realWidth <= width) {
+						// normal from left to right, do nothing
+					} else if (styles.left + styles.width >= realWidth) {
+							// from right to left
+							styles.left = styles.left + styles.width - realWidth;
+							rightToLeft = true;
+						} else {
+							// still left to right, do nothing
+						}
+				}
+
+				if (onTop) {
+					popover.addClass('top');
+					popover.removeClass('bottom');
+				} else {
+					popover.removeClass('top');
+					popover.addClass('bottom');
+				}
+				if (rightToLeft) {
+					popover.addClass('right-to-left');
+				}
+				popover.css({ top: styles.top, left: styles.left });
 			}
 		}
 	};
@@ -4691,13 +4782,6 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NArrayCheck = React.createClass($pt.defineCellComponent({
 		displayName: 'NArrayCheck',
-		statics: {},
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object
-		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
@@ -4705,52 +4789,6 @@
 					labelAttached: 'right'
 				}
 			};
-		},
-		getInitialState: function () {
-			return {};
-		},
-		/**
-   * will update
-   * @param nextProps
-   */
-		componentWillUpdate: function (nextProps) {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
-		/**
-   * did update
-   * @param prevProps
-   * @param prevState
-   */
-		componentDidUpdate: function (prevProps, prevState) {
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-   * did mount
-   */
-		componentDidMount: function () {
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-   * will unmount
-   */
-		componentWillUnmount: function () {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
 		},
 		renderItem: function (enabled, item, itemIndex) {
 			var model = $pt.createModel({
@@ -4792,9 +4830,6 @@
 				{ className: $pt.LayoutHelper.classSet(css) },
 				this.getCodeTable().list().map(this.renderItem.bind(this, enabled))
 			);
-		},
-		onModelChanged: function () {
-			this.forceUpdate();
 		},
 		onCodeItemCheckedChanged: function (codeTableItem, evt) {
 			if (evt.new) {
@@ -4845,55 +4880,12 @@
 	});
 })(window, jQuery, React, ReactDOM, $pt);
 
-/**
- * Array Panel, for array property
- * TODO add & remove are not supported yet
- * TODO since no apply action, must reset the whole model if want to reset the items data
- *
- * depends NPanel
- *
- * layout: {
- *      label: string,
- *      dataId: string,
- *      pos: {
- *          row: number,
- *          col: number,
- *          width: number,
- *          section: string,
- *          card: string
- *      },
- *      comp: {
- *          type: $pt.ComponentConstants.ArrayPanel,
- *          itemTitle: string|{when: function, depends: string|string[]},
- *          expanded: boolean,
- *          collapsible: boolean,
- *          style: string,
- *          checkInTitle: {}|function,
- *          editLayout: {}|function, // see form layout
- *          visible: {
- *              when: function,
- *              depends: string|string[]
- *          },
- *      },
- *      css: {
- *          cell: string,
- *          comp: string
- *      }
- * }
- */
 (function (window, $, React, ReactDOM, $pt) {
 	var NArrayPanel = React.createClass($pt.defineCellComponent({
 		displayName: 'NArrayPanel',
 		mixins: [$pt.mixins.ArrayComponentMixin],
 		statics: {
 			UNTITLED: 'Untitled Item'
-		},
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object,
-			direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
 		},
 		getDefaultProps: function () {
 			return {
@@ -4902,60 +4894,6 @@
 					expanded: true
 				}
 			};
-		},
-		getInitialState: function () {
-			return {};
-		},
-		/**
-   * will update
-   * @param nextProps
-   */
-		componentWillUpdate: function (nextProps) {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removePostAddListener(this.onModelChanged);
-			this.removePostRemoveListener(this.onModelChanged);
-			this.removePostValidateListener(this.onModelValidateChanged);
-			this.removeVisibleDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
-		/**
-   * did update
-   * @param prevProps
-   * @param prevState
-   */
-		componentDidUpdate: function (prevProps, prevState) {
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addPostAddListener(this.onModelChanged);
-			this.addPostRemoveListener(this.onModelChanged);
-			this.addPostValidateListener(this.onModelValidateChanged);
-			this.addVisibleDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-   * did mount
-   */
-		componentDidMount: function () {
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addPostAddListener(this.onModelChanged);
-			this.addPostRemoveListener(this.onModelChanged);
-			this.addPostValidateListener(this.onModelValidateChanged);
-			this.addVisibleDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-   * will unmount
-   */
-		componentWillUnmount: function () {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removePostAddListener(this.onModelChanged);
-			this.removePostRemoveListener(this.onModelChanged);
-			this.removePostValidateListener(this.onModelValidateChanged);
-			this.removeVisibleDependencyMonitor();
-			this.unregisterFromComponentCentral();
 		},
 		/**
    * render item
@@ -5019,21 +4957,6 @@
 			return data == null ? [] : data;
 		},
 		/**
-   * on model changed
-   * @param evt
-   */
-		onModelChanged: function (evt) {
-			this.forceUpdate();
-		},
-		/**
-   * monitor the parent model validation
-   * @param evt
-   */
-		onModelValidateChanged: function (evt) {
-			// TODO maybe will introduce performance issue, cannot sure now.
-			this.forceUpdate();
-		},
-		/**
    * get edit layout
    * @param model {ModelInterface} item model
    * @returns {{}}
@@ -5090,46 +5013,6 @@
 	});
 })(window, jQuery, React, ReactDOM, $pt);
 
-/**
- * Created by brad.wu on 8/20/2015.
- * TODO add & remove are not supported yet
- * TODO since no apply action, must reset the whole model if want to reset the items data
- *
- * depends NTab
- *
- * layout: {
- *      label: string,
- *      dataId: string,
- *      pos: {
- *          row: number,
- *          col: number,
- *          width: number,
- *          section: string,
- *          card: string
- *      },
- *      comp: {
- *          type: $pt.ComponentConstants.ArrayTab,
- *          tabType: string,
- *          itemTitle: string|{when: function, depends: string|string[]},
- *          itemIcon: string|{when: function, depends: string|string[]},
- *          badge: string|{when: function, depends: string|string[]},
- *          titleDirection: string,
- *          titleIconSize: string,
- *          justified: boolean,
- *          canActive: function,
- *          onActive: function,
- *          editLayout: {}|function, // see form layout
- *          visible: {
- *              when: function,
- *              depends: string|string[]
- *          },
- *      },
- *      css: {
- *          cell: string,
- *          comp: string
- *      }
- * }
- */
 (function (window, $, React, ReactDOM, $pt) {
 	var NArrayTab = React.createClass($pt.defineCellComponent({
 		displayName: 'NArrayTab',
@@ -5139,13 +5022,6 @@
 			ADD_ICON: 'plus-circle',
 			ADD_LABEL: 'Add'
 		},
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object,
-			direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
-		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
@@ -5154,62 +5030,6 @@
 					titleDirection: 'horizontal'
 				}
 			};
-		},
-		getInitialState: function () {
-			return {
-				tabs: null
-			};
-		},
-		/**
-   * will update
-   * @param nextProps
-   */
-		componentWillUpdate: function (nextProps) {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removePostAddListener(this.onModelChanged);
-			this.removePostRemoveListener(this.onModelChanged);
-			this.removePostValidateListener(this.onModelValidateChanged);
-			this.removeVisibleDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
-		/**
-   * did update
-   * @param prevProps
-   * @param prevState
-   */
-		componentDidUpdate: function (prevProps, prevState) {
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addPostAddListener(this.onModelChanged);
-			this.addPostRemoveListener(this.onModelChanged);
-			this.addPostValidateListener(this.onModelValidateChanged);
-			this.addVisibleDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-   * did mount
-   */
-		componentDidMount: function () {
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addPostAddListener(this.onModelChanged);
-			this.addPostRemoveListener(this.onModelChanged);
-			this.addPostValidateListener(this.onModelValidateChanged);
-			this.addVisibleDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-   * will unmount
-   */
-		componentWillUnmount: function () {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removePostAddListener(this.onModelChanged);
-			this.removePostRemoveListener(this.onModelChanged);
-			this.removePostValidateListener(this.onModelValidateChanged);
-			this.removeVisibleDependencyMonitor();
-			this.unregisterFromComponentCentral();
 		},
 		/**
    * render tab content
@@ -5383,14 +5203,6 @@
 			// this.forceUpdate();
 		},
 		/**
-   * monitor the parent model validation
-   * @param evt
-   */
-		onModelValidateChanged: function (evt) {
-			// TODO maybe will introduce performance issue, cannot sure now.
-			this.forceUpdate();
-		},
-		/**
    * get edit layout
    * @param model {ModelInterface} item model
    * @returns {FormLayout}
@@ -5504,50 +5316,9 @@
 	});
 })(window, jQuery, React, ReactDOM, $pt);
 
-/**
- * Created by brad.wu on 8/18/2015.
- *
- * layout: {
- *      label: string,
- *      dataId: string,
- *      pos: {
- *          row: number,
- *          col: number,
- *          width: number,
- *          section: string,
- *          card: string
- *      },
- *      css: {
- *          cell: string,
- *          comp: string
- *      },
- *      comp: {
- *          type: $pt.ComponentConstants.Button,
- *          icon: string,
- *          style: string,
- *          labelPosition: string,
- *          enabled: {
- *              when: function,
- *              depends: string|string[]
- *          },
- *          visible: {
- *              when: function,
- *              depends: string|string[]
- *          },
- *          click: function
- *      }
- * }
- */
 (function (window, $, React, ReactDOM, $pt) {
 	var NFormButton = React.createClass($pt.defineCellComponent({
 		displayName: 'NFormButton',
-		propTypes: {
-			// model, whole model, not only for this cell
-			// use id to get the value of this cell from model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object
-		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
@@ -5555,41 +5326,6 @@
 					labelFromModel: false
 				}
 			};
-		},
-		/**
-   * will update
-   * @param nextProps
-   */
-		componentWillUpdate: function (nextProps) {
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
-		/**
-   * did update
-   * @param prevProps
-   * @param prevState
-   */
-		componentDidUpdate: function (prevProps, prevState) {
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-   * did mount
-   */
-		componentDidMount: function () {
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-   * will unmount
-   */
-		componentWillUnmount: function () {
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
 		},
 		renderIcon: function (icon) {
 			if (icon == null) {
@@ -5786,93 +5522,9 @@
 	});
 })(window, jQuery, React, ReactDOM, $pt);
 
-/**
- * checkbox
- *
- * layout: {
- *      label: string,
- *      dataId: string,
- *      pos: {
- *          row: number,
- *          col: number,
- *          width: number,
- *          section: string,
- *          card: string
- *      },
- *      css: {
- *          cell: string,
- *          comp: string
- *      },
- *      comp: {
- *          type: $pt.ComponentConstants.Check,
- *          labelAttached: boolean,
- *          enabled: {
- *              when: function,
- *              depends: string|string[]
- *          },
- *          visible: {
- *              when: function,
- *              depends: string|string[]
- *          }
- *      }
- * }
- */
 (function (window, $, React, ReactDOM, $pt) {
 	var NCheck = React.createClass($pt.defineCellComponent({
 		displayName: 'NCheck',
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object
-		},
-		/**
-   * will update
-   * @param nextProps
-   */
-		componentWillUpdate: function (nextProps) {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
-		/**
-   * did update
-   * @param prevProps
-   * @param prevState
-   */
-		componentDidUpdate: function (prevProps, prevState) {
-			// set model value to component
-			// this.getComponent().prop("checked", this.getValueFromModel());
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-   * did mount
-   */
-		componentDidMount: function () {
-			// set model value to component
-			// this.getComponent().prop("checked", this.getValueFromModel());
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-   * will unmount
-   */
-		componentWillUnmount: function () {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
 		/**
    * render label
    * @param labelInLeft {boolean}
@@ -5965,22 +5617,6 @@
 			}
 		},
 		/**
-   * on component change
-   * @param evt
-   */
-		// onComponentChanged: function (evt) {
-		// 	// synchronize value to model
-		// 	this.setValueToModel(evt.target.checked);
-		// },
-		/**
-   * on model change
-   * @param evt
-   */
-		onModelChanged: function (evt) {
-			// this.getComponent().prop("checked", evt.new === true);
-			this.forceUpdate();
-		},
-		/**
    * is checked or not
    * @returns {boolean}
    */
@@ -6018,13 +5654,11 @@
 			ON_LOADING_ICON: 'fa fa-fw fa-spinner fa-spin',
 			ON_LOADING: 'On Loading...'
 		},
-		propTypes: {},
 		getDefaultProps: function () {
 			return {};
 		},
-		getInitialState: function () {
-			return {};
-		},
+		componentWillUpdate: function () {},
+		componentDidUpdate: function () {},
 		/**
    * did mount
    */
@@ -6056,6 +5690,7 @@
 				}
 			}
 		},
+		componentWillUnmount: function () {},
 		repaint: function () {
 			var onMounted = this.props.onMounted;
 			this.setState({
@@ -6115,17 +5750,10 @@
 	$pt.Components.NCodeTableWrapper = NCodeTableWrapper;
 })(window, jQuery, React, ReactDOM, $pt);
 
-/**
- * 1. the coordinate system of clock is center or circle.
- * 2. popover will be closed on
- * 		2.1 mouse down on others in document
- * 		2.2 press escape or tab
- * 		2.3 mouse wheel
- *		2.4 window resize
- */
 (function (window, $, moment, React, ReactDOM, $pt) {
 	var NDateTime = React.createClass($pt.defineCellComponent({
 		displayName: 'NDateTime',
+		mixins: [$pt.mixins.PopoverMixin],
 		statics: {
 			POP_FIX_ON_BOTTOM: false,
 			FORMAT: 'YYYY/MM/DD',
@@ -6165,11 +5793,6 @@
 			DATE_SWITCH_TEXT: 'Date',
 			TIME_SWITCH_TEXT: 'Time'
 		},
-		propTypes: {
-			model: React.PropTypes.object,
-			layout: React.PropTypes.object,
-			view: React.PropTypes.bool
-		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
@@ -6185,37 +5808,14 @@
 				}
 			};
 		},
-		getInitialState: function () {
-			return {
-				popover: null
-			};
-		},
-		componentWillUpdate: function (nextProps) {
-			this.removePostChangeListener(this.onModelChange);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
-		componentDidUpdate: function (prevProps, prevState) {
+		beforeDidUpdate: function () {
 			this.setValueToTextInput(this.getValueFromModel());
-			this.addPostChangeListener(this.onModelChange);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
 		},
-		componentDidMount: function () {
+		beforeDidMount: function () {
 			this.setValueToTextInput(this.getValueFromModel());
-			this.addPostChangeListener(this.onModelChange);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
 		},
-		componentWillUnmount: function () {
+		beforeWillUnmount: function () {
 			this.destroyPopover();
-			this.removePostChangeListener(this.onModelChange);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
 		},
 		renderIcon: function (options) {
 			var css = {
@@ -7362,7 +6962,7 @@
 					}
 			}
 		},
-		onModelChange: function (evt) {
+		onModelChanged: function (evt) {
 			var newValue = evt.new;
 			var text = this.getTextInput().val();
 			if (newValue == null || (newValue + '').isBlank()) {
@@ -7601,9 +7201,7 @@
 		},
 		getInitialState: function () {
 			return {
-				visible: false,
-				status: null,
-				message: null
+				visible: false
 			};
 		},
 		/**
@@ -7906,12 +7504,6 @@
 				showPreview: true
 			}
 		},
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object
-		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
@@ -7925,15 +7517,7 @@
 				monitors: {}
 			};
 		},
-		componentWillUpdate: function () {
-			this.removeVisibleDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
-		componentDidUpdate: function () {
-			this.addVisibleDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		componentDidMount: function () {
+		beforeDidMount: function () {
 			var input = $(ReactDOM.findDOMNode(this.refs.file));
 			input.fileinput(this.createDisplayOptions());
 			// event monitor
@@ -7952,10 +7536,8 @@
 			var comp = $(ReactDOM.findDOMNode(this.refs.comp));
 			comp.find('.kv-fileinput-caption').focus(this.onComponentFocused).blur(this.onComponentBlurred);
 			comp.find('.input-group-btn>.btn').focus(this.onComponentFocused).blur(this.onComponentBlurred);
-			this.addVisibleDependencyMonitor();
-			this.registerToComponentCentral();
 		},
-		componentWillUnmount: function () {
+		beforeWillUnmount: function () {
 			var input = $(ReactDOM.findDOMNode(this.refs.file));
 			// event monitor
 			var monitors = this.getEventMonitor();
@@ -7964,8 +7546,6 @@
 			}.bind(this));
 			// destroy the component
 			input.fileinput('destroy');
-			this.removeVisibleDependencyMonitor();
-			this.unregisterFromComponentCentral();
 		},
 		render: function () {
 			var css = {};
@@ -8026,56 +7606,11 @@
 	});
 })(window, jQuery, React, ReactDOM, $pt);
 
-/**
- * form component, a div
- *
- * depends NPanelFooter, NFormCell
- * layout: {
- *      _freeCard: boolean,
- *      _cardButtonShown: boolean,
- *      _cards: {
- *          someCardId: {
- *              label: string,
- *              badge: string,
- *              backable: boolean,
- *              active: boolean,
- *              index: number,
- *              leftButtons: {}[]|{
- *                  successCallback: string,
- *                  // other see NFormButton
- *              },
- *              rightButtons: {}[]|{},
- *              finishButton: {},
- *              _sections: {}
- *          }
- *      },
- *      _sections: {
- *          someSectionKey: {
- *              row: number,
- *              col: number,
- *              width: number,
- *              label: string,
- *              style: string,
- *              collapsible: boolean,
- *              expanded: boolean
- *          }
- *      }
- * }
- */
 (function (window, $, React, ReactDOM, $pt) {
 	var NForm = React.createClass({
 		displayName: 'NForm',
 		statics: {
 			LABEL_DIRECTION: 'vertical'
-		},
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// layout, FormLayout
-			layout: React.PropTypes.object,
-			direction: React.PropTypes.oneOf(['vertical', 'horizontal']),
-			view: React.PropTypes.bool,
-			className: React.PropTypes.string
 		},
 		getDefaultProps: function () {
 			return {
@@ -8604,28 +8139,6 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NFormButtonFooter = React.createClass($pt.defineCellComponent({
 		displayName: 'NFormButtonFooter',
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// layout, FormLayout
-			layout: React.PropTypes.object
-		},
-		componentWillUpdate: function () {
-			this.removeVisibleDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
-		componentDidUpdate: function () {
-			this.addVisibleDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		componentDidMount: function () {
-			this.addVisibleDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		componentWillUnmount: function () {
-			this.removeVisibleDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
 		render: function () {
 			var buttonLayout = this.getButtonLayout();
 			return React.createElement($pt.Components.NPanelFooter, { model: this.props.model,
@@ -8681,17 +8194,6 @@
 				return $pt.LayoutHelper.getComponentRenderer(type);
 			}
 		},
-		propTypes: {
-			// model, whole model, not only for this cell
-			// use id to get the value of this cell from model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object,
-			// label direction
-			direction: React.PropTypes.oneOf(['vertical', 'horizontal']),
-			// is view mode or not
-			view: React.PropTypes.bool
-		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
@@ -8700,63 +8202,21 @@
 				direction: 'vertical'
 			};
 		},
-		getInitialState: function () {
-			return {};
-		},
-		/**
-   * will update
-   * @param nextProps
-   */
-		componentWillUpdate: function (nextProps) {
+		beforeWillUpdate: function (nextProps) {
 			this.destroyPopover();
-			this.removePostChangeListener(this.onModelChanged);
-			this.removePostValidateListener(this.onModelValidateChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
 			this.removeRequiredDependencyMonitor();
-			this.removeValidateDependencyMonitor();
-			this.unregisterFromComponentCentral();
 		},
-		/**
-   * did update
-   * @param prevProps
-   * @param prevState
-   */
-		componentDidUpdate: function (prevProps, prevState) {
+		beforeDidUpdate: function (prevProps, prevState) {
 			this.renderPopover();
-			this.addPostChangeListener(this.onModelChanged);
-			this.addPostValidateListener(this.onModelValidateChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
 			this.addRequiredDependencyMonitor();
-			this.addValidateDependencyMonitor();
-			this.registerToComponentCentral();
 		},
-		/**
-   * did mount
-   */
-		componentDidMount: function () {
+		beforeDidMount: function () {
 			this.renderPopover();
-			this.addPostChangeListener(this.onModelChanged);
-			this.addPostValidateListener(this.onModelValidateChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
 			this.addRequiredDependencyMonitor();
-			this.addValidateDependencyMonitor();
-			this.registerToComponentCentral();
 		},
-		/**
-   * will unmount
-   */
-		componentWillUnmount: function () {
+		beforeWillUnmount: function () {
 			this.destroyPopover();
-			this.removePostChangeListener(this.onModelChanged);
-			this.removePostValidateListener(this.onModelValidateChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
 			this.removeRequiredDependencyMonitor();
-			this.removeValidateDependencyMonitor();
-			this.unregisterFromComponentCentral();
 		},
 		destroyPopover: function () {
 			var comp = this.refs.comp;
@@ -8982,28 +8442,6 @@
 			}
 		},
 		/**
-   * on model validate change
-   * @param evt not used
-   */
-		onModelValidateChanged: function (evt) {
-			// TODO maybe will introduce performance issue, cannot sure now.
-			this.forceUpdate();
-			// var div;
-			// if (this.getModel().hasError(this.getDataId())) {
-			// 	this.renderPopover();
-			// 	div = this.refs.div;
-			// 	if (div != null) {
-			// 		$(ReactDOM.findDOMNode(div)).addClass('has-error');
-			// 	}
-			// } else {
-			// 	this.destroyPopover();
-			// 	div = this.refs.div;
-			// 	if (div != null) {
-			// 		$(ReactDOM.findDOMNode(div)).removeClass('has-error');
-			// 	}
-			// }
-		},
-		/**
    * on label clicked
    */
 		onLabelClicked: function () {
@@ -9083,53 +8521,9 @@
 	$pt.Components.NFormCell = NFormCell;
 })(window, jQuery, React, ReactDOM, $pt);
 
-/**
- * Created by brad.wu on 8/20/2015.
- * depends NTab, NForm
- *
- * layout: {
- *      label: string,
- *      pos: {
- *          row: number,
- *          col: number,
- *          width: number,
- *          section: string,
- *          card: string
- *      },
- *      css: {
- *          cell: string,
- *          comp: string
- *      },
- *      comp: {
- *          type: $pt.ComponentConstants.Tab,
- *          tabType: string,
- *          justified: boolean,
- *          titleDirection: string,
- *          titleIconSize: string,
- *          canActive: function,
- *          onActive: function,
- *          tabs: {
- *              active: boolean,
- *              label: string,
- *              icon: string,
- *              badgeId: string,
- *              badgeRender: function,
- *              editLayout: {}
- *              layout: {} // see form layout, official key is 'editLayout'. for compatibility, keep key 'layout'
- *          }[]
- *      }
- * }
- */
 (function (window, $, React, ReactDOM, $pt) {
 	var NFormTab = React.createClass($pt.defineCellComponent({
 		displayName: 'NFormTab',
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object,
-			direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
-		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
@@ -9139,63 +8533,31 @@
 				}
 			};
 		},
-		getInitialState: function () {
-			return {};
+		beforeWillUpdate: function (nextProps) {
+			this.uninstallBadgeMonitor();
 		},
-		/**
-   * will update
-   * @param nextProps
-   */
-		componentWillUpdate: function (nextProps) {
-			var _this = this;
+		beforeDidUpdate: function (prevProps, prevState) {
+			this.installBadgeMonitor();
+		},
+		beforeDidMount: function () {
+			this.installBadgeMonitor();
+		},
+		beforeWillUnmount: function () {
+			this.uninstallBadgeMonitor();
+		},
+		installBadgeMonitor: function () {
 			this.getTabs().forEach(function (tab) {
 				if (tab.badgeId) {
-					_this.removeDependencyMonitor([tab.badgeId]);
+					this.addDependencyMonitor([tab.badgeId]);
 				}
-			});
-			this.removeVisibleDependencyMonitor();
-			this.unregisterFromComponentCentral();
+			}.bind(this));
 		},
-		/**
-   * did update
-   * @param prevProps
-   * @param prevState
-   */
-		componentDidUpdate: function (prevProps, prevState) {
-			var _this = this;
+		uninstallBadgeMonitor: function () {
 			this.getTabs().forEach(function (tab) {
 				if (tab.badgeId) {
-					_this.addDependencyMonitor([tab.badgeId]);
+					this.removeDependencyMonitor([tab.badgeId]);
 				}
-			});
-			this.addVisibleDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-   * did mount
-   */
-		componentDidMount: function () {
-			var _this = this;
-			this.getTabs().forEach(function (tab) {
-				if (tab.badgeId) {
-					_this.addDependencyMonitor([tab.badgeId]);
-				}
-			});
-			this.addVisibleDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-   * will unmount
-   */
-		componentWillUnmount: function () {
-			var _this = this;
-			this.getTabs().forEach(function (tab) {
-				if (tab.badgeId) {
-					_this.removeDependencyMonitor([tab.badgeId]);
-				}
-			});
-			this.removeVisibleDependencyMonitor();
-			this.unregisterFromComponentCentral();
+			}.bind(this));
 		},
 		renderTabContent: function (layout, index) {
 			var activeIndex = this.getActiveTabIndex();
@@ -9316,26 +8678,6 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NIcon = React.createClass({
 		displayName: 'NIcon',
-		propTypes: {
-			size: React.PropTypes.string, //React.PropTypes.oneOf(["lg", "2x", "3x", "4x", "5x"]),
-			fixWidth: React.PropTypes.bool,
-
-			icon: React.PropTypes.string.isRequired,
-			spin: React.PropTypes.bool,
-			pulse: React.PropTypes.bool,
-			rotate: React.PropTypes.oneOf([90, 180, 270]),
-			flip: React.PropTypes.oneOf(["h", "v"]),
-			iconClassName: React.PropTypes.string,
-
-			backIcon: React.PropTypes.string,
-			backSpin: React.PropTypes.bool,
-			backPulse: React.PropTypes.bool,
-			backRotate: React.PropTypes.oneOf([90, 180, 270]),
-			backFlip: React.PropTypes.oneOf(["h", "v"]),
-			backClassName: React.PropTypes.string,
-
-			tooltip: React.PropTypes.string
-		},
 		getDefaultProps: function () {
 			return {
 				fixWidth: false,
@@ -9434,9 +8776,6 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NJumbortron = React.createClass({
 		displayName: 'NJumbortron',
-		propTypes: {
-			highlightText: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.arrayOf(React.PropTypes.string)]).isRequired
-		},
 		renderText: function () {
 			if (Array.isArray(this.props.highlightText)) {
 				return this.props.highlightText.map(function (text, textIndex) {
@@ -9471,61 +8810,12 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NLabel = React.createClass($pt.defineCellComponent({
 		displayName: 'NLabel',
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object
-		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
 					textFromModel: true
 				}
 			};
-		},
-		/**
-   * will update
-   * @param nextProps
-   */
-		componentWillUpdate: function (nextProps) {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.__forceUpdate);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
-		/**
-   * did update
-   * @param prevProps
-   * @param prevState
-   */
-		componentDidUpdate: function (prevProps, prevState) {
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.__forceUpdate);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-   * did mount
-   */
-		componentDidMount: function () {
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.__forceUpdate);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-   * will unmount
-   */
-		componentWillUnmount: function () {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.__forceUpdate);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
 		},
 		render: function () {
 			var texts = this.getText();
@@ -9619,18 +8909,12 @@
 			CANCEL_ICON: 'ban',
 			Z_INDEX: 9698
 		},
-		propTypes: {
-			className: React.PropTypes.string
-		},
 		getDefaultProps: function () {
 			return {};
 		},
 		getInitialState: function () {
 			return {
-				visible: false,
-				title: null,
-				options: null,
-				onConfirm: null
+				visible: false
 			};
 		},
 		/**
@@ -9968,11 +9252,6 @@
 			RESET_CONFIRM_MESSAGE: ["Are you sure to reset data?", "All data will be lost and cannot be recovered."],
 			CANCEL_CONFIRM_TITLE: "Cancel Editing",
 			CANCEL_CONFIRM_MESSAGE: ["Are you sure to cancel current operating?", "All data will be lost and cannot be recovered."]
-		},
-		propTypes: {
-			title: React.PropTypes.string,
-			className: React.PropTypes.string,
-			zIndex: React.PropTypes.number
 		},
 		getInitialState: function () {
 			return {
@@ -10595,9 +9874,6 @@
 			WAITING_MESSAGE: 'Send request to server and waiting for response...',
 			Z_INDEX: 9898
 		},
-		propTypes: {
-			className: React.PropTypes.string
-		},
 		getInitialState: function () {
 			return {
 				visible: false
@@ -10721,9 +9997,6 @@
 			COMPANY_URL: 'https://github.com/bradwoo8621/nest',
 			LEFT_TEXT: 'For best viewing, we recommend using the latest Chrome version.'
 		},
-		propTypes: {
-			name: React.PropTypes.string.isRequired
-		},
 		getDefaultProps: function () {
 			return {};
 		},
@@ -10796,17 +10069,6 @@
 		displayName: 'NPageHeader',
 		statics: {
 			SEARCH_PLACEHOLDER: 'Search...'
-		},
-		propTypes: {
-			// brand string
-			brand: React.PropTypes.oneOfType([React.PropTypes.object, React.PropTypes.string]).isRequired,
-			brandUrl: React.PropTypes.string,
-			brandFunc: React.PropTypes.func,
-			// menu object
-			menus: React.PropTypes.array,
-			side: React.PropTypes.bool,
-			// search box properties
-			search: React.PropTypes.func
 		},
 		getDefaultProps: function () {
 			return {
@@ -11030,33 +10292,9 @@
 	$pt.Components.NPageHeader = NPageHeader;
 })(window, jQuery, React, ReactDOM, $pt);
 
-/**
- * pagination
- *
- * NOTE: never jump by itself, must register the toPage and refresh this component manually
- */
 (function (window, $, React, ReactDOM, $pt) {
 	var NPagination = React.createClass({
 		displayName: 'NPagination',
-		/**
-   * @override
-   */
-		propTypes: {
-			// max page buttons
-			maxPageButtons: React.PropTypes.number,
-			// page count
-			pageCount: React.PropTypes.number,
-			// current page index, start from 1
-			currentPageIndex: React.PropTypes.number,
-
-			// jump to page, will be invoked when page index changed
-			toPage: React.PropTypes.func.isRequired,
-
-			className: React.PropTypes.string,
-
-			// show status label
-			showStatus: React.PropTypes.bool
-		},
 		/**
    * override react method
    * @returns {*}
@@ -11392,104 +10630,9 @@
 	$pt.Components.NPagination = NPagination;
 })(window, jQuery, React, ReactDOM, $pt);
 
-/**
- * panel
- * depends NForm
- *
- * layout: {
- *      label: string,
- *      pos: {
- *          row: number,
- *          col: number,
- *          width: number,
- *          section: string,
- *          card: string
- *      },
- *      comp: {
- *          type: $pt.ComponentConstants.Panel,
- *          expanded: boolean,
- *          collapsible: boolean,
- *          style: string,
- *          expandedLabel: string|function,
- *          collapsedLabel: string|function,
- *          checkInTitle: {
- *              data: string,
- *              label: string,
- *              collapsible: string
- *          },
- *          editLayout: {}, // see form layout
- *          visible: {
- *              when: function,
- *              depends: string|string[]
- *          }
- *      },
- *      css: {
- *          cell: string,
- *          comp: string
- *      }
- * }
- */
 (function (window, $, React, ReactDOM, $pt) {
 	var NPanel = React.createClass($pt.defineCellComponent({
 		displayName: 'NPanel',
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object,
-			direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
-		},
-		/**
-   * will update
-   * @param nextProps
-   */
-		componentWillUpdate: function (nextProps) {
-			if (this.hasCheckInTitle()) {
-				this.getModel().removeListener(this.getCheckInTitleDataId(), 'post', 'change', this.onTitleCheckChanged);
-			}
-			this.removeDependencyMonitor(this.getDependencies("collapsedLabel"));
-			this.removeDependencyMonitor(this.getDependencies("expandedLabel"));
-			this.removeVisibleDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
-		/**
-   * did update
-   * @param prevProps
-   * @param prevState
-   */
-		componentDidUpdate: function (prevProps, prevState) {
-			if (this.hasCheckInTitle()) {
-				this.getModel().addListener(this.getCheckInTitleDataId(), 'post', 'change', this.onTitleCheckChanged);
-			}
-			this.addDependencyMonitor(this.getDependencies("collapsedLabel"));
-			this.addDependencyMonitor(this.getDependencies("expandedLabel"));
-			this.addVisibleDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-   * did mount
-   */
-		componentDidMount: function () {
-			if (this.hasCheckInTitle()) {
-				this.getModel().addListener(this.getCheckInTitleDataId(), 'post', 'change', this.onTitleCheckChanged);
-			}
-			this.addDependencyMonitor(this.getDependencies("collapsedLabel"));
-			this.addDependencyMonitor(this.getDependencies("expandedLabel"));
-			this.addVisibleDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-   * will unmount
-   */
-		componentWillUnmount: function () {
-			if (this.hasCheckInTitle()) {
-				this.getModel().removeListener(this.getCheckInTitleDataId(), 'post', 'change', this.onTitleCheckChanged);
-			}
-			this.removeDependencyMonitor(this.getDependencies("collapsedLabel"));
-			this.removeDependencyMonitor(this.getDependencies("expandedLabel"));
-			this.removeVisibleDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
@@ -11499,10 +10642,30 @@
 				}
 			};
 		},
-		getInitialState: function () {
-			return {
-				expanded: null
-			};
+		installMonitors: function () {
+			if (this.hasCheckInTitle()) {
+				this.getModel().addPostChangeListener(this.getCheckInTitleDataId(), this.onTitleCheckChanged);
+			}
+		},
+		uninstallMonitors: function () {
+			if (this.hasCheckInTitle()) {
+				this.getModel().removePostChangeListener(this.getCheckInTitleDataId(), this.onTitleCheckChanged);
+			}
+		},
+		beforeWillUpdate: function (nextProps) {
+			this.uninstallMonitors();
+		},
+		beforeDidUpdate: function (prevProps, prevState) {
+			this.installMonitors();
+		},
+		beforeDidMount: function () {
+			this.installMonitors();
+		},
+		beforeWillUnmount: function () {
+			this.uninstallMonitors();
+		},
+		getDependencyOptions: function () {
+			return ['collapsedLabel', 'expandedLabel'];
 		},
 		/**
    * render check in title
@@ -11885,56 +11048,14 @@
 			CANCEL_ICON: 'ban',
 			CANCEL_STYLE: 'danger'
 		},
-		propTypes: {
-			save: React.PropTypes.func,
-			validate: React.PropTypes.func,
-			cancel: React.PropTypes.func,
-			reset: React.PropTypes.func,
-
-			// left: React.PropTypes.arrayOf(React.PropTypes.shape({
-			// 	icon: React.PropTypes.string,
-			// 	text: React.PropTypes.string,
-			// 	style: React.PropTypes.string,
-			// 	click: React.PropTypes.func.isRequired,
-			// 	enabled: React.PropTypes.oneOfType([React.PropTypes.bool, React.PropTypes.shape({
-			// 		when: React.PropTypes.func,
-			// 		depends: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.arrayOf(React.PropTypes.string)])
-			// 	})])
-			// })),
-			// right: React.PropTypes.arrayOf(React.PropTypes.shape({
-			// 	icon: React.PropTypes.string,
-			// 	text: React.PropTypes.string,
-			// 	style: React.PropTypes.string, // references to bootstrap styles
-			// 	click: React.PropTypes.func.isRequired,
-			// 	enabled: React.PropTypes.oneOfType([React.PropTypes.bool, React.PropTypes.shape({
-			// 		when: React.PropTypes.func,
-			// 		depends: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.arrayOf(React.PropTypes.string)])
-			// 	})])
-			// })),
-
-			// model, pass to click
-			model: React.PropTypes.object,
-			view: React.PropTypes.bool
-		},
-		/**
-   * will update
-   * @param nextProps
-   */
-		componentWillUpdate: function (nextProps) {},
-		/**
-   * did update
-   * @param prevProps
-   * @param prevState
-   */
-		componentDidUpdate: function (prevProps, prevState) {},
-		/**
-   * did mount
-   */
-		componentDidMount: function () {},
-		/**
-   * will unmount
-   */
-		componentWillUnmount: function () {},
+		// componentWillUpdate: function (nextProps) {
+		// },
+		// componentDidUpdate: function (prevProps, prevState) {
+		// },
+		// componentDidMount: function () {
+		// },
+		// componentWillUnmount: function () {
+		// },
 		/**
    * render left buttons
    */
@@ -12061,46 +11182,9 @@
 	$pt.Components.NPanelFooter = NPanelFooter;
 })(window, jQuery, React, ReactDOM, $pt);
 
-/**
- * radio button
- * layout: {
- *      label: string,
- *      dataId: string,
- *      pos: {
- *          row: number,
- *          col: number,
- *          width: number,
- *          section: string,
- *          card: string
- *      },
- *      css: {
- *          cell: string,
- *          comp: string
- *      },
- *      comp: {
- *          type: $pt.ComponentConstants.Radio,
- *          direction: string,
- *          data: CodeTable,
- *          enabled: {
- *              when: function,
- *              depends: string|string[]
- *          },
- *          visible: {
- *              when: function,
- *              depends: string|string[]
- *          }
- *      }
- * }
- */
 (function (window, $, React, ReactDOM, $pt) {
 	var NRadio = React.createClass($pt.defineCellComponent({
 		displayName: 'NRadio',
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object
-		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
@@ -12108,49 +11192,6 @@
 					labelAtLeft: false
 				}
 			};
-		},
-		/**
-   * will update
-   * @param nextProps
-   */
-		componentWillUpdate: function (nextProps) {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
-		/**
-   * did update
-   * @param prevProps
-   * @param prevState
-   */
-		componentDidUpdate: function (prevProps, prevState) {
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-   * did mount
-   */
-		componentDidMount: function () {
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-   * will unmount
-   */
-		componentWillUnmount: function () {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
 		},
 		/**
    * render label
@@ -12254,29 +11295,6 @@
 				this.onButtonClicked(option);
 			}
 		},
-		/**
-   * on component change
-   * @param evt
-   */
-		// onComponentChanged: function (evt) {
-		// 	// synchronize value to model
-		// 	this.setValueToModel(evt.target.checked);
-		// },
-		/**
-   * on model changed
-   * @param evt
-   */
-		onModelChanged: function (evt) {
-			// this.getComponent().val(evt.new);
-			this.forceUpdate();
-		},
-		/**
-   * get component
-   * @returns {jQuery}
-   */
-		// getComponent: function () {
-		// 	return $(ReactDOM.findDOMNode(this.refs.txt));
-		// },
 		isLabelAtLeft: function () {
 			return this.getComponentOption('labelAtLeft');
 		}
@@ -12305,13 +11323,6 @@
 			ADVANCED_SEARCH_PROXY: null,
 			ADVANCED_SEARCH_PROXY_CALLBACK: null
 		},
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object,
-			view: React.PropTypes.bool
-		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {}
@@ -12322,51 +11333,12 @@
 				stopRetrieveLabelFromRemote: false
 			};
 		},
-		/**
-   * will update
-   * @param nextProps
-   */
-		componentWillUpdate: function (nextProps) {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChange);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
-		/**
-   * did update
-   * @param prevProps
-   * @param prevState
-   */
-		componentDidUpdate: function (prevProps, prevState) {
+		beforeDidUpdate: function (prevProps, prevState) {
 			this.initSetValues();
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChange);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
 		},
-		/**
-   * did mount
-   */
-		componentDidMount: function () {
+		beforeDidMount: function () {
 			// set model value to component
 			this.initSetValues();
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChange);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-   * will unmount
-   */
-		componentWillUnmount: function () {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChange);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
 		},
 		/**
    * render
@@ -12433,11 +11405,10 @@
    * on model change
    * @param evt
    */
-		onModelChange: function (evt) {
+		onModelChanged: function (evt) {
 			var value = evt.new;
 			this.getComponent().val(value);
 			this.retrieveAndSetLabelTextFromRemote(value);
-			// this.forceUpdate();
 		},
 		/**
    * show advanced search dialog
@@ -12729,6 +11700,7 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NSelect = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelect',
+		mixins: [$pt.mixins.PopoverMixin],
 		statics: {
 			POP_FIX_ON_BOTTOM: false,
 			PLACEHOLDER: "Please Select...",
@@ -12736,13 +11708,6 @@
 			FILTER_PLACEHOLDER: 'Search...',
 			CLOSE_TEXT: 'Close',
 			CLEAR_TEXT: 'Clear'
-		},
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object,
-			view: React.PropTypes.bool
 		},
 		getDefaultProps: function () {
 			return {
@@ -12765,50 +11730,23 @@
 				}
 			};
 		},
-		getInitialState: function () {
-			return {};
-		},
-		/**
-   * will update
-   */
-		componentWillUpdate: function (nextProps) {
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
+		afterWillUpdate: function (nextProps) {
 			if (this.hasParent()) {
 				// add post change listener into parent model
-				this.getParentModel().removeListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+				this.getParentModel().removePostChangeListener(this.getParentPropertyId(), this.onParentModelChanged);
 			}
-			this.unregisterFromComponentCentral();
 		},
-		/**
-   * did update
-   * @param prevProps
-   * @param prevState
-   */
-		componentDidUpdate: function (prevProps, prevState) {
-			this.addPostChangeListener(this.onModelChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
+		afterDidUpdate: function (prevProps, prevState) {
 			if (this.hasParent()) {
 				// remove post change listener from parent model
-				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+				this.getParentModel().addPostChangeListener(this.getParentPropertyId(), this.onParentModelChanged);
 			}
-
-			this.registerToComponentCentral();
 		},
-		/**
-   * did mount
-   */
-		componentDidMount: function () {
-			this.addPostChangeListener(this.onModelChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
+		afterDidMount: function () {
 			if (this.state.onloading) {
 				if (this.hasParent()) {
 					// add post change listener into parent model
-					this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+					this.getParentModel().addPostChangeListener(this.getParentPropertyId(), this.onParentModelChanged);
 					var parentValue = this.getParentPropertyValue();
 					if (parentValue == null) {
 						// no parent value
@@ -12832,19 +11770,11 @@
 				}
 			}
 		},
-		/**
-   * will unmount
-   */
-		componentWillUnmount: function () {
-			// remove post change listener
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
+		afterWillUnmount: function () {
 			if (this.hasParent()) {
 				// remove post change listener from parent model
-				this.getParentModel().removeListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+				this.getParentModel().removePostChangeListener(this.getParentPropertyId(), this.onParentModelChanged);
 			}
-			this.unregisterFromComponentCentral();
 		},
 		renderClear: function () {
 			if (!this.isClearAllowed()) {
@@ -13528,13 +12458,6 @@
 			delete this.state.touchStartTime;
 		},
 		/**
-   * on model change
-   * @param evt
-   */
-		onModelChanged: function (evt) {
-			this.forceUpdate();
-		},
-		/**
    * on parent model change
    * @param evt
    */
@@ -13655,16 +12578,11 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NSelectTree = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelectTree',
+		mixins: [$pt.mixins.PopoverMixin],
 		statics: {
 			POP_FIX_ON_BOTTOM: false,
 			PLACEHOLDER: "Please Select...",
 			CLOSE_TEXT: 'Close'
-		},
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object
 		},
 		getDefaultProps: function () {
 			return {
@@ -13681,57 +12599,26 @@
 				}
 			};
 		},
-		getInitialState: function () {
-			return {};
-		},
-		/**
-   * will update
-   * @param nextProps
-   */
-		componentWillUpdate: function (nextProps) {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.__forceUpdate);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
+		afterWillUpdate: function (nextProps) {
 			if (this.hasParent()) {
 				// add post change listener into parent model
-				this.getParentModel().removeListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+				this.getParentModel().removePostChangeListener(this.getParentPropertyId(), this.onParentModelChanged);
 			}
-			this.unregisterFromComponentCentral();
 		},
-		/**
-   * did update
-   * @param prevProps
-   * @param prevState
-   */
-		componentDidUpdate: function (prevProps, prevState) {
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.__forceUpdate);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
+		afterDidUpdate: function (prevProps, prevState) {
 			if (this.hasParent()) {
 				// add post change listener into parent model
-				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+				this.getParentModel().addPostChangeListener(this.getParentPropertyId(), this.onParentModelChanged);
 			}
-			this.registerToComponentCentral();
-
 			if (this.state.popoverDiv && this.state.popoverDiv.is(':visible')) {
 				this.showPopover();
 			}
 		},
-		/**
-   * did mount
-   */
-		componentDidMount: function () {
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.__forceUpdate);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
+		afterDidMount: function () {
 			if (this.hasParent()) {
 				// add post change listener into parent model
-				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+				this.getParentModel().addPostChangeListener(this.getParentPropertyId(), this.onParentModelChanged);
 			}
-			this.registerToComponentCentral();
 			if (this.state.onloading) {
 				this.getCodeTable().initializeRemote().done(function () {
 					this.setState({ onloading: false });
@@ -13739,20 +12626,14 @@
 			}
 			this.state.mounted = true;
 		},
-		/**
-   * will unmount
-   */
-		componentWillUnmount: function () {
+		beforeWillUnmount: function () {
 			this.destroyPopover();
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.__forceUpdate);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
+		},
+		afterWillUnmount: function () {
 			if (this.hasParent()) {
 				// add post change listener into parent model
-				this.getParentModel().removeListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+				this.getParentModel().removePostChangeListener(this.getParentPropertyId(), this.onParentModelChanged);
 			}
-			this.unregisterFromComponentCentral();
 		},
 		renderTree: function () {
 			var layout = $pt.createCellLayout('values', this.getTreeLayout());
@@ -14373,13 +13254,6 @@
 				return $pt.sideMenu[containerId];
 			}
 		},
-		propTypes: {
-			// menu object
-			menus: React.PropTypes.array,
-			hover: React.PropTypes.bool,
-
-			className: React.PropTypes.string
-		},
 		getDefaultProps: function () {
 			return {
 				hover: false
@@ -14550,35 +13424,9 @@
 	$pt.Components.NSideMenu = NSideMenu;
 })(window, jQuery, React, ReactDOM, $pt);
 
-/**
- * normal tab
- */
 (function (window, $, React, ReactDOM, $pt) {
 	var NTab = React.createClass({
 		displayName: 'NTab',
-		propTypes: {
-			type: React.PropTypes.oneOf(['tab', 'pill']),
-			justified: React.PropTypes.bool,
-			direction: React.PropTypes.oneOf(['vertical', 'horizontal']),
-			size: React.PropTypes.oneOf(["lg", "2x", "3x", "4x", "5x"]),
-			removable: React.PropTypes.bool,
-			canActive: React.PropTypes.func,
-			onActive: React.PropTypes.func,
-			canRemove: React.PropTypes.func,
-			onRemove: React.PropTypes.func,
-			tabClassName: React.PropTypes.string,
-
-			tabs: React.PropTypes.arrayOf(React.PropTypes.shape({
-				label: React.PropTypes.string,
-				icon: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.element]),
-				active: React.PropTypes.bool,
-				value: React.PropTypes.any,
-				badge: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number]),
-				innerId: React.PropTypes.string,
-				removable: React.PropTypes.bool,
-				className: React.PropTypes.string
-			}))
-		},
 		getDefaultProps: function () {
 			return {
 				type: 'tab',
@@ -14926,12 +13774,6 @@
 				}
 			}
 		},
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object
-		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
@@ -15015,7 +13857,7 @@
 				var index = $(this).parent().children().index($(this));
 				_this.getDivComponent().find("tbody tr:nth-child(" + (index + 1) + ")").removeClass("hover");
 			});
-			this.renderIfIE8();
+			// this.renderIfIE8();
 			this.renderHeaderPopover();
 			this.addPostChangeListener(this.onModelChanged);
 			this.state.searchModel.addPostChangeListener('text', this.onSearchBoxChanged);
@@ -15077,33 +13919,33 @@
 		/**
    * render when IE8, fixed the height of table since IE8 doesn't support max-height
    */
-		renderIfIE8: function () {
-			if (!this.isIE8() || !this.hasVerticalScrollBar()) {
-				return;
-			}
-			var mainTable = this.getComponent();
-			var leftFixedDiv = this.getFixedLeftBodyComponent();
-			var rightFixedDiv = this.getFixedRightBodyComponent();
-			var trs = mainTable.find("tr");
-			var rowCount = trs.length;
-			var height = rowCount * NTable.ROW_HEIGHT; // 32 is defined in css, if value in css is changed, it must be changed together
-			if (height > this.getComponentOption("scrollY")) {
-				height = this.getComponentOption("scrollY");
-			}
-			// calculate height of body if ie8 and scrollY
-			mainTable.closest("div").css({
-				height: height + 17
-			});
-			leftFixedDiv.css({
-				height: height
-			});
-			rightFixedDiv.css({
-				height: height
-			});
-		},
-		isIE: function () {
-			return $pt.browser.msie;
-		},
+		// renderIfIE8: function () {
+		// 	if (!this.isIE8() || !this.hasVerticalScrollBar()) {
+		// 		return;
+		// 	}
+		// 	var mainTable = this.getComponent();
+		// 	var leftFixedDiv = this.getFixedLeftBodyComponent();
+		// 	var rightFixedDiv = this.getFixedRightBodyComponent();
+		// 	var trs = mainTable.find("tr");
+		// 	var rowCount = trs.length;
+		// 	var height = rowCount * NTable.ROW_HEIGHT; // 32 is defined in css, if value in css is changed, it must be changed together
+		// 	if (height > this.getComponentOption("scrollY")) {
+		// 		height = this.getComponentOption("scrollY");
+		// 	}
+		// 	// calculate height of body if ie8 and scrollY
+		// 	mainTable.closest("div").css({
+		// 		height: height + 17
+		// 	});
+		// 	leftFixedDiv.css({
+		// 		height: height
+		// 	});
+		// 	rightFixedDiv.css({
+		// 		height: height
+		// 	});
+		// },
+		// isIE: function () {
+		// 	return $pt.browser.msie;
+		// },
 		/**
    * check browser is IE8 or not
    * @returns {boolean}
@@ -17015,14 +15857,6 @@
 			}
 		},
 		/**
-   * on model validate change
-   * @param evt
-   */
-		onModelValidateChanged: function (evt) {
-			// maybe will introduce performance issue, cannot sure now.
-			this.forceUpdate();
-		},
-		/**
    * jump to page by given page index
    * @param pageIndex
    */
@@ -17158,54 +15992,6 @@
 	});
 })(window, jQuery, React, ReactDOM, $pt);
 
-/**
- * text input
- * onKeyUp listener makes sure the keyboard operation monitored.
- * and change listener makes sure the mouse operation monitored on blur.
- *
- * layout: {
- *      label: string,
- *      dataId: string,
- *      pos: {
- *          row: number,
- *          col: number,
- *          width: number,
- *          section: string,
- *          card: string
- *      },
- *      css: {
- *          cell: string,
- *          comp: string,
- *          'normal-line': string,
- *          'focus-line': string
- *      },
- *      comp: {
- *          type: $pt.ComponentConstants.Text,
- *          pwd: boolean,
- *          placeholder: string,
- *          enabled: {
- *              when: function,
- *              depends: string|string[]
- *          },
- *          visible: {
- *              when: function,
- *              depends: string|string[]
- *          },
- *          leftAddon: {
- *              text: string,
- *              icon: string,
- *              iconFirst: boolean,
- *              click: function
- *          },
- *          rightAddon: {
- *              text: string,
- *              icon: string,
- *              iconFirst: boolean,
- *              click: function
- *          }
- *      }
- * }
- */
 (function (window, $, React, ReactDOM, $pt) {
 	var NText = React.createClass($pt.defineCellComponent({
 		displayName: 'NText',
@@ -17230,38 +16016,20 @@
 			},
 			TRIM: false
 		},
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object
-		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {}
 			};
 		},
-		getInitialState: function () {
-			return {};
-		},
-		/**
-   * will update
-   * @param nextProps
-   */
-		componentWillUpdate: function (nextProps) {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
+		afterWillUpdate: function (nextProps) {
 			this.getComponent().off('change', this.onComponentChanged);
-			this.unregisterFromComponentCentral();
 		},
 		/**
    * did update
    * @param prevProps
    * @param prevState
    */
-		componentDidUpdate: function (prevProps, prevState) {
+		beforeDidUpdate: function (prevProps, prevState) {
 			var formattedValue = this.getValueFromModel();
 			if (!$(ReactDOM.findDOMNode(this.refs.focusLine)).hasClass('focus')) {
 				formattedValue = this.getFormattedValue(formattedValue);
@@ -17269,36 +16037,19 @@
 			if (this.getComponent().val() != formattedValue) {
 				this.getComponent().val(formattedValue);
 			}
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.getComponent().on('change', this.onComponentChanged);
-			this.registerToComponentCentral();
 		},
-		/**
-   * did mount
-   */
-		componentDidMount: function () {
+		afterDidUpdate: function () {
+			this.getComponent().on('change', this.onComponentChanged);
+		},
+		beforeDidMount: function () {
 			// set model value to component
 			this.getComponent().val(this.getFormattedValue(this.getValueFromModel()));
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.getComponent().on('change', this.onComponentChanged);
-			this.registerToComponentCentral();
 		},
-		/**
-   * will unmount
-   */
-		componentWillUnmount: function () {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
+		afterDidMount: function () {
+			this.getComponent().on('change', this.onComponentChanged);
+		},
+		afterWillUnmount: function () {
 			this.getComponent().off('change', this.onComponentChanged);
-			this.unregisterFromComponentCentral();
 		},
 		/**
    * render left add-on
@@ -17467,24 +16218,6 @@
 				this.setValueToModel(evt.target.value);
 			}
 		},
-		/**
-   * on model change
-   * @param evt
-   */
-		onModelChanged: function (evt) {
-			this.forceUpdate();
-			// return;
-			//
-			// var formattedValue = this.getValueFromModel();
-			// if (!$(ReactDOM.findDOMNode(this.refs.focusLine)).hasClass('focus')) {
-			// 	formattedValue = this.getFormattedValue(formattedValue);
-			// }
-			// if (formattedValue == this.getComponent().val()) {
-			// 	return;
-			// }
-			// // window.console.debug('Text model changed[modelValue=' + evt.new + ', compValue=' + this.getComponent().val() + '].');
-			// this.getComponent().val(formattedValue);
-		},
 		onKeyUp: function (evt) {
 			var monitor = this.getEventMonitor('keyUp');
 			if (monitor) {
@@ -17569,51 +16302,9 @@
 	});
 })(window, jQuery, React, ReactDOM, $pt);
 
-/**
- * text input
- * onKeyUp listener makes sure the keyboard operation monitored.
- * and change listener makes sure the mouse operation monitored on blur.
- *
- * layout: {
- *      label: string,
- *      dataId: string,
- *      pos: {
- *          row: number,
- *          col: number,
- *          width: number,
- *          section: string,
- *          card: string
- *      },
- *      css: {
- *          cell: string,
- *          comp: string,
- *          'normal-line': string,
- *          'focus-line': string
- *      },
- *      comp: {
- *          type: $pt.ComponentConstants.TextArea,
- *          placeholder: string,
- *          lines: number,
- *          enabled: {
- *              when: function,
- *              depends: string|string[]
- *          },
- *          visible: {
- *              when: function,
- *              depends: string|string[]
- *          }
- *      }
- * }
- */
 (function (window, $, React, ReactDOM, $pt) {
 	var NTextArea = React.createClass($pt.defineCellComponent({
 		displayName: 'NTextArea',
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object
-		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
@@ -17621,57 +16312,32 @@
 				}
 			};
 		},
-		/**
-   * will update
-   * @param nextProps
-   */
-		componentWillUpdate: function (nextProps) {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
+		afterWillUpdate: function (nextProps) {
 			this.getComponent().off('change', this.onComponentChanged);
-			this.unregisterFromComponentCentral();
 		},
-		/**
-   * did update
-   * @param prevProps
-   * @param prevState
-   */
-		componentDidUpdate: function (prevProps, prevState) {
+		beforeDidUpdate: function (prevProps, prevState) {
 			if (this.getComponent().val() != this.getValueFromModel()) {
 				this.getComponent().val(this.getValueFromModel());
 			}
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
+		},
+		afterDidUpdate: function () {
 			this.getComponent().on('change', this.onComponentChanged);
-			this.registerToComponentCentral();
 		},
 		/**
    * did mount
    */
-		componentDidMount: function () {
+		beforeDidMount: function () {
 			// set model value to component
 			this.getComponent().val(this.getValueFromModel());
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
+		},
+		afterDidMount: function () {
 			this.getComponent().on('change', this.onComponentChanged);
-			this.registerToComponentCentral();
 		},
 		/**
    * will unmount
    */
-		componentWillUnmount: function () {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
+		afterWillUnmount: function () {
 			this.getComponent().off('change', this.onComponentChanged);
-			this.unregisterFromComponentCentral();
 		},
 		/**
    * render text
@@ -17729,18 +16395,6 @@
 			this.setValueToModel(evt.target.value);
 		},
 		/**
-   * on model change
-   * @param evt
-   */
-		onModelChanged: function (evt) {
-			// var value = evt.new;
-			// if (value == this.getComponent().val()) {
-			// 	return;
-			// }
-			// this.getComponent().val(evt.new);
-			this.forceUpdate();
-		},
-		/**
    * on addon clicked
    * @param userDefinedClickFunc
    */
@@ -17777,58 +16431,13 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NToggle = React.createClass($pt.defineCellComponent({
 		displayName: 'NToggle',
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object
-		},
-		/**
-   * will update
-   * @param nextProps
-   */
-		componentWillUpdate: function (nextProps) {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
-		/**
-   * did update
-   * @param prevProps
-   * @param prevState
-   */
-		componentDidUpdate: function (prevProps, prevState) {
+		beforeDidUpdate: function (prevProps, prevState) {
 			// set model value to component
 			this.getComponent().prop("checked", this.getValueFromModel());
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
 		},
-		/**
-   * did mount
-   */
-		componentDidMount: function () {
+		beforeDidMount: function () {
 			// set model value to component
 			this.getComponent().prop("checked", this.getValueFromModel());
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-   * will unmount
-   */
-		componentWillUnmount: function () {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
 		},
 		/**
    * render label
@@ -17981,12 +16590,6 @@
                 return array;
             }
         },
-        propTypes: {
-            // model
-            model: React.PropTypes.object,
-            // CellLayout
-            layout: React.PropTypes.object
-        },
         getDefaultProps: function () {
             return {
                 defaultOptions: {
@@ -18035,52 +16638,6 @@
                 expandButton: expandBtn,
                 collapseButton: collapseBtn
             };
-        },
-        /**
-        * will update
-        * @param nextProps
-        */
-        componentWillUpdate: function (nextProps) {
-            // remove post change listener to handle model change
-            this.removePostChangeListener(this.__forceUpdate);
-            this.removeVisibleDependencyMonitor();
-            this.removeEnableDependencyMonitor();
-            this.unregisterFromComponentCentral();
-        },
-        /**
-         * did update
-         * @param prevProps
-         * @param prevState
-         */
-        componentDidUpdate: function (prevProps, prevState) {
-            // add post change listener to handle model change
-            this.addPostChangeListener(this.__forceUpdate);
-            this.addVisibleDependencyMonitor();
-            this.addEnableDependencyMonitor();
-            this.registerToComponentCentral();
-        },
-        // componentWillMount: function() {
-        //     this.initExpand();
-        // },
-        /**
-         * did mount
-         */
-        componentDidMount: function () {
-            // add post change listener to handle model change
-            this.addPostChangeListener(this.__forceUpdate);
-            this.addVisibleDependencyMonitor();
-            this.addEnableDependencyMonitor();
-            this.registerToComponentCentral();
-        },
-        /**
-         * will unmount
-         */
-        componentWillUnmount: function () {
-            // remove post change listener to handle model change
-            this.removePostChangeListener(this.__forceUpdate);
-            this.removeVisibleDependencyMonitor();
-            this.removeEnableDependencyMonitor();
-            this.unregisterFromComponentCentral();
         },
         renderCheck: function (node, nodeId) {
             var canSelected = this.isNodeCanSelect(node);

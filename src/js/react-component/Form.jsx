@@ -1,53 +1,8 @@
-/**
- * form component, a div
- *
- * depends NPanelFooter, NFormCell
- * layout: {
- *      _freeCard: boolean,
- *      _cardButtonShown: boolean,
- *      _cards: {
- *          someCardId: {
- *              label: string,
- *              badge: string,
- *              backable: boolean,
- *              active: boolean,
- *              index: number,
- *              leftButtons: {}[]|{
- *                  successCallback: string,
- *                  // other see NFormButton
- *              },
- *              rightButtons: {}[]|{},
- *              finishButton: {},
- *              _sections: {}
- *          }
- *      },
- *      _sections: {
- *          someSectionKey: {
- *              row: number,
- *              col: number,
- *              width: number,
- *              label: string,
- *              style: string,
- *              collapsible: boolean,
- *              expanded: boolean
- *          }
- *      }
- * }
- */
 (function (window, $, React, ReactDOM, $pt) {
 	var NForm = React.createClass({
 		displayName: 'NForm',
 		statics: {
 			LABEL_DIRECTION: 'vertical'
-		},
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// layout, FormLayout
-			layout: React.PropTypes.object,
-			direction: React.PropTypes.oneOf(['vertical', 'horizontal']),
-			view: React.PropTypes.bool,
-			className: React.PropTypes.string
 		},
 		getDefaultProps: function () {
 			return {

@@ -1,52 +1,9 @@
-/**
- * Array Panel, for array property
- * TODO add & remove are not supported yet
- * TODO since no apply action, must reset the whole model if want to reset the items data
- *
- * depends NPanel
- *
- * layout: {
- *      label: string,
- *      dataId: string,
- *      pos: {
- *          row: number,
- *          col: number,
- *          width: number,
- *          section: string,
- *          card: string
- *      },
- *      comp: {
- *          type: $pt.ComponentConstants.ArrayPanel,
- *          itemTitle: string|{when: function, depends: string|string[]},
- *          expanded: boolean,
- *          collapsible: boolean,
- *          style: string,
- *          checkInTitle: {}|function,
- *          editLayout: {}|function, // see form layout
- *          visible: {
- *              when: function,
- *              depends: string|string[]
- *          },
- *      },
- *      css: {
- *          cell: string,
- *          comp: string
- *      }
- * }
- */
 (function (window, $, React, ReactDOM, $pt) {
 	var NArrayPanel = React.createClass($pt.defineCellComponent({
 		displayName: 'NArrayPanel',
 		mixins: [$pt.mixins.ArrayComponentMixin],
 		statics: {
 			UNTITLED: 'Untitled Item'
-		},
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object,
-			direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
 		},
 		getDefaultProps: function () {
 			return {
@@ -55,60 +12,6 @@
 					expanded: true
 				}
 			};
-		},
-		getInitialState: function () {
-			return {};
-		},
-		/**
-		 * will update
-		 * @param nextProps
-		 */
-		componentWillUpdate: function (nextProps) {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removePostAddListener(this.onModelChanged);
-			this.removePostRemoveListener(this.onModelChanged);
-			this.removePostValidateListener(this.onModelValidateChanged);
-			this.removeVisibleDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
-		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
-		componentDidUpdate: function (prevProps, prevState) {
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addPostAddListener(this.onModelChanged);
-			this.addPostRemoveListener(this.onModelChanged);
-			this.addPostValidateListener(this.onModelValidateChanged);
-			this.addVisibleDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-		 * did mount
-		 */
-		componentDidMount: function () {
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.onModelChanged);
-			this.addPostAddListener(this.onModelChanged);
-			this.addPostRemoveListener(this.onModelChanged);
-			this.addPostValidateListener(this.onModelValidateChanged);
-			this.addVisibleDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-		 * will unmount
-		 */
-		componentWillUnmount: function () {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.onModelChanged);
-			this.removePostAddListener(this.onModelChanged);
-			this.removePostRemoveListener(this.onModelChanged);
-			this.removePostValidateListener(this.onModelValidateChanged);
-			this.removeVisibleDependencyMonitor();
-			this.unregisterFromComponentCentral();
 		},
 		/**
 		 * render item
@@ -164,21 +67,6 @@
 		getValueFromModel: function () {
 			var data = this.getModel().get(this.getDataId());
 			return data == null ? [] : data;
-		},
-		/**
-		 * on model changed
-		 * @param evt
-		 */
-		onModelChanged: function (evt) {
-			this.forceUpdate();
-		},
-		/**
-		 * monitor the parent model validation
-		 * @param evt
-		 */
-		onModelValidateChanged: function (evt) {
-			// TODO maybe will introduce performance issue, cannot sure now.
-			this.forceUpdate();
 		},
 		/**
 		 * get edit layout

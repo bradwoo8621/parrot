@@ -1,14 +1,7 @@
-/**
- * 1. the coordinate system of clock is center or circle.
- * 2. popover will be closed on
- * 		2.1 mouse down on others in document
- * 		2.2 press escape or tab
- * 		2.3 mouse wheel
- *		2.4 window resize
- */
 (function(window, $, moment, React, ReactDOM, $pt) {
 	var NDateTime = React.createClass($pt.defineCellComponent({
 		displayName: 'NDateTime',
+		mixins: [$pt.mixins.PopoverMixin],
 		statics: {
 			POP_FIX_ON_BOTTOM: false,
 			FORMAT: 'YYYY/MM/DD',
@@ -48,11 +41,6 @@
 			DATE_SWITCH_TEXT: 'Date',
 			TIME_SWITCH_TEXT: 'Time'
 		},
-		propTypes: {
-			model: React.PropTypes.object,
-			layout: React.PropTypes.object,
-			view: React.PropTypes.bool
-		},
 		getDefaultProps: function() {
 			return {
 				defaultOptions: {
@@ -68,37 +56,14 @@
 				}
 			};
 		},
-		getInitialState: function() {
-			return {
-				popover: null
-			};
-		},
-		componentWillUpdate: function(nextProps) {
-			this.removePostChangeListener(this.onModelChange);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
-		componentDidUpdate: function(prevProps, prevState) {
+		beforeDidUpdate: function() {
 			this.setValueToTextInput(this.getValueFromModel());
-			this.addPostChangeListener(this.onModelChange);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
 		},
-		componentDidMount: function() {
+		beforeDidMount: function() {
 			this.setValueToTextInput(this.getValueFromModel());
-			this.addPostChangeListener(this.onModelChange);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
-			this.registerToComponentCentral();
 		},
-		componentWillUnmount: function() {
+		beforeWillUnmount: function() {
 			this.destroyPopover();
-			this.removePostChangeListener(this.onModelChange);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
-			this.unregisterFromComponentCentral();
 		},
 		renderIcon: function(options) {
 			var css = {
@@ -1111,7 +1076,7 @@
 				}
 			}
 		},
-		onModelChange: function (evt) {
+		onModelChanged: function (evt) {
 			var newValue = evt.new;
 			var text = this.getTextInput().val();
 			if (newValue == null || (newValue + '').isBlank()) {

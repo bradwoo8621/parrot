@@ -1,101 +1,6 @@
-/**
- * panel
- * depends NForm
- *
- * layout: {
- *      label: string,
- *      pos: {
- *          row: number,
- *          col: number,
- *          width: number,
- *          section: string,
- *          card: string
- *      },
- *      comp: {
- *          type: $pt.ComponentConstants.Panel,
- *          expanded: boolean,
- *          collapsible: boolean,
- *          style: string,
- *          expandedLabel: string|function,
- *          collapsedLabel: string|function,
- *          checkInTitle: {
- *              data: string,
- *              label: string,
- *              collapsible: string
- *          },
- *          editLayout: {}, // see form layout
- *          visible: {
- *              when: function,
- *              depends: string|string[]
- *          }
- *      },
- *      css: {
- *          cell: string,
- *          comp: string
- *      }
- * }
- */
 (function (window, $, React, ReactDOM, $pt) {
 	var NPanel = React.createClass($pt.defineCellComponent({
 		displayName: 'NPanel',
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object,
-			direction: React.PropTypes.oneOf(['vertical', 'horizontal'])
-		},
-		/**
-		 * will update
-		 * @param nextProps
-		 */
-		componentWillUpdate: function (nextProps) {
-			if (this.hasCheckInTitle()) {
-				this.getModel().removeListener(this.getCheckInTitleDataId(), 'post', 'change', this.onTitleCheckChanged);
-			}
-			this.removeDependencyMonitor(this.getDependencies("collapsedLabel"));
-			this.removeDependencyMonitor(this.getDependencies("expandedLabel"));
-			this.removeVisibleDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
-		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
-		componentDidUpdate: function (prevProps, prevState) {
-			if (this.hasCheckInTitle()) {
-				this.getModel().addListener(this.getCheckInTitleDataId(), 'post', 'change', this.onTitleCheckChanged);
-			}
-			this.addDependencyMonitor(this.getDependencies("collapsedLabel"));
-			this.addDependencyMonitor(this.getDependencies("expandedLabel"));
-			this.addVisibleDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-		 * did mount
-		 */
-		componentDidMount: function () {
-			if (this.hasCheckInTitle()) {
-				this.getModel().addListener(this.getCheckInTitleDataId(), 'post', 'change', this.onTitleCheckChanged);
-			}
-			this.addDependencyMonitor(this.getDependencies("collapsedLabel"));
-			this.addDependencyMonitor(this.getDependencies("expandedLabel"));
-			this.addVisibleDependencyMonitor();
-			this.registerToComponentCentral();
-		},
-		/**
-		 * will unmount
-		 */
-		componentWillUnmount: function () {
-			if (this.hasCheckInTitle()) {
-				this.getModel().removeListener(this.getCheckInTitleDataId(), 'post', 'change', this.onTitleCheckChanged);
-			}
-			this.removeDependencyMonitor(this.getDependencies("collapsedLabel"));
-			this.removeDependencyMonitor(this.getDependencies("expandedLabel"));
-			this.removeVisibleDependencyMonitor();
-			this.unregisterFromComponentCentral();
-		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
@@ -105,10 +10,30 @@
 				}
 			};
 		},
-		getInitialState: function () {
-			return {
-				expanded: null
-			};
+		installMonitors: function() {
+			if (this.hasCheckInTitle()) {
+				this.getModel().addPostChangeListener(this.getCheckInTitleDataId(), this.onTitleCheckChanged);
+			}
+		},
+		uninstallMonitors: function() {
+			if (this.hasCheckInTitle()) {
+				this.getModel().removePostChangeListener(this.getCheckInTitleDataId(), this.onTitleCheckChanged);
+			}
+		},
+		beforeWillUpdate: function (nextProps) {
+			this.uninstallMonitors();
+		},
+		beforeDidUpdate: function (prevProps, prevState) {
+			this.installMonitors();
+		},
+		beforeDidMount: function () {
+			this.installMonitors();
+		},
+		beforeWillUnmount: function () {
+			this.uninstallMonitors();
+		},
+		getDependencyOptions: function() {
+			return ['collapsedLabel', 'expandedLabel'];
 		},
 		/**
 		 * render check in title

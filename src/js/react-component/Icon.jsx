@@ -4,26 +4,6 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NIcon = React.createClass({
 		displayName: 'NIcon',
-		propTypes: {
-			size: React.PropTypes.string, //React.PropTypes.oneOf(["lg", "2x", "3x", "4x", "5x"]),
-			fixWidth: React.PropTypes.bool,
-
-			icon: React.PropTypes.string.isRequired,
-			spin: React.PropTypes.bool,
-			pulse: React.PropTypes.bool,
-			rotate: React.PropTypes.oneOf([90, 180, 270]),
-			flip: React.PropTypes.oneOf(["h", "v"]),
-			iconClassName: React.PropTypes.string,
-
-			backIcon: React.PropTypes.string,
-			backSpin: React.PropTypes.bool,
-			backPulse: React.PropTypes.bool,
-			backRotate: React.PropTypes.oneOf([90, 180, 270]),
-			backFlip: React.PropTypes.oneOf(["h", "v"]),
-			backClassName: React.PropTypes.string,
-
-			tooltip: React.PropTypes.string
-		},
 		getDefaultProps: function () {
 			return {
 				fixWidth: false,

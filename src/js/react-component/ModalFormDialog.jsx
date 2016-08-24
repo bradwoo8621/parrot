@@ -39,11 +39,6 @@
 			CANCEL_CONFIRM_TITLE: "Cancel Editing",
 			CANCEL_CONFIRM_MESSAGE: ["Are you sure to cancel current operating?", "All data will be lost and cannot be recovered."]
 		},
-		propTypes: {
-			title: React.PropTypes.string,
-			className: React.PropTypes.string,
-			zIndex: React.PropTypes.number
-		},
 		getInitialState: function () {
 			return {
 				visible: false,

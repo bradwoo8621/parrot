@@ -1116,6 +1116,92 @@
 	 * @type {*}
 	 */
 	var ComponentBase = {
+		// react methods
+		getInitialState: function() {
+			return {};
+		},
+		executePointcutBefore: function(pointcut) {
+			if (pointcut && pointcut.before) {
+				pointcut.before.call(this, Array.prototype.slice.call(arguments, 1));
+			}
+		},
+		executePointcutAfter: function(pointcut) {
+			if (pointcut && pointcut.after) {
+				pointcut.after.call(this, Array.prototype.slice.call(arguments, 1));
+			}
+		},
+		installBaseMonitors: function() {
+			this.executePointcutBefore.apply(this, arguments);
+			// add post change listener to handle model change
+			this.addPostChangeListener(this.onModelChanged);
+			if (this.isArrayData && this.isArrayData()) {
+				this.addPostAddListener(this.onModelChanged);
+				this.addPostRemoveListener(this.onModelChanged);
+				this.addPostValidateListener(this.onModelValidateChanged);
+			}
+			if (this.getDependencyOptions) {
+				var options = this.getDependencyOptions();
+				if (options) {
+					this.addDependencyMonitor(this.getDependencies(options));
+				}
+			}
+			this.addEnableDependencyMonitor();
+			this.addVisibleDependencyMonitor();
+			this.registerToComponentCentral();
+			this.executePointcutAfter.apply(this, arguments);
+		},
+		uninstallBaseMonitors: function() {
+			this.executePointcutBefore.apply(this, arguments);
+			// remove post change listener to handle model change
+			this.removePostChangeListener(this.onModelChanged);
+			if (this.isArrayData && this.isArrayData()) {
+				this.removePostAddListener(this.onModelChanged);
+				this.removePostRemoveListener(this.onModelChanged);
+				this.removePostValidateListener(this.onModelValidateChanged);
+			}
+			if (this.getDependencyOptions) {
+				var options = this.getDependencyOptions();
+				if (options) {
+					this.removeDependencyMonitor(this.getDependencies(options));
+				}
+			}
+			this.removeEnableDependencyMonitor();
+			this.removeVisibleDependencyMonitor();
+			this.unregisterFromComponentCentral();
+			this.executePointcutAfter.apply(this, arguments);
+		},
+		componentWillUpdate: function (nextProps, nextState) {
+			this.uninstallBaseMonitors({
+				before: this.beforeWillUpdate,
+				after: this.afterWillUpdate
+			}, nextProps, nextState);
+		},
+		componentDidUpdate: function (prevProps, prevState) {
+			this.installBaseMonitors({
+				before: this.beforeDidUpdate,
+				after: this.afterDidUpdate
+			}, prevProps, prevState);
+		},
+		componentDidMount: function () {
+			this.installBaseMonitors({
+				before: this.beforeDidMount,
+				after: this.afterDidMount
+			});
+		},
+		componentWillUnmount: function () {
+			this.uninstallBaseMonitors({
+				before: this.beforeWillUnmount,
+				after: this.afterWillUnmount
+			});
+		},
+		onModelChanged: function() {
+			this.forceUpdate();
+		},
+		onModelValidateChanged: function (evt) {
+			this.forceUpdate();
+		},
+
+		// customized methods
 		/**
 		 * get model
 		 * @returns {ModelInterface}
@@ -1574,68 +1660,6 @@
 		},
 		removePostValidateListener: function (listener) {
 			this.getModel().removePostValidateListener(this.getDataId(), listener);
-		},
-		recalcPopoverPosition: function(popover, component) {
-			var styles = {};
-			styles.width = component.outerWidth();
-			var offset = component.offset();
-			styles.top = offset.top + component.outerHeight();
-			styles.left = offset.left;
-
-			var onTop = false;
-			var rightToLeft = false;
-			var realHeight = popover.outerHeight();
-			var realWidth = popover.outerWidth();
-			// set the real top, assumpt it is on bottom
-			styles.top = offset.top + component.outerHeight();
-			// check popover in top or bottom
-			if ((styles.top + realHeight) > ($(window).height() + $(window).scrollTop())) {
-				// cannot show in bottom and in current viewport
-				// check it is enough top or not
-				if ((offset.top - $(window).scrollTop()) >= realHeight) {
-					// enough
-					styles.top = offset.top - realHeight;
-					onTop = true;
-				} else if ((styles.top + realHeight) <= $(document).height()) {
-					// can show in bottom and in current document
-					onTop = false;
-				} else if (offset.top < realHeight) {
-					// cannot show in top and in current document
-					onTop = false;
-				} else {
-					styles.top = offset.top - realHeight;
-					onTop = true;
-				}
-			} else {
-				// can show in bottom and in current viewport
-				onTop = false;
-			}
-
-			// check popover to left or right
-			if (realWidth > styles.width) {
-				var width = $(document).width();
-				if ((styles.left + realWidth) <= width) {
-					// normal from left to right, do nothing
-				} else if ((styles.left + styles.width) >= realWidth) {
-					// from right to left
-					styles.left = styles.left + styles.width - realWidth;
-					rightToLeft = true;
-				} else {
-					// still left to right, do nothing
-				}
-			}
-
-			if (onTop) {
-				popover.addClass('top');
-				popover.removeClass('bottom');
-			} else {
-				popover.removeClass('top');
-				popover.addClass('bottom');
-			}
-			if (rightToLeft) {
-				popover.addClass('right-to-left');
-			}
-			popover.css({top: styles.top, left: styles.left});
 		}
 	};
 	/**
@@ -1643,6 +1667,9 @@
 	 */
 	$pt.mixins = {
 		ArrayComponentMixin: {
+			isArrayData: function() {
+				return true;
+			},
 			addRowListener: function(rowModel) {
 				this.getRowListeners().forEach(function (listener) {
 					rowModel.addListener(listener.id,
@@ -1696,6 +1723,70 @@
 					model.useBaseAsCurrent();
 				}
 				return model;
+			}
+		},
+		PopoverMixin: {
+			recalcPopoverPosition: function(popover, component) {
+				var styles = {};
+				styles.width = component.outerWidth();
+				var offset = component.offset();
+				styles.top = offset.top + component.outerHeight();
+				styles.left = offset.left;
+
+				var onTop = false;
+				var rightToLeft = false;
+				var realHeight = popover.outerHeight();
+				var realWidth = popover.outerWidth();
+				// set the real top, assumpt it is on bottom
+				styles.top = offset.top + component.outerHeight();
+				// check popover in top or bottom
+				if ((styles.top + realHeight) > ($(window).height() + $(window).scrollTop())) {
+					// cannot show in bottom and in current viewport
+					// check it is enough top or not
+					if ((offset.top - $(window).scrollTop()) >= realHeight) {
+						// enough
+						styles.top = offset.top - realHeight;
+						onTop = true;
+					} else if ((styles.top + realHeight) <= $(document).height()) {
+						// can show in bottom and in current document
+						onTop = false;
+					} else if (offset.top < realHeight) {
+						// cannot show in top and in current document
+						onTop = false;
+					} else {
+						styles.top = offset.top - realHeight;
+						onTop = true;
+					}
+				} else {
+					// can show in bottom and in current viewport
+					onTop = false;
+				}
+
+				// check popover to left or right
+				if (realWidth > styles.width) {
+					var width = $(document).width();
+					if ((styles.left + realWidth) <= width) {
+						// normal from left to right, do nothing
+					} else if ((styles.left + styles.width) >= realWidth) {
+						// from right to left
+						styles.left = styles.left + styles.width - realWidth;
+						rightToLeft = true;
+					} else {
+						// still left to right, do nothing
+					}
+				}
+
+				if (onTop) {
+					popover.addClass('top');
+					popover.removeClass('bottom');
+				} else {
+					popover.removeClass('top');
+					popover.addClass('bottom');
+				}
+				if (rightToLeft) {
+					popover.addClass('right-to-left');
+				}
+				popover.css({top: styles.top, left: styles.left});
 			}
 		}
 	};

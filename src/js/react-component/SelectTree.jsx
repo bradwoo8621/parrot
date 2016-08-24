@@ -8,16 +8,11 @@
 (function(window, $, React, ReactDOM, $pt) {
 	var NSelectTree = React.createClass($pt.defineCellComponent({
 		displayName: 'NSelectTree',
+		mixins: [$pt.mixins.PopoverMixin],
 		statics: {
 			POP_FIX_ON_BOTTOM: false,
 			PLACEHOLDER: "Please Select...",
 			CLOSE_TEXT: 'Close'
-		},
-		propTypes: {
-			// model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object
 		},
 		getDefaultProps: function() {
 			return {
@@ -34,57 +29,26 @@
 				}
 			};
 		},
-		getInitialState: function() {
-			return {};
-		},
-		/**
-		 * will update
-		 * @param nextProps
-		 */
-		componentWillUpdate: function (nextProps) {
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.__forceUpdate);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
+		afterWillUpdate: function (nextProps) {
 			if (this.hasParent()) {
 				// add post change listener into parent model
-				this.getParentModel().removeListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+				this.getParentModel().removePostChangeListener(this.getParentPropertyId(), this.onParentModelChanged);
 			}
-			this.unregisterFromComponentCentral();
 		},
-		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
-		componentDidUpdate: function (prevProps, prevState) {
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.__forceUpdate);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
+		afterDidUpdate: function (prevProps, prevState) {
 			if (this.hasParent()) {
 				// add post change listener into parent model
-				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+				this.getParentModel().addPostChangeListener(this.getParentPropertyId(), this.onParentModelChanged);
 			}
-			this.registerToComponentCentral();
-
 			if (this.state.popoverDiv && this.state.popoverDiv.is(':visible')) {
 				this.showPopover();
 			}
 		},
-		/**
-		 * did mount
-		 */
-		componentDidMount: function () {
-			// add post change listener to handle model change
-			this.addPostChangeListener(this.__forceUpdate);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
+		afterDidMount: function () {
 			if (this.hasParent()) {
 				// add post change listener into parent model
-				this.getParentModel().addListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+				this.getParentModel().addPostChangeListener(this.getParentPropertyId(), this.onParentModelChanged);
 			}
-			this.registerToComponentCentral();
 			if (this.state.onloading) {
 				this.getCodeTable().initializeRemote().done(function() {
 					this.setState({onloading: false});
@@ -92,20 +56,14 @@
 			}
 			this.state.mounted = true;
 		},
-		/**
-		 * will unmount
-		 */
-		componentWillUnmount: function () {
+		beforeWillUnmount: function () {
 			this.destroyPopover();
-			// remove post change listener to handle model change
-			this.removePostChangeListener(this.__forceUpdate);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
+		},
+		afterWillUnmount: function() {
 			if (this.hasParent()) {
 				// add post change listener into parent model
-				this.getParentModel().removeListener(this.getParentPropertyId(), "post", "change", this.onParentModelChanged);
+				this.getParentModel().removePostChangeListener(this.getParentPropertyId(), this.onParentModelChanged);
 			}
-			this.unregisterFromComponentCentral();
 		},
 		renderTree: function() {
 			var layout = $pt.createCellLayout('values', this.getTreeLayout());

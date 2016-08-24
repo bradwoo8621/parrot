@@ -32,17 +32,6 @@
 				return $pt.LayoutHelper.getComponentRenderer(type);
 			}
 		},
-		propTypes: {
-			// model, whole model, not only for this cell
-			// use id to get the value of this cell from model
-			model: React.PropTypes.object,
-			// CellLayout
-			layout: React.PropTypes.object,
-			// label direction
-			direction: React.PropTypes.oneOf(['vertical', 'horizontal']),
-			// is view mode or not
-			view: React.PropTypes.bool
-		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
@@ -51,63 +40,21 @@
 				direction: 'vertical'
 			};
 		},
-		getInitialState: function () {
-			return {};
-		},
-		/**
-		 * will update
-		 * @param nextProps
-		 */
-		componentWillUpdate: function (nextProps) {
+		beforeWillUpdate: function (nextProps) {
 			this.destroyPopover();
-			this.removePostChangeListener(this.onModelChanged);
-			this.removePostValidateListener(this.onModelValidateChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
 			this.removeRequiredDependencyMonitor();
-			this.removeValidateDependencyMonitor();
-			this.unregisterFromComponentCentral();
 		},
-		/**
-		 * did update
-		 * @param prevProps
-		 * @param prevState
-		 */
-		componentDidUpdate: function (prevProps, prevState) {
+		beforeDidUpdate: function (prevProps, prevState) {
 			this.renderPopover();
-			this.addPostChangeListener(this.onModelChanged);
-			this.addPostValidateListener(this.onModelValidateChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
 			this.addRequiredDependencyMonitor();
-			this.addValidateDependencyMonitor();
-			this.registerToComponentCentral();
 		},
-		/**
-		 * did mount
-		 */
-		componentDidMount: function () {
+		beforeDidMount: function () {
 			this.renderPopover();
-			this.addPostChangeListener(this.onModelChanged);
-			this.addPostValidateListener(this.onModelValidateChanged);
-			this.addVisibleDependencyMonitor();
-			this.addEnableDependencyMonitor();
 			this.addRequiredDependencyMonitor();
-			this.addValidateDependencyMonitor();
-			this.registerToComponentCentral();
 		},
-		/**
-		 * will unmount
-		 */
-		componentWillUnmount: function () {
+		beforeWillUnmount: function () {
 			this.destroyPopover();
-			this.removePostChangeListener(this.onModelChanged);
-			this.removePostValidateListener(this.onModelValidateChanged);
-			this.removeVisibleDependencyMonitor();
-			this.removeEnableDependencyMonitor();
 			this.removeRequiredDependencyMonitor();
-			this.removeValidateDependencyMonitor();
-			this.unregisterFromComponentCentral();
 		},
 		destroyPopover: function () {
 			var comp = this.refs.comp;
@@ -319,28 +266,6 @@
 				// no delay for validation
 				this.validate();
 			}
-		},
-		/**
-		 * on model validate change
-		 * @param evt not used
-		 */
-		onModelValidateChanged: function (evt) {
-			// TODO maybe will introduce performance issue, cannot sure now.
-			this.forceUpdate();
-			// var div;
-			// if (this.getModel().hasError(this.getDataId())) {
-			// 	this.renderPopover();
-			// 	div = this.refs.div;
-			// 	if (div != null) {
-			// 		$(ReactDOM.findDOMNode(div)).addClass('has-error');
-			// 	}
-			// } else {
-			// 	this.destroyPopover();
-			// 	div = this.refs.div;
-			// 	if (div != null) {
-			// 		$(ReactDOM.findDOMNode(div)).removeClass('has-error');
-			// 	}
-			// }
 		},
 		/**
 		 * on label clicked
