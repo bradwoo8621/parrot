@@ -3262,6 +3262,67 @@ div.n-file .file-input div.btn.btn-file {
   outline: 0;
   outline-offset: 0;
 }
+div.n-file .file-input button.fileinput-upload.fileinput-upload-button:hover,
+div.n-file .file-input button.fileinput-cancel.fileinput-cancel-button:hover,
+div.n-file .file-input button.fileinput-remove.fileinput-remove-button:hover,
+div.n-file .file-input a.fileinput-upload.fileinput-upload-button:hover,
+div.n-file .file-input a.fileinput-cancel.fileinput-cancel-button:hover,
+div.n-file .file-input a.fileinput-remove.fileinput-remove-button:hover,
+div.n-file .file-input div.btn.btn-file:hover,
+div.n-file .file-input button.fileinput-upload.fileinput-upload-button.active,
+div.n-file .file-input button.fileinput-cancel.fileinput-cancel-button.active,
+div.n-file .file-input button.fileinput-remove.fileinput-remove-button.active,
+div.n-file .file-input a.fileinput-upload.fileinput-upload-button.active,
+div.n-file .file-input a.fileinput-cancel.fileinput-cancel-button.active,
+div.n-file .file-input a.fileinput-remove.fileinput-remove-button.active,
+div.n-file .file-input div.btn.btn-file.active,
+div.n-file .file-input button.fileinput-upload.fileinput-upload-button:active,
+div.n-file .file-input button.fileinput-cancel.fileinput-cancel-button:active,
+div.n-file .file-input button.fileinput-remove.fileinput-remove-button:active,
+div.n-file .file-input a.fileinput-upload.fileinput-upload-button:active,
+div.n-file .file-input a.fileinput-cancel.fileinput-cancel-button:active,
+div.n-file .file-input a.fileinput-remove.fileinput-remove-button:active,
+div.n-file .file-input div.btn.btn-file:active,
+div.n-file .file-input button.fileinput-upload.fileinput-upload-button.focus,
+div.n-file .file-input button.fileinput-cancel.fileinput-cancel-button.focus,
+div.n-file .file-input button.fileinput-remove.fileinput-remove-button.focus,
+div.n-file .file-input a.fileinput-upload.fileinput-upload-button.focus,
+div.n-file .file-input a.fileinput-cancel.fileinput-cancel-button.focus,
+div.n-file .file-input a.fileinput-remove.fileinput-remove-button.focus,
+div.n-file .file-input div.btn.btn-file.focus,
+div.n-file .file-input button.fileinput-upload.fileinput-upload-button:focus,
+div.n-file .file-input button.fileinput-cancel.fileinput-cancel-button:focus,
+div.n-file .file-input button.fileinput-remove.fileinput-remove-button:focus,
+div.n-file .file-input a.fileinput-upload.fileinput-upload-button:focus,
+div.n-file .file-input a.fileinput-cancel.fileinput-cancel-button:focus,
+div.n-file .file-input a.fileinput-remove.fileinput-remove-button:focus,
+div.n-file .file-input div.btn.btn-file:focus,
+div.n-file .file-input button.fileinput-upload.fileinput-upload-button:active:focus,
+div.n-file .file-input button.fileinput-cancel.fileinput-cancel-button:active:focus,
+div.n-file .file-input button.fileinput-remove.fileinput-remove-button:active:focus,
+div.n-file .file-input a.fileinput-upload.fileinput-upload-button:active:focus,
+div.n-file .file-input a.fileinput-cancel.fileinput-cancel-button:active:focus,
+div.n-file .file-input a.fileinput-remove.fileinput-remove-button:active:focus,
+div.n-file .file-input div.btn.btn-file:active:focus,
+div.n-file .file-input button.fileinput-upload.fileinput-upload-button.active:focus,
+div.n-file .file-input button.fileinput-cancel.fileinput-cancel-button.active:focus,
+div.n-file .file-input button.fileinput-remove.fileinput-remove-button.active:focus,
+div.n-file .file-input a.fileinput-upload.fileinput-upload-button.active:focus,
+div.n-file .file-input a.fileinput-cancel.fileinput-cancel-button.active:focus,
+div.n-file .file-input a.fileinput-remove.fileinput-remove-button.active:focus,
+div.n-file .file-input div.btn.btn-file.active:focus,
+div.n-file .file-input button.fileinput-upload.fileinput-upload-button:active.focus,
+div.n-file .file-input button.fileinput-cancel.fileinput-cancel-button:active.focus,
+div.n-file .file-input button.fileinput-remove.fileinput-remove-button:active.focus,
+div.n-file .file-input a.fileinput-upload.fileinput-upload-button:active.focus,
+div.n-file .file-input a.fileinput-cancel.fileinput-cancel-button:active.focus,
+div.n-file .file-input a.fileinput-remove.fileinput-remove-button:active.focus,
+div.n-file .file-input div.btn.btn-file:active.focus {
+  background: transparent;
+  color: #666666;
+  outline: 0;
+  outline-offset: 0;
+}
 .n-tree {
   position: relative;
   overflow-y: hidden;
