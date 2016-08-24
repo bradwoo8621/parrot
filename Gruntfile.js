@@ -513,7 +513,13 @@ module.exports = function(grunt) {
 			// Unit tests.
 	        nodeunit: {
 	            tests: ['unit-test/test.js']
-	        }
+	        },
+	        jscpd: {
+			    javascript: {
+					path: 'target/parrot/module',
+					exclude: ['*.min.js']
+			    }
+			}
 		});
 
 	grunt.loadNpmTasks('grunt-contrib-copy');
@@ -527,6 +533,7 @@ module.exports = function(grunt) {
 	// grunt.loadNpmTasks('grunt-react');
 	grunt.loadNpmTasks('grunt-replace');
 	grunt.loadNpmTasks('grunt-babel');
+	grunt.loadNpmTasks('grunt-jscpd');
 
 	// copy bower files to target
 	grunt.registerTask('dependency-copy',

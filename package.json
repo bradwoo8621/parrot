@@ -53,6 +53,7 @@
     "grunt-contrib-less": "^1.0.1",
     "grunt-contrib-nodeunit": "^0.4.1",
     "grunt-contrib-uglify": "^0.9.1",
+    "grunt-jscpd": "0.0.12",
     "grunt-replace": "^0.9.2",
     "html5shiv": "^3.7.3",
     "jquery-mockjax": "^2.0.1",
