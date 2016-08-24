@@ -41,6 +41,7 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NArrayTab = React.createClass($pt.defineCellComponent({
 		displayName: 'NArrayTab',
+		mixins: [$pt.mixins.ArrayComponentMixin],
 		statics: {
 			UNTITLED: 'Untitled Item',
 			ADD_ICON: 'plus-circle',
@@ -209,49 +210,11 @@
 				</div>
 			</div>);
 		},
-		createItemModel: function(item) {
-			var parentModel = this.getModel();
-			var parentValidator = parentModel.getValidator();
-			var validator = null;
-			if (parentValidator) {
-				var parentValidationConfig = parentValidator.getConfig()[this.getDataId()];
-				if (parentValidationConfig && parentValidationConfig.table) {
-					validator = $pt.createModelValidator(parentValidationConfig.table);
-				}
-			}
-			var model = validator ? $pt.createModel(item, validator) : $pt.createModel(item);
-			model.useBaseAsCurrent();
-			model.parent(parentModel);
-			// synchronized the validation result from parent model
-			// get errors about current value
-			var errors = this.getModel().getError(this.getDataId());
-			if (errors) {
-				var itemError = null;
-				for (var errorIndex = 0, errorCount = errors.length; errorIndex < errorCount; errorIndex++) {
-					if (typeof errors[errorIndex] !== "string") {
-						itemError = errors[errorIndex].getError(item);
-						model.mergeError(itemError);
-					}
-				}
-			}
-			var listeners = this.getComponentOption('rowListener');
-			if (listeners) {
-				listeners = Array.isArray(listeners) ? listeners : [listeners];
-				listeners.forEach(function (listener) {
-					model.addListener(listener.id,
-						listener.time ? listener.time : 'post',
-						listener.type ? listener.type : 'change',
-						listener.listener);
-				});
-			}
-			return model;
-		},
 		/**
 		 * get tabs
 		 * @returns {Array}
 		 */
 		getTabs: function () {
-			var _this = this;
 			var activeTabIndex = 0;
 			if (this.state.transientActiveTabIndex != null) {
 				activeTabIndex = this.state.transientActiveTabIndex;
@@ -259,36 +222,18 @@
 			} else {
 				activeTabIndex = this.getActiveTabIndex();
 			}
-			// if (activeTabIndex == -1) {
-			// 	activeTabIndex = 0;
-			// }
-			// var activeTabIndex = this.state.transientActiveTabIndex; ? this.getActiveTabIndex();
-			// if (this.state.tabs) {
-			// 	this.state.tabs.forEach(function(tab, tabIndex) {
-			// 		if ((_this.isAddable() && (tabIndex != _this.state.tabs.length - 1)) || !_this.isAddable()) {
-			// 			var model = _this.createItemModel(item); //tab.data;
-			// 			tab.label = _this.getTabTitle(model);
-			// 			tab.icon = _this.getTabIcon(model);
-			// 			tab.layout = _this.getEditLayout(model);
-			// 			tab.badge = _this.getTabBadge(model);
-			// 			tab.data = model;
-			// 			tab.active = tabIndex == activeTabIndex;
-			// 		}
-			// 	});
-			// 	return this.state.tabs;
-			// }
-
 			this.state.tabs = this.getValueFromModel().map(function (item, itemIndex) {
-				var model = _this.createItemModel(item);
+				var model = this.createRowModel(item, true);
+				this.addRowListener(model);
 				return {
-					label: _this.getTabTitle(model),
-					icon: _this.getTabIcon(model),
-					layout: _this.getEditLayout(model),
-					badge: _this.getTabBadge(model),
+					label: this.getTabTitle(model),
+					icon: this.getTabIcon(model),
+					layout: this.getEditLayout(model),
+					badge: this.getTabBadge(model),
 					data: model,
 					active: itemIndex == activeTabIndex
 				};
-			});
+			}.bind(this));
 			if (this.isAddable()) {
 				this.state.tabs.push({
 					icon: NArrayTab.ADD_ICON,

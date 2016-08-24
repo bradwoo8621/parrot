@@ -13,6 +13,9 @@
             }
         }
     }));
+    model.addPostChangeListener('items', function(evt) {
+        console.log('event fired', evt);
+    });
     var panelTemplate = {
         label: 'Normal Panel',
         dataId: 'items',

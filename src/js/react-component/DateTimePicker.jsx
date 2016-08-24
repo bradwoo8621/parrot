@@ -1248,7 +1248,9 @@
 			return valueFormat ? valueFormat : NDateTime.VALUE_FORMAT;
 		},
 		is12Hour: function() {
-			return this.getComponentOption('hour') == 12;
+			// seems mobile doesn't support event on svg and its inner nodes
+			// so doesn't support 12 hours format in mobile equipments
+			return this.getComponentOption('hour') == 12 && !this.isMobile();
 		},
 		getHourRadius: function() {
 			var hourRadius = NDateTime.CLOCK_RADIUS;

@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.4.29 2016-08-23 */
+	/** nest-parrot.V0.4.29 2016-08-24 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -4446,6 +4446,64 @@
 			popover.css({ top: styles.top, left: styles.left });
 		}
 	};
+	/**
+  * Array component mixin
+  */
+	$pt.mixins = {
+		ArrayComponentMixin: {
+			addRowListener: function (rowModel) {
+				this.getRowListeners().forEach(function (listener) {
+					rowModel.addListener(listener.id, listener.time ? listener.time : 'post', listener.type ? listener.type : 'change', listener.listener);
+				});
+				rowModel.addPostChangeListener(null, this.onRowModelChanged);
+				rowModel.addPostAddListener(null, this.onRowModelChanged);
+				rowModel.addPostRemoveListener(null, this.onRowModelChanged);
+			},
+			onRowModelChanged: function (evt) {
+				// fire a change operation no matter what type of event
+				console.log(this.getModel().isChanged());
+				this.getModel().update(this.getDataId(), evt.model.getCurrentModel(), evt.model.getCurrentModel());
+				console.log(this.getModel().isChanged());
+			},
+			/**
+    * get row listeners, return empty array if no row listener defined
+    */
+			getRowListeners: function () {
+				var listeners = this.getComponentOption(this.getRowListenerKey());
+				return listeners ? Array.isArray(listeners) ? listeners : [listeners] : [];
+			},
+			getRowListenerKey: function () {
+				return 'rowListener';
+			},
+			createRowModel: function (item, useBaseAsCurrent) {
+				var parentModel = this.getModel();
+				var parentValidator = parentModel.getValidator();
+				var validator = null;
+				if (parentValidator) {
+					var parentValidationConfig = parentValidator.getConfig()[this.getDataId()];
+					if (parentValidationConfig && parentValidationConfig.table) {
+						validator = $pt.createModelValidator(parentValidationConfig.table);
+					}
+				}
+				var model = validator ? $pt.createModel(item, validator) : $pt.createModel(item);
+				model.parent(parentModel);
+				// synchronized the validation result from parent model
+				// get errors about current value
+				var errors = this.getModel().getError(this.getDataId());
+				if (errors) {
+					errors.forEach(function (error) {
+						if (typeof error !== 'string') {
+							model.mergeError(error.getError(item));
+						}
+					});
+				}
+				if (useBaseAsCurrent) {
+					model.useBaseAsCurrent();
+				}
+				return model;
+			}
+		}
+	};
 
 	/**
   * define cell component
@@ -4826,6 +4884,7 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NArrayPanel = React.createClass($pt.defineCellComponent({
 		displayName: 'NArrayPanel',
+		mixins: [$pt.mixins.ArrayComponentMixin],
 		statics: {
 			UNTITLED: 'Untitled Item'
 		},
@@ -4904,36 +4963,8 @@
    * @returns {XML}
    */
 		renderItem: function (item, itemIndex) {
-			var parentModel = this.getModel();
-			var parentValidator = parentModel.getValidator();
-			var validator = null;
-			if (parentValidator) {
-				var parentValidationConfig = parentValidator.getConfig()[this.getDataId()];
-				if (parentValidationConfig && parentValidationConfig.table) {
-					validator = $pt.createModelValidator(parentValidationConfig.table);
-				}
-			}
-			var model = validator ? $pt.createModel(item, validator) : $pt.createModel(item);
-			model.useBaseAsCurrent();
-			model.parent(parentModel);
-			// synchronized the validation result from parent model
-			// get errors about current value
-			var errors = this.getModel().getError(this.getDataId());
-			if (errors) {
-				errors.forEach(function (error) {
-					if (typeof error !== 'string') {
-						model.mergeError(error.getError(item));
-					}
-				});
-			}
-
-			var listeners = this.getComponentOption('rowListener');
-			if (listeners) {
-				listeners = Array.isArray(listeners) ? listeners : [listeners];
-				listeners.forEach(function (listener) {
-					model.addListener(listener.id, listener.time ? listener.time : 'post', listener.type ? listener.type : 'change', listener.listener);
-				});
-			}
+			var model = this.createRowModel(item, true);
+			this.addRowListener(model);
 
 			var _this = this;
 			this.getDependencies('itemTitle').forEach(function (key) {
@@ -5102,6 +5133,7 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NArrayTab = React.createClass($pt.defineCellComponent({
 		displayName: 'NArrayTab',
+		mixins: [$pt.mixins.ArrayComponentMixin],
 		statics: {
 			UNTITLED: 'Untitled Item',
 			ADD_ICON: 'plus-circle',
@@ -5271,46 +5303,11 @@
 				)
 			);
 		},
-		createItemModel: function (item) {
-			var parentModel = this.getModel();
-			var parentValidator = parentModel.getValidator();
-			var validator = null;
-			if (parentValidator) {
-				var parentValidationConfig = parentValidator.getConfig()[this.getDataId()];
-				if (parentValidationConfig && parentValidationConfig.table) {
-					validator = $pt.createModelValidator(parentValidationConfig.table);
-				}
-			}
-			var model = validator ? $pt.createModel(item, validator) : $pt.createModel(item);
-			model.useBaseAsCurrent();
-			model.parent(parentModel);
-			// synchronized the validation result from parent model
-			// get errors about current value
-			var errors = this.getModel().getError(this.getDataId());
-			if (errors) {
-				var itemError = null;
-				for (var errorIndex = 0, errorCount = errors.length; errorIndex < errorCount; errorIndex++) {
-					if (typeof errors[errorIndex] !== "string") {
-						itemError = errors[errorIndex].getError(item);
-						model.mergeError(itemError);
-					}
-				}
-			}
-			var listeners = this.getComponentOption('rowListener');
-			if (listeners) {
-				listeners = Array.isArray(listeners) ? listeners : [listeners];
-				listeners.forEach(function (listener) {
-					model.addListener(listener.id, listener.time ? listener.time : 'post', listener.type ? listener.type : 'change', listener.listener);
-				});
-			}
-			return model;
-		},
 		/**
    * get tabs
    * @returns {Array}
    */
 		getTabs: function () {
-			var _this = this;
 			var activeTabIndex = 0;
 			if (this.state.transientActiveTabIndex != null) {
 				activeTabIndex = this.state.transientActiveTabIndex;
@@ -5318,36 +5315,18 @@
 			} else {
 				activeTabIndex = this.getActiveTabIndex();
 			}
-			// if (activeTabIndex == -1) {
-			// 	activeTabIndex = 0;
-			// }
-			// var activeTabIndex = this.state.transientActiveTabIndex; ? this.getActiveTabIndex();
-			// if (this.state.tabs) {
-			// 	this.state.tabs.forEach(function(tab, tabIndex) {
-			// 		if ((_this.isAddable() && (tabIndex != _this.state.tabs.length - 1)) || !_this.isAddable()) {
-			// 			var model = _this.createItemModel(item); //tab.data;
-			// 			tab.label = _this.getTabTitle(model);
-			// 			tab.icon = _this.getTabIcon(model);
-			// 			tab.layout = _this.getEditLayout(model);
-			// 			tab.badge = _this.getTabBadge(model);
-			// 			tab.data = model;
-			// 			tab.active = tabIndex == activeTabIndex;
-			// 		}
-			// 	});
-			// 	return this.state.tabs;
-			// }
-
 			this.state.tabs = this.getValueFromModel().map(function (item, itemIndex) {
-				var model = _this.createItemModel(item);
+				var model = this.createRowModel(item, true);
+				this.addRowListener(model);
 				return {
-					label: _this.getTabTitle(model),
-					icon: _this.getTabIcon(model),
-					layout: _this.getEditLayout(model),
-					badge: _this.getTabBadge(model),
+					label: this.getTabTitle(model),
+					icon: this.getTabIcon(model),
+					layout: this.getEditLayout(model),
+					badge: this.getTabBadge(model),
 					data: model,
 					active: itemIndex == activeTabIndex
 				};
-			});
+			}.bind(this));
 			if (this.isAddable()) {
 				this.state.tabs.push({
 					icon: NArrayTab.ADD_ICON,
@@ -7519,7 +7498,9 @@
 			return valueFormat ? valueFormat : NDateTime.VALUE_FORMAT;
 		},
 		is12Hour: function () {
-			return this.getComponentOption('hour') == 12;
+			// seems mobile doesn't support event on svg and its inner nodes
+			// so doesn't support 12 hours format in mobile equipments
+			return this.getComponentOption('hour') == 12 && !this.isMobile();
 		},
 		getHourRadius: function () {
 			var hourRadius = NDateTime.CLOCK_RADIUS;
@@ -14857,6 +14838,7 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NTable = React.createClass($pt.defineCellComponent({
 		displayName: 'NTable',
+		mixins: [$pt.mixins.ArrayComponentMixin],
 		statics: {
 			__operationButtonWidth: 31,
 			__minOperationButtonWidth: 40,
@@ -15818,7 +15800,8 @@
 				}
 			}
 
-			var inlineModel = this.createInlineRowModel(row);
+			var inlineModel = this.createRowModel(row, true);
+			this.addRowListener(inlineModel);
 			return React.createElement(
 				'tr',
 				{ className: className, key: rowIndex },
@@ -17002,35 +16985,13 @@
    * @param item
    */
 		createEditingModel: function (item) {
-			var modelValidator = this.getModel().getValidator();
-			var tableValidator = modelValidator ? modelValidator.getConfig()[this.getDataId()] : null;
-			var itemValidator = tableValidator ? $pt.createModelValidator(tableValidator.table) : null;
-			var editModel = $pt.createModel(item, itemValidator);
-			editModel.parent(this.getModel());
-			return editModel;
-		},
-		createInlineRowModel: function (item) {
-			var model = this.createEditingModel(item);
-			model.useBaseAsCurrent();
-			var listeners = this.getComponentOption('rowListener');
-			if (listeners) {
-				listeners = Array.isArray(listeners) ? listeners : [listeners];
-				listeners.forEach(function (listener) {
-					model.addListener(listener.id, listener.time ? listener.time : 'post', listener.type ? listener.type : 'change', listener.listener);
-				});
-			}
-			if (this.getModel().hasError(this.getDataId())) {
-				// var rowError = null;
-				var errors = this.getModel().getError(this.getDataId());
-				if (errors) {
-					errors.forEach(function (error) {
-						if (typeof error !== 'string') {
-							model.mergeError(error.getError(item));
-						}
-					});
-				}
-			}
-			return model;
+			// var modelValidator = this.getModel().getValidator();
+			// var tableValidator = modelValidator ? modelValidator.getConfig()[this.getDataId()] : null;
+			// var itemValidator = tableValidator ? $pt.createModelValidator(tableValidator.table) : null;
+			// var editModel = $pt.createModel(item, itemValidator);
+			// editModel.parent(this.getModel());
+			// return editModel;
+			return this.createRowModel(item, false);
 		},
 		/**
    * on model change

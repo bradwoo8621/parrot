@@ -6,6 +6,7 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NTable = React.createClass($pt.defineCellComponent({
 		displayName: 'NTable',
+		mixins: [$pt.mixins.ArrayComponentMixin],
 		statics: {
 			__operationButtonWidth: 31,
 			__minOperationButtonWidth: 40,
@@ -932,7 +933,8 @@
 				}
 			}
 
-			var inlineModel = this.createInlineRowModel(row);
+			var inlineModel = this.createRowModel(row, true);
+			this.addRowListener(inlineModel);
 			return (<tr className={className} key={rowIndex}>{
 				this.state.columns.map(function (column) {
 					if (columnIndex >= indexToRender.min && columnIndex <= indexToRender.max) {
@@ -2055,38 +2057,13 @@
 		 * @param item
 		 */
 		createEditingModel: function (item) {
-			var modelValidator = this.getModel().getValidator();
-			var tableValidator = modelValidator ? modelValidator.getConfig()[this.getDataId()] : null;
-			var itemValidator = tableValidator ? $pt.createModelValidator(tableValidator.table) : null;
-			var editModel = $pt.createModel(item, itemValidator);
-			editModel.parent(this.getModel());
-			return editModel;
-		},
-		createInlineRowModel: function (item) {
-			var model = this.createEditingModel(item);
-			model.useBaseAsCurrent();
-			var listeners = this.getComponentOption('rowListener');
-			if (listeners) {
-				listeners = Array.isArray(listeners) ? listeners : [listeners];
-				listeners.forEach(function (listener) {
-					model.addListener(listener.id,
-						listener.time ? listener.time : 'post',
-						listener.type ? listener.type : 'change',
-						listener.listener);
-				});
-			}
-			if (this.getModel().hasError(this.getDataId())) {
-				// var rowError = null;
-				var errors = this.getModel().getError(this.getDataId());
-				if (errors) {
-					errors.forEach(function(error) {
-						if (typeof error !== 'string') {
-							model.mergeError(error.getError(item));
-						}
-					});
-				}
-			}
-			return model;
+			// var modelValidator = this.getModel().getValidator();
+			// var tableValidator = modelValidator ? modelValidator.getConfig()[this.getDataId()] : null;
+			// var itemValidator = tableValidator ? $pt.createModelValidator(tableValidator.table) : null;
+			// var editModel = $pt.createModel(item, itemValidator);
+			// editModel.parent(this.getModel());
+			// return editModel;
+			return this.createRowModel(item, false);
 		},
 		/**
 		 * on model change

@@ -37,6 +37,7 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NArrayPanel = React.createClass($pt.defineCellComponent({
 		displayName: 'NArrayPanel',
+		mixins: [$pt.mixins.ArrayComponentMixin],
 		statics: {
 			UNTITLED: 'Untitled Item'
 		},
@@ -115,39 +116,8 @@
 		 * @returns {XML}
 		 */
 		renderItem: function (item, itemIndex) {
-			var parentModel = this.getModel();
-			var parentValidator = parentModel.getValidator();
-			var validator = null;
-			if (parentValidator) {
-				var parentValidationConfig = parentValidator.getConfig()[this.getDataId()];
-				if (parentValidationConfig && parentValidationConfig.table) {
-					validator = $pt.createModelValidator(parentValidationConfig.table);
-				}
-			}
-			var model = validator ? $pt.createModel(item, validator) : $pt.createModel(item);
-			model.useBaseAsCurrent();
-			model.parent(parentModel);
-			// synchronized the validation result from parent model
-			// get errors about current value
-			var errors = this.getModel().getError(this.getDataId());
-			if (errors) {
-				errors.forEach(function(error) {
-					if (typeof error !== 'string') {
-						model.mergeError(error.getError(item));
-					}
-				});
-			}
-
-			var listeners = this.getComponentOption('rowListener');
-			if (listeners) {
-				listeners = Array.isArray(listeners) ? listeners : [listeners];
-				listeners.forEach(function (listener) {
-					model.addListener(listener.id,
-						listener.time ? listener.time : 'post',
-						listener.type ? listener.type : 'change',
-						listener.listener);
-				});
-			}
+			var model = this.createRowModel(item, true);
+			this.addRowListener(model);
 
 			var _this = this;
 			this.getDependencies('itemTitle').forEach(function (key) {

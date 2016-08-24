@@ -1638,6 +1638,67 @@
 			popover.css({top: styles.top, left: styles.left});
 		}
 	};
+	/**
+	 * Array component mixin
+	 */
+	$pt.mixins = {
+		ArrayComponentMixin: {
+			addRowListener: function(rowModel) {
+				this.getRowListeners().forEach(function (listener) {
+					rowModel.addListener(listener.id,
+						listener.time ? listener.time : 'post',
+						listener.type ? listener.type : 'change',
+						listener.listener);
+				});
+				rowModel.addPostChangeListener(null, this.onRowModelChanged);
+				rowModel.addPostAddListener(null, this.onRowModelChanged);
+				rowModel.addPostRemoveListener(null, this.onRowModelChanged);
+			},
+			onRowModelChanged: function(evt) {
+				// fire a change operation no matter what type of event
+				console.log(this.getModel().isChanged());
+				this.getModel().update(this.getDataId(), evt.model.getCurrentModel(), evt.model.getCurrentModel());
+				console.log(this.getModel().isChanged());
+			},
+			/**
+			 * get row listeners, return empty array if no row listener defined
+			 */
+			getRowListeners: function() {
+				var listeners = this.getComponentOption(this.getRowListenerKey());
+				return listeners ? (Array.isArray(listeners) ? listeners : [listeners]) : [];
+			},
+			getRowListenerKey: function() {
+				return 'rowListener';
+			},
+			createRowModel: function(item, useBaseAsCurrent) {
+				var parentModel = this.getModel();
+				var parentValidator = parentModel.getValidator();
+				var validator = null;
+				if (parentValidator) {
+					var parentValidationConfig = parentValidator.getConfig()[this.getDataId()];
+					if (parentValidationConfig && parentValidationConfig.table) {
+						validator = $pt.createModelValidator(parentValidationConfig.table);
+					}
+				}
+				var model = validator ? $pt.createModel(item, validator) : $pt.createModel(item);
+				model.parent(parentModel);
+				// synchronized the validation result from parent model
+				// get errors about current value
+				var errors = this.getModel().getError(this.getDataId());
+				if (errors) {
+					errors.forEach(function(error) {
+						if (typeof error !== 'string') {
+							model.mergeError(error.getError(item));
+						}
+					});
+				}
+				if (useBaseAsCurrent) {
+					model.useBaseAsCurrent();
+				}
+				return model;
+			}
+		}
+	};
 
 	/**
 	 * define cell component
