@@ -98,6 +98,24 @@
 					index: 40
 				};
 			},
+			constants: function () {
+				return {
+					id: 'select-tree-constants',
+					title: 'Constants',
+					desc: 'Available constants. Constants must be change before construct component.',
+					index: 990,
+					code: $demo.convertJSON({
+						variable: 'NSelectTree',
+						json: {
+							statics: {
+								POP_FIX_ON_BOTTOM: false,
+								PLACEHOLDER: "Please Select...",
+								CLOSE_TEXT: 'Close'
+							}
+						}
+					})
+				};
+			},
 			css: function () {
 				return $demo.convertCSSJSONToExample({
 					id: 'select-tree-css',

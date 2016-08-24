@@ -160,9 +160,12 @@
 						variable: 'NSelect',
 						json: {
 							statics: {
+								POP_FIX_ON_BOTTOM: false,
 								PLACEHOLDER: NSelect.PLACEHOLDER,
 								NO_OPTION_FOUND: 'No Option Found',
-								FILTER_PLACEHOLDER: 'Search...'
+								FILTER_PLACEHOLDER: 'Search...',
+								CLOSE_TEXT: 'Close',
+								CLEAR_TEXT: 'Clear'
 							}
 						}
 					})

@@ -244,10 +244,43 @@
 			},
 			constants: function () {
 				var statics = {
+					POP_FIX_ON_BOTTOM: false,
 					FORMAT: 'YYYY/MM/DD',
 					HEADER_MONTH_FORMAT: 'MMMM',
 					HEADER_YEAR_FORMAT: 'YYYY',
-					VALUE_FORMAT: $pt.ComponentConstants.Default_Date_Format
+					VALUE_FORMAT: $pt.ComponentConstants.Default_Date_Format,
+					FORMAT_TYPES: {
+						// use binary
+						ALL: 64 + 32 + 16 + 8 + 4 + 2,
+						YMD: 64 + 32 + 16,
+						YM: 64 + 32,
+						HM: 8 + 4,
+						HMS: 8 + 4 + 2,
+
+						YEAR: 64,
+						MONTH: 32,
+						DAY: 16,
+						HOUR: 8,
+						MINUTE: 4,
+						SECOND: 2,
+						MILLSECOND: 1
+					},
+					CLOCK_RADIUS: 100,
+					CLOCK_HOUR_PERCENTAGE: 0.6,
+					CLOCK_BIG_ENGRAVE_LENGTH: 8,
+					CLOCK_SMALL_ENGRAVE_LENGTH: 4,
+					CLOCK_CHAR_POS: {
+						TOP: {X: 100, Y: -2},
+						LEFT: {X: -1, Y: 99},
+						RIGHT: {X: 201, Y: 99},
+						BOTTOM: {X: 100, Y: 203}
+					},
+					CLOCK_HAND_OFFSET: 10,
+					CLOSE_TEXT: 'Close',
+					TODAY_TEXT: 'Now',
+					CLEAR_TEXT: 'Clear',
+					DATE_SWITCH_TEXT: 'Date',
+					TIME_SWITCH_TEXT: 'Time'
 				};
 				return {
 					id: 'datetime-constants',
