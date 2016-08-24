@@ -73,6 +73,10 @@
 					And at last, the component can be registered into central instance repository automatically by <code>registerToComponentCentral</code>
 					and quit the central control by <code>unregisterToComponentCentral</code>.<br/>
 					Using these listeners, monitors to handle the change of data model, and change the behavior of customized component.<br/>
+					If don't want to replace the lifecycle methods, for each method, there are two pointcut methods, <br/>
+					eg.<br/>
+					for <code>componentWillUpdate</code>, there are <code>beforeWillUpdate</code> and <code>afterWillUpdate</code>,
+					they will be called automatically when base <code>componentWillUpdate</code> method doesn't be replaced.
 				</span>,
 				<span>
 					Another important thing is monitor the DOM component in customized component. eg.<br/>

@@ -1683,9 +1683,7 @@
 			},
 			onRowModelChanged: function(evt) {
 				// fire a change operation no matter what type of event
-				console.log(this.getModel().isChanged());
 				this.getModel().update(this.getDataId(), evt.model.getCurrentModel(), evt.model.getCurrentModel());
-				console.log(this.getModel().isChanged());
 			},
 			/**
 			 * get row listeners, return empty array if no row listener defined

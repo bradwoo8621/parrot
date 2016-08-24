@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.4.29 2016-08-24 */
+	/** nest-parrot.V0.4.30 2016-08-24 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -4488,9 +4488,7 @@
 			},
 			onRowModelChanged: function (evt) {
 				// fire a change operation no matter what type of event
-				console.log(this.getModel().isChanged());
 				this.getModel().update(this.getDataId(), evt.model.getCurrentModel(), evt.model.getCurrentModel());
-				console.log(this.getModel().isChanged());
 			},
 			/**
     * get row listeners, return empty array if no row listener defined
@@ -8970,7 +8968,7 @@
 					click: this.onConfirmClicked
 				}
 			});
-			return React.createElement($pt.Components.NFormButton, { layout: layout });
+			return React.createElement($pt.Components.NFormButton, { layout: layout, model: $pt.createModel({}) });
 		},
 		/**
    * render close button
@@ -8989,7 +8987,7 @@
 					click: this.onCancelClicked
 				}
 			});
-			return React.createElement($pt.Components.NFormButton, { layout: layout });
+			return React.createElement($pt.Components.NFormButton, { layout: layout, model: $pt.createModel({}) });
 		},
 		renderDialogCloseButton: function () {
 			if (this.isDialogCloseShown()) {
@@ -11106,11 +11104,6 @@
 			});
 			delete layout.comp.label;
 			var model = this.getModel();
-			// if (model) {
-			// 	return <$pt.Components.NFormCell model={this.getModel()}
-			// 									   layout={$pt.createCellLayout('pseudo-button', layout)}
-			// 									   key={buttonIndex}/>;
-			// } else {
 			return React.createElement($pt.Components.NFormButton, { model: this.getModel(),
 				layout: $pt.createCellLayout('pseudo-button', layout),
 				key: buttonIndex });
@@ -11173,7 +11166,7 @@
    * @returns {ModelInterface}
    */
 		getModel: function () {
-			return this.props.model;
+			return this.props.model == null ? $pt.createModel({}) : this.props.model;
 		},
 		isViewMode: function () {
 			return this.props.view;

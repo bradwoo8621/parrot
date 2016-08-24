@@ -12,7 +12,7 @@
 				var canActive = function (newTabValue, newTabIndex, currentTabValue, currentTableIndex) {
 					alert("Current[value=" + currentTabValue + ", index=" + currentTableIndex + "], " +
 						"New[value=" + newTabValue + ", index=" + newTabIndex + "]");
-					return newTableValue == 'a';
+					return newTabValue == 'a';
 				};
 				var compCode = $demo.convertComponentCreatorToString({
 					tag: 'NTab',

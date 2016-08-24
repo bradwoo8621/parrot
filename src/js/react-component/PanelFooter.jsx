@@ -80,11 +80,6 @@
 			});
 			delete layout.comp.label;
 			var model = this.getModel();
-			// if (model) {
-			// 	return <$pt.Components.NFormCell model={this.getModel()}
-			// 									   layout={$pt.createCellLayout('pseudo-button', layout)}
-			// 									   key={buttonIndex}/>;
-			// } else {
 			return <$pt.Components.NFormButton model={this.getModel()}
 											   layout={$pt.createCellLayout('pseudo-button', layout)}
 											   key={buttonIndex}/>;
@@ -141,7 +136,7 @@
 		 * @returns {ModelInterface}
 		 */
 		getModel: function () {
-			return this.props.model;
+			return this.props.model == null ? $pt.createModel({}) : this.props.model;
 		},
 		isViewMode: function() {
 			return this.props.view;

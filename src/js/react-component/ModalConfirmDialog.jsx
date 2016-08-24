@@ -88,7 +88,7 @@
 					click: this.onConfirmClicked
 				}
 			});
-			return <$pt.Components.NFormButton layout={layout}/>;
+			return <$pt.Components.NFormButton layout={layout} model={$pt.createModel({})}/>;
 		},
 		/**
 		 * render close button
@@ -107,7 +107,7 @@
 					click: this.onCancelClicked
 				}
 			});
-			return <$pt.Components.NFormButton layout={layout}/>;
+			return <$pt.Components.NFormButton layout={layout} model={$pt.createModel({})}/>;
 		},
 		renderDialogCloseButton: function() {
 			if (this.isDialogCloseShown()) {
