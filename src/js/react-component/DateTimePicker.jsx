@@ -632,12 +632,9 @@
 				</div>
 			</div>);
 		},
-		/**
-		 * render popover content
-		 * @param date {moment} flag date for popover
-		 * @param popoverType {number} popover display type
-		 */
-		renderPopoverContent: function(date, popoverType) {
+		renderPopoverContent: function(options) {
+			var date = options ? options.date : null;
+			var popoverType = options ? options.type : null;
 			date = date ? date : this.getValueFromModel();
 			date = date ? date : this.getToday();
 			if (popoverType == null) {
@@ -693,69 +690,31 @@
 				</div>);
 			}
 		},
-		/**
-		 * render popover
-		 * @param options {{date: moment, type: number, set: boolean}} optional
-		 */
-		renderPopover: function(options) {
+		isPopoverMatchComponentWidth: function() {
+			return false;
+		},
+		hasPopoverContentWrapper: function() {
+			return false;
+		},
+		getPopoverContainerCSS: function() {
+			var displayFormatType = this.guessDisplayFormatType();
+			return $pt.LayoutHelper.classSet({
+				'n-datetime': true,
+				'time-only': !this.hasDateToDisplay(displayFormatType) && this.hasTimeToDisplay(displayFormatType),
+				'date-only': this.hasDateToDisplay(displayFormatType) && !this.hasTimeToDisplay(displayFormatType),
+				'date-and-time': this.hasDateToDisplay(displayFormatType) && this.hasTimeToDisplay(displayFormatType)
+			});
+		},
+		beforeRenderPopover: function(options) {
 			if (!options) {
 				options = {};
 			}
 			if (options.set) {
 				this.setValueToModel(options.date);
 			}
-
-			var styles = {display: 'block'};
-			var displayFormatType = this.guessDisplayFormatType();
-			styles.top = -10000;
-			styles.left = 0;
-
-			var popoverCSS = {
-				'n-datetime': true,
-				'popover': true,
-				'bottom': true,
-				'in': true,
-				'time-only': !this.hasDateToDisplay(displayFormatType) && this.hasTimeToDisplay(displayFormatType),
-				'date-only': this.hasDateToDisplay(displayFormatType) && !this.hasTimeToDisplay(displayFormatType),
-				'date-and-time': this.hasDateToDisplay(displayFormatType) && this.hasTimeToDisplay(displayFormatType)
-			};
-
-			if (this.isMobilePhone()) {
-				popoverCSS['mobile-phone'] = true;
-				popoverCSS['fix-bottom'] = this.isPopoverFixOnBottom();
-				styles = {display: 'block'};	// reset styles
-			}
-			var popover = (<div role="tooltip" className={$pt.LayoutHelper.classSet(popoverCSS)} style={styles}>
-				<div className="arrow"></div>
-				{this.renderPopoverContent(options.date, options.type)}
-			</div>);
-			ReactDOM.render(popover, this.state.popoverDiv.get(0), this.onPopoverRenderComplete);
 		},
-		onPopoverRenderComplete: function() {
-			this.state.popoverDiv.show();
-			if (this.isMobilePhone()) {
-				$('html').addClass('on-mobile-popover-shown');
-				return;
-			}
-
-			var popover = this.state.popoverDiv.children('.popover');
-			var component = this.getComponent();
-			this.recalcPopoverPosition(popover, component);
-		},
-		renderPopoverContainer: function() {
-			if (this.state.popoverDiv == null) {
-				this.state.popoverDiv = $('<div>');
-				this.state.popoverDiv.appendTo($('body'));
-				if (!this.isMobilePhone()) {
-					$(document).on('mousedown', this.onDocumentMouseDown)
-						.on('keyup', this.onDocumentKeyUp)
-						.on('mousewheel', this.onDocumentMouseWheel);
-					$(window).on('resize', this.onWindowResize);
-				} else {
-					$('body').on('touchmove mousewheel', this.onDocumentMouseWheel);
-				}
-			}
-			this.state.popoverDiv.hide();
+		beforeDestoryPopover: function() {
+			this.stopClockInterval();
 		},
 		stopClockInterval: function() {
 			if (this.state.clockInterval) {
@@ -767,43 +726,17 @@
 			if (!this.getComponentOption('runClock', true)) {
 				return;
 			}
-			var _this = this;
 			var value = this.getValueFromModel();
 			if (value == null) {
 				this.stopClockInterval();
 				this.state.clockInterval = {
 					handler: setTimeout(function() {
-						_this.renderPopover({date: currentTime.add(1, 's'), type: popoverType});
-					}, 1000),
+						this.renderPopover({date: currentTime.add(1, 's'), type: popoverType});
+					}.bind(this), 1000),
 					type: popoverType
 				};
 			} else {
 				this.stopClockInterval();
-			}
-		},
-		/**
-		 * show popover
-		 */
-		showPopover: function() {
-			this.renderPopoverContainer();
-			this.renderPopover();
-		},
-		hidePopover: function() {
-			this.destroyPopover();
-		},
-		destroyPopover: function() {
-			$('html').removeClass('on-mobile-popover-shown');
-			if (this.state.popoverDiv) {
-				this.stopClockInterval();
-				$(document).off('mousedown', this.onDocumentMouseDown)
-					.off('keyup', this.onDocumentKeyUp)
-					.off('mousewheel', this.onDocumentMouseWheel);
-				$(window).off('resize', this.onWindowResize);
-				if (this.isMobilePhone()) {
-					$('body').off('touchmove mousewheel', this.onDocumentMouseWheel);
-				}
-				this.state.popoverDiv.remove();
-				delete this.state.popoverDiv;
 			}
 		},
 		/**
@@ -851,28 +784,6 @@
 				(hasMinute ? NDateTime.FORMAT_TYPES.MINUTE : 0) +
 				(hasSecond ? NDateTime.FORMAT_TYPES.SECOND : 0) +
 				(hasMillsecond ? NDateTime.FORMAT_TYPES.MILLSECOND : 0);
-		},
-		onDocumentMouseDown: function(evt) {
-			var target = $(evt.target);
-			if (target.closest(this.getComponent()).length == 0 && target.closest(this.state.popoverDiv).length == 0) {
-				this.hidePopover();
-			}
-		},
-		onDocumentMouseWheel: function(evt) {
-			if (this.isMobilePhone()) {
-				// when mobile phone, prevent the touch move and mouse wheel event
-				evt.preventDefault();
-				return;
-			}
-			this.hidePopover();
-		},
-		onDocumentKeyUp: function(evt) {
-			if (evt.keyCode === 27 || evt.keyCode === 9) { // escape and tab
-				this.hidePopover();
-			}
-		},
-		onWindowResize: function() {
-			this.hidePopover();
 		},
 		onCalendarButtonClicked: function() {
 			if (!this.isEnabled() || this.isViewMode()) {
@@ -1273,9 +1184,6 @@
 		},
 		getInitialPopoverType: function() {
 			return this.getComponentOption('popoverType');
-		},
-		isPopoverFixOnBottom: function() {
-			return this.isMobilePhone() && NDateTime.POP_FIX_ON_BOTTOM === true;
 		}
 	}));
 

@@ -138,22 +138,6 @@
 				{this.renderFocusLine()}
 			</div>);
 		},
-		renderPopoverContainer: function() {
-			if (this.state.popoverDiv == null) {
-				this.state.popoverDiv = $('<div>');
-				this.state.popoverDiv.appendTo($('body'));
-				if (!this.isMobilePhone()) {
-					$(document).on('mousedown', this.onDocumentMouseDown)
-						.on('keyup', this.onDocumentKeyUp)
-						.on('keydown', this.onDocumentKeyDown)
-						.on('mousewheel', this.onDocumentMouseWheel);
-					$(window).on('resize', this.onWindowResize);
-				} else {
-					$('body').on('touchmove mousewheel', this.onDocumentMouseWheel);
-				}
-			}
-			// this.state.popoverDiv.hide();
-		},
 		renderOptions: function(options, filterText) {
 			if (options == null || options.length == 0) {
 				return null;
@@ -248,33 +232,10 @@
 				{this.renderPopoverOperations()}
 			</div>);
 		},
-		renderPopover: function(filterText) {
-			var styles = {display: 'block'};
-			var component = this.getComponent();
-			styles.width = component.outerWidth();
-			var offset = component.offset();
-			styles.top = -10000; // let it out of screen
-			styles.left = 0;
-			var css = {
-				'n-select-popover': true,
-				'popover': true,
-				'bottom': true,
-				'in': true,
-			};
-			if (this.isMobilePhone()) {
-				css['mobile-phone'] = true;
-				css['fix-bottom'] = this.isPopoverFixOnBottom();
-				styles = {display: 'block'};	// reset styles
-			}
-			var popover = (<div role="tooltip" className={$pt.LayoutHelper.classSet(css)} style={styles}>
-				<div className="arrow"></div>
-				<div className="popover-content">
-					{this.renderPopoverContent(filterText)}
-				</div>
-			</div>);
-			ReactDOM.render(popover, this.state.popoverDiv.get(0), this.onPopoverRenderComplete);
+		getPopoverContainerCSS: function() {
+			return 'n-select-popover';
 		},
-		showPopover: function(filterText) {
+		beforeShowPopover: function() {
 			if (this.state.popoverDiv) {
 				// log the last active option
 				var activeOption = this.state.popoverDiv.find('ul.options > li.active');
@@ -282,41 +243,27 @@
 			} else {
 				delete this.state.lastActiveOptionId;
 			}
-			this.renderPopoverContainer();
-			this.renderPopover(filterText);
 		},
-		recalculatePopoverPosition: function() {
+		afterPopoverRenderComplete: function() {
 			// only recalculate when not mobile phone
-			if (this.isMobilePhone()) {
-				$('html').addClass('on-mobile-popover-shown');
-				return;
-			}
-
-			var popover = this.state.popoverDiv.children('.popover');
-			var component = this.getComponent();
-			this.recalcPopoverPosition(popover, component);
-
-			// if there is no active option, set first as active
-			var options = this.state.popoverDiv.find('ul.options > li');
-			if (options.length != 0) {
-				if (this.state.lastActiveOptionId) {
-					// according to react mechanism, must remove the existed active option first
-					// since active is not render by react by jquery, react will keep it
-					// active the last active option if exists
-					options.removeClass('active').filter(function(index, option) {
-						return $(option).attr('data-id') == this.state.lastActiveOptionId;
-					}.bind(this)).addClass('active');
-				}
-				if (this.state.popoverDiv.find('ul.options > li.active').length == 0) {
-					// active the first if no active option
-					this.state.popoverDiv.find('ul.options > li').first().addClass('active');
+			if (!this.isMobilePhone()) {
+				// if there is no active option, set first as active
+				var options = this.state.popoverDiv.find('ul.options > li');
+				if (options.length != 0) {
+					if (this.state.lastActiveOptionId) {
+						// according to react mechanism, must remove the existed active option first
+						// since active is not render by react by jquery, react will keep it
+						// active the last active option if exists
+						options.removeClass('active').filter(function(index, option) {
+							return $(option).attr('data-id') == this.state.lastActiveOptionId;
+						}.bind(this)).addClass('active');
+					}
+					if (this.state.popoverDiv.find('ul.options > li.active').length == 0) {
+						// active the first if no active option
+						this.state.popoverDiv.find('ul.options > li').first().addClass('active');
+					}
 				}
 			}
-		},
-		onPopoverRenderComplete: function() {
-			this.state.popoverDiv.show();
-			this.recalculatePopoverPosition();
-
 			var filterText = this.state.popoverDiv.find('div.n-text input[type=text]');
 			if (!filterText.is(':focus')) {
 				if (this.state.filteTextCaret != null) {
@@ -335,24 +282,6 @@
 			// see #renderFilterText
 			if (this.state.filterModel) {
 				this.state.filterModel.set('disabled', false);
-			}
-		},
-		hidePopover: function() {
-			this.destroyPopover();
-		},
-		destroyPopover: function() {
-			$('html').removeClass('on-mobile-popover-shown');
-			if (this.state.popoverDiv) {
-				$(document).off('mousedown', this.onDocumentMouseDown)
-					.off('keyup', this.onDocumentKeyUp)
-					.off('keydown', this.onDocumentKeyDown)
-					.off('mousewheel', this.onDocumentMouseWheel);
-				$(window).off('resize', this.onWindowResize);
-				if (this.isMobilePhone()) {
-					$('body').off('touchmove mousewheel', this.onDocumentMouseWheel);
-				}
-				this.state.popoverDiv.remove();
-				delete this.state.popoverDiv;
 			}
 		},
 		isOnLoadingWhenHasParent: function() {
@@ -550,37 +479,6 @@
 				// which means parent top is less than window top, since option already been seen in parent
 				win.scrollTop(windowTop - (windowTop - optionTop));
 			}
-		},
-		onDocumentMouseDown: function(evt) {
-			var target = $(evt.target);
-			if (target.closest(this.getComponent()).length == 0 && target.closest(this.state.popoverDiv).length == 0) {
-				this.hidePopover();
-			}
-		},
-		onDocumentMouseWheel: function(evt) {
-			if (this.isMobilePhone()) {
-				// when mobile phone, prevent the touch move and mouse wheel event
-				evt.preventDefault();
-				return;
-			}
-
-			var target = $(evt.target);
-			if (target.closest(this.state.popoverDiv).length == 0) {
-				this.hidePopover();
-			}
-		},
-		onDocumentKeyUp: function(evt) {
-			if (evt.keyCode === 27 || evt.keyCode === 9) { // escape and tab
-				this.hidePopover();
-			}
-		},
-		onDocumentKeyDown: function(evt)  {
-			if (evt.keyCode === 38 || evt.keyCode === 40) {
-				evt.preventDefault();
-			}
-		},
-		onWindowResize: function() {
-			this.hidePopover();
 		},
 		onOptionClick: function(item) {
 			this.setValueToModel(item.id);
@@ -818,9 +716,6 @@
 		},
 		getComponent: function() {
 			return $(ReactDOM.findDOMNode(this.refs.comp));
-		},
-		isPopoverFixOnBottom: function() {
-			return this.isMobilePhone() && NSelect.POP_FIX_ON_BOTTOM === true;
 		}
 	}));
 	$pt.Components.NSelect = NSelect;

@@ -1122,12 +1122,12 @@
 		},
 		executePointcutBefore: function(pointcut) {
 			if (pointcut && pointcut.before) {
-				pointcut.before.call(this, Array.prototype.slice.call(arguments, 1));
+				pointcut.before.apply(this, Array.prototype.slice.call(arguments, 1));
 			}
 		},
 		executePointcutAfter: function(pointcut) {
 			if (pointcut && pointcut.after) {
-				pointcut.after.call(this, Array.prototype.slice.call(arguments, 1));
+				pointcut.after.apply(this, Array.prototype.slice.call(arguments, 1));
 			}
 		},
 		installBaseMonitors: function() {
@@ -1137,8 +1137,8 @@
 			if (this.isArrayData && this.isArrayData()) {
 				this.addPostAddListener(this.onModelChanged);
 				this.addPostRemoveListener(this.onModelChanged);
-				this.addPostValidateListener(this.onModelValidateChanged);
 			}
+			this.addPostValidateListener(this.onModelValidateChanged);
 			if (this.getDependencyOptions) {
 				var options = this.getDependencyOptions();
 				if (options) {
@@ -1157,8 +1157,8 @@
 			if (this.isArrayData && this.isArrayData()) {
 				this.removePostAddListener(this.onModelChanged);
 				this.removePostRemoveListener(this.onModelChanged);
-				this.removePostValidateListener(this.onModelValidateChanged);
 			}
+			this.removePostValidateListener(this.onModelValidateChanged);
 			if (this.getDependencyOptions) {
 				var options = this.getDependencyOptions();
 				if (options) {
@@ -1724,6 +1724,86 @@
 			}
 		},
 		PopoverMixin: {
+			// A) method list should be defined in component scripts:
+			// 		1. getComponent, return jQuery object, required
+			//		2. getPopoverContainerCSS, return css class name string, optional
+			//		3. renderPopoverContent, return JSX DOM object, required
+			//		4. beforePopoverRenderComplete, optional
+			//		5. afterPopoverRenderComplete, optional
+			//		6. isPopoverMatchComponentWidth, return boolean, default true, optional
+			//		7. hasPopoverContentWrapper, return boolean, default true, optional
+			//		8. beforeDestoryPopover, optional
+			//		9. afterDestoryPopover, optional
+			// B) state properties list:
+			// 		1. this.state.popoverDiv
+			renderPopoverContainer: function() {
+				if (this.state.popoverDiv == null) {
+					this.state.popoverDiv = $('<div>');
+					this.state.popoverDiv.appendTo($('body'));
+					if (!this.isMobilePhone()) {
+						$(document).on('mousedown', this.onDocumentMouseDownWhenPopoverShown)
+							.on('keyup', this.onDocumentKeyUpWhenPopoverShown)
+							.on('keydown', this.onDocumentKeyDownWhenPopoverShown)
+							.on('mousewheel', this.onDocumentMouseWheelWhenPopoverShown);
+						$(window).on('resize', this.onWindowResizeWhenPopoverShown);
+					} else {
+						$('body').on('touchmove mousewheel', this.onDocumentMouseWheelWhenPopoverShown);
+					}
+				}
+			},
+			renderPopover: function() {
+				if (this.beforeRenderPopover) {
+					this.beforeRenderPopover.apply(this, arguments);
+				}
+
+				var styles = {display: 'block'};
+				if (!this.isPopoverMatchComponentWidth || this.isPopoverMatchComponentWidth() !== false) {
+					var component = this.getComponent();
+					styles.width = component.outerWidth();
+				}
+				styles.top = -10000; // let it out of screen
+				styles.left = 0;
+				var css = {
+					'popover bottom in': true
+				};
+				if (this.getPopoverContainerCSS) {
+					css[this.getPopoverContainerCSS()] = true;
+				}
+				if (this.isMobilePhone()) {
+					css['mobile-phone'] = true;
+					css['fix-bottom'] = this.isPopoverFixOnBottom();
+					styles = {display: 'block'};	// reset styles
+				}
+				var content = this.renderPopoverContent.apply(this, arguments);
+				if (!this.hasPopoverContentWrapper || this.hasPopoverContentWrapper() !== false) {
+					content = (<div className="popover-content">
+						{content}
+					</div>);
+				}
+				var popover = (<div role="tooltip" className={$pt.LayoutHelper.classSet(css)} style={styles}>
+					<div className="arrow"></div>
+					{content}
+				</div>);
+				ReactDOM.render(popover, this.state.popoverDiv.get(0), this.onPopoverRenderComplete);
+			},
+			onPopoverRenderComplete: function() {
+				if (this.beforePopoverRenderComplete) {
+					this.beforePopoverRenderComplete.apply(this, arguments);
+				}
+
+				this.state.popoverDiv.show();
+				if (this.isMobilePhone()) {
+					$('html').addClass('on-mobile-popover-shown');
+				} else {
+					var popover = this.state.popoverDiv.children('.popover');
+					var component = this.getComponent();
+					this.recalcPopoverPosition(popover, component);
+				}
+
+				if (this.afterPopoverRenderComplete) {
+					this.afterPopoverRenderComplete.apply(this, arguments);
+				}
+			},
 			recalcPopoverPosition: function(popover, component) {
 				var styles = {};
 				styles.width = component.outerWidth();
@@ -1785,6 +1865,72 @@
 					popover.addClass('right-to-left');
 				}
 				popover.css({top: styles.top, left: styles.left});
+			},
+			showPopover: function() {
+				if (this.beforeShowPopover) {
+					this.beforeShowPopover.apply(this, arguments);
+				}
+				this.renderPopoverContainer();
+				this.renderPopover.apply(this, arguments);
+			},
+			hidePopover: function() {
+				this.destroyPopover();
+			},
+			destroyPopover: function() {
+				if (this.beforeDestoryPopover) {
+					this.beforeDestoryPopover.apply(this, arguments);
+				}
+				$('html').removeClass('on-mobile-popover-shown');
+				if (this.state.popoverDiv) {
+					$(document).off('mousedown', this.onDocumentMouseDownWhenPopoverShown)
+						.off('keyup', this.onDocumentKeyUpWhenPopoverShown)
+						.off('keydown', this.onDocumentKeyDownWhenPopoverShown)
+						.off('mousewheel', this.onDocumentMouseWheelWhenPopoverShown);
+					$(window).off('resize', this.onWindowResizeWhenPopoverShown);
+					if (this.isMobilePhone()) {
+						$('body').off('touchmove mousewheel', this.onDocumentMouseWheelWhenPopoverShown);
+					}
+					this.state.popoverDiv.remove();
+					delete this.state.popoverDiv;
+				}
+
+				if (this.afterDestoryPopover) {
+					this.afterDestoryPopover.apply(this, arguments);
+				}
+			},
+			onDocumentMouseDownWhenPopoverShown: function(evt) {
+				var target = $(evt.target);
+				if (target.closest(this.getComponent()).length == 0 && target.closest(this.state.popoverDiv).length == 0) {
+					this.hidePopover();
+				}
+			},
+			onDocumentKeyUpWhenPopoverShown: function(evt) {
+				if (evt.keyCode === 27 || evt.keyCode === 9) { // escape and tab
+					this.hidePopover();
+				}
+			},
+			onDocumentKeyDownWhenPopoverShown: function(evt)  {
+				if (evt.keyCode === 38 || evt.keyCode === 40) {
+					evt.preventDefault();
+				}
+			},
+			onDocumentMouseWheelWhenPopoverShown: function(evt) {
+				if (this.isMobilePhone()) {
+					// when mobile phone, prevent the touch move and mouse wheel event
+					evt.preventDefault();
+					return;
+				}
+
+				var target = $(evt.target);
+				if (target.closest(this.state.popoverDiv).length == 0) {
+					this.hidePopover();
+				}
+			},
+			onWindowResizeWhenPopoverShown: function() {
+				this.hidePopover();
+			},
+			isPopoverFixOnBottom: function() {
+				return this.isMobilePhone() && this.POP_FIX_ON_BOTTOM === true;
 			}
 		}
 	};

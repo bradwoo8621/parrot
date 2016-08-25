@@ -69,7 +69,7 @@
 			var layout = $pt.createCellLayout('values', this.getTreeLayout());
 			var model = $pt.createModel({values: this.getValueFromModel()});
 			model.addPostChangeListener('values', this.onTreeValueChanged);
-			return <$pt.Components.NTree model={model} layout={layout}/>;
+			return <$pt.Components.NTree model={model} layout={layout} key='tree'/>;
 		},
 		renderSelectionItem: function(codeItem, nodeId) {
 			if (this.isMobilePhone()) {
@@ -212,26 +212,11 @@
 				{this.renderFocusLine()}
 			</div>);
 		},
-		renderPopoverContainer: function() {
-			if (this.state.popoverDiv == null) {
-				this.state.popoverDiv = $('<div>');
-				this.state.popoverDiv.appendTo($('body'));
-				if (!this.isMobilePhone()) {
-					$(document).on('mousedown', this.onDocumentMouseDown)
-						.on('keyup', this.onDocumentKeyUp)
-						.on('mousewheel', this.onDocumentMouseWheel);
-					$(window).on('resize', this.onWindowResize);
-				} else {
-					$('body').on('touchmove mousewheel', this.onDocumentMouseWheel);
-				}
-			}
-			this.state.popoverDiv.hide();
-		},
 		renderPopoverOperations: function() {
 			if (!this.isMobilePhone()) {
 				return null;
 			}
-			return (<div className='operations'>
+			return (<div className='operations' key='operations'>
 				<div>
 					<a href='javascript:void(0);' onClick={this.hidePopover}>
 						<span>{NSelectTree.CLOSE_TEXT}</span>
@@ -239,75 +224,28 @@
 				</div>
 			</div>);
 		},
-		renderPopover: function() {
-			var styles = {display: 'block'};
-			var component = this.getComponent();
-			styles.width = component.outerWidth();
-			var offset = component.offset();
-			styles.top = -10000; // let it out of screen
-			styles.left = 0;
-			var css = {
-				'n-select-tree-popover': true,
-				'popover': true,
-				'bottom': true,
-				'in': true,
-			};
-			if (this.isMobilePhone()) {
-				css['mobile-phone'] = true;
-				css['fix-bottom'] = this.isPopoverFixOnBottom();
-				styles = {display: 'block'};	// reset styles
-			}
-			var popover = (<div role="tooltip" className={$pt.LayoutHelper.classSet(css)} style={styles}>
-				<div className="arrow"></div>
-				<div className="popover-content">
-					{this.renderTree()}
-					{this.renderPopoverOperations()}
-				</div>
-			</div>);
-			ReactDOM.render(popover, this.state.popoverDiv.get(0), this.onPopoverRenderComplete);
+		getPopoverContainerCSS: function() {
+			return 'n-select-tree-popover';
 		},
-		showPopover: function() {
-			this.renderPopoverContainer();
-			this.renderPopover();
+		renderPopoverContent: function() {
+			return [this.renderTree(), this.renderPopoverOperations()];
 		},
-		onPopoverRenderComplete: function() {
-			this.state.popoverDiv.show();
+		afterPopoverRenderComplete: function() {
 			if (this.isMobilePhone()) {
-				$('html').addClass('on-mobile-popover-shown');
 				var tree = this.state.popoverDiv.find('div.n-tree > ul');
 				tree.on('touchstart', this.onTreeTouchStart)
 					.on('touchmove', this.onTreeTouchMove)
-					.on('touchend', this.onTreeTouchEnd)
-				return;
+					.on('touchend', this.onTreeTouchEnd);
 			}
-
-			var popover = this.state.popoverDiv.children('.popover');
-			var component = this.getComponent();
-			this.recalcPopoverPosition(popover, component);
 		},
-		hidePopover: function() {
-			// if (this.state.popoverDiv && this.state.popoverDiv.is(':visible')) {
-			// 	this.state.popoverDiv.hide();
-			// 	ReactDOM.render(<noscript/>, this.state.popoverDiv.get(0));
-			// }
-			this.destroyPopover();
-		},
-		destroyPopover: function() {
-			$('html').removeClass('on-mobile-popover-shown');
+		afterDestoryPopover: function() {
 			if (this.state.popoverDiv) {
-				$(document).off('mousedown', this.onDocumentMouseDown)
-					.off('keyup', this.onDocumentKeyUp)
-					.off('mousewheel', this.onDocumentMouseWheel);
-				$(window).off('resize', this.onWindowResize);
 				if (this.isMobilePhone()) {
-					$('body').off('touchmove mousewheel', this.onDocumentMouseWheel);
 					var tree = this.state.popoverDiv.find('div.n-tree > ul');
 					tree.off('touchstart', this.onTreeTouchStart)
 						.off('touchmove', this.onTreeTouchMove)
 						.off('touchend', this.onTreeTouchEnd);
 				}
-				this.state.popoverDiv.remove();
-				delete this.state.popoverDiv;
 			}
 		},
 		isOnLoading: function() {
@@ -331,32 +269,6 @@
 			} else {
 				this.showPopover();
 			}
-		},
-		onDocumentMouseDown: function(evt) {
-			var target = $(evt.target);
-			if (target.closest(this.getComponent()).length == 0 && target.closest(this.state.popoverDiv).length == 0) {
-				this.hidePopover();
-			}
-		},
-		onDocumentMouseWheel: function(evt) {
-			if (this.isMobilePhone()) {
-				// when mobile phone, prevent the touch move and mouse wheel event
-				evt.preventDefault();
-				return;
-			}
-
-			var target = $(evt.target);
-			if (target.closest(this.state.popoverDiv).length == 0) {
-				this.hidePopover();
-			}
-		},
-		onDocumentKeyUp: function(evt) {
-			if (evt.keyCode === 27 || evt.keyCode === 9) { // escape and tab
-				this.hidePopover();
-			}
-		},
-		onWindowResize: function() {
-			this.hidePopover();
 		},
 		/**
 		 * on parent model changed
@@ -614,9 +526,6 @@
 		 */
 		getParentPropertyValue: function () {
 			return this.getParentModel().get(this.getParentPropertyId());
-		},
-		isPopoverFixOnBottom: function() {
-			return this.isMobilePhone() && NSelectTree.POP_FIX_ON_BOTTOM === true;
 		}
 	}));
 	$pt.Components.NSelectTree = NSelectTree;
