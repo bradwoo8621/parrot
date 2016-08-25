@@ -1,4 +1,4 @@
-/** nest-parrot.V0.4.30 2016-08-25 */
+/** nest-parrot.V0.4.31 2016-08-25 */
 (function (window) {
 	var patches = {
 		console: function () {
