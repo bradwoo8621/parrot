@@ -76,6 +76,9 @@
             <span>Monitor Browse Event</span>
             <NFile model={model} layout={eventMonitor}/>
         </div>
+        <div className=''>
+            <input type='file' />
+        </div>
     </div>);
     ReactDOM.render(panel, document.getElementById('main'));
 })();

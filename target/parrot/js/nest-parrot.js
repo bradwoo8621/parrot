@@ -1,4 +1,4 @@
-/** nest-parrot.V0.4.31 2016-08-25 */
+/** nest-parrot.V0.4.31 2016-08-29 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -7605,6 +7605,11 @@
 					} else {
 						delete options[key];
 					}
+				}
+			});
+			Object.keys(NFile.DEFAULT_PROPERTY_VALUES).forEach(function (key) {
+				if (options[key] == null) {
+					options[key] = NFile.DEFAULT_PROPERTY_VALUES[key];
 				}
 			});
 			return options;
