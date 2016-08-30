@@ -3361,8 +3361,8 @@ div.n-file.mobile .file-input .file-preview > .file-drop-zone,
 div.n-file.mobile .file-input .file-preview > .file-drop-disabled {
   margin-bottom: 5px;
 }
-div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails > .file-preview-frame,
-div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails > .file-preview-frame {
+div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails .file-preview-frame,
+div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails .file-preview-frame {
   box-shadow: none;
   border: 0;
   border-radius: 4px;
@@ -3372,44 +3372,44 @@ div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-previe
   background-color: #e0e0e0;
   border: 1px solid #e0e0e0;
 }
-div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails > .file-preview-frame:not(.file-preview-error):hover,
-div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails > .file-preview-frame:not(.file-preview-error):hover {
+div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails .file-preview-frame:not(.file-preview-error):hover,
+div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails .file-preview-frame:not(.file-preview-error):hover {
   box-shadow: none;
 }
-div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails > .file-preview-frame > .file-object > .file-preview-other,
-div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails > .file-preview-frame > .file-object > .file-preview-other {
+div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails .file-preview-frame > .file-object > .file-preview-other,
+div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails .file-preview-frame > .file-object > .file-preview-other {
   width: 80px;
   height: 80px;
   border: 0;
   border-radius: 0;
   display: block;
 }
-div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails > .file-preview-frame > .file-object > .file-preview-other > span,
-div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails > .file-preview-frame > .file-object > .file-preview-other > span {
+div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails .file-preview-frame > .file-object > .file-preview-other > span,
+div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails .file-preview-frame > .file-object > .file-preview-other > span {
   line-height: 80px;
 }
-div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails > .file-preview-frame > .file-object > .file-preview-other > span > i,
-div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails > .file-preview-frame > .file-object > .file-preview-other > span > i {
+div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails .file-preview-frame > .file-object > .file-preview-other > span > i,
+div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails .file-preview-frame > .file-object > .file-preview-other > span > i {
   line-height: 80px;
 }
-div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails > .file-preview-frame > .file-thumbnail-footer > .file-footer-caption,
-div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails > .file-preview-frame > .file-thumbnail-footer > .file-footer-caption {
+div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails .file-preview-frame > .file-thumbnail-footer > .file-footer-caption,
+div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails .file-preview-frame > .file-thumbnail-footer > .file-footer-caption {
   display: none;
 }
-div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails > .file-preview-frame > .file-thumbnail-footer > .file-actions,
-div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails > .file-preview-frame > .file-thumbnail-footer > .file-actions {
+div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails .file-preview-frame > .file-thumbnail-footer > .file-actions,
+div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails .file-preview-frame > .file-thumbnail-footer > .file-actions {
   margin: 0 3px;
 }
-div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails > .file-preview-frame > .file-thumbnail-footer > .file-actions > .file-footer-buttons > button > i,
-div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails > .file-preview-frame > .file-thumbnail-footer > .file-actions > .file-footer-buttons > button > i {
+div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails .file-preview-frame > .file-thumbnail-footer > .file-actions > .file-footer-buttons > button > i,
+div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails .file-preview-frame > .file-thumbnail-footer > .file-actions > .file-footer-buttons > button > i {
   line-height: 23px;
 }
-div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails > .file-preview-frame > .file-thumbnail-footer > .file-actions > .file-upload-indicator,
-div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails > .file-preview-frame > .file-thumbnail-footer > .file-actions > .file-upload-indicator {
+div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails .file-preview-frame > .file-thumbnail-footer > .file-actions > .file-upload-indicator,
+div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails .file-preview-frame > .file-thumbnail-footer > .file-actions > .file-upload-indicator {
   padding-top: 0;
 }
-div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails > .file-preview-frame > .file-thumbnail-footer > .file-actions > .file-upload-indicator > i,
-div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails > .file-preview-frame > .file-thumbnail-footer > .file-actions > .file-upload-indicator > i {
+div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails .file-preview-frame > .file-thumbnail-footer > .file-actions > .file-upload-indicator > i,
+div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails .file-preview-frame > .file-thumbnail-footer > .file-actions > .file-upload-indicator > i {
   line-height: 23px;
 }
 div.n-file.mobile .file-input .kv-upload-progress {
@@ -3421,6 +3421,7 @@ div.n-file.mobile .file-input .input-group {
 }
 div.n-file.mobile .file-input .input-group > .input-group-btn {
   width: 100%;
+  text-align: center;
 }
 div.n-file.mobile .file-input .input-group > .input-group-btn > button.btn.fileinput-remove.fileinput-remove-button,
 div.n-file.mobile .file-input .input-group > .input-group-btn > button.btn.fileinput-cancel.fileinput-cancel-button,
