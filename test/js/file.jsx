@@ -15,11 +15,11 @@
     var customButtons = $pt.createCellLayout('file', $.extend(true, {}, layoutTemplate, {
         comp: {
             browseLabel: "Pick",
-            browseIcon: "<i class=\"fa fa-check\"></i> ",
+            browseIcon: "<i class=\"fa fa-check\"></i>",
             removeLabel: "Del",
-            removeIcon: "<i class=\"fa fa-trash\"></i> ",
+            removeIcon: "<i class=\"fa fa-trash\"></i>",
             uploadLabel: "Go",
-            uploadIcon: "<i class=\"fa fa-upload\"></i> "
+            uploadIcon: "<i class=\"fa fa-upload\"></i>"
         }
     }));
     var noPreview = $pt.createCellLayout('file', $.extend(true, {}, layoutTemplate, {
@@ -35,7 +35,9 @@
     var eventMonitor = $pt.createCellLayout('file', $.extend(true, {}, layoutTemplate, {
         comp: {
             uploadUrl: '/test',
-            uploadAsync: false
+            uploadAsync: false,
+            // multiple: false,
+            dropZoneEnabled: false
         },
         evt: {
             filebrowse: function(evt) {

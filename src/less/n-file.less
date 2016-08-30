@@ -47,5 +47,141 @@ div.n-file {
 		div.btn.btn-file {
 			.upload-button
 		}
+		object.file-object[type="application/pdf"] {
+			& + .file-thumbnail-footer {
+				margin-top: -2px;
+			}
+		}
+		video + .file-thumbnail-footer {
+			margin-top: -7px;
+		}
+		.file-thumbnail-footer {
+			.file-footer-buttons {
+				> button {
+					box-shadow: none;
+					background: none;
+					border: 0;
+				}
+			}
+		}
+	}
+
+	&.mobile {
+		.file-input {
+			min-height: 50px;
+			border: 1px solid @border-color;
+			border-radius: 4px;
+			.file-preview {
+				margin-bottom: 0;
+				background-color: @container-background-color;
+				z-index: 3;
+				position: relative;
+				padding: 0;
+				border: 0;
+				border-radius: 0;
+				> .file-drop-zone {
+					border: 0;
+					border-radius: 0;
+					margin: 0;
+					padding: 0;
+					> .file-drop-zone-title {
+						display: none;
+					}
+				}
+				> .file-drop-zone,
+				> .file-drop-disabled {
+					margin-bottom: 5px;
+					> .file-preview-thumbnails {
+						> .file-preview-frame {
+							box-shadow: none;
+							border: 0;
+							border-radius: 4px;
+							padding: 2px;
+							margin: 5px 0 0 5px;
+							height: 80px;
+							background-color: @border-color;
+							border: 1px solid @border-color;
+							&:not(.file-preview-error):hover {
+								box-shadow: none;
+							}
+							> .file-object {
+								> .file-preview-other {
+									width: 80px;
+									height: 80px;
+									border: 0;
+									border-radius: 0;
+									display: block;
+									> span {
+										line-height: 80px;
+										> i {
+											line-height: 80px;
+										}
+									}
+								}
+							}
+							> .file-thumbnail-footer {
+								> .file-footer-caption {
+									display: none;
+								}
+								> .file-thumb-progress {
+									// display: none;
+								}
+								> .file-actions {
+									margin: 0 3px;
+									> .file-footer-buttons {
+										> button {
+											> i {
+												line-height: 23px;
+											}
+										}
+									}
+									> .file-upload-indicator {
+										padding-top: 0;
+										> i {
+											line-height: 23px;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			.kv-upload-progress {
+				display: none !important;
+			}
+			.input-group {
+				width: 100%;
+				padding: 5px;
+				> .form-control.file-caption.kv-fileinput-caption {
+					// display: none;
+				}
+				> .input-group-btn {
+					width: 100%;
+					> button.btn.fileinput-remove.fileinput-remove-button,
+					> button.btn.fileinput-cancel.fileinput-cancel-button,
+					> a.btn.fileinput-upload.fileinput-upload-button,
+					> button.btn.fileinput-upload.fileinput-upload-button,
+					> div.btn.btn-file {
+						height: auto;
+						padding: 0;
+						margin: 0;
+						color: lighten(@font-color, 20%);
+						width: 1 / 3 * 100%;
+						> i {
+							float: right;
+							font-size: 35px;
+							line-height: 40px;
+							width: 100%;
+						}
+					}
+
+				}
+			}
+		}
+		hr.normal-line,
+		hr.focus-line {
+			display: none;
+		}
 	}
 }

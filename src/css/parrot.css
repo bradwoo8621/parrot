@@ -3323,6 +3323,130 @@ div.n-file .file-input div.btn.btn-file:active.focus {
   outline: 0;
   outline-offset: 0;
 }
+div.n-file .file-input object.file-object[type="application/pdf"] + .file-thumbnail-footer {
+  margin-top: -2px;
+}
+div.n-file .file-input video + .file-thumbnail-footer {
+  margin-top: -7px;
+}
+div.n-file .file-input .file-thumbnail-footer .file-footer-buttons > button {
+  box-shadow: none;
+  background: none;
+  border: 0;
+}
+div.n-file.mobile .file-input {
+  min-height: 50px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+}
+div.n-file.mobile .file-input .file-preview {
+  margin-bottom: 0;
+  background-color: #ffffff;
+  z-index: 3;
+  position: relative;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+}
+div.n-file.mobile .file-input .file-preview > .file-drop-zone {
+  border: 0;
+  border-radius: 0;
+  margin: 0;
+  padding: 0;
+}
+div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-drop-zone-title {
+  display: none;
+}
+div.n-file.mobile .file-input .file-preview > .file-drop-zone,
+div.n-file.mobile .file-input .file-preview > .file-drop-disabled {
+  margin-bottom: 5px;
+}
+div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails > .file-preview-frame,
+div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails > .file-preview-frame {
+  box-shadow: none;
+  border: 0;
+  border-radius: 4px;
+  padding: 2px;
+  margin: 5px 0 0 5px;
+  height: 80px;
+  background-color: #e0e0e0;
+  border: 1px solid #e0e0e0;
+}
+div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails > .file-preview-frame:not(.file-preview-error):hover,
+div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails > .file-preview-frame:not(.file-preview-error):hover {
+  box-shadow: none;
+}
+div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails > .file-preview-frame > .file-object > .file-preview-other,
+div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails > .file-preview-frame > .file-object > .file-preview-other {
+  width: 80px;
+  height: 80px;
+  border: 0;
+  border-radius: 0;
+  display: block;
+}
+div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails > .file-preview-frame > .file-object > .file-preview-other > span,
+div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails > .file-preview-frame > .file-object > .file-preview-other > span {
+  line-height: 80px;
+}
+div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails > .file-preview-frame > .file-object > .file-preview-other > span > i,
+div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails > .file-preview-frame > .file-object > .file-preview-other > span > i {
+  line-height: 80px;
+}
+div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails > .file-preview-frame > .file-thumbnail-footer > .file-footer-caption,
+div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails > .file-preview-frame > .file-thumbnail-footer > .file-footer-caption {
+  display: none;
+}
+div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails > .file-preview-frame > .file-thumbnail-footer > .file-actions,
+div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails > .file-preview-frame > .file-thumbnail-footer > .file-actions {
+  margin: 0 3px;
+}
+div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails > .file-preview-frame > .file-thumbnail-footer > .file-actions > .file-footer-buttons > button > i,
+div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails > .file-preview-frame > .file-thumbnail-footer > .file-actions > .file-footer-buttons > button > i {
+  line-height: 23px;
+}
+div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails > .file-preview-frame > .file-thumbnail-footer > .file-actions > .file-upload-indicator,
+div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails > .file-preview-frame > .file-thumbnail-footer > .file-actions > .file-upload-indicator {
+  padding-top: 0;
+}
+div.n-file.mobile .file-input .file-preview > .file-drop-zone > .file-preview-thumbnails > .file-preview-frame > .file-thumbnail-footer > .file-actions > .file-upload-indicator > i,
+div.n-file.mobile .file-input .file-preview > .file-drop-disabled > .file-preview-thumbnails > .file-preview-frame > .file-thumbnail-footer > .file-actions > .file-upload-indicator > i {
+  line-height: 23px;
+}
+div.n-file.mobile .file-input .kv-upload-progress {
+  display: none !important;
+}
+div.n-file.mobile .file-input .input-group {
+  width: 100%;
+  padding: 5px;
+}
+div.n-file.mobile .file-input .input-group > .input-group-btn {
+  width: 100%;
+}
+div.n-file.mobile .file-input .input-group > .input-group-btn > button.btn.fileinput-remove.fileinput-remove-button,
+div.n-file.mobile .file-input .input-group > .input-group-btn > button.btn.fileinput-cancel.fileinput-cancel-button,
+div.n-file.mobile .file-input .input-group > .input-group-btn > a.btn.fileinput-upload.fileinput-upload-button,
+div.n-file.mobile .file-input .input-group > .input-group-btn > button.btn.fileinput-upload.fileinput-upload-button,
+div.n-file.mobile .file-input .input-group > .input-group-btn > div.btn.btn-file {
+  height: auto;
+  padding: 0;
+  margin: 0;
+  color: #999999;
+  width: 33.33333333%;
+}
+div.n-file.mobile .file-input .input-group > .input-group-btn > button.btn.fileinput-remove.fileinput-remove-button > i,
+div.n-file.mobile .file-input .input-group > .input-group-btn > button.btn.fileinput-cancel.fileinput-cancel-button > i,
+div.n-file.mobile .file-input .input-group > .input-group-btn > a.btn.fileinput-upload.fileinput-upload-button > i,
+div.n-file.mobile .file-input .input-group > .input-group-btn > button.btn.fileinput-upload.fileinput-upload-button > i,
+div.n-file.mobile .file-input .input-group > .input-group-btn > div.btn.btn-file > i {
+  float: right;
+  font-size: 35px;
+  line-height: 40px;
+  width: 100%;
+}
+div.n-file.mobile hr.normal-line,
+div.n-file.mobile hr.focus-line {
+  display: none;
+}
 .n-tree {
   position: relative;
   overflow-y: hidden;

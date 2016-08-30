@@ -137,11 +137,32 @@
 				removeClass: 'btn btn-link',
 				showClose: false,
 				showPreview: true
-			}
+			},
+			MOBILE_SETTINGS: {
+				previewSettings: {
+	                image: {width: "80px", height: "80px"},
+	                html: {width: "80px", height: "80px"},
+	                text: {width: "80px", height: "80px"},
+	                video: {width: "80px", height: "80px"},
+	                audio: {width: "80px", height: "80px"},
+	                flash: {width: "80px", height: "80px"},
+	                object: {width: "80px", height: "80px"},
+	                other: {width: "80px", height: "80px"}
+	            },
+	            browseIcon: '<i class="fa fa-fw fa-plus-square"></i>',
+	            showCaption: true,
+	            layoutTemplates: {
+	            	caption: '<span />',
+		            progress: '<span />'
+		        },
+		        showCancel: false,
+	            dropZoneEnabled: false
+            }
 		},
 		getDefaultProps: function () {
 			return {
 				defaultOptions: {
+					mobileEnabled: true,
 					multiple: true,
 					inputName: 'fileData'
 				}
@@ -189,6 +210,7 @@
 		render: function () {
 			var css = {};
 			css[this.getComponentCSS('n-file')] = true;
+			css.mobile = this.isMobileEnabled();
 			var inputCSS = {
 				file: true
 			};
@@ -209,7 +231,7 @@
 			var options = this.getLayout().getComponentOption();
 			Object.keys(options).filter(function(key) {
 				// the component type should be filterred
-				return key != 'type' && key != 'multiple' && key != 'inputName';
+				return ['type', 'multiple', 'inputName', 'mobileEnabled'].indexOf(key) == -1;
 			}).forEach(function (key) {
 				options[key] = _this.getComponentOption(key);
 				// console.log(key, options[key]);
@@ -228,6 +250,14 @@
 					options[key] = NFile.DEFAULT_PROPERTY_VALUES[key];
 				}
 			});
+			if (this.isMobileEnabled()) {
+				Object.keys(NFile.MOBILE_SETTINGS).forEach(function(key) {
+					var value = NFile.MOBILE_SETTINGS[key];
+					if (value) {
+						options[key] = value;
+					}
+				});
+			}
 			return options;
 		},
 		allowMultipleFiles: function () {
@@ -240,6 +270,9 @@
 		onComponentBlurred: function () {
 			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
 			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
+		},
+		isMobileEnabled: function() {
+			return this.isMobile() && this.getComponentOption('mobileEnabled');
 		}
 	}));
 	$pt.Components.NFile = NFile;
