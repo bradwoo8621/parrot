@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.5.0 2016-09-01 */
+	/** nest-parrot.V0.5.0 2016-09-08 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -6004,9 +6004,9 @@
 				return this.renderInViewMode();
 			}
 			var divCSS = {
-				'n-datetime': true,
 				'n-disabled': !this.isEnabled()
 			};
+			divCSS[this.getComponentCSS('n-datetime')] = true;
 			return React.createElement(
 				'div',
 				{ className: $pt.LayoutHelper.classSet(divCSS) },
@@ -7621,7 +7621,9 @@
 			input.fileinput('destroy');
 		},
 		render: function () {
-			var css = {};
+			var css = {
+				'n-disabled': !this.isEnabled()
+			};
 			css[this.getComponentCSS('n-file')] = true;
 			css.mobile = this.isMobileEnabled();
 			var inputCSS = {
@@ -11920,7 +11922,7 @@
 			return React.createElement(
 				'div',
 				{ className: $pt.LayoutHelper.classSet(css),
-					tabIndex: '0',
+					tabIndex: this.isEnabled() ? '0' : null,
 					onKeyUp: this.onComponentKeyUp,
 					'aria-readonly': 'true',
 					readOnly: 'true',
@@ -12776,7 +12778,7 @@
 				{ className: $pt.LayoutHelper.classSet(css),
 					'aria-readonly': 'true',
 					readOnly: 'true',
-					tabIndex: '0' },
+					tabIndex: this.isEnabled() ? '0' : null },
 				this.renderText(),
 				this.renderNormalLine(),
 				this.renderFocusLine()
@@ -16373,10 +16375,10 @@
 				{ className: $pt.LayoutHelper.classSet(css) },
 				React.createElement("span", { className: "n-toggle-line" }),
 				React.createElement("span", { className: "n-toggle-true",
-					tabIndex: "-1",
+					tabIndex: this.isEnabled() ? '-1' : null,
 					onClick: this.onButtonClicked.bind(this, true) }),
 				React.createElement("span", { className: "n-toggle-false",
-					tabIndex: "-1",
+					tabIndex: this.isEnabled() ? '-1' : null,
 					onClick: this.onButtonClicked.bind(this, false) })
 			);
 		},

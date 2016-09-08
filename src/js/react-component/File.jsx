@@ -208,7 +208,9 @@
 			input.fileinput('destroy');
 		},
 		render: function () {
-			var css = {};
+			var css = {
+				'n-disabled': !this.isEnabled()
+			};
 			css[this.getComponentCSS('n-file')] = true;
 			css.mobile = this.isMobileEnabled();
 			var inputCSS = {

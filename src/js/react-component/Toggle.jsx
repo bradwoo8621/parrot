@@ -53,10 +53,10 @@
 			return (<div className={$pt.LayoutHelper.classSet(css)}>
 				<span className='n-toggle-line'/>
             <span className='n-toggle-true'
-                  tabIndex='-1'
+                  tabIndex={this.isEnabled() ? '-1' : null}
                   onClick={this.onButtonClicked.bind(this, true)}/>
             <span className='n-toggle-false'
-                  tabIndex='-1'
+                  tabIndex={this.isEnabled() ? '-1' : null}
                   onClick={this.onButtonClicked.bind(this, false)}/>
 			</div>);
 		},

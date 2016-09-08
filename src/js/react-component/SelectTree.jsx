@@ -206,7 +206,7 @@
 			return (<div className={$pt.LayoutHelper.classSet(css)} 
 						 aria-readonly='true' 
 						 readOnly='true'
-						 tabIndex='0'>
+						 tabIndex={this.isEnabled() ? '0' : null}>
 				{this.renderText()}
 				{this.renderNormalLine()}
 				{this.renderFocusLine()}

@@ -2363,6 +2363,7 @@ div.n-confirm .modal-body h6:last-child {
 div.n-toggle {
   padding-top: 5px;
   padding-bottom: 2px;
+  height: 30px;
 }
 div.n-toggle > span.toggle-label {
   display: inline-block;
@@ -3240,6 +3241,7 @@ div.n-file .file-input .form-control.file-caption.kv-fileinput-caption {
   -o-box-shadow: none;
   -webkit-box-shadow: none;
   padding: 5px 0;
+  background-color: transparent;
 }
 div.n-file .file-input button.fileinput-upload.fileinput-upload-button,
 div.n-file .file-input button.fileinput-cancel.fileinput-cancel-button,

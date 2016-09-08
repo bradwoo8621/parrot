@@ -105,9 +105,9 @@
 				return this.renderInViewMode();
 			}
 			var divCSS = {
-				'n-datetime': true,
 				'n-disabled': !this.isEnabled()
 			};
+			divCSS[this.getComponentCSS('n-datetime')] = true;
 			return (<div className={$pt.LayoutHelper.classSet(divCSS)}>
 				{this.renderInputArea()}
 				{this.renderNormalLine()}

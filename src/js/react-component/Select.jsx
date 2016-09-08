@@ -128,7 +128,7 @@
 			};
 			css[this.getComponentCSS('n-select')] = true;
 			return (<div className={$pt.LayoutHelper.classSet(css)} 
-						 tabIndex='0'
+						 tabIndex={this.isEnabled() ? '0' : null}
 						 onKeyUp={this.onComponentKeyUp}
 						 aria-readonly='true' 
 						 readOnly='true'
