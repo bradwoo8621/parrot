@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.5.1 2016-09-08 */
+	/** nest-parrot.V0.5.2 2016-09-20 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -5223,17 +5223,6 @@
    * @returns {XML}
    */
 		render: function () {
-			// when state.clear is true, forcily clear the dom
-			// and then delete the state
-			// see the following code in #onModelChanged
-			// this.setState({clear: true}, this.forceUpdate);
-			// forceUpdate must be passed as callback to #setState
-			// all these are to remove the flicking when remove data from model side
-			if (this.state.clear === true) {
-				delete this.state.clear;
-				return React.createElement('div', null);
-			}
-
 			var tabs = this.getTabs();
 			var canActiveProxy = function (newTabValue, newTabIndex, activeTabValue, activeTabIndex) {
 				if (this.isAddable() && newTabIndex == tabs.length - 1) {
@@ -5247,10 +5236,16 @@
 					}
 				}
 			}.bind(this);
-			return React.createElement(
-				'div',
-				{ className: this.getComponentCSS('n-array-tab') },
-				React.createElement($pt.Components.NTab, { type: this.getComponentOption('tabType'),
+
+			// when state.clear is true, forcily clear the tab title dom
+			// and then delete the state
+			// see the following code in #onModelChanged
+			// this.setState({clear: true}, this.forceUpdate);
+			// forceUpdate must be passed as callback to #setState
+			// all these are to remove the flicking when remove data from model side
+			var tabTitle = null;
+			if (this.state.clear !== true) {
+				tabTitle = React.createElement($pt.Components.NTab, { type: this.getComponentOption('tabType'),
 					justified: this.getComponentOption('justified'),
 					direction: this.getComponentOption('titleDirection'),
 					size: this.getComponentOption('titleIconSize'),
@@ -5258,7 +5253,15 @@
 					tabs: tabs,
 					canActive: canActiveProxy,
 					onActive: this.onTabClicked,
-					ref: 'tabs' }),
+					ref: 'tabs' });
+			} else {
+				delete this.state.clear;
+			}
+
+			return React.createElement(
+				'div',
+				{ className: this.getComponentCSS('n-array-tab') },
+				tabTitle,
 				React.createElement(
 					'div',
 					{ className: 'n-array-tab-content', ref: 'content' },

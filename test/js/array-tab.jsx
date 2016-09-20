@@ -90,6 +90,33 @@
             badge: 'count'
         }
     }));
+
+    var hierarchyModel = $pt.createModel({
+        level1: [{
+            level2: [{}]
+        }, {}, {}]
+    });
+    var hierarchyLayout = $pt.createCellLayout('level1', {
+        comp: {
+            type: $pt.ComponentConstants.ArrayTab,
+            editLayout: function() {
+                console.log(arguments);
+                return {
+                    level2: {
+                        comp: {
+                            type: $pt.ComponentConstants.Table,
+                            columns: [{
+                                data: 'name',
+                                title: 'Name',
+                                inline: 'text'
+                            }]
+                        },
+                        pos: {width: 12}
+                    }
+                };
+            }
+        }
+    });
     var panel = (<div>
         <div className='row'>
             <div className='col-md-6 col-lg-6 col-sm-6'>
@@ -108,6 +135,11 @@
                 <span>View Mode</span>
                 <NArrayTab model={model} layout={fixedTitlePill} view={true}/>
             </div>
+            <div className='col-md-6 col-lg-6 col-sm-6'>
+                <span>Hierarchy</span>
+                <NArrayTab model={hierarchyModel} layout={hierarchyLayout} />
+            </div>
+            
         </div>
     </div>);
     ReactDOM.render(panel, document.getElementById('main'));
