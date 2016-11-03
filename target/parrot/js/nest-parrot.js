@@ -1,4 +1,4 @@
-/** nest-parrot.V0.5.2 2016-09-20 */
+/** nest-parrot.V0.5.3 2016-11-03 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -1966,16 +1966,16 @@
    * @returns {*}
    * @private
    */
-		_validateByPhase: function (model, value, ruleKey, phase, ruleBody) {
+		_validateByPhase: function (model, value, ruleKey, phase, ruleBody, dataId) {
 			var ret = null;
 			if (typeof ruleBody === "function") {
 				// a simple function, call it, gather the return value
-				ret = ruleBody.call(this, model, value, phase);
+				ret = ruleBody.call(this, model, value, phase, dataId);
 			} else if (Array.isArray(ruleBody)) {
 				// rule body is an array
 				var _this = this;
 				var result = ruleBody.map(function (body) {
-					return _this._validateByPhase(model, value, ruleKey, phase, body);
+					return _this._validateByPhase(model, value, ruleKey, phase, body, dataId);
 				});
 				var finalResult = [];
 				result.forEach(function (item) {
@@ -2025,10 +2025,10 @@
 				}
 				if (runRule) {
 					if (typeof realRuleBody === 'function') {
-						ret = realRuleBody.call(this, model, value, phase);
+						ret = realRuleBody.call(this, model, value, phase, dataId);
 					} else {
 						// console.log(model, value, realRuleBody);
-						ret = this.getRule(ruleKey).call(this, model, value, realRuleBody, phase);
+						ret = this.getRule(ruleKey).call(this, model, value, realRuleBody, phase, dataId);
 					}
 				}
 			}
@@ -2052,7 +2052,7 @@
 					result = Object.keys(config).map(function (rule) {
 						var ruleBody = config[rule];
 						var value = model.get(id);
-						var ret = _this._validateByPhase(model, value, rule, phase, ruleBody);
+						var ret = _this._validateByPhase(model, value, rule, phase, ruleBody, id);
 						return ret != null && ret !== true ? ret : null;
 					});
 					var finalResult = [];
