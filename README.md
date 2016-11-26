@@ -16,7 +16,8 @@ Parrot is a sub module of NEST.
 [Guide](http://bradwoo8621.github.io/parrot/guide/index.html)
 
 # Release Log
-See wiki for [Version History](https://github.com/bradwoo8621/parrot/wiki/Version-History)
+See wiki for [Version History](https://github.com/bradwoo8621/parrot/wiki/Version-History)  
+The new version of Parrot is released, see [Nest Parrot2](https://github.com/bradwoo8621/parrot2)
 
 # In Browser
 ```html
