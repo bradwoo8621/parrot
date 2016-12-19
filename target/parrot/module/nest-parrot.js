@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.5.3 2016-11-03 */
+	/** nest-parrot.V0.5.4 2016-12-19 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -1560,8 +1560,8 @@
 						target[propName] = $pt.mergeObject({ deep: deep, target: destPropValue, sources: [sourcePropValue] });
 						// Don't bring in undefined values
 					} else if (sourcePropValue !== undefined) {
-							target[propName] = sourcePropValue;
-						}
+						target[propName] = sourcePropValue;
+					}
 				}
 			}
 		}
@@ -2603,12 +2603,12 @@
 								this.__parent.mergeError(errors, key);
 								// console.log(this.__parent.getError());
 							} else {
-									// no error
-									if (tableErrorIndex != -1) {
-										// remove the exists error
-										errors[tableErrorIndex].remove(elm);
-									}
+								// no error
+								if (tableErrorIndex != -1) {
+									// remove the exists error
+									errors[tableErrorIndex].remove(elm);
 								}
+							}
 						}
 					}.bind(this));
 				}
@@ -4652,12 +4652,12 @@
 					if (styles.left + realWidth <= width) {
 						// normal from left to right, do nothing
 					} else if (styles.left + styles.width >= realWidth) {
-							// from right to left
-							styles.left = styles.left + styles.width - realWidth;
-							rightToLeft = true;
-						} else {
-							// still left to right, do nothing
-						}
+						// from right to left
+						styles.left = styles.left + styles.width - realWidth;
+						rightToLeft = true;
+					} else {
+						// still left to right, do nothing
+					}
 				}
 
 				if (onTop) {
@@ -5334,17 +5334,17 @@
 				this.state.transientActiveTabIndex = evt.index;
 				// this.clearTabs(this.setActiveTabIndex.bind(this, evt.index));
 			} else if (evt.type === 'remove') {
-					var index = evt.index;
-					var data = this.getValueFromModel();
-					if (index == data.length) {
-						index = index - 1;
-					}
-					this.state.transientActiveTabIndex = index;
-					// this.clearTabs(this.setActiveTabIndex.bind(this, index));
-				} else {
-						// this.forceUpdate();
-						this.state.transientActiveTabIndex = evt.index != null ? evt.index : null;
-					}
+				var index = evt.index;
+				var data = this.getValueFromModel();
+				if (index == data.length) {
+					index = index - 1;
+				}
+				this.state.transientActiveTabIndex = index;
+				// this.clearTabs(this.setActiveTabIndex.bind(this, index));
+			} else {
+				// this.forceUpdate();
+				this.state.transientActiveTabIndex = evt.index != null ? evt.index : null;
+			}
 			this.setState({ clear: true }, this.forceUpdate);
 			// this.forceUpdate();
 		},
@@ -6934,10 +6934,10 @@
 				if (point.x > 0 && point.y >= 0) {
 					// do nothing
 				} else if (point.x < 0) {
-						degree += 180;
-					} else {
-						degree += 360;
-					}
+					degree += 180;
+				} else {
+					degree += 360;
+				}
 			}
 			// transform to real clock coordinate system
 			if (degree <= 90) {
@@ -7016,8 +7016,8 @@
 				if (date == null && text.length != 0) {
 					// TODO invalid date, do nothing now. donot know how to deal with it...
 				} else {
-						this.setValueToModel(date);
-					}
+					this.setValueToModel(date);
+				}
 			}
 		},
 		onModelChanged: function (evt) {
@@ -7027,16 +7027,16 @@
 				if (text == null || text.isBlank()) {
 					// do nothing
 				} else {
-						this.forceUpdate();
-					}
+					this.forceUpdate();
+				}
 			} else {
 				var valueDate = this.getValueFromModel();
 				var textDate = this.convertValueFromString(text, this.getDisplayFormat(), true);
 				if (valueDate.isSame(textDate)) {
 					// do nothing
 				} else {
-						this.forceUpdate();
-					}
+					this.forceUpdate();
+				}
 			}
 		},
 		getValueFromModel: function () {
@@ -7366,7 +7366,7 @@
 									React.createElement(
 										"span",
 										{ "aria-hidden": "true" },
-										"×"
+										"\xD7"
 									)
 								),
 								React.createElement(
@@ -9097,7 +9097,7 @@
 					React.createElement(
 						"span",
 						{ "aria-hidden": "true" },
-						"×"
+						"\xD7"
 					)
 				);
 			}
@@ -9520,7 +9520,7 @@
 					React.createElement(
 						"span",
 						{ "aria-hidden": "true" },
-						"×"
+						"\xD7"
 					)
 				);
 			}
@@ -11546,22 +11546,22 @@
 				if (value == null) {
 					// $(ReactDOM.findDOMNode(this.refs.viewLabel)).text('');
 				} else {
-						var label = value;
-						if (text == null) {
-							label += ' - ' + NSearchText.NOT_FOUND;
-						} else {
-							label += ' - ' + text;
-						}
-						// $(ReactDOM.findDOMNode(this.refs.viewLabel)).text(label);
-						var def = this.refs.viewLabel.getLayout().getDefinition();
-						def.label = label;
-						this.refs.viewLabel.forceUpdate();
-						// this.refs.viewLabel.getLayout()
-						// this.setState({viewLabel: label})
+					var label = value;
+					if (text == null) {
+						label += ' - ' + NSearchText.NOT_FOUND;
+					} else {
+						label += ' - ' + text;
 					}
-			} else {
-					$(ReactDOM.findDOMNode(this.refs.label)).val(text);
+					// $(ReactDOM.findDOMNode(this.refs.viewLabel)).text(label);
+					var def = this.refs.viewLabel.getLayout().getDefinition();
+					def.label = label;
+					this.refs.viewLabel.forceUpdate();
+					// this.refs.viewLabel.getLayout()
+					// this.setState({viewLabel: label})
 				}
+			} else {
+				$(ReactDOM.findDOMNode(this.refs.label)).val(text);
+			}
 			// if label property id defined, and value changed, set to model
 			var labelPropertyId = this.getComponentOption('labelPropId');
 			if (labelPropertyId) {
@@ -11831,8 +11831,12 @@
 				// remove post change listener from parent model
 				this.getParentModel().addPostChangeListener(this.getParentPropertyId(), this.onParentModelChanged);
 			}
+			this.checkLoadingState();
 		},
 		afterDidMount: function () {
+			this.checkLoadingState();
+		},
+		checkLoadingState: function () {
 			if (this.state.onloading) {
 				if (this.hasParent()) {
 					// add post change listener into parent model
@@ -12180,7 +12184,7 @@
 		},
 		onComponentKeyUp: function (evt) {
 			if (evt.keyCode === 40) {
-				// down arrow
+				// down arrow 
 				this.onComponentDownArrowKeyUp(evt);
 			} else if (evt.keyCode === 38) {
 				// up arrow
@@ -12306,7 +12310,7 @@
 			windowTop = win.scrollTop();
 			if (optionTop < windowTop) {
 				// can not see option in window, even it is seen in its parent
-				// option is above the window top,
+				// option is above the window top, 
 				// which means parent top is less than window top, since option already been seen in parent
 				win.scrollTop(windowTop - (windowTop - optionTop));
 			}
@@ -12325,7 +12329,7 @@
 			// when handled the arrow up/down event, highlight the option
 			// in chrome, the mouse event will be triggered after call #scrollIntoView
 			// so use state onKeyEventProcessed to flag this operation
-			// if the flag is true, ignore the mouse event,
+			// if the flag is true, ignore the mouse event, 
 			// and reset the flag, let the following mouse event processed
 			// cannot use mouse enter event, since there is no second enter event triggered
 			// must use mouse move event to handle, seems no performance issue here.
@@ -12887,57 +12891,57 @@
 			if (values == null) {
 				// do nothing
 			} else if (this.getTreeLayout().comp.valueAsArray) {
-					if (hierarchyCheck) {
-						var codes = this.getAvailableTreeModel().listWithHierarchyKeys({ separator: NTree.NODE_SEPARATOR, rootId: NTree.ROOT_ID });
-						var codeHierarchyIds = Object.keys(codes);
-						// find all children
-						var childrenIds = codeHierarchyIds.filter(function (key) {
-							return key.indexOf(nodeId + NTree.NODE_SEPARATOR) != -1;
-						}).map(function (id) {
-							return id.split(NTree.NODE_SEPARATOR).pop();
+				if (hierarchyCheck) {
+					var codes = this.getAvailableTreeModel().listWithHierarchyKeys({ separator: NTree.NODE_SEPARATOR, rootId: NTree.ROOT_ID });
+					var codeHierarchyIds = Object.keys(codes);
+					// find all children
+					var childrenIds = codeHierarchyIds.filter(function (key) {
+						return key.indexOf(nodeId + NTree.NODE_SEPARATOR) != -1;
+					}).map(function (id) {
+						return id.split(NTree.NODE_SEPARATOR).pop();
+					});
+					var hierarchyId = codeHierarchyIds.find(function (id) {
+						return id.endsWith(NTree.NODE_SEPARATOR + nodeId);
+					});
+					// find itself and its ancestor ids
+					var ancestorIds = codeHierarchyIds.filter(function (id) {
+						return hierarchyId.startsWith(id);
+					}).map(function (id) {
+						return id.split(NTree.NODE_SEPARATOR).pop();
+					});
+					// combine
+					var ids = childrenIds.concat(ancestorIds);
+					// filter found ids
+					this.setValueToModel(values.filter(function (id) {
+						return -1 == ids.findIndex(function (idNeedRemove) {
+							return id == idNeedRemove;
 						});
-						var hierarchyId = codeHierarchyIds.find(function (id) {
-							return id.endsWith(NTree.NODE_SEPARATOR + nodeId);
-						});
-						// find itself and its ancestor ids
-						var ancestorIds = codeHierarchyIds.filter(function (id) {
-							return hierarchyId.startsWith(id);
-						}).map(function (id) {
-							return id.split(NTree.NODE_SEPARATOR).pop();
-						});
-						// combine
-						var ids = childrenIds.concat(ancestorIds);
-						// filter found ids
-						this.setValueToModel(values.filter(function (id) {
-							return -1 == ids.findIndex(function (idNeedRemove) {
-								return id == idNeedRemove;
-							});
-						}));
-					} else {
-						// remove itself
-						this.setValueToModel(values.filter(function (id) {
-							return id != nodeId;
-						}));
-					}
+					}));
 				} else {
-					var effectiveNodes = nodeId.split(NTree.NODE_SEPARATOR).slice(1);
-					var node = $pt.getValueFromJSON(values, effectiveNodes.join($pt.PROPERTY_SEPARATOR));
-					if (hierarchyCheck) {
-						// set itself and its children to unselected
-						Object.keys(node).forEach(function (key) {
-							delete node[key];
-						});
-						// set its ancestors to unselected
-						effectiveNodes.splice(effectiveNodes.length - 1, 1);
-						effectiveNodes.forEach(function (id, index, array) {
-							$pt.setValueIntoJSON(values, array.slice(0, index + 1).join($pt.PROPERTY_SEPARATOR) + $pt.PROPERTY_SEPARATOR + 'selected', false);
-						});
-					} else {
-						// set itself to unselected
-						delete node.selected;
-					}
-					this.getModel().firePostChangeEvent(this.getDataId(), values, values);
+					// remove itself
+					this.setValueToModel(values.filter(function (id) {
+						return id != nodeId;
+					}));
 				}
+			} else {
+				var effectiveNodes = nodeId.split(NTree.NODE_SEPARATOR).slice(1);
+				var node = $pt.getValueFromJSON(values, effectiveNodes.join($pt.PROPERTY_SEPARATOR));
+				if (hierarchyCheck) {
+					// set itself and its children to unselected
+					Object.keys(node).forEach(function (key) {
+						delete node[key];
+					});
+					// set its ancestors to unselected
+					effectiveNodes.splice(effectiveNodes.length - 1, 1);
+					effectiveNodes.forEach(function (id, index, array) {
+						$pt.setValueIntoJSON(values, array.slice(0, index + 1).join($pt.PROPERTY_SEPARATOR) + $pt.PROPERTY_SEPARATOR + 'selected', false);
+					});
+				} else {
+					// set itself to unselected
+					delete node.selected;
+				}
+				this.getModel().firePostChangeEvent(this.getDataId(), values, values);
+			}
 		},
 		isNodeCheckClicked: function (evt) {
 			return $(evt.target).closest('.n-checkbox').length != 0;
@@ -14391,15 +14395,15 @@
 			if (target.closest(this.state.popoverDiv).length != 0) {
 				// click in popover
 			} else if (target.closest($('.n-table-op-btn.more')).length != 0) {
-					// click in more button
-					if (target.closest($(this.refs.div)).length == 0) {
-						// in other table's more button
-						this.hidePopover();
-					}
-				} else {
-					// neither popover nor more button
+				// click in more button
+				if (target.closest($(this.refs.div)).length == 0) {
+					// in other table's more button
 					this.hidePopover();
 				}
+			} else {
+				// neither popover nor more button
+				this.hidePopover();
+			}
 		},
 		onDocumentKeyUp: function (evt) {
 			if (evt.keyCode === 27) {
@@ -14578,8 +14582,8 @@
 									layout = $.extend(true, {}, { comp: { data: column.codes } }, layout);
 									// }
 								} else {
-										layout = $.extend(true, {}, layout);
-									}
+									layout = $.extend(true, {}, layout);
+								}
 								// pre-defined, use with data together
 								data = React.createElement($pt.Components.NFormCell, { model: inlineModel,
 									layout: $pt.createCellLayout(column.data, layout),
@@ -15666,8 +15670,8 @@
 				} else if (typeof column.sort === 'boolean') {
 					// do nothing, use default sorter
 				} else {
-						throw $pt.createComponentException($pt.ComponentConstants.Err_Unuspported_Column_Sort, "Column sort [" + column.sort + "] is not supported yet.");
-					}
+					throw $pt.createComponentException($pt.ComponentConstants.Err_Unuspported_Column_Sort, "Column sort [" + column.sort + "] is not supported yet.");
+				}
 			}
 			var _this = this;
 			// if no sorter specific in column
@@ -15740,9 +15744,9 @@
 			} else if (evt.type == "remove") {
 				// do nothing
 			} else if (evt.type == "change") {
-					// do nothing
-					// window.console.log('Table[' + this.getDataId() + '] data changed.');
-				}
+				// do nothing
+				// window.console.log('Table[' + this.getDataId() + '] data changed.');
+			}
 
 			if (this.getModel().getValidator() != null) {
 				this.getModel().validate(this.getDataId());
