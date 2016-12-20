@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.5.4 2016-12-19 */
+	/** nest-parrot.V0.5.5 2016-12-20 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -4571,10 +4571,15 @@
 				if (this.getPopoverContainerCSS) {
 					css[this.getPopoverContainerCSS()] = true;
 				}
+				var additionalPopoverContainerCSS = this.getAdditionalCSS('popover');
+				if (additionalPopoverContainerCSS) {
+					css[additionalPopoverContainerCSS] = true;
+				}
 				if (this.isMobilePhone()) {
 					css['mobile-phone'] = true;
 					css['fix-bottom'] = this.isPopoverFixOnBottom();
-					styles = { display: 'block' }; // reset styles
+					// use default display style
+					styles = { display: '' }; // reset styles
 				}
 				var content = this.renderPopoverContent.apply(this, arguments);
 				if (!this.hasPopoverContentWrapper || this.hasPopoverContentWrapper() !== false) {

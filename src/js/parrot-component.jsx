@@ -1769,10 +1769,15 @@
 				if (this.getPopoverContainerCSS) {
 					css[this.getPopoverContainerCSS()] = true;
 				}
+				var additionalPopoverContainerCSS = this.getAdditionalCSS('popover');
+				if (additionalPopoverContainerCSS) {
+					css[additionalPopoverContainerCSS] = true;
+				}
 				if (this.isMobilePhone()) {
 					css['mobile-phone'] = true;
 					css['fix-bottom'] = this.isPopoverFixOnBottom();
-					styles = {display: 'block'};	// reset styles
+					// use default display style
+					styles = {display: ''};	// reset styles
 				}
 				var content = this.renderPopoverContent.apply(this, arguments);
 				if (!this.hasPopoverContentWrapper || this.hasPopoverContentWrapper() !== false) {
