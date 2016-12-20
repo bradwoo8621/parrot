@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.5.5 2016-12-20 */
+	/** nest-parrot.V0.5.6 2016-12-20 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -12320,10 +12320,26 @@
 				win.scrollTop(windowTop - (windowTop - optionTop));
 			}
 		},
-		onOptionClick: function (item) {
+		defaultOptionClick: function (item) {
 			this.setValueToModel(item.id);
 			this.hidePopover();
 			$(this.refs.comp).focus();
+		},
+		onOptionClick: function (item) {
+			var customOptionClick = this.getComponentOption('optionClick');
+			if (customOptionClick) {
+				var ret = customOptionClick.call(this, item);
+				if (ret && ret.done) {
+					// have return value, must be a jquery deferred
+					ret.done(function () {
+						this.defaultOptionClick(item);
+					}.bind(this));
+				} else {
+					this.defaultOptionClick(item);
+				}
+			} else {
+				this.defaultOptionClick(item);
+			}
 		},
 		onOptionMouseEnter: function (evt) {},
 		onOptionMouseLeave: function (evt) {
