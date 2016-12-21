@@ -1,4 +1,4 @@
-/** nest-parrot.V0.5.6 2016-12-20 */
+/** nest-parrot.V0.5.7 2016-12-21 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -4548,7 +4548,7 @@
 					css['mobile-phone'] = true;
 					css['fix-bottom'] = this.isPopoverFixOnBottom();
 					// use default display style
-					styles = { display: '' }; // reset styles
+					styles = { display: 'block' }; // reset styles
 				}
 				var content = this.renderPopoverContent.apply(this, arguments);
 				if (!this.hasPopoverContentWrapper || this.hasPopoverContentWrapper() !== false) {
