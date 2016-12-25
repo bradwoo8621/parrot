@@ -3,8 +3,8 @@ A model based web framework base on Bootstrap and ReactJS.
 
 Parrot is a sub module of NEST.
 
-![](http://bradwoo8621.github.io/parrot/guide/img/nest-transparent.png)  
-![](http://bradwoo8621.github.io/parrot/guide/img/parrot-transparent.png)
+![](http://bradwoo8621.github.io/parrot/guide/img/nest.png)  
+![](http://bradwoo8621.github.io/parrot/guide/img/parrot.png)
 
 ### Status
 [![Build Status](https://travis-ci.org/bradwoo8621/parrot.svg?branch=master)](https://travis-ci.org/bradwoo8621/parrot) [![Codacy Badge](https://api.codacy.com/project/badge/grade/2c3fa38232a947079918f76282330bd6)](https://www.codacy.com/app/bradwoo8621/parrot)
