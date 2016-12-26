@@ -48,7 +48,7 @@
 			this.checkLoadingState();
 		},
 		checkLoadingState: function() {
-			if (this.state.onloading) {
+			if (this.state.onloading && !this.state.alreadySendRequest) {
 				if (this.hasParent()) {
 					// add post change listener into parent model
 					this.getParentModel().addPostChangeListener(this.getParentPropertyId(), this.onParentModelChanged);
@@ -328,22 +328,30 @@
 				var codetable = this.getCodeTable();
 				if (this.hasParent() && this.isOnLoadingWhenHasParent()) {
 					this.setState({
-						onloading: true
+						onloading: true,
+						alreadySendRequest: true
 					}, function() {
 						codetable.loadRemoteCodeSegment(this.getParentPropertyValue()).done(function() {
 							this.showPopover();
 						}.bind(this)).always(function() {
-							this.setState({onloading: false});
+							this.setState({
+								onloading: false,
+								alreadySendRequest: false
+							});
 						}.bind(this));
 					}.bind(this));
 				} else if (this.isOnLoadingWhenNoParent()) {
 					this.setState({
-						onloading: true
+						onloading: true,
+						alreadySendRequest: true
 					}, function() {
 						codetable.initializeRemote().done(function() {
 							this.showPopover();
 						}.bind(this)).always(function() {
-							this.setState({onloading: false});
+							this.setState({
+								onloading: false,
+								alreadySendRequest: false
+							});
 						}.bind(this));
 					}.bind(this));
 				} else {
