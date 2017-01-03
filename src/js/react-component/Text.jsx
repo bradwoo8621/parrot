@@ -20,7 +20,8 @@
 					return (isNaN(value) || (value + '').isBlank()) ? value : ((value + '').movePointRight(2));
 				}
 			},
-			TRIM: false
+			TRIM: false,
+			DELAY: 300
 		},
 		getDefaultProps: function () {
 			return {
@@ -206,16 +207,30 @@
 			}
 			//return hasText1 ? ((v1 + '') === (v2 + '')) : !hasText2;
 		},
+		textChanged: function(newValue) {
+			console.log(newValue);
+			var oldValue = this.getValueFromModel();
+			if (!this.textEquals(newValue, oldValue)) {
+				this.setValueToModel(newValue);
+			}
+		},
 		/**
 		 * on component change
 		 * @param evt
 		 */
 		onComponentChanged: function (evt) {
 			// console.debug('Text component changed[modelValue=' + this.getValueFromModel() + ', compValue=' + evt.target.value + '].');
-			var newValue = evt.target.value;
-			var oldValue = this.getValueFromModel();
-			if (!this.textEquals(newValue, oldValue)) {
-				this.setValueToModel(evt.target.value);
+			if (NText.DELAY === 0) {
+				this.textChanged(evt.target.value);
+			} else {
+				if (this.state.textChangeHandler) {
+					clearTimeout(this.state.textChangeHandler);
+					delete this.state.textChangeHandler;
+				}
+				var newValue = evt.target.value;
+				this.state.textChangeHandler = setTimeout(function() {
+					this.textChanged(newValue);
+				}.bind(this), NText.DELAY);
 			}
 		},
 		onKeyUp: function (evt) {

@@ -1682,8 +1682,19 @@
 				rowModel.addPostRemoveListener(null, this.onRowModelChanged);
 			},
 			onRowModelChanged: function(evt) {
-				// fire a change operation no matter what type of event
-				this.getModel().update(this.getDataId(), evt.model.getCurrentModel(), evt.model.getCurrentModel());
+				var hierarchyPublisher = this.getComponentOption('hierarchyPublisher');
+				if (hierarchyPublisher) {
+					var jsonModel = evt.model.getCurrentModel();
+					var array = this.getModel().get(this.getDataId());
+					var index = array.indexOf(jsonModel);
+					hierarchyPublisher.call(this, this.getModel(), this.getDataId(), evt, index);
+				} else if (hierarchyPublisher === false) {
+					// do not publish to parent
+				} else {
+					// default behavior
+					// fire a change operation no matter what type of event
+					this.getModel().update(this.getDataId(), evt.model.getCurrentModel(), evt.model.getCurrentModel());
+				}
 			},
 			/**
 			 * get row listeners, return empty array if no row listener defined

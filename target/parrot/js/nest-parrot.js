@@ -1,4 +1,4 @@
-/** nest-parrot.V0.5.8 2016-12-26 */
+/** nest-parrot.V0.5.9 2017-01-03 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -4456,8 +4456,19 @@
 				rowModel.addPostRemoveListener(null, this.onRowModelChanged);
 			},
 			onRowModelChanged: function (evt) {
-				// fire a change operation no matter what type of event
-				this.getModel().update(this.getDataId(), evt.model.getCurrentModel(), evt.model.getCurrentModel());
+				var hierarchyPublisher = this.getComponentOption('hierarchyPublisher');
+				if (hierarchyPublisher) {
+					var jsonModel = evt.model.getCurrentModel();
+					var array = this.getModel().get(this.getDataId());
+					var index = array.indexOf(jsonModel);
+					hierarchyPublisher.call(this, this.getModel(), this.getDataId(), evt, index);
+				} else if (hierarchyPublisher === false) {
+					// do not publish to parent
+				} else {
+					// default behavior
+					// fire a change operation no matter what type of event
+					this.getModel().update(this.getDataId(), evt.model.getCurrentModel(), evt.model.getCurrentModel());
+				}
 			},
 			/**
     * get row listeners, return empty array if no row listener defined
@@ -15910,7 +15921,8 @@
 					return isNaN(value) || (value + '').isBlank() ? value : (value + '').movePointRight(2);
 				}
 			},
-			TRIM: false
+			TRIM: false,
+			DELAY: 300
 		},
 		getDefaultProps: function () {
 			return {
@@ -16102,16 +16114,30 @@
 			}
 			//return hasText1 ? ((v1 + '') === (v2 + '')) : !hasText2;
 		},
+		textChanged: function (newValue) {
+			console.log(newValue);
+			var oldValue = this.getValueFromModel();
+			if (!this.textEquals(newValue, oldValue)) {
+				this.setValueToModel(newValue);
+			}
+		},
 		/**
    * on component change
    * @param evt
    */
 		onComponentChanged: function (evt) {
 			// console.debug('Text component changed[modelValue=' + this.getValueFromModel() + ', compValue=' + evt.target.value + '].');
-			var newValue = evt.target.value;
-			var oldValue = this.getValueFromModel();
-			if (!this.textEquals(newValue, oldValue)) {
-				this.setValueToModel(evt.target.value);
+			if (NText.DELAY === 0) {
+				this.textChanged(evt.target.value);
+			} else {
+				if (this.state.textChangeHandler) {
+					clearTimeout(this.state.textChangeHandler);
+					delete this.state.textChangeHandler;
+				}
+				var newValue = evt.target.value;
+				this.state.textChangeHandler = setTimeout(function () {
+					this.textChanged(newValue);
+				}.bind(this), NText.DELAY);
 			}
 		},
 		onKeyUp: function (evt) {

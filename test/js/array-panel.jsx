@@ -35,7 +35,8 @@
         comp: {
             itemTitle: 'Panel Title',
             style: 'primary',
-            collapsible: false
+            collapsible: false,
+            hierarchyPublisher: function() {console.log(arguments)}
         }
     }));
     var monitorTitle = $pt.createCellLayout('panel', $.extend(true, {}, panelTemplate, {
