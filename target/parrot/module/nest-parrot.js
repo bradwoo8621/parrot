@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.5.9 2017-01-03 */
+	/** nest-parrot.V0.5.10 2017-03-03 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -10406,6 +10406,9 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NPagination = React.createClass({
 		displayName: 'NPagination',
+		statics: {
+			PAGE_TEXT: 'Page: '
+		},
 		/**
    * override react method
    * @returns {*}
@@ -10477,12 +10480,12 @@
    */
 		renderFirst: function (buttonsRange) {
 			return React.createElement(
-				"li",
+				'li',
 				null,
 				React.createElement(
-					"a",
-					{ href: "javascript:void(0);", "aria-label": "First", onClick: this.toFirst },
-					React.createElement("span", { className: "fa fa-fw fa-fast-backward" })
+					'a',
+					{ href: 'javascript:void(0);', 'aria-label': 'First', onClick: this.toFirst },
+					React.createElement('span', { className: 'fa fa-fw fa-fast-backward' })
 				)
 			);
 		},
@@ -10493,12 +10496,12 @@
    */
 		renderPreviousSection: function (buttonsRange) {
 			return React.createElement(
-				"li",
+				'li',
 				null,
 				React.createElement(
-					"a",
-					{ href: "javascript:void(0);", "aria-label": "PreviousSection", onClick: this.toPreviousSection },
-					React.createElement("span", { className: "fa fa-fw fa-backward" })
+					'a',
+					{ href: 'javascript:void(0);', 'aria-label': 'PreviousSection', onClick: this.toPreviousSection },
+					React.createElement('span', { className: 'fa fa-fw fa-backward' })
 				)
 			);
 		},
@@ -10509,12 +10512,12 @@
    */
 		renderPrevious: function (buttonsRange) {
 			return React.createElement(
-				"li",
+				'li',
 				null,
 				React.createElement(
-					"a",
-					{ href: "javascript:void(0);", "aria-label": "Previous", onClick: this.toPrevious },
-					React.createElement("span", { className: "fa fa-fw fa-chevron-left" })
+					'a',
+					{ href: 'javascript:void(0);', 'aria-label': 'Previous', onClick: this.toPrevious },
+					React.createElement('span', { className: 'fa fa-fw fa-chevron-left' })
 				)
 			);
 		},
@@ -10534,13 +10537,13 @@
 					active: index == _this.getCurrentPageIndex()
 				};
 				return React.createElement(
-					"li",
+					'li',
 					{ key: index },
 					React.createElement(
-						"a",
-						{ href: "javascript:void(0);",
+						'a',
+						{ href: 'javascript:void(0);',
 							onClick: _this.toPage,
-							"data-index": index,
+							'data-index': index,
 							className: $pt.LayoutHelper.classSet(css) },
 						index
 					)
@@ -10554,12 +10557,12 @@
    */
 		renderNext: function (buttonsRange) {
 			return React.createElement(
-				"li",
+				'li',
 				null,
 				React.createElement(
-					"a",
-					{ href: "javascript:void(0);", "aria-label": "Next", onClick: this.toNext },
-					React.createElement("span", { className: "fa fa-fw fa-chevron-right" })
+					'a',
+					{ href: 'javascript:void(0);', 'aria-label': 'Next', onClick: this.toNext },
+					React.createElement('span', { className: 'fa fa-fw fa-chevron-right' })
 				)
 			);
 		},
@@ -10570,12 +10573,12 @@
    */
 		renderNextSection: function (buttonsRange) {
 			return React.createElement(
-				"li",
+				'li',
 				null,
 				React.createElement(
-					"a",
-					{ href: "javascript:void(0);", "aria-label": "NextSection", onClick: this.toNextSection },
-					React.createElement("span", { className: "fa fa-fw fa-forward" })
+					'a',
+					{ href: 'javascript:void(0);', 'aria-label': 'NextSection', onClick: this.toNextSection },
+					React.createElement('span', { className: 'fa fa-fw fa-forward' })
 				)
 			);
 		},
@@ -10586,12 +10589,12 @@
    */
 		renderLast: function (buttonsRange) {
 			return React.createElement(
-				"li",
+				'li',
 				null,
 				React.createElement(
-					"a",
-					{ href: "javascript:void(0);", "aria-label": "Last", onClick: this.toLast },
-					React.createElement("span", { className: "fa fa-fw fa-fast-forward" })
+					'a',
+					{ href: 'javascript:void(0);', 'aria-label': 'Last', onClick: this.toLast },
+					React.createElement('span', { className: 'fa fa-fw fa-fast-forward' })
 				)
 			);
 		},
@@ -10602,14 +10605,14 @@
 		renderStatus: function () {
 			if (this.props.showStatus) {
 				return React.createElement(
-					"div",
-					{ className: "n-pagination-status col-sm-2 col-md-2 col-lg-2" },
+					'div',
+					{ className: 'n-pagination-status col-sm-2 col-md-2 col-lg-2' },
 					React.createElement(
-						"div",
+						'div',
 						null,
-						"Page: ",
+						NPagination.PAGE_TEXT,
 						this.getCurrentPageIndex(),
-						" / ",
+						' / ',
 						this.getPageCount()
 					)
 				);
@@ -10637,15 +10640,15 @@
 				'col-sm-12 col-md-12 col-lg-12': !this.props.showStatus
 			};
 			return React.createElement(
-				"div",
+				'div',
 				{ className: $pt.LayoutHelper.classSet(css) },
 				this.renderStatus(),
 				React.createElement(
-					"div",
+					'div',
 					{ className: $pt.LayoutHelper.classSet(buttonCSS) },
 					React.createElement(
-						"ul",
-						{ className: "pagination" },
+						'ul',
+						{ className: 'pagination' },
 						this.renderFirst(buttonsRange),
 						this.renderPreviousSection(buttonsRange),
 						this.renderPrevious(buttonsRange),

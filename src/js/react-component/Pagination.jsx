@@ -1,6 +1,9 @@
 (function (window, $, React, ReactDOM, $pt) {
 	var NPagination = React.createClass({
 		displayName: 'NPagination',
+		statics: {
+			PAGE_TEXT: 'Page: '
+		},
 		/**
 		 * override react method
 		 * @returns {*}
@@ -168,7 +171,7 @@
 			if (this.props.showStatus) {
 				return (<div className="n-pagination-status col-sm-2 col-md-2 col-lg-2">
 					<div>
-						Page: {this.getCurrentPageIndex()} / {this.getPageCount()}
+						{NPagination.PAGE_TEXT}{this.getCurrentPageIndex()} / {this.getPageCount()}
 					</div>
 				</div>);
 			} else {
