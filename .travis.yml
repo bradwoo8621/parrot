@@ -15,7 +15,6 @@ install:
   # - npm install grunt-react
   # - npm install grunt-replace
 
-  - npm install jsdom
   - npm install jquery
   - npm install jsface
   - npm install moment
