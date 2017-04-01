@@ -131,10 +131,10 @@
 				'n-view-mode': this.isViewMode()
 			};
 			css[this.getComponentCSS('n-select')] = true;
-			return (<div className={$pt.LayoutHelper.classSet(css)} 
+			return (<div className={$pt.LayoutHelper.classSet(css)}
 						 tabIndex={this.isEnabled() ? '0' : null}
 						 onKeyUp={this.onComponentKeyUp}
-						 aria-readonly='true' 
+						 aria-readonly='true'
 						 readOnly='true'
 						 ref='comp'>
 				{this.renderText()}
@@ -153,7 +153,7 @@
 			}
 			var _this = this;
 			var value = this.getValueFromModel();
-			return (<ul className='options' 
+			return (<ul className='options'
 						onTouchStart={this.isMobilePhone() ? this.onOptionTouchStart : null}
 						onTouchMove={this.isMobilePhone() ? this.onOptionTouchMove : null}
 						onTouchEnd={this.isMobilePhone() ? this.onOptionTouchEnd : null}>
@@ -361,7 +361,7 @@
 		},
 		onComponentKeyUp: function(evt) {
 			if (evt.keyCode === 40) {
-				// down arrow 
+				// down arrow
 				this.onComponentDownArrowKeyUp(evt);
 			} else if (evt.keyCode === 38) {
 				// up arrow
@@ -381,7 +381,7 @@
 			}
 			if (!this.state.popoverDiv || !this.state.popoverDiv.is(':visible')) {
 				return;
-			} 
+			}
 			var option = this.state.popoverDiv.find('ul.options > li.active');
 			if (option.length > 0) {
 				this.setValueToModel(option.attr('data-id'));
@@ -487,7 +487,7 @@
 			windowTop = win.scrollTop();
 			if (optionTop < windowTop) {
 				// can not see option in window, even it is seen in its parent
-				// option is above the window top, 
+				// option is above the window top,
 				// which means parent top is less than window top, since option already been seen in parent
 				win.scrollTop(windowTop - (windowTop - optionTop));
 			}
@@ -497,7 +497,9 @@
 			this.hidePopover();
 			$(this.refs.comp).focus();
 		},
-		onOptionClick: function(item) {
+		onOptionClick: function(item, evt) {
+			evt.stopPropagation();
+			evt.preventDefault();
 			var customOptionClick = this.getComponentOption('optionClick');
 			if (customOptionClick) {
 				var ret = customOptionClick.call(this, item);
@@ -523,7 +525,7 @@
 			// when handled the arrow up/down event, highlight the option
 			// in chrome, the mouse event will be triggered after call #scrollIntoView
 			// so use state onKeyEventProcessed to flag this operation
-			// if the flag is true, ignore the mouse event, 
+			// if the flag is true, ignore the mouse event,
 			// and reset the flag, let the following mouse event processed
 			// cannot use mouse enter event, since there is no second enter event triggered
 			// must use mouse move event to handle, seems no performance issue here.
@@ -629,12 +631,12 @@
 				var targetOffsetY = this.calcOptionContainerOffsetY(target, startOffsetY + (speed * 100 / 2));
 				target.one('webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend', function() {
 					target.css({
-						'transition-timing-function': '', 
+						'transition-timing-function': '',
 						'transition-duration': ''
 					});
 				});
 				target.css({
-					'transition-timing-function': 'cubic-bezier(0.1, 0.57, 0.1, 1)', 
+					'transition-timing-function': 'cubic-bezier(0.1, 0.57, 0.1, 1)',
 					'transition-duration': '500ms',
 					'transform': 'translateY(' + targetOffsetY + 'px)'
 				});
