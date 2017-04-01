@@ -24,7 +24,6 @@
     "node": ">= 0.8.0"
   },
   "scripts": {
-    "test": "grunt test"
   },
   "dependencies": {
     "bootstrap": "^3.3.6",
