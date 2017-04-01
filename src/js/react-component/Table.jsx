@@ -938,8 +938,8 @@
 							width: column.width,
 						};
 						if (column.styles) {
-							Object.keys(columns.styles).forEach(function(key) {
-								style[key] = columns.styles[key];
+							Object.keys(column.styles).forEach(function(key) {
+								style[key] = column.styles[key];
 							});
 						}
 						if (!(column.visible === undefined || column.visible === true)) {

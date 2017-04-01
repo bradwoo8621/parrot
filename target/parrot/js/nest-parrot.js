@@ -1,4 +1,4 @@
-/** nest-parrot.V0.5.11 2017-04-01 */
+/** nest-parrot.V0.5.12 2017-04-01 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -12180,7 +12180,7 @@
 		},
 		onComponentKeyUp: function (evt) {
 			if (evt.keyCode === 40) {
-				// down arrow 
+				// down arrow
 				this.onComponentDownArrowKeyUp(evt);
 			} else if (evt.keyCode === 38) {
 				// up arrow
@@ -12306,7 +12306,7 @@
 			windowTop = win.scrollTop();
 			if (optionTop < windowTop) {
 				// can not see option in window, even it is seen in its parent
-				// option is above the window top, 
+				// option is above the window top,
 				// which means parent top is less than window top, since option already been seen in parent
 				win.scrollTop(windowTop - (windowTop - optionTop));
 			}
@@ -12316,7 +12316,9 @@
 			this.hidePopover();
 			$(this.refs.comp).focus();
 		},
-		onOptionClick: function (item) {
+		onOptionClick: function (item, evt) {
+			evt.stopPropagation();
+			evt.preventDefault();
 			var customOptionClick = this.getComponentOption('optionClick');
 			if (customOptionClick) {
 				var ret = customOptionClick.call(this, item);
@@ -12341,7 +12343,7 @@
 			// when handled the arrow up/down event, highlight the option
 			// in chrome, the mouse event will be triggered after call #scrollIntoView
 			// so use state onKeyEventProcessed to flag this operation
-			// if the flag is true, ignore the mouse event, 
+			// if the flag is true, ignore the mouse event,
 			// and reset the flag, let the following mouse event processed
 			// cannot use mouse enter event, since there is no second enter event triggered
 			// must use mouse move event to handle, seems no performance issue here.
@@ -14565,8 +14567,8 @@
 							width: column.width
 						};
 						if (column.styles) {
-							Object.keys(columns.styles).forEach(function (key) {
-								style[key] = columns.styles[key];
+							Object.keys(column.styles).forEach(function (key) {
+								style[key] = column.styles[key];
 							});
 						}
 						if (!(column.visible === undefined || column.visible === true)) {
