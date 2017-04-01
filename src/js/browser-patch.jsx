@@ -1,4 +1,4 @@
-(function (window) {
+(function (window) { 
 	var patches = {
 		console: function () {
 			var noop = function () {
