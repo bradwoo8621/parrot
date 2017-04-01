@@ -935,8 +935,13 @@
 						// column is fixed.
 						columnIndex++;
 						var style = {
-							width: column.width
+							width: column.width,
 						};
+						if (column.styles) {
+							Object.keys(columns.styles).forEach(function(key) {
+								style[key] = columns.styles[key];
+							});
+						}
 						if (!(column.visible === undefined || column.visible === true)) {
 							style.display = "none";
 						}
