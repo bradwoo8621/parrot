@@ -623,7 +623,7 @@
 			// calculate the speed
 			var timeUsed = moment().diff(this.state.touchStartTime, 'ms');
 			// alert(timeUsed);
-			if (timeUsed <= 300) {
+			if (timeUsed <= 300 && this.state.touchLastClientY != null) {
 				var distance = this.state.touchLastClientY - this.state.touchStartClientY;
 				var speed = distance / timeUsed * 10;	// pixels per 10 ms
 				var target = this.getOptionTouchEventContainer(evt);
@@ -645,6 +645,7 @@
 			delete this.state.touchStartClientY;
 			delete this.state.touchStartRelatedY;
 			delete this.state.touchStartTime;
+			delete this.state.touchLastClientY;
 		},
 		/**
 		 * on parent model change

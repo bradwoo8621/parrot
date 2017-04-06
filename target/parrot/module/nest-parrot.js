@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.5.12 2017-04-01 */
+	/** nest-parrot.V0.5.13 2017-04-06 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -12472,7 +12472,7 @@
 			// calculate the speed
 			var timeUsed = moment().diff(this.state.touchStartTime, 'ms');
 			// alert(timeUsed);
-			if (timeUsed <= 300) {
+			if (timeUsed <= 300 && this.state.touchLastClientY != null) {
 				var distance = this.state.touchLastClientY - this.state.touchStartClientY;
 				var speed = distance / timeUsed * 10; // pixels per 10 ms
 				var target = this.getOptionTouchEventContainer(evt);
@@ -12494,6 +12494,7 @@
 			delete this.state.touchStartClientY;
 			delete this.state.touchStartRelatedY;
 			delete this.state.touchStartTime;
+			delete this.state.touchLastClientY;
 		},
 		/**
    * on parent model change
@@ -13053,7 +13054,7 @@
 			// calculate the speed
 			var timeUsed = moment().diff(this.state.touchStartTime, 'ms');
 			// alert(timeUsed);
-			if (timeUsed <= 300) {
+			if (timeUsed <= 300 && this.state.touchLastClientY != null) {
 				var distance = this.state.touchLastClientY - this.state.touchStartClientY;
 				var speed = distance / timeUsed * 10; // pixels per 10 ms
 				var target = this.getNodeTouchEventContainer(evt);
@@ -13075,6 +13076,7 @@
 			delete this.state.touchStartClientY;
 			delete this.state.touchStartRelatedY;
 			delete this.state.touchStartTime;
+			delete this.state.touchLastClientY;
 		},
 		getComponent: function () {
 			return $(ReactDOM.findDOMNode(this.refs.comp));

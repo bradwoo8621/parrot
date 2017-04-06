@@ -203,8 +203,8 @@
 				'n-view-mode': this.isViewMode()
 			};
 			css[this.getComponentCSS('n-select-tree')] = true;
-			return (<div className={$pt.LayoutHelper.classSet(css)} 
-						 aria-readonly='true' 
+			return (<div className={$pt.LayoutHelper.classSet(css)}
+						 aria-readonly='true'
 						 readOnly='true'
 						 tabIndex={this.isEnabled() ? '0' : null}>
 				{this.renderText()}
@@ -423,7 +423,7 @@
 			// calculate the speed
 			var timeUsed = moment().diff(this.state.touchStartTime, 'ms');
 			// alert(timeUsed);
-			if (timeUsed <= 300) {
+			if (timeUsed <= 300 && this.state.touchLastClientY != null) {
 				var distance = this.state.touchLastClientY - this.state.touchStartClientY;
 				var speed = distance / timeUsed * 10;	// pixels per 10 ms
 				var target = this.getNodeTouchEventContainer(evt);
@@ -431,12 +431,12 @@
 				var targetOffsetY = this.calcNodeContainerOffsetY(target, startOffsetY + (speed * 100 / 2));
 				target.one('webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend', function() {
 					target.css({
-						'transition-timing-function': '', 
+						'transition-timing-function': '',
 						'transition-duration': ''
 					});
 				});
 				target.css({
-					'transition-timing-function': 'cubic-bezier(0.1, 0.57, 0.1, 1)', 
+					'transition-timing-function': 'cubic-bezier(0.1, 0.57, 0.1, 1)',
 					'transition-duration': '500ms',
 					'transform': 'translateY(' + targetOffsetY + 'px)'
 				});
@@ -445,6 +445,7 @@
 			delete this.state.touchStartClientY;
 			delete this.state.touchStartRelatedY;
 			delete this.state.touchStartTime;
+			delete this.state.touchLastClientY;
 		},
 		getComponent: function() {
 			return $(ReactDOM.findDOMNode(this.refs.comp));
