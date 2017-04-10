@@ -157,7 +157,7 @@
 
 			var active = this.isActive(nodeId) ? 'active' : null;
 			return (
-				<li className={active} key={nodeId} data-nodeId={nodeId}>
+				<li className={active} key={nodeId} data-node-id={nodeId}>
 					<div className='node-content'>
 						{opIcon}
 						{folderIcon}
