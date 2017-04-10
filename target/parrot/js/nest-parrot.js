@@ -1,4 +1,4 @@
-/** nest-parrot.V0.5.13 2017-04-07 */
+/** nest-parrot.V0.5.15 2017-04-10 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -16657,7 +16657,7 @@
 			var active = this.isActive(nodeId) ? 'active' : null;
 			return React.createElement(
 				'li',
-				{ className: active, key: nodeId },
+				{ className: active, key: nodeId, 'data-nodeId': nodeId },
 				React.createElement(
 					'div',
 					{ className: 'node-content' },
