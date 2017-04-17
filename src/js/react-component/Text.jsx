@@ -74,7 +74,16 @@
 			var css = {
 				'form-control': true
 			};
-			return (<input type={this.getComponentOption('pwd', false) ? 'password' : 'text'}
+			var textType = 'text';
+			var isPassword = this.getComponentOption('pwd', false);
+			if (isPassword) {
+				textType = 'password';
+			}
+			var specialType = this.getComponentOption('textType');
+			if (specialType) {
+				textType = specialType;
+			}
+			return (<input type={textType}
 			               className={$pt.LayoutHelper.classSet(css)}
 			               disabled={!this.isEnabled()}
 			               placeholder={this.getComponentOption('placeholder')}

@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.5.16 2017-04-10 */
+	/** nest-parrot.V0.5.17 2017-04-17 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -16018,7 +16018,16 @@
 			var css = {
 				'form-control': true
 			};
-			return React.createElement('input', { type: this.getComponentOption('pwd', false) ? 'password' : 'text',
+			var textType = 'text';
+			var isPassword = this.getComponentOption('pwd', false);
+			if (isPassword) {
+				textType = 'password';
+			}
+			var specialType = this.getComponentOption('textType');
+			if (specialType) {
+				textType = specialType;
+			}
+			return React.createElement('input', { type: textType,
 				className: $pt.LayoutHelper.classSet(css),
 				disabled: !this.isEnabled(),
 				placeholder: this.getComponentOption('placeholder'),
