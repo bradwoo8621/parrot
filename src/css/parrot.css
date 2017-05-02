@@ -703,6 +703,10 @@ div.n-datetime.popover.top > div.popover-content .calendar-body .day-view-body-b
 div.n-datetime.popover.bottom > div.popover-content .calendar-body .day-view-body-body div.gap-day {
   color: #b3b3b3;
 }
+div.n-datetime.popover.top > div.popover-content .calendar-body .day-view-body-body div.disable-day,
+div.n-datetime.popover.bottom > div.popover-content .calendar-body .day-view-body-body div.disable-day {
+  color: #b3b3b3;
+}
 div.n-datetime.popover.top > div.popover-content .calendar-body .month-view-body-body,
 div.n-datetime.popover.bottom > div.popover-content .calendar-body .month-view-body-body {
   position: relative;

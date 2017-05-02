@@ -7,11 +7,13 @@
     });
     $pt.ComponentConstants.Default_Date_Format = 'YYYY-MM-DDTHH:mm:ss';
     NDateTime.VALUE_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
+    NDateTime.FIXED_WEEKDS = true;
     window.model = model;
     var defaultFormat = $pt.createCellLayout('name', {
         label: 'Plain Text',
         comp: {
-            type: $pt.ComponentConstants.Date
+            type: $pt.ComponentConstants.Date,
+            min: '2017-05-06'
         },
         pos: {row: 1, col: 1}
     });

@@ -39,7 +39,8 @@
 			TODAY_TEXT: 'Now',
 			CLEAR_TEXT: 'Clear',
 			DATE_SWITCH_TEXT: 'Date',
-			TIME_SWITCH_TEXT: 'Time'
+			TIME_SWITCH_TEXT: 'Time',
+			FIXED_WEEKDS: false
 		},
 		getDefaultProps: function() {
 			return {
@@ -83,7 +84,7 @@
 				link: true,
 				disabled: !this.isEnabled()
 			};
-			return (<div className='input-group' 
+			return (<div className='input-group'
 						 onClick={this.onCalendarButtonClicked}
 						 ref='comp'>
 				<input type='text'
@@ -203,6 +204,18 @@
 				viewDay.add(index, 'd');
 				viewDays.push(viewDay);
 			}
+			if (NDateTime.FIXED_WEEKDS) {
+				lastDay = viewDays[viewDays.length - 1];
+				var dayCount = viewDays.length;
+				if (dayCount < 42) {
+					for (index = 1 ; index <= 42 - dayCount; index++) {
+						viewDay = lastDay.clone();
+						viewDay.add(index, 'd');
+						viewDays.push(viewDay);
+					}
+				}
+			}
+
 			return viewDays;
 		},
 		renderDayBody: function(date) {
@@ -212,6 +225,10 @@
 			var currentMonth = date.month();
 			var value = this.getValueFromModel();
 			var today = this.getToday();
+
+			var min = this.getMinDate();
+			var max = this.getMaxDate();
+
 			return (<div className='calendar-body day-view'>
 				<div className='day-view-body-header row'>
 					{header.map(function(weekday, weekdayIndex) {
@@ -223,11 +240,16 @@
 						var css = {
 							'cell-7-1': true,
 							'gap-day': (day.month() != currentMonth),
+							'disable-day': (day.isBefore(min) || day.isAfter(max)),
 							today: day.isSame(today, 'day'),
 							'current-value': value != null && day.isSame(value, 'day')
 						};
+						var click = _this.onDaySelected.bind(_this, day);
+						if (css['disable-day'] === true) {
+							click = null;
+						}
 						return (<div className={$pt.LayoutHelper.classSet(css)}
-									 onClick={_this.onDaySelected.bind(_this, day)}
+									 onClick={click}
 									 key={'day-' + dayIndex}>
 							<span>{day.date()}</span>
 						</div>);
@@ -363,15 +385,15 @@
 			if (this.hasDateToDisplay() && this.hasTimeToDisplay()) {
 				viewSwitch = [];
 				// is date view, show time switch
-				viewSwitch.push(<a href='javascript:void(0);' 
-								   onClick={this.switchToTimeViewOnMobile} 
+				viewSwitch.push(<a href='javascript:void(0);'
+								   onClick={this.switchToTimeViewOnMobile}
 								   className={'time-switch' + (this.state.dateViewWhenMobilePhone ? '' : ' hidden')}
 								   key='date'>
 					<span>{NDateTime.TIME_SWITCH_TEXT}</span>
 				</a>);
 				// not date view, show date switch
-				viewSwitch.push(<a href='javascript:void(0);' 
-								   onClick={this.switchToDateViewOnMobile} 
+				viewSwitch.push(<a href='javascript:void(0);'
+								   onClick={this.switchToDateViewOnMobile}
 								   className={'date-switch' + (this.state.dateViewWhenMobilePhone ? ' hidden' : '')}
 								   key='time'>
 					<span>{NDateTime.DATE_SWITCH_TEXT}</span>
@@ -1115,6 +1137,20 @@
 		getBodyYearFormat: function() {
 			return this.getComponentOption('bodyYearFormat');
 		},
+		getMinDate: function() {
+			var min = this.getComponentOption('min');
+			if (min == null) {
+				min = moment('0001-01-01');
+			}
+			return min;
+		},
+		getMaxDate: function() {
+			var max = this.getComponentOption('max');
+			if (max == null) {
+				max = moment('9999-12-31');
+			}
+			return max;
+		},
 		/**
 		 * get value format
 		 * @returns {string}
@@ -1179,7 +1215,7 @@
 				} else {
 					today = defaultTime;
 				}
-			} 
+			}
 			return today;
 		},
 		getInitialPopoverType: function() {

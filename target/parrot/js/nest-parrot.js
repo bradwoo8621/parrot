@@ -1,4 +1,4 @@
-/** nest-parrot.V0.5.17 2017-04-17 */
+/** nest-parrot.V0.5.18 2017-05-02 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -5922,7 +5922,8 @@
 			TODAY_TEXT: 'Now',
 			CLEAR_TEXT: 'Clear',
 			DATE_SWITCH_TEXT: 'Date',
-			TIME_SWITCH_TEXT: 'Time'
+			TIME_SWITCH_TEXT: 'Time',
+			FIXED_WEEKDS: false
 		},
 		getDefaultProps: function () {
 			return {
@@ -6098,6 +6099,18 @@
 				viewDay.add(index, 'd');
 				viewDays.push(viewDay);
 			}
+			if (NDateTime.FIXED_WEEKDS) {
+				lastDay = viewDays[viewDays.length - 1];
+				var dayCount = viewDays.length;
+				if (dayCount < 42) {
+					for (index = 1; index <= 42 - dayCount; index++) {
+						viewDay = lastDay.clone();
+						viewDay.add(index, 'd');
+						viewDays.push(viewDay);
+					}
+				}
+			}
+
 			return viewDays;
 		},
 		renderDayBody: function (date) {
@@ -6107,6 +6120,10 @@
 			var currentMonth = date.month();
 			var value = this.getValueFromModel();
 			var today = this.getToday();
+
+			var min = this.getMinDate();
+			var max = this.getMaxDate();
+
 			return React.createElement(
 				'div',
 				{ className: 'calendar-body day-view' },
@@ -6128,13 +6145,18 @@
 						var css = {
 							'cell-7-1': true,
 							'gap-day': day.month() != currentMonth,
+							'disable-day': day.isBefore(min) || day.isAfter(max),
 							today: day.isSame(today, 'day'),
 							'current-value': value != null && day.isSame(value, 'day')
 						};
+						var click = _this.onDaySelected.bind(_this, day);
+						if (css['disable-day'] === true) {
+							click = null;
+						}
 						return React.createElement(
 							'div',
 							{ className: $pt.LayoutHelper.classSet(css),
-								onClick: _this.onDaySelected.bind(_this, day),
+								onClick: click,
 								key: 'day-' + dayIndex },
 							React.createElement(
 								'span',
@@ -7131,6 +7153,20 @@
 		},
 		getBodyYearFormat: function () {
 			return this.getComponentOption('bodyYearFormat');
+		},
+		getMinDate: function () {
+			var min = this.getComponentOption('min');
+			if (min == null) {
+				min = moment('0001-01-01');
+			}
+			return min;
+		},
+		getMaxDate: function () {
+			var max = this.getComponentOption('max');
+			if (max == null) {
+				max = moment('9999-12-31');
+			}
+			return max;
 		},
 		/**
    * get value format
