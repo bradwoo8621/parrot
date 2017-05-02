@@ -1141,6 +1141,8 @@
 			var min = this.getComponentOption('min');
 			if (min == null) {
 				min = moment('0001-01-01');
+			} else if (typeof min === 'function') {
+				min = min.call(this);
 			}
 			return min;
 		},
@@ -1148,6 +1150,8 @@
 			var max = this.getComponentOption('max');
 			if (max == null) {
 				max = moment('9999-12-31');
+			} else if (typeof max === 'function') {
+				max = max.call(this);
 			}
 			return max;
 		},
