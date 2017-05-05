@@ -1,6 +1,6 @@
 {
   "name": "nest-parrot",
-  "version": "0.5.20",
+  "version": "0.5.21",
   "description": "Parrot built on react",
   "main": "target/parrot/module/nest-parrot.js",
   "repository": {

@@ -1,4 +1,4 @@
-/** nest-parrot.V0.5.20 2017-05-02 */
+/** nest-parrot.V0.5.21 2017-05-05 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -12134,7 +12134,7 @@
 				} else if (filterText.val() != null) {
 					filterText.caret(filterText.val().length);
 				}
-				if (!this.isMobilePhone()) {
+				if (!this.isMobile()) {
 					filterText.focus();
 				} else {
 					// filterText.blur();

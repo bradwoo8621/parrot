@@ -275,7 +275,7 @@
 				} else if (filterText.val() != null) {
 					filterText.caret(filterText.val().length)
 				}
-				if (!this.isMobilePhone()) {
+				if (!this.isMobile()) {
 					filterText.focus();
 				} else {
 					// filterText.blur();
