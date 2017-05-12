@@ -1,4 +1,4 @@
-/** nest-parrot.V0.5.21 2017-05-05 */
+/** nest-parrot.V0.5.23 2017-05-12 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -4525,7 +4525,7 @@
 				if (this.state.popoverDiv == null) {
 					this.state.popoverDiv = $('<div>');
 					this.state.popoverDiv.appendTo($('body'));
-					if (!this.isMobilePhone()) {
+					if (!this.isMobile()) {
 						$(document).on('mousedown', this.onDocumentMouseDownWhenPopoverShown).on('keyup', this.onDocumentKeyUpWhenPopoverShown).on('keydown', this.onDocumentKeyDownWhenPopoverShown).on('mousewheel', this.onDocumentMouseWheelWhenPopoverShown);
 						$(window).on('resize', this.onWindowResizeWhenPopoverShown);
 					} else {
@@ -12131,7 +12131,7 @@
 			if (!filterText.is(':focus')) {
 				if (this.state.filteTextCaret != null) {
 					filterText.caret(this.state.filteTextCaret);
-				} else if (filterText.val() != null) {
+				} else if (filterText.val().length > 0) {
 					filterText.caret(filterText.val().length);
 				}
 				if (!this.isMobile()) {
