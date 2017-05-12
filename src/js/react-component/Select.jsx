@@ -272,8 +272,8 @@
 			if (!filterText.is(':focus')) {
 				if (this.state.filteTextCaret != null) {
 					filterText.caret(this.state.filteTextCaret);
-				} else if (filterText.val() != null) {
-					filterText.caret(filterText.val().length)
+				} else if (filterText.val().length > 0) {
+					filterText.caret(filterText.val().length);
 				}
 				if (!this.isMobile()) {
 					filterText.focus();

@@ -1751,7 +1751,7 @@
 				if (this.state.popoverDiv == null) {
 					this.state.popoverDiv = $('<div>');
 					this.state.popoverDiv.appendTo($('body'));
-					if (!this.isMobilePhone()) {
+					if (!this.isMobile()) {
 						$(document).on('mousedown', this.onDocumentMouseDownWhenPopoverShown)
 							.on('keyup', this.onDocumentKeyUpWhenPopoverShown)
 							.on('keydown', this.onDocumentKeyDownWhenPopoverShown)
