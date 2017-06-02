@@ -269,7 +269,7 @@
 				}
 			}
 			var filterText = this.state.popoverDiv.find('div.n-text input[type=text]');
-			if (!filterText.is(':focus')) {
+			if (filterText.length > 0 && !filterText.is(':focus')) {
 				if (this.state.filteTextCaret != null) {
 					filterText.caret(this.state.filteTextCaret);
 				} else if (filterText.val().length > 0) {

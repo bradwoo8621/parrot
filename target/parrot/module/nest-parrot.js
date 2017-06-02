@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.5.23 2017-05-12 */
+	/** nest-parrot.V0.5.25 2017-06-02 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -12159,7 +12159,7 @@
 				}
 			}
 			var filterText = this.state.popoverDiv.find('div.n-text input[type=text]');
-			if (!filterText.is(':focus')) {
+			if (filterText.length > 0 && !filterText.is(':focus')) {
 				if (this.state.filteTextCaret != null) {
 					filterText.caret(this.state.filteTextCaret);
 				} else if (filterText.val().length > 0) {
