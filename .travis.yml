@@ -1,48 +1,28 @@
 language: node_js
 node_js:
-  - 4.1
+- 4.1
 install:
-  - npm install -g grunt-cli
-  - npm install grunt
-  # - npm install grunt-contrib-copy
-  - npm install grunt-contrib-nodeunit
-  # - npm install grunt-contrib-clean
-  # - npm install grunt-contrib-uglify
-  # - npm install grunt-contrib-jshint
-  # - npm install grunt-contrib-concat
-  # - npm install grunt-contrib-cssmin
-  # - npm install grunt-contrib-less
-  # - npm install grunt-react
-  # - npm install grunt-replace
-
-  - npm install jquery
-  - npm install jsface
-  - npm install moment
-  - npm install jquery-deparam
-  - npm install jquery-mousewheel
-  - npm install react
-  - npm install react-dom
-  - npm install bootstrap-fileinput-npm
-  - npm install bootstrap
-
-#after_success:
-#  - git config --global user.email "bradwoo8621@gmail.com"
-#  - git config --global user.name "bradwoo8621"
-#  - npm version patch
-
-#notifications:
-#  slack: nest-parrot:z3jqw9krJbPu0CcQBKS90AnZ
-
+- npm install -g grunt-cli
+- npm install grunt
+- npm install grunt-contrib-nodeunit
+- npm install jquery
+- npm install jsface
+- npm install moment
+- npm install jquery-deparam
+- npm install jquery-mousewheel
+- npm install react
+- npm install react-dom
+- npm install bootstrap-fileinput-npm
+- npm install bootstrap
 notifications:
   slack:
     rooms:
-      - nest-parrot:z3jqw9krJbPu0CcQBKS90AnZ#travis-ci
-#      - nest-parrot:z3jqw9krJbPu0CcQBKS90AnZ#random
-
+    - nest-parrot:z3jqw9krJbPu0CcQBKS90AnZ#travis-ci
 deploy:
-    skip_cleanup: true
-    provider: npm
-    email: bradwoo8621@gmail.com
-    api_key: oHv3yA7k1CGCZrJmFsnfY3YCng+xVY0mXGciBGXg8rL2ZnxZzKLs+vSfQoz+vuHCOfS2o66tbqb2Jw6y4CtPml8u0p6BgPcDmZaWb8PmKXLaGYJvu8kIm3VkoMAo7T7taXsO8q042ZUI6Q88Tqrg3hGKptYzdascqU4t4vdo8xPYFOCWI3aBsFlS4DtyGzvibiE4YYR+Mj8VmOrAf7NPa7WJLRMOBcVPFPOlxS+1yzlHjXeXHDudWM24vlRMVkyF+b3cCdlkLWlDAwU9fAbZVb0o5LuUNSUVGvoV3lHVtA9VyA5SL2ayPkIwjJoQLejfrdf4pgdmZRrmwGnLWGfAqZb3ef5OKExABWhzM7f+QyEqC2lsLisXMxUmp1F/JOjQOVZ38oB6k84D2f4iQGY8Fh+NXf3yQ0UEQdAbNxIcHqNjcJOKpFSTT3RhIdFSPoJW7WFlwVjEKh2CbLbri8xtg/o2+csv9k2Z9cCHcUT+vByxx5VKSaxY22fSmqi9to0Fx/7avVvnl2ploPz6wMHKDQ4bX2hzRo2DBUEnfCh2Bzh8m1gt8OchqDkIxpaMW9Hp1ZAdbr5YXuRRg0DD9GkEvCIm/1wIAg/u3F+hkl4OPa//HwW7y9BjbEJqZZFeK7mULON6O4bEtT3bW6TsG8vogjPPLcVp7UbunYw0xX4msfw=
-    on:
-        tags: true
+  skip_cleanup: true
+  provider: npm
+  email: bradwoo8621@gmail.com
+  api_key:
+    secure: FSMU2bBLayf0G8thrO/I2v6xZQ3Xg28vCkPcXTFWaZoFuPnk6mIIhusxYSHrQSo+KbPntNagKtM42qpFo/oktrn89QWiS8FUfpMYiNNyaxYjXr0au5hB/x9aekvhqu8XWF7JuO8fixz6mgobQkkUNGRmXAhiPoDFJl/K9yKLVcVIt/feEaxoP408U9V3ckxsPU7ltWbmbeXcEnYsPsx/tg+KiLQ3c4QZFDWz0hZlMkijRl9muH/8Tn7kYl1neVMg667i8Dtc4NsF8ePKUdhe8BK4RPvH5sClGDm7E3Jk387B+oqXtUnzgzdgCEStZSOH1y/biKQkHjtaTPEc0N26dvu9fyCl/Op16Hvf8jeOAvcRZXb+KkchRDee2u0RKxjohKW+4NSgCEuuzvibtzQ32YWhU38WAC49+6I2z03srwn+yGs29RBSEJT9Vu+5wgegc0Cc8A7C14B5TAHh4bDsWTMgLAmxVHR8UDlb4g4004w5hZk7gbmXDDke0uh8hgdj3KkC+SQD4XvSU8PnJa8OL+XkiTJrdvDRqVZDxe/gpQR6JJ1r16UOrdg79wURkUouvVvIsAKTUge4OP5cw7cV4Mc+09nE/hGX4JUzZxT8ZVmNTwbsiGvm6bRW4I8JqFToh/L5DUXMw2qyVY8xvf9mOpcEHh7SgB+PS46+yWxo06c=
+  on:
+    tags: true
