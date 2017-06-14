@@ -1,4 +1,4 @@
-/** nest-parrot.V0.5.28 2017-06-14 */
+/** nest-parrot.V0.5.29 2017-06-14 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -14308,14 +14308,23 @@
 		renderRowOperationButton: function (operation, rowModel, operationIndex) {
 			var layout = $pt.createCellLayout('rowButton', {
 				label: operation.icon ? null : operation.tooltip,
-				comp: {
+				comp: Object.keys(operation).reduce(function (options, key) {
+					if (key != 'click') {
+						options[key] = operation[key];
+					}
+					return options;
+				}, {
 					style: 'link',
-					icon: operation.icon,
-					enabled: operation.enabled,
-					visible: operation.visible,
-					click: this.onRowOperationClicked.bind(this, operation.click, rowModel),
-					tooltip: operation.tooltip
-				},
+					click: this.onRowOperationClicked.bind(this, operation.click, rowModel)
+				}),
+				// {
+				// 	style: 'link',
+				// 	icon: operation.icon,
+				// 	enabled: operation.enabled,
+				// 	visible: operation.visible,
+				// 	click: this.onRowOperationClicked.bind(this, operation.click, rowModel),
+				// 	tooltip: operation.tooltip
+				// },
 				css: {
 					comp: 'n-table-op-btn'
 				}

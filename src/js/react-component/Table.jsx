@@ -644,14 +644,23 @@
 		renderRowOperationButton: function (operation, rowModel, operationIndex) {
 			var layout = $pt.createCellLayout('rowButton', {
 				label: operation.icon ? null : operation.tooltip,
-				comp: {
+				comp: Object.keys(operation).reduce(function(options, key) {
+					if (key != 'click') {
+						options[key] = operation[key];
+					}
+					return options;
+				}, {
 					style: 'link',
-					icon: operation.icon,
-					enabled: operation.enabled,
-					visible: operation.visible,
-					click: this.onRowOperationClicked.bind(this, operation.click, rowModel),
-					tooltip: operation.tooltip
-				},
+					click: this.onRowOperationClicked.bind(this, operation.click, rowModel)
+				}),
+				// {
+				// 	style: 'link',
+				// 	icon: operation.icon,
+				// 	enabled: operation.enabled,
+				// 	visible: operation.visible,
+				// 	click: this.onRowOperationClicked.bind(this, operation.click, rowModel),
+				// 	tooltip: operation.tooltip
+				// },
 				css: {
 					comp: 'n-table-op-btn'
 				}
