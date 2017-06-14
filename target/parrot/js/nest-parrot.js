@@ -1,4 +1,4 @@
-/** nest-parrot.V0.5.27 2017-06-07 */
+/** nest-parrot.V0.5.28 2017-06-14 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -552,6 +552,9 @@
 		} else {
 			return object;
 		}
+	};
+	$pt.isVisibleOnAuth = function (component) {
+		return true;
 	};
 
 	/*!
@@ -4240,10 +4243,14 @@
    * @returns {boolean}
    */
 		isVisible: function () {
+			var visible = $pt.isVisibleOnAuth(this);
+			if (visible === false) {
+				return false;
+			}
 			// when the component is not visible
 			// or declared only view in edit mode
 			// hide it
-			var visible = this.getComponentRuleValue("visible", true);
+			visible = this.getComponentRuleValue("visible", true);
 			if (visible) {
 				var view = this.getComponentOption('view');
 				if (this.isViewMode()) {

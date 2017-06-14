@@ -2,6 +2,9 @@
  * Created by brad.wu on 8/16/2015.
  */
 (function () {
+    // $pt.isVisibleOnAuth = function(component) {
+    //     return component.getComponentOption('auth') !== '00001';
+    // };
     // NText.TRIM = true;
     var model = $pt.createModel({
         name: 'Name'
@@ -25,7 +28,7 @@
     });
     var placeholder = $pt.createCellLayout('name', {
         label: 'Plain Text',
-        comp: {placeholder: 'Placeholder...'},
+        comp: {placeholder: 'Placeholder...', auth: '00001'},
         pos: {row: 1, col: 1}
     });
     var password = $pt.createCellLayout('name1', {

@@ -243,6 +243,9 @@
 			return object;
 		}
 	};
+	$pt.isVisibleOnAuth = function(component) {
+		return true;
+	};
 
 	/*!
 	 * jQuery Browser Plugin 0.1.0

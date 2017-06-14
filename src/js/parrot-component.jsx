@@ -1463,10 +1463,14 @@
 		 * @returns {boolean}
 		 */
 		isVisible: function () {
+			var visible = $pt.isVisibleOnAuth(this);
+			if (visible === false) {
+				return false;
+			}
 			// when the component is not visible
 			// or declared only view in edit mode
 			// hide it
-			var visible = this.getComponentRuleValue("visible", true);
+			visible = this.getComponentRuleValue("visible", true);
 			if (visible) {
 				var view = this.getComponentOption('view');
 				if (this.isViewMode()) {
