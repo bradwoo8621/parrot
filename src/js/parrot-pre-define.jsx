@@ -246,6 +246,12 @@
 	$pt.isVisibleOnAuth = function(component) {
 		return true;
 	};
+	$pt.markFuncAsWrap = function(func) {
+		if (func) {
+			func.wrap = true;
+		}
+		return func;
+	};
 
 	/*!
 	 * jQuery Browser Plugin 0.1.0

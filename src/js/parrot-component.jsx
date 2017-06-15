@@ -51,6 +51,17 @@
 			this.__dataId = cell.dataId ? cell.dataId : this.__id;
 			this.__cell = cell;
 		},
+		unwrapValueWhenIsAFunc: function(value, forceWrap) {
+			if (typeof value === 'function') {
+				if (forceWrap || value.wrap === true) {
+					return value.call(this);
+				} else {
+					return value;
+				}
+			} else {
+				return value;
+			}
+		},
 		/**
 		 * get definition json
 		 * @returns {*}
@@ -147,6 +158,7 @@
 					// comp defined
 					var option = this.__cell.comp[key];
 					// not defined with given key, use default value instead
+					option = this.unwrapValueWhenIsAFunc(option);
 					return option === undefined ? defaultValue : option;
 				} else {
 					// comp not defined, use default value instead
@@ -162,7 +174,7 @@
 		 * @returns {string}
 		 */
 		getLabel: function () {
-			return this.__cell.label;
+			return this.unwrapValueWhenIsAFunc(this.__cell.label, true);
 		},
 		/**
 		 * get label CSS, if not defined, return original CSS

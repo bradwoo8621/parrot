@@ -17,7 +17,7 @@
     });
     var model = $pt.createModel({check: true}, validator);
     var plainText = $pt.createCellLayout('text', {
-        label: 'Default Cell',
+        label: function() {return 'Default Cell'},
         comp: {
             view: 'edit'
         },
@@ -26,7 +26,10 @@
     var requiredCell = $pt.createCellLayout('text1', {
         label: 'Default Cell',
         comp: {
-            tooltip: 'I\'m a tooltip'
+            tooltip: $pt.markFuncAsWrap(function() {
+                console.log('func executed')
+                return 'I\'m a tooltip';
+            })
         },
         pos: {row: 1, col: 1}
     });
