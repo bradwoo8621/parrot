@@ -85,6 +85,14 @@
 				return null;
 			}
 		},
+		renderCustomHeader: function() {
+			var customHeader = this.getComponentOption('customHeader');
+			if (typeof customHeader === 'function') {
+				return customHeader.call(this);
+			} else {
+				return customHeader;
+			}
+		},
 		/**
 		 * render heading
 		 * @returns {XML}
@@ -101,6 +109,7 @@
 						<a href='javascript:void(0);' onClick={this.onTitleClicked} ref='head'>{label}</a>
 						{this.renderCheckInTitle()}
 					</h4>
+					{this.renderCustomHeader()}
 					{this.renderHeadingButtons()}
 				</div>);
 			} else if (this.hasCheckInTitle()) {
@@ -110,11 +119,13 @@
 						<span ref='head'>{label}</span>
 						{this.renderCheckInTitle()}
 					</h4>
+					{this.renderCustomHeader()}
 					{this.renderHeadingButtons()}
 				</div>);
 			} else {
 				return (<div className='panel-heading' ref='head'>
 					{label}
+					{this.renderCustomHeader()}
 					{this.renderHeadingButtons()}
 				</div>);
 			}

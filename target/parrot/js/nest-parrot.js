@@ -1,4 +1,4 @@
-/** nest-parrot.V0.6.1 2017-06-15 */
+/** nest-parrot.V0.6.2 2017-07-04 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -10871,6 +10871,14 @@
 				return null;
 			}
 		},
+		renderCustomHeader: function () {
+			var customHeader = this.getComponentOption('customHeader');
+			if (typeof customHeader === 'function') {
+				return customHeader.call(this);
+			} else {
+				return customHeader;
+			}
+		},
 		/**
    * render heading
    * @returns {XML}
@@ -10895,6 +10903,7 @@
 						),
 						this.renderCheckInTitle()
 					),
+					this.renderCustomHeader(),
 					this.renderHeadingButtons()
 				);
 			} else if (this.hasCheckInTitle()) {
@@ -10912,6 +10921,7 @@
 						),
 						this.renderCheckInTitle()
 					),
+					this.renderCustomHeader(),
 					this.renderHeadingButtons()
 				);
 			} else {
@@ -10919,6 +10929,7 @@
 					'div',
 					{ className: 'panel-heading', ref: 'head' },
 					label,
+					this.renderCustomHeader(),
 					this.renderHeadingButtons()
 				);
 			}
