@@ -92,10 +92,10 @@
 		},
 		getCustomerHeader: function(model, itemIndex) {
 			var header = this.getComponentOption('customHeader');
-			if (typeof customHeader === 'function') {
-				return customHeader.call(this, model, itemIndex);
+			if (typeof header === 'function') {
+				return header.call(this, model, itemIndex);
 			} else {
-				return customHeader;
+				return header;
 			}
 		},
 		/**

@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.6.3 2017-08-02 */
+	/** nest-parrot.V0.6.4 2017-08-02 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -5164,10 +5164,10 @@
 		},
 		getCustomerHeader: function (model, itemIndex) {
 			var header = this.getComponentOption('customHeader');
-			if (typeof customHeader === 'function') {
-				return customHeader.call(this, model, itemIndex);
+			if (typeof header === 'function') {
+				return header.call(this, model, itemIndex);
 			} else {
-				return customHeader;
+				return header;
 			}
 		},
 		/**
