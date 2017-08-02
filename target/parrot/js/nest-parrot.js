@@ -1,4 +1,4 @@
-/** nest-parrot.V0.6.2 2017-07-04 */
+/** nest-parrot.V0.6.3 2017-08-02 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -5074,7 +5074,8 @@
 					checkInTitle: this.getCheckInTitle(model, itemIndex),
 					expandedLabel: this.getComponentOption('expandedLabel'),
 					collapsedLabel: this.getComponentOption('collapsedLabel'),
-					headerButtons: this.getHeaderButtons(model, itemIndex)
+					headerButtons: this.getHeaderButtons(model, itemIndex),
+					customHeader: this.getCustomerHeader(model, itemIndex)
 				}
 			};
 			return React.createElement(
@@ -5128,6 +5129,14 @@
 				return buttons.call(this, model, itemIndex);
 			} else {
 				return buttons;
+			}
+		},
+		getCustomerHeader: function (model, itemIndex) {
+			var header = this.getComponentOption('customHeader');
+			if (typeof customHeader === 'function') {
+				return customHeader.call(this, model, itemIndex);
+			} else {
+				return customHeader;
 			}
 		},
 		/**

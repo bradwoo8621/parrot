@@ -39,7 +39,8 @@
 					checkInTitle: this.getCheckInTitle(model, itemIndex),
 					expandedLabel: this.getComponentOption('expandedLabel'),
 					collapsedLabel: this.getComponentOption('collapsedLabel'),
-					headerButtons: this.getHeaderButtons(model, itemIndex)
+					headerButtons: this.getHeaderButtons(model, itemIndex),
+					customHeader: this.getCustomerHeader(model, itemIndex)
 				}
 			};
 			return (<div className='row' key={itemIndex}>
@@ -87,6 +88,14 @@
 				return buttons.call(this, model, itemIndex);
 			} else {
 				return buttons;
+			}
+		},
+		getCustomerHeader: function(model, itemIndex) {
+			var header = this.getComponentOption('customHeader');
+			if (typeof customHeader === 'function') {
+				return customHeader.call(this, model, itemIndex);
+			} else {
+				return customHeader;
 			}
 		},
 		/**
