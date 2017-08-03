@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.6.4 2017-08-03 */
+	/** nest-parrot.V0.6.5 2017-08-03 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -5106,7 +5106,8 @@
 					expandedLabel: this.getComponentOption('expandedLabel'),
 					collapsedLabel: this.getComponentOption('collapsedLabel'),
 					headerButtons: this.getHeaderButtons(model, itemIndex),
-					customHeader: this.getCustomerHeader(model, itemIndex)
+					customHeader: this.getCustomerHeader(model, itemIndex),
+					centralId: this.getComponentCentralId() + '-' + itemIndex
 				}
 			};
 			return React.createElement(

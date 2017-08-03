@@ -40,7 +40,8 @@
 					expandedLabel: this.getComponentOption('expandedLabel'),
 					collapsedLabel: this.getComponentOption('collapsedLabel'),
 					headerButtons: this.getHeaderButtons(model, itemIndex),
-					customHeader: this.getCustomerHeader(model, itemIndex)
+					customHeader: this.getCustomerHeader(model, itemIndex),
+					centralId: this.getComponentCentralId() + '-' + itemIndex
 				}
 			};
 			return (<div className='row' key={itemIndex}>
