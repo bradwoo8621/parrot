@@ -452,7 +452,7 @@
 			return (<div className={css}>
 				<span className={this.getAdditionalCSS("headingLabel", $pt.LayoutHelper.classSet(spanCSS))}
 				      ref={this.getHeaderLabelId()} onClick={this.isCollapsible() ? this.onTitleClicked : null}>
-					{this.getLayout().getLabel()}
+					{this.getLayout().getLabel(this)}
 				</span>
 			</div>);
 		},
@@ -465,7 +465,7 @@
 				var _this = this;
 				var content = messages.map(function (msg) {
 					if (typeof msg === "string") {
-						return "<span style='display:block'>" + msg.format([_this.getLayout().getLabel()]) + "</span>";
+						return "<span style='display:block'>" + msg.format([_this.getLayout().getLabel(this)]) + "</span>";
 					} else {
 						return "<span style='display:block'>" + NTable.DETAIL_ERROR_MESSAGE + "</span>";
 					}
@@ -2056,7 +2056,7 @@
 		 */
 		getEditDialog: function () {
 			if (this.state.editDialog === undefined || this.state.editDialog === null) {
-				this.state.editDialog = $pt.Components.NModalForm.createFormModal(this.getLayout().getLabel());
+				this.state.editDialog = $pt.Components.NModalForm.createFormModal(this.getLayout().getLabel(this));
 			}
 			return this.state.editDialog;
 		},

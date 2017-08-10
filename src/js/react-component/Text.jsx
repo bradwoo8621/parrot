@@ -2,7 +2,7 @@
 	var NText = React.createClass($pt.defineCellComponent({
 		displayName: 'NText',
 		statics: {
-			NUMBER_FORMAT: function(value) {
+			NUMBER_FORMAT: function (value) {
 				var parts = (value + '').split('.');
 				var integral = parts[0];
 				var fraction = parts.length > 1 ? '.' + parts[1] : '';
@@ -13,10 +13,10 @@
 				return integral + fraction;
 			},
 			PERCENTAGE: {
-				model: function(value) {
+				model: function (value) {
 					return (isNaN(value) || (value + '').isBlank()) ? value : ((value + '').movePointLeft(2));
 				},
-				view: function(value) {
+				view: function (value) {
 					return (isNaN(value) || (value + '').isBlank()) ? value : ((value + '').movePointRight(2));
 				}
 			},
@@ -29,7 +29,8 @@
 			};
 		},
 		afterWillUpdate: function (nextProps) {
-			this.getComponent().off('change', this.onComponentChanged);
+			this.getComponent().off('change', this.onChange);
+			this.uninstallOtherDOMListeners();
 		},
 		/**
 		 * did update
@@ -45,18 +46,37 @@
 				this.getComponent().val(formattedValue);
 			}
 		},
-		afterDidUpdate: function() {
-			this.getComponent().on('change', this.onComponentChanged);
+		afterDidUpdate: function () {
+			this.getComponent().on('change', this.onChange);
+			this.installOtherDOMListeners();
 		},
 		beforeDidMount: function () {
 			// set model value to component
 			this.getComponent().val(this.getFormattedValue(this.getValueFromModel()));
 		},
-		afterDidMount: function() {
-			this.getComponent().on('change', this.onComponentChanged);
+		afterDidMount: function () {
+			this.getComponent().on('change', this.onChange);
+			this.installOtherDOMListeners();
 		},
 		afterWillUnmount: function () {
-			this.getComponent().off('change', this.onComponentChanged);
+			this.getComponent().off('change', this.onChange);
+			this.uninstallOtherDOMListeners();
+		},
+		installOtherDOMListeners: function() {
+			var listeners = this.getEventMonitor();
+			Object.keys(listeners).filter(function(name) {
+				return ['change', 'blur', 'focus', 'keyPress', 'keyUp'].indexOf(name) < 0;
+			}).forEach(function(name) {
+				this.getComponent().on(name, listeners[name].bind(this));
+			}.bind(this));
+		},
+		uninstallOtherDOMListeners: function() {
+			var listeners = this.getEventMonitor();
+			Object.keys(listeners).filter(function(name) {
+				return ['change', 'blur', 'focus', 'keyPress', 'keyUp'].indexOf(name) < 0;
+			}).forEach(function(name) {
+				this.getComponent().off(name);
+			}.bind(this));
 		},
 		/**
 		 * render left add-on
@@ -84,17 +104,17 @@
 				textType = specialType;
 			}
 			return (<input type={textType}
-			               className={$pt.LayoutHelper.classSet(css)}
-			               disabled={!this.isEnabled()}
-			               placeholder={this.getComponentOption('placeholder')}
+				className={$pt.LayoutHelper.classSet(css)}
+				disabled={!this.isEnabled()}
+				placeholder={this.getComponentOption('placeholder')}
 
-			               onKeyPress={this.onComponentChanged}
-			               onChange={this.onComponentChanged}
-			               onFocus={this.onComponentFocused}
-			               onBlur={this.onComponentBlurred}
-			               onKeyUp={this.onKeyUp}
+				onKeyPress={this.onKeyPress}
+				onChange={this.onChange}
+				onFocus={this.onComponentFocused}
+				onBlur={this.onComponentBlurred}
+				onKeyUp={this.onKeyUp}
 
-			               ref='txt'/>);
+				ref='txt' />);
 		},
 		/**
 		 * render right add-on
@@ -132,11 +152,11 @@
 			if (icon != null) {
 				iconCss['fa-' + icon] = true;
 			}
-			var iconPart = icon == null ? null : (<span className={$pt.LayoutHelper.classSet(iconCss)} key='iconPart'/>);
+			var iconPart = icon == null ? null : (<span className={$pt.LayoutHelper.classSet(iconCss)} key='iconPart' />);
 			var textPart = addon.text;
 			var innerParts = addon.iconFirst === false ? [textPart, iconPart] : [iconPart, textPart];
 			return (<span className={$pt.LayoutHelper.classSet(spanCss)}
-			              onClick={this.onAddonClicked.bind(this, addon.click)}>
+				onClick={this.onAddonClicked.bind(this, addon.click)}>
 				{innerParts.map(function (part) {
 					return part;
 				})}
@@ -164,7 +184,7 @@
 				{this.renderFocusLine()}
 			</div>);
 		},
-		onComponentFocused: function () {
+		onComponentFocused: function (evt) {
 			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
 			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 
@@ -174,6 +194,8 @@
 			}
 			this.getComponent().val(value);
 			// window.console.log("focused: " + this.getValueFromModel());
+
+			this.notifyEvent(evt);
 		},
 		onComponentBlurred: function (evt) {
 			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
@@ -196,15 +218,12 @@
 			if (!this.textEquals(value, this.getValueFromModel())) {
 				this.setValueToModel(value);
 			}
-			var monitor = this.getEventMonitor('blur');
-			if (monitor) {
-				monitor.call(this, evt);
-			}
+			this.notifyEvent(evt);
 		},
-		hasText: function(value) {
+		hasText: function (value) {
 			return value != null && !(value + '').isEmpty();
 		},
-		textEquals: function(v1, v2) {
+		textEquals: function (v1, v2) {
 			var hasText1 = this.hasText(v1);
 			var hasText2 = this.hasText(v2);
 			if (hasText1) {
@@ -216,12 +235,15 @@
 			}
 			//return hasText1 ? ((v1 + '') === (v2 + '')) : !hasText2;
 		},
-		textChanged: function(newValue) {
-			console.log(newValue);
+		textChanged: function (newValue) {
 			var oldValue = this.getValueFromModel();
 			if (!this.textEquals(newValue, oldValue)) {
 				this.setValueToModel(newValue);
 			}
+		},
+		onChange: function(evt) {
+			this.onComponentChanged(evt);
+			this.notifyEvent(evt);
 		},
 		/**
 		 * on component change
@@ -237,16 +259,17 @@
 					delete this.state.textChangeHandler;
 				}
 				var newValue = evt.target.value;
-				this.state.textChangeHandler = setTimeout(function() {
+				this.state.textChangeHandler = setTimeout(function () {
 					this.textChanged(newValue);
 				}.bind(this), NText.DELAY);
 			}
 		},
+		onKeyPress: function (evt) {
+			this.onComponentChanged(evt);
+			this.notifyEvent(evt);
+		},
 		onKeyUp: function (evt) {
-			var monitor = this.getEventMonitor('keyUp');
-			if (monitor) {
-				monitor.call(this, evt);
-			}
+			this.notifyEvent(evt);
 		},
 		/**
 		 * on addon clicked
@@ -273,10 +296,10 @@
 		isAddonClickable: function (userDefinedClickFunc) {
 			return this.isEnabled() && userDefinedClickFunc;
 		},
-		getTextFormat: function() {
+		getTextFormat: function () {
 			return this.getComponentOption('format');
 		},
-		getFormattedValue: function(value) {
+		getFormattedValue: function (value) {
 			if (value) {
 				if (typeof value === 'number') {
 					value = value + '';
@@ -296,10 +319,10 @@
 			}
 			return value;
 		},
-		getTextConvertor: function() {
+		getTextConvertor: function () {
 			return this.getComponentOption('transformer') || this.getComponentOption('convertor');
 		},
-		getValueFromModel: function() {
+		getValueFromModel: function () {
 			var value = this.getModel().get(this.getDataId());
 			var convertor = this.getTextConvertor();
 			if (convertor && convertor.view) {
@@ -316,12 +339,12 @@
 				this.getModel().set(this.getDataId(), value);
 			}
 		},
-		getTextInViewMode: function() {
+		getTextInViewMode: function () {
 			return this.getModel().get(this.getDataId());
 		}
 	}));
 	$pt.Components.NText = NText;
 	$pt.LayoutHelper.registerComponentRenderer($pt.ComponentConstants.Text, function (model, layout, direction, viewMode) {
-		return <$pt.Components.NText {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode)}/>;
+		return <$pt.Components.NText {...$pt.LayoutHelper.transformParameters(model, layout, direction, viewMode) } />;
 	});
 }(window, jQuery, React, ReactDOM, $pt));

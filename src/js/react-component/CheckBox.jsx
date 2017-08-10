@@ -8,7 +8,7 @@
 		 */
 		renderLabel: function (labelInLeft) {
 			if (this.isLabelAttached()) {
-				var label = this.getLayout().getLabel();
+				var label = this.getLayout().getLabel(this);
 				if (label == null || label.isEmpty()) {
 					return null;
 				}
@@ -20,7 +20,7 @@
 				};
 				return (<span className={$pt.LayoutHelper.classSet(css)}
 				             onClick={(enabled && !this.isViewMode()) ? this.onButtonClicked : null}>
-                	{this.getLayout().getLabel()}
+                	{this.getLayout().getLabel(this)}
             	</span>);
 			}
 			return null;

@@ -51,10 +51,10 @@
 			this.__dataId = cell.dataId ? cell.dataId : this.__id;
 			this.__cell = cell;
 		},
-		unwrapValueWhenIsAFunc: function(value, forceWrap) {
+		unwrapValueWhenIsAFunc: function(value, forceWrap, delegate) {
 			if (typeof value === 'function') {
 				if (forceWrap || value.wrap === true) {
-					return value.call(this);
+					return value.call(delegate ? delegate : this);
 				} else {
 					return value;
 				}
@@ -147,7 +147,7 @@
 		 * @param defaultValue optional, only effective when key passed
 		 * @returns {*}
 		 */
-		getComponentOption: function (key, defaultValue) {
+		getComponentOption: function (key, defaultValue, delegate) {
 			if (key) {
 				// key passed
 				// set default value as null if not passed
@@ -158,7 +158,7 @@
 					// comp defined
 					var option = this.__cell.comp[key];
 					// not defined with given key, use default value instead
-					option = this.unwrapValueWhenIsAFunc(option);
+					option = this.unwrapValueWhenIsAFunc(option, false, delegate);
 					return option === undefined ? defaultValue : option;
 				} else {
 					// comp not defined, use default value instead
@@ -173,8 +173,8 @@
 		 * get label
 		 * @returns {string}
 		 */
-		getLabel: function () {
-			return this.unwrapValueWhenIsAFunc(this.__cell.label, true);
+		getLabel: function (delegate) {
+			return this.unwrapValueWhenIsAFunc(this.__cell.label, true, delegate);
 		},
 		/**
 		 * get label CSS, if not defined, return original CSS
@@ -1359,7 +1359,8 @@
 		 * @param defaultValue
 		 */
 		getComponentOption: function (key, defaultValue) {
-			var option = this.getLayout().getComponentOption(key, defaultValue);
+			// pass delegate to CellLayout#getComponentOption
+			var option = this.getLayout().getComponentOption(key, defaultValue, this);
 			if (option == null && this.props.defaultOptions != null) {
 				option = this.props.defaultOptions[key];
 			}

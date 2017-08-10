@@ -56,7 +56,7 @@
 			if (this.isTextFromModel()) {
 				return this.getValueFromModel();
 			} else {
-				return this.getLayout().getLabel();
+				return this.getLayout().getLabel(this);
 			}
 		},
 		isTextFromModel: function () {

@@ -102,7 +102,7 @@
 		 */
 		showAdvancedSearchDialog: function () {
 			if (!this.state.searchDialog) {
-				this.state.searchDialog = $pt.Components.NModalForm.createFormModal(this.getLayout().getLabel(), 'advanced-search-dialog');
+				this.state.searchDialog = $pt.Components.NModalForm.createFormModal(this.getLayout().getLabel(this), 'advanced-search-dialog');
 			}
 			this.state.searchDialog.show({
 				model: this.getAdvancedSearchDialogModel(),

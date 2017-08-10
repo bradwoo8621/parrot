@@ -99,7 +99,7 @@
 					trigger: 'hover',
 					html: true,
 					content: messages.map(function (msg) {
-						return "<span style='display:block'>" + msg.format([_this.getLayout().getLabel()]) + "</span>";
+						return "<span style='display:block'>" + msg.format([_this.getLayout().getLabel(_this)]) + "</span>";
 					}),
 					container: 'body',
 					// false is very import, since when destroy popover,
@@ -196,7 +196,7 @@
 						onClick={this.onLabelClicked}
 						ref="label">
 				{iconLabel}
-				{this.getLayout().getLabel()}
+				{this.getLayout().getLabel(this)}
 				{tooltipIcon}
 				{requiredLabel}
 			</span>);

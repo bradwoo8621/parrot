@@ -151,7 +151,7 @@
 		 * @returns {XML}
 		 */
 		render: function () {
-			var label = this.getLayout().getLabel();
+			var label = this.getLayout().getLabel(this);
 			if (label == null) {
 				return (<div ref='panel'>
 					{this.getInnerLayout().getRows().map(this.renderRow)}
@@ -221,7 +221,7 @@
 			return this.getComponentOption('style');
 		},
 		getTitle: function () {
-			var label = this.getLayout().getLabel();
+			var label = this.getLayout().getLabel(this);
 			if (this.state.expanded) {
 				var expandedLabel = this.getExpandedLabelRenderer();
 				if (expandedLabel) {

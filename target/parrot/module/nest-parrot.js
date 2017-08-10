@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.6.5 2017-08-03 */
+	/** nest-parrot.V0.6.6 2017-08-10 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -2869,10 +2869,10 @@
 			this.__dataId = cell.dataId ? cell.dataId : this.__id;
 			this.__cell = cell;
 		},
-		unwrapValueWhenIsAFunc: function (value, forceWrap) {
+		unwrapValueWhenIsAFunc: function (value, forceWrap, delegate) {
 			if (typeof value === 'function') {
 				if (forceWrap || value.wrap === true) {
-					return value.call(this);
+					return value.call(delegate ? delegate : this);
 				} else {
 					return value;
 				}
@@ -2965,7 +2965,7 @@
    * @param defaultValue optional, only effective when key passed
    * @returns {*}
    */
-		getComponentOption: function (key, defaultValue) {
+		getComponentOption: function (key, defaultValue, delegate) {
 			if (key) {
 				// key passed
 				// set default value as null if not passed
@@ -2976,7 +2976,7 @@
 					// comp defined
 					var option = this.__cell.comp[key];
 					// not defined with given key, use default value instead
-					option = this.unwrapValueWhenIsAFunc(option);
+					option = this.unwrapValueWhenIsAFunc(option, false, delegate);
 					return option === undefined ? defaultValue : option;
 				} else {
 					// comp not defined, use default value instead
@@ -2991,8 +2991,8 @@
    * get label
    * @returns {string}
    */
-		getLabel: function () {
-			return this.unwrapValueWhenIsAFunc(this.__cell.label, true);
+		getLabel: function (delegate) {
+			return this.unwrapValueWhenIsAFunc(this.__cell.label, true, delegate);
 		},
 		/**
    * get label CSS, if not defined, return original CSS
@@ -4176,7 +4176,8 @@
    * @param defaultValue
    */
 		getComponentOption: function (key, defaultValue) {
-			var option = this.getLayout().getComponentOption(key, defaultValue);
+			// pass delegate to CellLayout#getComponentOption
+			var option = this.getLayout().getComponentOption(key, defaultValue, this);
 			if (option == null && this.props.defaultOptions != null) {
 				option = this.props.defaultOptions[key];
 			}
@@ -5702,7 +5703,7 @@
 			if (labelFromModel) {
 				return this.getValueFromModel();
 			} else {
-				return this.getLayout().getLabel();
+				return this.getLayout().getLabel(this);
 			}
 		},
 		/**
@@ -5729,7 +5730,7 @@
    */
 		renderLabel: function (labelInLeft) {
 			if (this.isLabelAttached()) {
-				var label = this.getLayout().getLabel();
+				var label = this.getLayout().getLabel(this);
 				if (label == null || label.isEmpty()) {
 					return null;
 				}
@@ -5743,7 +5744,7 @@
 					'span',
 					{ className: $pt.LayoutHelper.classSet(css),
 						onClick: enabled && !this.isViewMode() ? this.onButtonClicked : null },
-					this.getLayout().getLabel()
+					this.getLayout().getLabel(this)
 				);
 			}
 			return null;
@@ -8445,7 +8446,7 @@
 					trigger: 'hover',
 					html: true,
 					content: messages.map(function (msg) {
-						return "<span style='display:block'>" + msg.format([_this.getLayout().getLabel()]) + "</span>";
+						return "<span style='display:block'>" + msg.format([_this.getLayout().getLabel(_this)]) + "</span>";
 					}),
 					container: 'body',
 					// false is very import, since when destroy popover,
@@ -8546,7 +8547,7 @@
 					onClick: this.onLabelClicked,
 					ref: 'label' },
 				iconLabel,
-				this.getLayout().getLabel(),
+				this.getLayout().getLabel(this),
 				tooltipIcon,
 				requiredLabel
 			);
@@ -9054,7 +9055,7 @@
 			if (this.isTextFromModel()) {
 				return this.getValueFromModel();
 			} else {
-				return this.getLayout().getLabel();
+				return this.getLayout().getLabel(this);
 			}
 		},
 		isTextFromModel: function () {
@@ -11000,7 +11001,7 @@
    * @returns {XML}
    */
 		render: function () {
-			var label = this.getLayout().getLabel();
+			var label = this.getLayout().getLabel(this);
 			if (label == null) {
 				return React.createElement(
 					'div',
@@ -11076,7 +11077,7 @@
 			return this.getComponentOption('style');
 		},
 		getTitle: function () {
-			var label = this.getLayout().getLabel();
+			var label = this.getLayout().getLabel(this);
 			if (this.state.expanded) {
 				var expandedLabel = this.getExpandedLabelRenderer();
 				if (expandedLabel) {
@@ -11610,7 +11611,7 @@
    */
 		showAdvancedSearchDialog: function () {
 			if (!this.state.searchDialog) {
-				this.state.searchDialog = $pt.Components.NModalForm.createFormModal(this.getLayout().getLabel(), 'advanced-search-dialog');
+				this.state.searchDialog = $pt.Components.NModalForm.createFormModal(this.getLayout().getLabel(this), 'advanced-search-dialog');
 			}
 			this.state.searchDialog.show({
 				model: this.getAdvancedSearchDialogModel(),
@@ -14170,7 +14171,7 @@
 					'span',
 					{ className: this.getAdditionalCSS("headingLabel", $pt.LayoutHelper.classSet(spanCSS)),
 						ref: this.getHeaderLabelId(), onClick: this.isCollapsible() ? this.onTitleClicked : null },
-					this.getLayout().getLabel()
+					this.getLayout().getLabel(this)
 				)
 			);
 		},
@@ -14183,7 +14184,7 @@
 				var _this = this;
 				var content = messages.map(function (msg) {
 					if (typeof msg === "string") {
-						return "<span style='display:block'>" + msg.format([_this.getLayout().getLabel()]) + "</span>";
+						return "<span style='display:block'>" + msg.format([_this.getLayout().getLabel(this)]) + "</span>";
 					} else {
 						return "<span style='display:block'>" + NTable.DETAIL_ERROR_MESSAGE + "</span>";
 					}
@@ -15863,7 +15864,7 @@
    */
 		getEditDialog: function () {
 			if (this.state.editDialog === undefined || this.state.editDialog === null) {
-				this.state.editDialog = $pt.Components.NModalForm.createFormModal(this.getLayout().getLabel());
+				this.state.editDialog = $pt.Components.NModalForm.createFormModal(this.getLayout().getLabel(this));
 			}
 			return this.state.editDialog;
 		},
@@ -16068,7 +16069,8 @@
 			};
 		},
 		afterWillUpdate: function (nextProps) {
-			this.getComponent().off('change', this.onComponentChanged);
+			this.getComponent().off('change', this.onChange);
+			this.uninstallOtherDOMListeners();
 		},
 		/**
    * did update
@@ -16085,17 +16087,36 @@
 			}
 		},
 		afterDidUpdate: function () {
-			this.getComponent().on('change', this.onComponentChanged);
+			this.getComponent().on('change', this.onChange);
+			this.installOtherDOMListeners();
 		},
 		beforeDidMount: function () {
 			// set model value to component
 			this.getComponent().val(this.getFormattedValue(this.getValueFromModel()));
 		},
 		afterDidMount: function () {
-			this.getComponent().on('change', this.onComponentChanged);
+			this.getComponent().on('change', this.onChange);
+			this.installOtherDOMListeners();
 		},
 		afterWillUnmount: function () {
-			this.getComponent().off('change', this.onComponentChanged);
+			this.getComponent().off('change', this.onChange);
+			this.uninstallOtherDOMListeners();
+		},
+		installOtherDOMListeners: function () {
+			var listeners = this.getEventMonitor();
+			Object.keys(listeners).filter(function (name) {
+				return ['change', 'blur', 'focus', 'keyPress', 'keyUp'].indexOf(name) < 0;
+			}).forEach(function (name) {
+				this.getComponent().on(name, listeners[name].bind(this));
+			}.bind(this));
+		},
+		uninstallOtherDOMListeners: function () {
+			var listeners = this.getEventMonitor();
+			Object.keys(listeners).filter(function (name) {
+				return ['change', 'blur', 'focus', 'keyPress', 'keyUp'].indexOf(name) < 0;
+			}).forEach(function (name) {
+				this.getComponent().off(name);
+			}.bind(this));
 		},
 		/**
    * render left add-on
@@ -16127,8 +16148,8 @@
 				disabled: !this.isEnabled(),
 				placeholder: this.getComponentOption('placeholder'),
 
-				onKeyPress: this.onComponentChanged,
-				onChange: this.onComponentChanged,
+				onKeyPress: this.onKeyPress,
+				onChange: this.onChange,
 				onFocus: this.onComponentFocused,
 				onBlur: this.onComponentBlurred,
 				onKeyUp: this.onKeyUp,
@@ -16209,7 +16230,7 @@
 				this.renderFocusLine()
 			);
 		},
-		onComponentFocused: function () {
+		onComponentFocused: function (evt) {
 			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
 			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 
@@ -16219,6 +16240,8 @@
 			}
 			this.getComponent().val(value);
 			// window.console.log("focused: " + this.getValueFromModel());
+
+			this.notifyEvent(evt);
 		},
 		onComponentBlurred: function (evt) {
 			$(ReactDOM.findDOMNode(this.refs.focusLine)).toggleClass('focus');
@@ -16241,10 +16264,7 @@
 			if (!this.textEquals(value, this.getValueFromModel())) {
 				this.setValueToModel(value);
 			}
-			var monitor = this.getEventMonitor('blur');
-			if (monitor) {
-				monitor.call(this, evt);
-			}
+			this.notifyEvent(evt);
 		},
 		hasText: function (value) {
 			return value != null && !(value + '').isEmpty();
@@ -16262,11 +16282,14 @@
 			//return hasText1 ? ((v1 + '') === (v2 + '')) : !hasText2;
 		},
 		textChanged: function (newValue) {
-			console.log(newValue);
 			var oldValue = this.getValueFromModel();
 			if (!this.textEquals(newValue, oldValue)) {
 				this.setValueToModel(newValue);
 			}
+		},
+		onChange: function (evt) {
+			this.onComponentChanged(evt);
+			this.notifyEvent(evt);
 		},
 		/**
    * on component change
@@ -16287,11 +16310,12 @@
 				}.bind(this), NText.DELAY);
 			}
 		},
+		onKeyPress: function (evt) {
+			this.onComponentChanged(evt);
+			this.notifyEvent(evt);
+		},
 		onKeyUp: function (evt) {
-			var monitor = this.getEventMonitor('keyUp');
-			if (monitor) {
-				monitor.call(this, evt);
-			}
+			this.notifyEvent(evt);
 		},
 		/**
    * on addon clicked
