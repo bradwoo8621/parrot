@@ -243,7 +243,17 @@
 		getEventMonitor: function (key) {
 			if (key) {
 				if (this.__cell && this.__cell.evt) {
-					return this.__cell.evt[key];
+					var monitor = this.__cell.evt[key];
+					if (monitor) {
+						return monitor;
+					} else {
+						var name = Object.keys(this.__cell.evt).find(function(name) {
+							return name.toLowerCase() === key.toLowerCase();
+						});
+						if (name) {
+							return this.__cell.evt[name];
+						}
+					}
 				} else {
 					return null;
 				}
