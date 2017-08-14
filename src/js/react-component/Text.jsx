@@ -190,9 +190,9 @@
 
 			var value = this.getValueFromModel();
 			if (value == this.getComponent().val()) {
-				return;
+			} else {
+				this.getComponent().val(value);
 			}
-			this.getComponent().val(value);
 			// window.console.log("focused: " + this.getValueFromModel());
 
 			this.notifyEvent(evt);

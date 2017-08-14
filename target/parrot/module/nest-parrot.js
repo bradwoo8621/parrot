@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.6.7 2017-08-11 */
+	/** nest-parrot.V0.6.8 2017-08-14 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -16245,10 +16245,9 @@
 			$(ReactDOM.findDOMNode(this.refs.normalLine)).toggleClass('focus');
 
 			var value = this.getValueFromModel();
-			if (value == this.getComponent().val()) {
-				return;
+			if (value == this.getComponent().val()) {} else {
+				this.getComponent().val(value);
 			}
-			this.getComponent().val(value);
 			// window.console.log("focused: " + this.getValueFromModel());
 
 			this.notifyEvent(evt);
