@@ -107,6 +107,7 @@
 				className={$pt.LayoutHelper.classSet(css)}
 				disabled={!this.isEnabled()}
 				placeholder={this.getComponentOption('placeholder')}
+				maxlength={this.getComponentOption('maxlength')}
 
 				onKeyPress={this.onKeyPress}
 				onChange={this.onChange}

@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.6.8 2017-08-14 */
+	/** nest-parrot.V0.6.9 2017-10-13 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -16157,6 +16157,7 @@
 				className: $pt.LayoutHelper.classSet(css),
 				disabled: !this.isEnabled(),
 				placeholder: this.getComponentOption('placeholder'),
+				maxlength: this.getComponentOption('maxlength'),
 
 				onKeyPress: this.onKeyPress,
 				onChange: this.onChange,
