@@ -48,7 +48,6 @@ global.window = document.defaultView;
 propagateToGlobal(window);
 
 function propagateToGlobal (window) {
-//
 	for (let key in window) {
 		if (!window.hasOwnProperty(key))
 			continue;
