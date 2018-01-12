@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.6.10 2017-10-13 */
+	/** nest-parrot.V0.6.11 2018-01-12 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -11943,20 +11943,18 @@
 			}
 		},
 		afterDidUpdate: function (prevProps, prevState) {
-			if (this.hasParent()) {
-				// remove post change listener from parent model
-				this.getParentModel().addPostChangeListener(this.getParentPropertyId(), this.onParentModelChanged);
-			}
 			this.checkLoadingState();
 		},
 		afterDidMount: function () {
 			this.checkLoadingState();
 		},
 		checkLoadingState: function () {
+			if (this.hasParent()) {
+				// remove post change listener from parent model
+				this.getParentModel().addPostChangeListener(this.getParentPropertyId(), this.onParentModelChanged);
+			}
 			if (this.state.onloading && !this.state.alreadySendRequest) {
 				if (this.hasParent()) {
-					// add post change listener into parent model
-					this.getParentModel().addPostChangeListener(this.getParentPropertyId(), this.onParentModelChanged);
 					var parentValue = this.getParentPropertyValue();
 					if (parentValue == null) {
 						// no parent value

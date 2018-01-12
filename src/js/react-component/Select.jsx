@@ -38,20 +38,18 @@
 			}
 		},
 		afterDidUpdate: function (prevProps, prevState) {
-			if (this.hasParent()) {
-				// remove post change listener from parent model
-				this.getParentModel().addPostChangeListener(this.getParentPropertyId(), this.onParentModelChanged);
-			}
 			this.checkLoadingState();
 		},
 		afterDidMount: function () {
 			this.checkLoadingState();
 		},
 		checkLoadingState: function() {
+			if (this.hasParent()) {
+				// remove post change listener from parent model
+				this.getParentModel().addPostChangeListener(this.getParentPropertyId(), this.onParentModelChanged);
+			}
 			if (this.state.onloading && !this.state.alreadySendRequest) {
 				if (this.hasParent()) {
-					// add post change listener into parent model
-					this.getParentModel().addPostChangeListener(this.getParentPropertyId(), this.onParentModelChanged);
 					var parentValue = this.getParentPropertyValue();
 					if (parentValue == null) {
 						// no parent value
