@@ -169,7 +169,7 @@
 						</a>
 						{buttons}
 					</div>
-					{this.renderNodes(node, nodeId)}
+					{active ? this.renderNodes(node, nodeId) : null}
 				</li>
 			);
 		},
