@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.6.13 2018-01-18 */
+	/** nest-parrot.V0.6.14 2018-01-22 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -16844,7 +16844,7 @@
 					),
 					buttons
 				),
-				active ? this.renderNodes(node, nodeId) : null
+				this.getComponentOption('lazyLoad') && !active ? null : this.renderNodes(node, nodeId)
 			);
 		},
 		renderNodes: function (parent, parentNodeId) {

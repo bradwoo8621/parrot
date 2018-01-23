@@ -169,7 +169,7 @@
 						</a>
 						{buttons}
 					</div>
-					{active ? this.renderNodes(node, nodeId) : null}
+					{this.getComponentOption('lazyLoad') && !active ? null : this.renderNodes(node, nodeId)}
 				</li>
 			);
 		},
