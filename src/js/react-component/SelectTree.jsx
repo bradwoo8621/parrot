@@ -183,7 +183,7 @@
 						if (this.isViewMode()) {
 							return <span className='text'/>;
 						} else {
-							return <span className='text'>{NSelectTree.PLACEHOLDER}</span>
+							return <span className='text'>{this.getComponentOption('placeholder', NSelectTree.PLACEHOLDER)}</span>
 						}
 					} else {
 						return (<ul className='selection'>
