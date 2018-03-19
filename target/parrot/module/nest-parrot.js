@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.6.14 2018-01-22 */
+	/** nest-parrot.V0.6.15 2018-03-19 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -12896,7 +12896,7 @@
 							return React.createElement(
 								'span',
 								{ className: 'text' },
-								NSelectTree.PLACEHOLDER
+								this.getComponentOption('placeholder', NSelectTree.PLACEHOLDER)
 							);
 						}
 					} else {
