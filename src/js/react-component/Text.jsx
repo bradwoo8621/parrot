@@ -310,7 +310,9 @@
 					if (format) {
 						var formatValue = value;
 						if (format == 'currency') {
-							formatValue = value.currencyFormat();
+							var fraction = this.getComponentOption('fraction');
+							fraction = fraction ? fraction * 1 : 0;
+							formatValue = value.currencyFormat(fraction);
 						} else {
 							formatValue = format.call(this, value);
 						}
