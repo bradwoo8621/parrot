@@ -1,4 +1,4 @@
-/** nest-parrot.V0.6.15 2018-03-19 */
+/** nest-parrot.V0.6.16 2018-09-03 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -14717,7 +14717,7 @@
 							} else if (column.inline.inlineType == 'cell') {
 								column.inline.pos = { width: 12 };
 								if (column.inline.css) {
-									column.inline.css.cell = 'inline-editor' + column.inline.css.cell ? ' ' + column.inline.css.cell : '';
+									column.inline.css.cell = 'inline-editor' + (column.inline.css.cell ? ' ' + column.inline.css.cell : '');
 								} else {
 									column.inline.css = { cell: 'inline-editor' };
 								}
@@ -16332,7 +16332,9 @@
 					if (format) {
 						var formatValue = value;
 						if (format == 'currency') {
-							formatValue = value.currencyFormat();
+							var fraction = this.getComponentOption('fraction');
+							fraction = fraction ? fraction * 1 : 0;
+							formatValue = value.currencyFormat(fraction);
 						} else {
 							formatValue = format.call(this, value);
 						}

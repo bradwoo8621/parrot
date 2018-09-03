@@ -991,7 +991,7 @@
 							} else if (column.inline.inlineType == 'cell') {
 								column.inline.pos = {width: 12};
 								if (column.inline.css) {
-									column.inline.css.cell = 'inline-editor' + (column.inline.css.cell) ? (' ' + column.inline.css.cell) : '';
+									column.inline.css.cell = 'inline-editor' + (column.inline.css.cell ? (' ' + column.inline.css.cell) : '');
 								} else {
 									column.inline.css = {cell: 'inline-editor'};
 								}
