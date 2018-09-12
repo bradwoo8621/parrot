@@ -1,4 +1,4 @@
-/** nest-parrot.V0.6.16 2018-09-03 */
+/** nest-parrot.V0.6.17 2018-09-12 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -8528,7 +8528,8 @@
 				iconLabel,
 				this.getLayout().getLabel(this),
 				tooltipIcon,
-				requiredLabel
+				requiredLabel,
+				this.getComponentOption('customLabelAddon')
 			);
 		},
 		/**

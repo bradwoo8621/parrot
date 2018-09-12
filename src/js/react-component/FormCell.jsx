@@ -199,6 +199,7 @@
 				{this.getLayout().getLabel(this)}
 				{tooltipIcon}
 				{requiredLabel}
+				{this.getComponentOption('customLabelAddon')}
 			</span>);
 		},
 		/**
