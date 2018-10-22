@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.6.17 2018-09-12 */
+	/** nest-parrot.V0.6.18 2018-10-22 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -5110,7 +5110,7 @@
 				comp: {
 					type: $pt.ComponentConstants.Panel,
 					collapsible: this.getComponentOption('collapsible'),
-					expanded: this.getComponentOption('expanded'),
+					expanded: this.getExpanded(model, itemIndex),
 					editLayout: this.getEditLayout(model, itemIndex),
 					style: this.getComponentOption('style'),
 					checkInTitle: this.getCheckInTitle(model, itemIndex),
@@ -5172,6 +5172,14 @@
 				return buttons.call(this, model, itemIndex);
 			} else {
 				return buttons;
+			}
+		},
+		getExpanded: function (model, itemIndex) {
+			var expanded = this.getComponentOption('expanded');
+			if (typeof expanded === 'function') {
+				return expanded.call(this, model, itemIndex);
+			} else {
+				return expanded;
 			}
 		},
 		getCustomerHeader: function (model, itemIndex) {
