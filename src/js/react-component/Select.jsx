@@ -219,7 +219,7 @@
 					<a href='javascript:void(0);' onClick={this.hidePopover}>
 						<span>{NSelect.CLOSE_TEXT}</span>
 					</a>
-					{this.isClearAllowed() ? <a href='javascript:void(0);' onClick={this.onClearClick}>
+					{this.getComponentOption('allowClear') ? <a href='javascript:void(0);' onClick={this.onClearClick}>
 						<span>{NSelect.CLEAR_TEXT}</span>
 					</a> : null}
 				</div>
