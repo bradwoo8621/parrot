@@ -212,7 +212,6 @@
 			} else {
 				var css = this.getCSSClassName();
 				if (this.getModel().hasError(this.getDataId())
-					&& !this.isViewMode()
 					&& this.getLayout().getComponentType().renderError !== false) {
 					css += " has-error";
 				}

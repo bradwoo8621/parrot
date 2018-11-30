@@ -1,4 +1,4 @@
-/** nest-parrot.V0.6.19 2018-10-23 */
+/** nest-parrot.V0.6.20 2018-11-30 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -8549,7 +8549,7 @@
 				return React.createElement('div', { className: this.getCSSClassName() + ' n-form-cell-invisible' });
 			} else {
 				var css = this.getCSSClassName();
-				if (this.getModel().hasError(this.getDataId()) && !this.isViewMode() && this.getLayout().getComponentType().renderError !== false) {
+				if (this.getModel().hasError(this.getDataId()) && this.getLayout().getComponentType().renderError !== false) {
 					css += " has-error";
 				}
 				if (!this.isEnabled()) {
@@ -12136,7 +12136,7 @@
 							NSelect.CLOSE_TEXT
 						)
 					),
-					React.createElement(
+					this.isClearAllowed() ? React.createElement(
 						'a',
 						{ href: 'javascript:void(0);', onClick: this.onClearClick },
 						React.createElement(
@@ -12144,7 +12144,7 @@
 							null,
 							NSelect.CLEAR_TEXT
 						)
-					)
+					) : null
 				)
 			);
 		},
