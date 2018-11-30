@@ -1,4 +1,4 @@
-/** nest-parrot.V0.6.20 2018-11-30 */
+/** nest-parrot.V0.6.21 2018-11-30 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -12136,7 +12136,7 @@
 							NSelect.CLOSE_TEXT
 						)
 					),
-					this.isClearAllowed() ? React.createElement(
+					this.getComponentOption('allowClear') ? React.createElement(
 						'a',
 						{ href: 'javascript:void(0);', onClick: this.onClearClick },
 						React.createElement(
