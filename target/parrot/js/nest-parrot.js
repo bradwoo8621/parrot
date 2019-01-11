@@ -1,4 +1,4 @@
-/** nest-parrot.V0.6.21 2018-11-30 */
+/** nest-parrot.V0.6.22 2019-01-11 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -9137,7 +9137,7 @@
 				return null;
 			}
 			var layout = $pt.createCellLayout('pseudo-button', {
-				label: NConfirm.OK_TEXT,
+				label: this.state.options && this.state.options.confirmText ? this.state.options.confirmText : NConfirm.OK_TEXT,
 				comp: {
 					type: $pt.ComponentConstants.Button,
 					icon: NConfirm.OK_ICON,
@@ -9374,6 +9374,7 @@
 						disableConfirm: options.disableConfirm,
 						disableClose: options.disableClose,
 						disableDialogClose: options.disableDialogClose,
+						confirmText: options.confirmText,
 						close: options.close,
 						messages: options.messages
 					},
