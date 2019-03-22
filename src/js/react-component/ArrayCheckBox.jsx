@@ -18,7 +18,7 @@
 				label: item.text,
 				comp: {
 					labelAttached: this.getComponentOption('labelAttached'),
-					enabled: enabled
+					enabled: item.enabled != null ? item.enabled : enabled
 				}
 			});
 			model.addPostChangeListener('checked', this.onCodeItemCheckedChanged.bind(this, item));
