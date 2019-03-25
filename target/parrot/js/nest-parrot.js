@@ -1,4 +1,4 @@
-/** nest-parrot.V0.6.23 2019-03-22 */
+/** nest-parrot.V0.6.24 2019-03-25 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -10998,15 +10998,16 @@
 					this.getInnerLayout().getRows().map(this.renderRow)
 				);
 			}
+			var expanded = this.canExpanded() && this.isExpanded();
 			var css = {
 				panel: true,
 				'panel-collapsible': this.isCollapsible(),
-				'panel-expanded': this.isExpanded()
+				'panel-expanded': expanded
 			};
 			css['panel-' + this.getStyle()] = true;
 			css[this.getComponentCSS('n-panel')] = true;
 			var bodyStyle = {
-				display: this.isExpanded() ? 'block' : 'none'
+				display: expanded ? 'block' : 'none'
 			};
 			return React.createElement(
 				'div',

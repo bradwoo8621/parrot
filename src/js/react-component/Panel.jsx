@@ -157,15 +157,16 @@
 					{this.getInnerLayout().getRows().map(this.renderRow)}
 				</div>);
 			}
+			var expanded = this.canExpanded() && this.isExpanded();
 			var css = {
 				panel: true,
 				'panel-collapsible': this.isCollapsible(),
-				'panel-expanded': this.isExpanded()
+				'panel-expanded': expanded
 			};
 			css['panel-' + this.getStyle()] = true;
 			css[this.getComponentCSS('n-panel')] = true;
 			var bodyStyle = {
-				display: this.isExpanded() ? 'block' : 'none'
+				display: expanded ? 'block' : 'none'
 			};
 			return (<div className={$pt.LayoutHelper.classSet(css)} ref='panel'>
 				{this.renderHeading()}
