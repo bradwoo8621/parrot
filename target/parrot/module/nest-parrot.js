@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.6.22 2019-01-11 */
+	/** nest-parrot.V0.6.23 2019-03-22 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -4994,7 +4994,7 @@
 				label: item.text,
 				comp: {
 					labelAttached: this.getComponentOption('labelAttached'),
-					enabled: enabled
+					enabled: item.enabled != null ? item.enabled : enabled
 				}
 			});
 			model.addPostChangeListener('checked', this.onCodeItemCheckedChanged.bind(this, item));
