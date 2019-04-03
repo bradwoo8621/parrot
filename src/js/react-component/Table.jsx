@@ -417,7 +417,7 @@
 				                style={style}
 								key='add-button'>
 					<$pt.Components.NIcon icon={NTable.ADD_BUTTON_ICON}/>
-					{NTable.ADD_BUTTON_TEXT}
+					{this.getComponentOption('addText') || NTable.ADD_BUTTON_TEXT}
 				</a>);
 			}
 			if (this.isDownloadable()) {
