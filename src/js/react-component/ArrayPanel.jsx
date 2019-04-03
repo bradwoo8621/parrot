@@ -44,6 +44,10 @@
 					centralId: this.getComponentCentralId() + '-' + itemIndex
 				}
 			};
+			if(this.getComponentOption('itemCss')) {
+				var itemCss = this.getComponentOption('itemCss')
+				cellLayout.css = typeof itemCss == 'string' ? {comp: itemCss} : itemCss;
+			}
 			return (<div className='row' key={itemIndex}>
 				<div className='col-sm-12 col-md-12 col-lg-12'>
 					<$pt.Components.NPanel model={model}

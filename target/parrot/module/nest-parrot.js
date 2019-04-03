@@ -29,7 +29,7 @@
 	};
 
 	// insert all source code here
-	/** nest-parrot.V0.6.24 2019-03-25 */
+	/** nest-parrot.V0.6.25 2019-04-03 */
 (function (window) {
 	var patches = {
 		console: function () {
@@ -5121,6 +5121,10 @@
 					centralId: this.getComponentCentralId() + '-' + itemIndex
 				}
 			};
+			if (this.getComponentOption('itemCss')) {
+				var itemCss = this.getComponentOption('itemCss');
+				cellLayout.css = typeof itemCss == 'string' ? { comp: itemCss } : itemCss;
+			}
 			return React.createElement(
 				'div',
 				{ className: 'row', key: itemIndex },
@@ -14149,7 +14153,7 @@
 						style: style,
 						key: 'add-button' },
 					React.createElement($pt.Components.NIcon, { icon: NTable.ADD_BUTTON_ICON }),
-					NTable.ADD_BUTTON_TEXT
+					this.getComponentOption('addText') || NTable.ADD_BUTTON_TEXT
 				));
 			}
 			if (this.isDownloadable()) {
