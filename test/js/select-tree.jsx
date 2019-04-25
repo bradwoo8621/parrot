@@ -88,6 +88,7 @@
 			hideChildWhenParentChecked: true,
 			treeLayout: {
 				comp: {
+					searchable: true,
 					hierarchyCheck: true,
 					// valueAsArray: true
 				}

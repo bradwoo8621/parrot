@@ -12,6 +12,7 @@
 			OP_FILE_ICON: '',
 			NODE_SEPARATOR : ';',
 			ROOT_ID : '0',
+			FILTER_PLACEHOLDER: 'Search...',
 			convertValueTreeToArray: function(nodeValues, id) {
 				var array = [];
 				var push = function(node, id) {
@@ -78,7 +79,19 @@
 				root: {text: this.getRootLabel(), id: NTree.ROOT_ID},
 				expandButton: expandBtn,
 				collapseButton: collapseBtn,
+				initialized: false
 			};
+		},
+		componentWillMount: function() {
+			if(this.state.root.children) {
+				this.setState({initialized: true});
+			}
+		},
+		componentWillUpdate: function() {
+			if(!this.state.initialized && this.state.root.children && this.isSearchable()) {
+				var nodes = this.filterNodes(this.state.root);
+				this.setState({root: nodes, initialized: true});
+			}
 		},
 		renderCheck: function(node, nodeId) {
 			var canSelected = this.isNodeCanSelect(node);
@@ -103,6 +116,9 @@
 			return <$pt.Components.NCheck model={model} layout={layout} view={this.isViewMode()}/>;
 		},
 		renderNode: function(parentNodeId, node) {
+			if(node.visible === false) {
+				return null;
+			}
 			var nodeId = this.getNodeId(parentNodeId, node);
 
 			var opIcon = null;
@@ -175,7 +191,9 @@
 		},
 		renderNodes: function(parent, parentNodeId) {
 			var children =  parent.children;
-			if (children && children.length > 0) {
+			if (children && children.length > 0 && children.some(function(item) {
+				return item.visible !== false;
+			})) {
 				return (
 					<ul className='nav'>
 						{children.map(this.renderNode.bind(this, parentNodeId))}
@@ -213,6 +231,37 @@
 				return null;
 			}
 		},
+		renderFilterText: function() {
+			var model = $pt.createModel({
+				text: this.state.filterText,
+				// on mobile phone, set as true to disable the soft keyboard
+				// set as false to enable it when popover render completed
+				// see #onPopoverRenderComplete
+				disabled: this.isMobilePhone() ? true : false
+			});
+			var layout = $pt.createCellLayout('text', {
+				comp: {
+					placeholder: NTree.FILTER_PLACEHOLDER,
+					/* rightAddon: {
+						icon: 'search',
+						click: this.onFilterTextChange
+					}, */
+					enabled: {
+						depends: 'disabled',
+						when: function(model) {
+							return model.get('disabled') !== true;
+						}
+					}
+				},
+				css: {comp: 'bottom-margin-5'},
+				evt: {
+					keyUp: this.onSearchEnterKeyUp
+				}
+			});
+			model.addPostChangeListener('text', this.onFilterTextChange);
+			this.state.filterModel = model;
+			return <$pt.Components.NText model={model} layout={layout} />;
+		},
 		initExpand: function() {
 			var expandLevel = this.getComponentOption('expandLevel');
 			if (expandLevel == null) {
@@ -235,16 +284,50 @@
 			if (this.getComponentOption('maxHeight')) {
 				styles.maxHeight = this.getComponentOption('maxHeight');
 			}
-			var css = this.getComponentCSS('n-tree');
+			var css = this.getComponentCSS('n-tree'),
+				searchable = this.isSearchable();
+			if (searchable) {
+				css += ' searchable';
+			}
 			if (this.getComponentOption('border')) {
 				css += ' border';
 			}
 			return (
 				<div className={css} style={styles} ref='me'>
+					{searchable ? this.renderFilterText() : null}
 					{this.renderTopLevel()}
 					{this.renderButtons()}
 				</div>
 			);
+		},
+		onSearchEnterKeyUp: function (evt) {
+			evt.preventDefault();
+			evt.stopPropagation();
+			if (evt.keyCode !== 13) {
+				return;
+			}
+			this.onFilterTextChange(evt);
+		},
+		onFilterTextChange: function(evt) {
+			var val = evt.new || this.state.filterModel.get('text');
+			var filteredNodes = this.filterNodes(this.state.root, val);
+			this.setState({ filterText: val, root: filteredNodes });
+		},
+		filterNodes: function(node, value) {
+			if(node.children && node.children.length > 0) {
+				node.children = node.children.map(function(item) {
+					return this.filterNodes(item, value);
+				}.bind(this));
+			}
+			// console.log('[filterNodes]', node, value)
+			if(!value || node.text.toUpperCase().indexOf(value.toUpperCase()) >= 0 || (node.children && node.children.some(function(item) {
+				return item.visible !== false;
+			}))) {
+				node.visible = true;
+			} else {
+				node.visible = false;
+			}
+			return node;
 		},
 		onNodeClicked: function(node, nodeId) {
 			if (!this.isLeaf(node)) {
@@ -529,6 +612,9 @@
 			} else {
 				return NTree.ROOT_LABEL;
 			}
+		},
+		isSearchable: function() {
+			return this.getComponentOption('searchable') && !this.isViewMode();
 		},
 		isActive: function(nodeId) {
 			return this.state.activeNodes[nodeId];
