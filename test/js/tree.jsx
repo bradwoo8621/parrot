@@ -61,6 +61,7 @@
 			expandLevel: 2,
 			inactiveSlibing: true,
 			border: true,
+			searchable: true,
 			nodeClick: function(node) {
 				alert(node);
 				console.log(node);
