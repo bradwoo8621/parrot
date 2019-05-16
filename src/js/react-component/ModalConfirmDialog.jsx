@@ -83,7 +83,7 @@
 				label: this.state.options && this.state.options.confirmText ? this.state.options.confirmText : NConfirm.OK_TEXT,
 				comp: {
 					type: $pt.ComponentConstants.Button,
-					icon: NConfirm.OK_ICON,
+					icon: this.state.options && this.state.options.confirmIcon ? this.state.options.confirmIcon : NConfirm.OK_ICON,
 					style: 'primary',
 					click: this.onConfirmClicked
 				}
@@ -288,6 +288,7 @@
 						disableClose: options.disableClose,
 						disableDialogClose: options.disableDialogClose,
 						confirmText: options.confirmText,
+						confirmIcon: options.confirmIcon,
 						close: options.close,
 						messages: options.messages
 					},
